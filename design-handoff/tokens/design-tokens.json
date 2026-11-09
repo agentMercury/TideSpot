@@ -1,0 +1,175 @@
+{
+  "schema": "tidespot.design-tokens/1.0",
+  "meta": {
+    "package": "潮点 TideSpot · UI v2 设计侧落地件",
+    "version": "2.0.0",
+    "status": "用户已确认（2026-11-09）",
+    "offline": true,
+    "requires_network": false,
+    "path_base": "本文件所在 design-handoff/ 目录的上一级，即仓库根目录",
+    "unit_note": "尺寸单位统一为 dp（Android 逻辑像素）；设计稿 390×844 为 1x，1px = 1dp。颜色为 #RRGGBB，ARGB 为 0xAARRGGBB。",
+    "authority_order": [
+      "1. 工程冻结代码（ScoreBands.kt / ConfidenceBadge.kt / TideSpotStrings.kt / TideSpotTheme.kt）——色值与文案以此为准",
+      "2. 本文件——布局、字阶、间距、圆角、安全区",
+      "3. assets/ 下的 SVG/PNG——视觉基准",
+      "4. TIDESPORT_REQUIREMENTS.md v1.3 §8 / §9.6——交互与合规口径"
+    ],
+    "source_files": [
+      "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/theme/TideSpotTheme.kt",
+      "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/band/ScoreBands.kt",
+      "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/badge/ConfidenceBadge.kt",
+      "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/strings/TideSpotStrings.kt",
+      "TIDESPORT_REQUIREMENTS.md",
+      "REQUIREMENTS_REGISTER.md",
+      "PROGRESS_TRACKER.md",
+      "HANDOVER.md"
+    ]
+  },
+
+  "theme": {
+    "engine": "Material 3 · Jetpack Compose · TideSpotTheme",
+    "follow_system_dark": true,
+    "light": {
+      "primary": "#1565C0",
+      "secondary": "#00695C",
+      "tertiary": "#6A1B9A",
+      "error": "#C62828",
+      "primary_argb": "0xFF1565C0"
+    },
+    "dark": {
+      "primary": "#90CAF9",
+      "secondary": "#80CBC4",
+      "tertiary": "#CE93D8",
+      "error": "#EF9A9A",
+      "primary_argb": "0xFF90CAF9"
+    },
+    "note": "工程 TideSpotTheme 只显式定义 primary/secondary/tertiary/error，其余 colorScheme 角色为 Material3 默认值，禁止在 feature 层硬编码补齐。"
+  },
+
+  "surface": {
+    "light": { "canvas": "#EEF3F8", "card": "#FFFFFF", "sheet": "#FFFFFF", "scrim": "#99000000" },
+    "dark": { "canvas": "#0E1721", "card": "#16212E", "sheet": "#16212E", "scrim": "#B3000000" },
+    "map_overlay": "半透明白/深色浮层，位于地图之上；顶部工具浮层与底部信息条均使用 16 dp 圆角卡片"
+  },
+
+  "text": {
+    "light": { "primary": "#10243A", "secondary": "#4A6076", "tertiary": "#73879B", "on_primary": "#FFFFFF" },
+    "dark": { "primary": "#E8F0F8", "secondary": "#A9BCCE", "tertiary": "#7C93A8", "on_primary": "#0E1721" }
+  },
+
+  "border": {
+    "light": "#DCE5EE",
+    "dark": "#2A3A4C",
+    "width_dp": 1
+  },
+
+  "semantic_frozen": {
+    "rule": "以下色值为规格冻结值，由 Kotlin 单源定义。禁止写入 MaterialTheme、禁止在 XML/Compose 中重复定义、禁止按主题派生第二套色值（深色下也不得改值）。",
+    "dark_mode_rule": "深色屏的色带看起来更亮，是深色卡片底色造成的相对明度感受，不是另一套色值。实现时仍取冻结色；可读性靠保留文字标签、加深色描边（1 dp #00000033）与卡片底色对比保证，对比度目标 ≥ 4.5:1。",
+    "score_bands": [
+      { "key": "EXPLOSIVE", "min": 80, "max": 100, "label": "爆护窗口", "color": "#1B5E20", "argb": "0xFF1B5E20", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" },
+      { "key": "GREAT",     "min": 65, "max": 79,  "label": "很适合",   "color": "#43A047", "argb": "0xFF43A047", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" },
+      { "key": "OK",        "min": 50, "max": 64,  "label": "可以",     "color": "#FDD835", "argb": "0xFFFDD835", "on_color": "#263238", "on_argb": "0xFF263238" },
+      { "key": "POOR",      "min": 35, "max": 49,  "label": "较差",     "color": "#FB8C00", "argb": "0xFFFB8C00", "on_color": "#000000", "on_argb": "0xFF000000" },
+      { "key": "BAD",       "min": 0,  "max": 34,  "label": "别去",     "color": "#E53935", "argb": "0xFFE53935", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" }
+    ],
+    "score_band_source": "core/ui/.../band/ScoreBands.kt · ScoreBand 枚举；WINDOW_THRESHOLD = 80",
+    "confidence_badges": [
+      { "key": "MEASURED",       "label": "实测",   "color": "#1565C0", "argb": "0xFF1565C0", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" },
+      { "key": "SATELLITE",      "label": "卫星",   "color": "#00695C", "argb": "0xFF00695C", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" },
+      { "key": "MODEL",          "label": "模型",   "color": "#6A1B9A", "argb": "0xFF6A1B9A", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" },
+      { "key": "ESTIMATED",      "label": "估算",   "color": "#EF6C00", "argb": "0xFFEF6C00", "on_color": "#000000", "on_argb": "0xFF000000" },
+      { "key": "UNCALIBRATED",   "label": "未校正", "color": "#757575", "argb": "0xFF757575", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" },
+      { "key": "LOW_CONFIDENCE", "label": "低置信", "color": "#C62828", "argb": "0xFFC62828", "on_color": "#FFFFFF", "on_argb": "0xFFFFFFFF" }
+    ],
+    "badge_source": "core/ui/.../badge/ConfidenceBadge.kt · Kind 枚举；domain Confidence.UNAVAILABLE → UNCALIBRATED，不虚构更高置信",
+    "badge_geometry": { "corner_radius_dp": 4, "padding_horizontal_dp": 6, "padding_vertical_dp": 2, "text_role": "labelSmall" },
+    "accessibility_rule": "N-7：档位/徽标必须色块 + 文字同时出现，禁止只用颜色编码；TalkBack 读「数据置信：<label>」"
+  },
+
+  "typography": {
+    "design_family": "Noto Sans SC（中文）/ DM Sans、Geist Mono（数值）",
+    "android_fallback": "未内置字族时回退系统 sans + monospace；不得因字体缺失改变行高或换行，避免破坏标注",
+    "scale": [
+      { "role": "screen_title",     "design": "Bold 20", "m3_role_suggestion": "titleLarge",  "use": "点位名称 / 卡片主标题" },
+      { "role": "section_title",    "design": "Bold 16", "m3_role_suggestion": "titleMedium", "use": "设置页分区标题 / Sheet 标题" },
+      { "role": "card_title",       "design": "Bold 14", "m3_role_suggestion": "titleSmall",  "use": "卡片小标题 / 指标名" },
+      { "role": "body",             "design": "Regular 13", "m3_role_suggestion": "bodyMedium", "use": "正文、标签、数值说明" },
+      { "role": "numeric",          "design": "Medium 13 / 等宽", "m3_role_suggestion": "bodyMedium + FontFamily.Monospace", "use": "经纬度、分数、潮高、dh/dt、时间" },
+      { "role": "caption",          "design": "Regular 10", "m3_role_suggestion": "labelSmall", "use": "来源时间、署名、免责说明" },
+      { "role": "chip",             "design": "Medium 12", "m3_role_suggestion": "labelLarge",  "use": "DaySelector Chip / Tab / FilterChip" }
+    ],
+    "line_height_note": "辅助文案行高 12 dp；多行明细（ΠV / 免责）行高 15 dp；不得用 ellipsis 截断免责原文"
+  },
+
+  "spacing": {
+    "scale_dp": [4, 8, 12, 16, 24],
+    "screen_horizontal_margin_dp": 12,
+    "primary_card_width_dp": 366,
+    "secondary_content_width_dp": 358,
+    "secondary_content_inset_dp": 16,
+    "card_padding_dp": 12,
+    "section_gap_dp": 16,
+    "component_gap_dp": 8
+  },
+
+  "radius": {
+    "card_dp": 16,
+    "button_dp": 12,
+    "chip_dp": 18,
+    "badge_dp": 4,
+    "bottom_sheet_top_dp": 20,
+    "dialog_dp": 20,
+    "app_icon_outer_dp": 44,
+    "note": "badge_dp=4 来自 ConfidenceBadge.kt RoundedCornerShape(4.dp)，勿改；bottom_sheet_top_dp / dialog_dp 为设计建议值，工程尚未定义"
+  },
+
+  "layout": {
+    "design_viewport": { "width_dp": 390, "height_dp": 844, "density": "1x" },
+    "navigation_model": "地图优先（无通用底部 Tab Bar）；顶部浮层 + 准星 + 底部信息条 + Top10 入口",
+    "map_overlay": {
+      "top_control_y_min_dp": 68,
+      "top_control_height_dp": 46,
+      "top_control_button_size_dp": 44,
+      "search_field_width_dp": 206,
+      "crosshair_size_dp": 64,
+      "crosshair_is_single_source_of_truth": true,
+      "crosshair_contract": "F-1.3：准星是唯一选点真源；所有后续请求、信息条、收藏、详情均以准星落点坐标为准",
+      "info_bar_width_dp": 366,
+      "info_bar_height_dp": 200,
+      "top10_entry_width_dp": 366,
+      "top10_entry_height_dp": 48
+    },
+    "detail": {
+      "tab_count": 5,
+      "tab_order": ["风浪", "天气", "钓鱼指数", "水质", "潮流"],
+      "tab_order_inland": ["湖面风与水温", "天气", "钓鱼指数", "水质", "水位（无潮汐）"],
+      "tab_order_land": ["风浪（估算）", "天气", "钓鱼指数", "水质（估算）", "潮流（不可用）"],
+      "tab_bar_height_dp": 40,
+      "day_selector_height_dp": 36,
+      "day_selector_range": "今天 … +N，N 由设置 7/10 天决定（默认 7 天：今天 +1…+6；10 天：+9）",
+      "hour_chart_card_height_dp": 210,
+      "score_main_card_height_dp": 152
+    },
+    "bottom_sheet": { "top10_height_dp": 240, "disclaimer_height_dp": "按 5 条内容自适应，需可滚动" }
+  },
+
+  "safe_area": {
+    "target": "Android 16 edge-to-edge / 荣耀 Win RT / 无 GMS（单机口径）",
+    "top_status_bar_placeholder_dp": 58,
+    "top_overlay_start_min_dp": 68,
+    "bottom_gesture_bar_reserve_min_dp": 24,
+    "implementation_note": "占位值仅用于设计稿表现；实现必须走 WindowInsets.statusBars / navigationBars，不得写死 58/24 到代码",
+    "must_pad_components": ["底部信息条", "Top10 入口", "BottomSheet 内容底部", "对话框底部按钮", "免责 Sheet 末条"]
+  },
+
+  "app_icon_palette": {
+    "gradient_start": "#1976D2",
+    "gradient_end": "#0D47A1",
+    "tide_line": "#80CBC4",
+    "center_dot": "#80CBC4",
+    "foreground_white": "#FFFFFF",
+    "secondary": "#00695C",
+    "see": "icon/app-icon-spec.md 与 icon/*.svg"
+  }
+}

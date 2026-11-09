@@ -1,0 +1,305 @@
+{
+  "schema": "tidespot.components/1.0",
+  "meta": {
+    "version": "2.0.0",
+    "status": "用户已确认（2026-11-09）",
+    "offline": true,
+    "how_to_use": "按 id 索引组件；每个 states[] 是必须实现/覆盖的视觉状态。copy 字段指向 copy/copy.json 的键。未标注『工程已有』的均为设计侧规定，实现时不得删减状态。",
+    "authority": "色值查 tokens/design-tokens.json；文案查 copy/copy.json；屏内位置查 screens/screens.json；工程落点查 mapping/design-to-code.json",
+    "a11y_global": [
+      "N-7：每张图表必须有等价数值表，TalkBack 可读",
+      "档位与徽标必须色块 + 文字同时出现",
+      "所有可点元素命中区 ≥ 48 dp",
+      "免责原文不得省略、改写或用 ellipsis 截断"
+    ]
+  },
+  "components": [
+    {
+      "id": "C01", "name": "准星 Crosshair", "spec_ref": "F-1.3 / §8.1",
+      "source_hint": "feature/map/.../crosshair/CrosshairStateMachine.kt",
+      "geometry": "64 × 64 dp，屏幕视觉中心；圆环 + 四向刻度 + 中心点",
+      "contract": "准星是唯一选点真源。所有请求、信息条、收藏、详情页都以准星落点坐标为准，禁止把地图中心点击点或搜索结果直接当作选点。",
+      "states": [
+        { "id": "idle", "trigger": "进入地图 / 定位完成", "visual": "静态圆环 + 中心点，主色 #1565C0（深 #90CAF9）", "copy": null },
+        { "id": "dragging", "trigger": "拖动地图", "visual": "圆环放大 1.08×、中心点保持不动、刻度加粗；不显示结果卡片", "copy": null, "notes": "N-1 准星拖动无掉帧，避免在拖动中发起网络请求" },
+        { "id": "settled", "trigger": "停止拖动 / 长按落点", "visual": "圆环回弹到 1.0×，浮出准星信息条 C03", "copy": "design_proposed.resolving" },
+        { "id": "locating", "trigger": "点击定位按钮", "visual": "圆环显示进度弧，中心点脉动", "copy": null },
+        { "id": "permission_denied", "trigger": "定位权限被拒", "visual": "圆环保持可用（地图仍可手动选点），不弹阻断式遮罩", "copy": "design_proposed.location_denied" }
+      ],
+      "dark": "圆环用 dark.primary，中心点保持 #80CBC4",
+      "a11y": "contentDescription = 选点准星 + 当前经纬度"
+    },
+    {
+      "id": "C02", "name": "顶部工具浮层 TopControlBar", "spec_ref": "§8.1",
+      "geometry": "y ≥ 68 dp 起；高 46 dp；搜索框 206 dp；定位 / 收藏 / 设置各 44 × 46 dp；行内间距 8 dp",
+      "states": [
+        { "id": "default", "trigger": "常态", "visual": "白色卡片浮层，16 dp 圆角，轻投影", "copy": null },
+        { "id": "search_focused", "trigger": "搜索框获焦", "visual": "搜索框扩展并上推浮层，展开 C20 搜索面板", "copy": null },
+        { "id": "offline", "trigger": "无网络", "visual": "图标不变灰；由 C17 顶部条统一提示，避免多处重复告警", "copy": null }
+      ],
+      "dark": "卡片 #16212E，图标 dark.primary",
+      "a11y": "四个入口分别带 contentDescription"
+    },
+    {
+      "id": "C03", "name": "底部选点信息条 PointInfoBar", "spec_ref": "F-1.3 / §5.8 / §8.1",
+      "source_hint": "feature/map/.../infobar/InfoBarState.kt",
+      "geometry": "366 × 200 dp，卡片 16 dp 圆角，底部预留手势条 ≥ 24 dp",
+      "content_order": ["经纬度（等宽）", "地名（逆地理结果）", "水体类型", "置信徽标 C12", "[确定]", "[收藏]"],
+      "states": [
+        { "id": "resolving", "trigger": "准星落点后等待逆地理", "visual": "地名位显示骨架条，按钮不可点", "copy": "design_proposed.resolving" },
+        { "id": "resolved", "trigger": "逆地理成功", "visual": "显示优先级最高的地名 + plusCode 兜底", "copy": null },
+        { "id": "reverse_geo_off", "trigger": "设置关闭逆地理总开关", "visual": "仅显示坐标文本 + 本地 plusCode，其余功能不受损", "copy": "design_proposed.reverse_geo_off" },
+        { "id": "unknown_waterbody", "trigger": "水体类型待判定", "visual": "水体类型位显示提示徽标，不禁用确定按钮", "copy": "TideSpotStrings.NOTICE_UNKNOWN" },
+        { "id": "land_point", "trigger": "判定为陆地点", "visual": "顶部加一条说明带，水质/潮流标注估算或不可用", "copy": "TideSpotStrings.NOTICE_LAND" },
+        { "id": "all_geocoder_failed", "trigger": "RG-A/RG-B 全链失败", "visual": "落 RG-D plusCode，信息条必须非空，禁止空白或报错弹窗", "copy": null }
+      ],
+      "dark": "卡片 #16212E，弱文字 #7C93A8",
+      "a11y": "经纬度可被 TalkBack 逐字读出"
+    },
+    {
+      "id": "C04", "name": "确认收藏对话框 ConfirmFavoriteDialog", "spec_ref": "M6 / OPT-M5-07 / CHG-16",
+      "status": "v2 新增，替代 v1 的一键收藏",
+      "geometry": "宽 338 dp，圆角 20 dp，居中；遮罩 #99000000；底部按钮距手势条 ≥ 24 dp",
+      "content_order": ["标题", "预填逆地理名称（可编辑）", "点位坐标摘要", "[取消]", "[确认收藏]"],
+      "states": [
+        { "id": "prefilled", "trigger": "点击 [收藏] 且地名可用", "visual": "名称框预填逆地理名，光标不自动聚焦", "copy": "design_proposed.favorite_dialog_title" },
+        { "id": "empty_name", "trigger": "逆地理不可用", "visual": "名称框为空并显示坐标作为 placeholder", "copy": "design_proposed.favorite_name_hint" },
+        { "id": "editing", "trigger": "用户改名称", "visual": "输入框获焦描边 primary，确认按钮保持可用", "copy": null },
+        { "id": "confirmed", "trigger": "确认收藏", "visual": "对话框消失，收藏入口图标切换为已收藏态", "copy": null }
+      ],
+      "dark": "对话框 #16212E，遮罩 #B3000000",
+      "a11y": "对话框需 focusable + 明确的取消/确认读法",
+      "notes": "对话框中不要遮挡准星信息条 C03；v2 校样已把对话框下移到 y=386 避免压住信息条。"
+    },
+    {
+      "id": "C05", "name": "Top10 BottomSheet", "spec_ref": "CHG-16 / §8.1",
+      "status": "v2 变更：由整屏改为 BottomSheet",
+      "geometry": "390 × 240 dp，顶角 20 dp，遮罩可点关闭；内容底部预留 ≥ 24 dp",
+      "content_order": ["拖拽把手", "标题 + 范围切换（本点 / 全部收藏）", "排序公式说明", "Top10 列表（窗口时段 / 分数档 / 点位）", "免责入口"],
+      "rank_formula": "rank(W) = 0.62 × 峰值 + 0.23 × 均值 + 1.4 × min(时长, 4)",
+      "states": [
+        { "id": "this_spot", "trigger": "默认", "visual": "本点窗口列表，选中范围 Chip", "copy": "design_proposed.top10_this_spot" },
+        { "id": "all_favorites", "trigger": "切换范围", "visual": "跨点聚合列表，每行带点位名", "copy": "design_proposed.top10_all" },
+        { "id": "empty", "trigger": "无 ≥60 分窗口", "visual": "空态插图位 + 说明；**禁止 ≥60 兜底造假窗口**", "copy": "design_proposed.top10_empty" },
+        { "id": "expanded", "trigger": "上拖", "visual": "可滚到全量 24 行数值表", "copy": null }
+      ],
+      "dark": "Sheet #16212E",
+      "a11y": "列表每行可读出时间与分数档位文字"
+    },
+    {
+      "id": "C06", "name": "免责声明 BottomSheet", "spec_ref": "§9.6 / D11 / N-5 / N-6",
+      "status": "v2 变更：常驻入口 + 恒 5 条 Sheet",
+      "geometry": "高度按 5 条内容自适应，可滚动；顶角 20 dp；末条下方预留 ≥ 24 dp",
+      "content_order": ["标题「免责声明」", "条款 1..5（顺序固定）", "数据来源署名"],
+      "states": [
+        { "id": "collapsed_entry", "trigger": "常态", "visual": "详情页底部 366 × 56 dp 常驻入口条", "copy": "TideSpotStrings.DISCLAIMER_ENTRY" },
+        { "id": "open", "trigger": "点击常驻入口", "visual": "Sheet 展开，5 条原文完整展示，禁止折叠/省略", "copy": "TideSpotStrings.DISCLAIMER_ITEMS" }
+      ],
+      "dark": "Sheet #16212E；入口条见 assets/screen-04-dark-score.svg",
+      "a11y": "5 条逐条可读；不得用 ellipsis",
+      "red_line": "恒 5 条，第 5 条为 M6 新增「潮汐校正 / 现场校潮」；顺序 1..5 见 copy/copy.json"
+    },
+    {
+      "id": "C07", "name": "DaySelector", "spec_ref": "§8.2-1 / §8.1",
+      "source_hint": "core/ui/.../selector/DaySelector.kt",
+      "geometry": "358 × 36 dp，横向滚动 Chip；Chip 圆角 18 dp",
+      "content_order": ["今天 MM-DD", "+1 … +N", "右侧：源更新 HH:mm · 本机拉取 HH:mm"],
+      "states": [
+        { "id": "selected", "trigger": "当前选中日", "visual": "Chip 填充 primary，文字 onPrimary", "copy": null },
+        { "id": "unselected", "trigger": "其他日", "visual": "Chip 描边 #DCE5EE，文字 secondary", "copy": null },
+        { "id": "range_7", "trigger": "设置 = 7 天", "visual": "今天 +1…+6", "copy": null },
+        { "id": "range_10", "trigger": "设置 = 10 天", "visual": "今天 +1…+9", "copy": null },
+        { "id": "stale", "trigger": "源更新 / 本机拉取时间差超阈值", "visual": "时间行变色并交由 C17 统一提示", "copy": null }
+      ],
+      "dark": "Chip 选中态用 dark.primary，文字深色",
+      "a11y": "每个 Chip contentDescription = 完整日期"
+    },
+    {
+      "id": "C08", "name": "五维 TabBar", "spec_ref": "§8.1 / F-1.6 / F-1.7",
+      "source_hint": "core/ui/.../titles/WaterBodyTabTitles.kt + TideSpotStrings.TAB_*",
+      "geometry": "358 × 40 dp；5 等分；选中项 2 dp 下划线 primary",
+      "states": [
+        { "id": "sea", "trigger": "海洋/近海点位", "visual": "风浪 | 天气 | 钓鱼指数 | 水质 | 潮流", "copy": "tab.sea" },
+        { "id": "inland", "trigger": "内陆水体", "visual": "湖面风与水温 | 天气 | 钓鱼指数 | 水质 | 水位（无潮汐）", "copy": "tab.inland" },
+        { "id": "land", "trigger": "陆地点", "visual": "风浪（估算） | 天气 | 钓鱼指数 | 水质（估算） | 潮流（不可用）", "copy": "tab.land" },
+        { "id": "unavailable_tab", "trigger": "潮流（不可用）", "visual": "Tab 可选中但内容区显示降级说明，不隐藏 Tab、不弹错误", "copy": null }
+      ],
+      "dark": "下划线 dark.primary",
+      "a11y": "Tab 文案必须与 WaterBodyTabTitles 逐字一致",
+      "notes": "Tab 切换不重算（N-2），240 h 全维一次入库。"
+    },
+    {
+      "id": "C09", "name": "HourChart ⇄ 数值表", "spec_ref": "§8.2-2 / N-7",
+      "source_hint": "core/ui/.../chart/HourChart.kt + ChartMath.kt",
+      "geometry": "卡片 366 × 210 dp；24 点横轴；y 轴自适应带单位",
+      "states": [
+        { "id": "chart_default", "trigger": "默认", "visual": "指数 Tab 用柱 + 五档色带；其余 Tab 用折线/面积", "copy": null },
+        { "id": "null_gap", "trigger": "某小时数据为 null", "visual": "**断线不连线**，禁止画成 0；轴上留空位并标灰", "copy": null },
+        { "id": "window_overlay", "trigger": "指数 Tab 且分数 ≥ 80", "visual": "对应段叠加「窗口」横条", "copy": "design_proposed.window_bar" },
+        { "id": "hour_selected", "trigger": "点选某小时", "visual": "浮层显示该小时数值；指数 Tab 打开 C11 因子分解", "copy": null },
+        { "id": "table_mode", "trigger": "切换到数值表", "visual": "24 行等价数值表（时间 / 值 / 档位文字 / 置信）", "copy": null }
+      ],
+      "dark": "网格线 #2A3A4C；冻结色带不改值",
+      "a11y": "N-7 图表必须有等价数值表；档位同时有文字"
+    },
+    {
+      "id": "C10", "name": "今日指数主卡 ScoreMainCard", "spec_ref": "§6.3 / §8.2-2",
+      "geometry": "366 × 152 dp",
+      "content_order": ["0–100 整数分（大号等宽）", "档位色块 + 文字", "最佳窗口时间段", "置信徽标 C12", "否决/降级摘要"],
+      "states": [
+        { "id": "normal", "trigger": "有效评分", "visual": "档位色块用冻结色，色块内文字用对应 on_color", "copy": "band.labels" },
+        { "id": "vetoed", "trigger": "触发 ΠV 否决", "visual": "分数下降并展示结构化 VetoCode，禁止 parse 文案", "copy": null },
+        { "id": "degraded", "trigger": "因子剔除后有效权重 < 0.6", "visual": "显示「低置信」徽标", "copy": "TideSpotStrings.BADGE_LOW_CONFIDENCE" },
+        { "id": "no_data", "trigger": "整窗无数据", "visual": "显示空态而非 0 分", "copy": null }
+      ],
+      "dark": "卡片 #16212E；色块仍取冻结色",
+      "a11y": "分数 + 档位文字一起朗读"
+    },
+    {
+      "id": "C11", "name": "FactorBreakdown 因子分解", "spec_ref": "F-3.4 / §8.2-3",
+      "source_hint": "core/ui/.../breakdown/FactorBreakdown.kt",
+      "geometry": "点选小时后展开的面板；多行文本行高 15 dp",
+      "content_order": ["子分行：名称 / 权重 / 得分 / 贡献条", "ΠV 明细：触发了哪些、乘子值", "原始输入：Tw、DO_p、P、ΔP3、ΔP24、风/阵风、雨、云、WMO、浪、潮位、dh/dt、流速、月龄、照明、中天"],
+      "states": [
+        { "id": "collapsed", "trigger": "默认", "visual": "仅显示入口提示", "copy": null },
+        { "id": "expanded", "trigger": "点选小时", "visual": "显示子分 + ΠV + 原始输入三段，标签列左对齐、数值列等宽右对齐", "copy": null },
+        { "id": "veto_triggered", "trigger": "ΠV 命中", "visual": "触发行加深色底 + 乘子值标红；V 单调不升", "copy": null }
+      ],
+      "dark": "数值列保持等宽",
+      "a11y": "每行可读出「名称 权重 得分」",
+      "notes": "v1 校样修正过 ΠV 明细对齐与 tooltip 换行，落地时保持多行文案 + lineHeight 15。"
+    },
+    {
+      "id": "C12", "name": "ConfidenceBadge", "spec_ref": "§8.2-4 / N-7",
+      "source_hint": "core/ui/.../badge/ConfidenceBadge.kt",
+      "geometry": "圆角 4 dp；padding 6 × 2 dp；labelSmall",
+      "states_key": "六档见 tokens/design-tokens.json → semantic_frozen.confidence_badges",
+      "states": [
+        { "id": "MEASURED", "visual": "#1565C0 / 实测" }, { "id": "SATELLITE", "visual": "#00695C / 卫星" },
+        { "id": "MODEL", "visual": "#6A1B9A / 模型" }, { "id": "ESTIMATED", "visual": "#EF6C00 / 估算" },
+        { "id": "UNCALIBRATED", "visual": "#757575 / 未校正" }, { "id": "LOW_CONFIDENCE", "visual": "#C62828 / 低置信" }
+      ],
+      "red_line": "M6 已动态接线，禁止硬编码 ESTIMATED；UNAVAILABLE → UNCALIBRATED",
+      "a11y": "contentDescription = 数据置信：<label>"
+    },
+    {
+      "id": "C13", "name": "TideChart 潮位曲线", "spec_ref": "§8.1 / §8.2 / §6.2b",
+      "source_hint": "feature/detail/.../TideChartDerivations.kt + core/ui/.../chart/HourChart.kt",
+      "geometry": "图表卡内；主曲线 + dh/dt 副轴",
+      "content_order": ["潮高曲线", "dh/dt 副轴", "高低潮标记", "涨 / 退箭头", "校正前后对照", "[校准] 入口"],
+      "states": [
+        { "id": "sea", "trigger": "海洋点位", "visual": "完整潮位曲线 + 副轴 + 高低潮标记", "copy": null },
+        { "id": "inland", "trigger": "内陆水体", "visual": "切为水位曲线，隐藏潮汐专属标记；Tab 标题「水位（无潮汐）」", "copy": "tab.inland" },
+        { "id": "calibrated", "trigger": "校正生效", "visual": "叠加校正后曲线并以图例区分，显示 lag/gain/offset/r/样本数", "copy": null },
+        { "id": "uncalibrated", "trigger": "无参考源", "visual": "显示「未校正」徽标，提供 [校准] 入口；禁止假装已校正", "copy": "TideSpotStrings.BADGE_UNCALIBRATED" },
+        { "id": "no_tide_data", "trigger": "潮流（不可用）", "visual": "内容区降级说明，不画 0 值曲线", "copy": null }
+      ],
+      "dark": "曲线用 dark.primary / dark.secondary",
+      "a11y": "高低潮时刻与 dh/dt 数值需可读"
+    },
+    {
+      "id": "C14", "name": "CalibrationPanel 校准面板 / 现场校潮", "spec_ref": "§8.2-5 / §9.6 第 5 条",
+      "geometry": "由 [校准] 入口展开的面板或 Sheet",
+      "content_order": ["校正状态：lag / gain / offset / r / 样本数 / 参考源", "无参考源时的现场校潮流程：选时间 + 类型 → 落 manual_observation → 重算 lag/offset"],
+      "states": [
+        { "id": "status", "trigger": "有参考源", "visual": "状态参数列表 + 参考源署名", "copy": null },
+        { "id": "manual_entry", "trigger": "无参考源", "visual": "时间选择器 + 类型选择 + 记录按钮", "copy": "design_proposed.record_high_tide" },
+        { "id": "recorded", "trigger": "记录完成", "visual": "重算结果显示，并保留免责第 5 条常驻入口", "copy": "TideSpotStrings.DISCLAIMER_TIDE_CORRECTION" }
+      ],
+      "dark": "同 Sheet 规范",
+      "a11y": "表单项逐一可读"
+    },
+    {
+      "id": "C15", "name": "水质 2×2 指标卡", "spec_ref": "F-1.7 / §9.6",
+      "geometry": "2 列 × 2 行；单卡高度 ≥ 112 dp，clipsContent = false",
+      "states": [
+        { "id": "measured", "visual": "指标名 / 数值 / 单位 / 置信徽标" },
+        { "id": "estimated", "visual": "数值前不加「实测」字样，显示「估算」徽标", "copy": "TideSpotStrings.BADGE_ESTIMATED" },
+        { "id": "unavailable", "visual": "显示「—」而非 0，卡片保留高度", "copy": null }
+      ],
+      "notes": "v1 校样修复过首行徽标裁切：卡高必须 ≥ 112 dp 且不裁切内容。免责第 4 条「多数点位为模型估算值，非实测」必须出现在该 Tab 底部。",
+      "dark": "卡片 #16212E",
+      "a11y": "数值 + 单位 + 置信一起朗读"
+    },
+    {
+      "id": "C16", "name": "FilterChip / Switch（设置）", "spec_ref": "CHG-16 / SettingsScreen 六版块",
+      "source_hint": "feature/settings/.../SettingsScreen.kt",
+      "geometry": "FilterChip 圆角 18 dp（M3 默认）；Switch 右对齐；行高按 M3",
+      "sections": ["显示", "数据与网络", "用例 · 物种 · 权重（占位）", "API Key（可选，占位）", "开源许可与数据署名", "隐私披露（逐源）"],
+      "states": [
+        { "id": "chip_selected", "visual": "填充 primary", "copy": null },
+        { "id": "chip_unselected", "visual": "描边框", "copy": null },
+        { "id": "switch_on", "visual": "轨道 primary", "copy": null },
+        { "id": "switch_off", "visual": "轨道描边", "copy": null },
+        { "id": "placeholder", "visual": "占位版块用弱文字说明，不做可点假入口", "copy": "design_proposed.placeholder_v11" }
+      ],
+      "red_line": "隐私逐源披露必须列出「本机将向以下服务发送你选点的经纬度」，并提供逆地理总开关；隐私政策不得声明「零数据传输」。",
+      "dark": "跟随 M3",
+      "a11y": "Chip / Switch 现有 semantics 描述保持不变"
+    },
+    {
+      "id": "C17", "name": "离线陈旧条 OfflineStaleBar", "spec_ref": "M6 / §7.3 TTL",
+      "geometry": "详情页顶部或 DaySelector 下方，高 38 dp；深色稿见 assets/screen-04-dark-score.svg",
+      "states": [
+        { "id": "offline", "trigger": "网络不可用", "visual": "窄条 + 图标 + 说明，不用阻断式弹窗", "copy": "design_proposed.offline" },
+        { "id": "stale", "trigger": "缓存超过 TTL", "visual": "显示上次成功拉取时刻", "copy": "design_proposed.stale" },
+        { "id": "fresh", "trigger": "数据新鲜", "visual": "不显示", "copy": null }
+      ],
+      "dark": "深色调见 assets/dark-adaptation.svg",
+      "a11y": "提示条不抢焦点"
+    },
+    {
+      "id": "C18", "name": "分维降级卡 DimensionDegradedCard", "spec_ref": "M6 / §6.7 / §12",
+      "geometry": "详情内容区插入，高 80 dp；深色稿见 assets/screen-04-dark-score.svg",
+      "states": [
+        { "id": "partial", "trigger": "部分维度源不可用", "visual": "列出缺失维度 + 已按有效权重重算说明", "copy": "design_proposed.dimension_degraded" },
+        { "id": "all_missing", "trigger": "全维度不可用", "visual": "空态 + 重试入口，不显示 0 分", "copy": null }
+      ],
+      "red_line": "海洋维度 null 不得产生 wave = 0；vetoReason 空时为空列表而非 null/空串。",
+      "dark": "卡片 #16212E",
+      "a11y": "缺失维度逐项可读"
+    },
+    {
+      "id": "C19", "name": "收藏入口 / 收藏列表", "spec_ref": "§8.1",
+      "source_hint": "feature/favorites/.../FavoritesScreen.kt + FavoritesSortLogic.kt",
+      "states": [
+        { "id": "empty", "visual": "空态说明 + 引导回地图选点", "copy": null },
+        { "id": "list", "visual": "点位名 / 水体类型 / 最佳窗口摘要 / 置信徽标", "copy": null },
+        { "id": "favorited", "visual": "地图收藏入口图标切换为已收藏态", "copy": null }
+      ],
+      "dark": "列表卡片 #16212E",
+      "a11y": "每行可读出点位与窗口"
+    },
+    {
+      "id": "C20", "name": "SearchPanel 正地理搜索", "spec_ref": "§5.9",
+      "source_hint": "feature/map/.../search/SearchPanel.kt",
+      "states": [
+        { "id": "idle", "visual": "收起", "copy": null },
+        { "id": "typing", "visual": "输入中显示建议列表", "copy": null },
+        { "id": "result_selected", "trigger": "选中搜索结果", "visual": "地图移动到结果并把准星落到该坐标（仍走 C01 真源）", "copy": null },
+        { "id": "no_result", "visual": "空态，不弹错误", "copy": null }
+      ],
+      "dark": "面板 #16212E",
+      "a11y": "建议项可读"
+    },
+    {
+      "id": "C21", "name": "地图署名 MapAttribution", "spec_ref": "F-3.7 / N-6",
+      "geometry": "底图右下，10 dp 弱文字，不遮挡信息条",
+      "states": [
+        { "id": "default", "visual": "Map data: OpenStreetMap contributors · CARTO Positron · Open-Meteo", "copy": "attribution.map" }
+      ],
+      "dark": "弱文字 #7C93A8",
+      "a11y": "可不聚焦，但需在数值/来源表可查"
+    },
+    {
+      "id": "C22", "name": "来源与更新时间行", "spec_ref": "F-3.7 / §8.2-1",
+      "geometry": "每 Tab 底部；358 × 13 dp；10 dp 弱文字",
+      "states": [
+        { "id": "default", "visual": "模型名 · 网格分辨率 · UTC 更新时刻 · 本机拉取时刻", "copy": "attribution.model" }
+      ],
+      "red_line": "文案由 §5 契约生成，禁止硬编码错误来源；不得省略本机拉取时刻。",
+      "dark": "弱文字 #7C93A8",
+      "a11y": "可读出完整时间"
+    }
+  ]
+}

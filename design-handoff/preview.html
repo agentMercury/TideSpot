@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>潮点 TideSpot · UI v2 设计侧落地件（离线预览）</title>
+<style>
+  :root { --bg:#EEF3F8; --card:#FFFFFF; --ink:#10243A; --sub:#4A6076; --weak:#73879B; --line:#DCE5EE; --primary:#1565C0; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:32px; background:var(--bg); color:var(--ink);
+         font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif; }
+  header { max-width:1400px; margin:0 auto 28px; }
+  h1 { font-size:26px; margin:0 0 8px; }
+  .meta { color:var(--sub); font-size:13px; line-height:1.8; }
+  .tag { display:inline-block; background:var(--primary); color:#fff; border-radius:6px;
+         padding:3px 10px; font-size:12px; margin-right:8px; }
+  section { max-width:1400px; margin:0 auto 34px; background:var(--card); border:1px solid var(--line);
+            border-radius:16px; padding:22px; }
+  h2 { font-size:17px; margin:0 0 6px; }
+  .desc { color:var(--weak); font-size:12px; margin:0 0 18px; line-height:1.7; }
+  .grid { display:grid; gap:20px; }
+  .g4 { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+  .g3 { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+  figure { margin:0; }
+  figure img { width:100%; height:auto; display:block; background:#F7FAFC;
+               border:1px solid var(--line); border-radius:12px; }
+  figcaption { font-size:12px; color:var(--sub); margin-top:8px; line-height:1.6; }
+  figcaption b { color:var(--ink); }
+  .full img { border-radius:12px; }
+  .note { background:#F7FAFC; border-left:3px solid var(--primary); border-radius:8px;
+          padding:12px 16px; font-size:12px; color:var(--sub); line-height:1.8; margin-top:18px; }
+  a { color:var(--primary); }
+  footer { max-width:1400px; margin:0 auto; color:var(--weak); font-size:12px; line-height:1.8; padding-bottom:40px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>潮点 TideSpot · UI v2 设计侧落地件</h1>
+  <div class="meta">
+    <span class="tag">v2.0.0 · 已确认</span>
+    单文件离线预览 · 2026-11-09 · 390 × 844 dp / Android 16 edge-to-edge<br>
+    本页所有资源均为相对路径的本地文件，<b>无需联网、无需 Ardot 画布</b>。入口文件：<a href="INDEX.md">INDEX.md</a> · <a href="manifest.json">manifest.json</a>
+  </div>
+</header>
+
+<section>
+  <h2>00 · 整板效果图（用户已确认）</h2>
+  <p class="desc">v2 效果提案整板，含 APP 图标系统、视觉基调、关键屏与深色对照。</p>
+  <figure class="full"><img src="assets/board-v2.png" alt="v2 整板效果图"><figcaption><b>assets/board-v2.png</b> · 1700 × 3025</figcaption></figure>
+</section>
+
+<section>
+  <h2>01 · 已确认像素稿（✅ 视觉基准）</h2>
+  <p class="desc">这 4 张是用户确认过的 v2 关键屏，配色、圆角、字阶一律以它们为准。</p>
+  <div class="grid g4">
+    <figure><img src="assets/screen-01-map.svg" alt="S01 地图选点"><figcaption><b>S01 地图选点</b><br>准星 + 顶部浮层 + 信息条 + 确认收藏对话框</figcaption></figure>
+    <figure><img src="assets/screen-02-score.svg" alt="S02 钓鱼指数"><figcaption><b>S02 钓鱼指数</b><br>五维 Tab + 主卡 + 图表 + Top10 Sheet</figcaption></figure>
+    <figure><img src="assets/screen-03-settings.svg" alt="S09 设置与隐私"><figcaption><b>S09 设置与隐私</b><br>六版块 + FilterChip / Switch</figcaption></figure>
+    <figure><img src="assets/screen-04-dark-score.svg" alt="DV01 深色钓鱼指数"><figcaption><b>DV01 深色 · 钓鱼指数</b><br>深色 token + 免责常驻入口</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>02 · 补充屏结构稿（🔶 按规格推导）</h2>
+  <p class="desc">S03–S08 复用 S02 屏骨架，按 <a href="screens/screens.json">screens.json</a> 的层结构推导，用于表达层级与占位。视觉细节以 01 的基准屏 + <a href="tokens/design-tokens.json">design-tokens.json</a> 为准。</p>
+  <div class="grid g4">
+    <figure><img src="assets/derived/S03-factor-breakdown.svg" alt="S03 因子分解"><figcaption><b>S03 因子分解</b><br>子分 / ΠV / 原始输入 16 项</figcaption></figure>
+    <figure><img src="assets/derived/S04-inland-wave.svg" alt="S04 湖面风与水温"><figcaption><b>S04 湖面风与水温</b><br>内陆降级 + 分维降级卡</figcaption></figure>
+    <figure><img src="assets/derived/S05-weather.svg" alt="S05 天气"><figcaption><b>S05 天气</b><br>曲线 + 安全摘要</figcaption></figure>
+    <figure><img src="assets/derived/S06-water-quality.svg" alt="S06 水质"><figcaption><b>S06 水质</b><br>2×2 指标卡（高 ≥112 dp）</figcaption></figure>
+    <figure><img src="assets/derived/S07-tide.svg" alt="S07 潮流"><figcaption><b>S07 潮流</b><br>潮高 + dh/dt + 校正对照 + 现场校潮</figcaption></figure>
+    <figure><img src="assets/derived/S08-favorites.svg" alt="S08 收藏列表"><figcaption><b>S08 收藏列表</b><br>点位 + 最佳窗口 + 档位</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>03 · APP 图标系统</h2>
+  <p class="desc">母题＝准星（F-1.3 唯一选点真源）× 潮位曲线。规格见 <a href="icon/app-icon-spec.md">app-icon-spec.md</a>。</p>
+  <div class="grid g4">
+    <figure><img src="icon/tidespot-icon-preview.svg" alt="图标预览"><figcaption><b>合成预览</b> · 192 × 192 / 圆角 44</figcaption></figure>
+    <figure><img src="icon/tidespot-icon-background.svg" alt="背景层"><figcaption><b>background</b> · 108 dp 蓝渐变</figcaption></figure>
+    <figure><img src="icon/tidespot-icon-foreground.svg" alt="前景层"><figcaption><b>foreground</b> · 108 dp / 72 dp 安全区</figcaption></figure>
+    <figure><img src="icon/tidespot-icon-monochrome.svg" alt="单色图标"><figcaption><b>monochrome</b> · 24 dp 通知小图标</figcaption></figure>
+  </div>
+  <figure class="full" style="margin-top:20px"><img src="assets/icon-system.svg" alt="图标系统效果稿"><figcaption><b>assets/icon-system.svg</b> · 用户已确认的图标系统效果稿（含变体与 48 dp 桌面校验）</figcaption></figure>
+</section>
+
+<section>
+  <h2>04 · 规范卡</h2>
+  <div class="grid g3">
+    <figure><img src="assets/visual-baseline.svg" alt="视觉基调"><figcaption><b>视觉基调</b> · 主题 token / 五档色带 / 六徽标 / 字阶</figcaption></figure>
+    <figure><img src="assets/dark-adaptation.svg" alt="深色与边缘适配"><figcaption><b>深色与边缘适配</b> · 离线陈旧 / 分维降级 / 安全区</figcaption></figure>
+  </div>
+  <div class="note">
+    <b>给其他 agent：</b>本目录自包含、纯本地文件。请先读 <a href="INDEX.md">INDEX.md</a> 与 <a href="manifest.json">manifest.json</a>；
+    色值查 <a href="tokens/design-tokens.json">tokens</a>、文案查 <a href="copy/copy.json">copy</a>、
+    屏结构查 <a href="screens/screens.json">screens</a>、工程落点查 <a href="mapping/design-to-code.json">mapping</a>。
+    <b>动手前务必先看 mapping 的 conflicts</b>（底部 NavigationBar 与地图优先导航的冲突未决策）。
+  </div>
+</section>
+
+<footer>
+  潮点 TideSpot · UI v2 设计侧落地件 · 本包不含 Compose 代码与可编译 res 资源，也不修改工程源码。<br>
+  冻结色值与文案以 Kotlin 单源为准；示例分数 / 时间 / 点位为版式示意，非业务数据。
+</footer>
+</body>
+</html>

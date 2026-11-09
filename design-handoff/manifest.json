@@ -1,0 +1,328 @@
+{
+  "schema": "tidespot.design-handoff-manifest/1.0",
+  "meta": {
+    "name": "潮点 TideSpot · UI v2 设计侧落地件",
+    "version": "2.0.0",
+    "status": "用户已确认（2026-11-09）",
+    "offline": true,
+    "requires_network": false,
+    "requires_canvas": false,
+    "path_base": "本 manifest 所在目录 design-handoff/；仓库相对路径以其上一级为基准",
+    "entry_human": "INDEX.md / preview.html",
+    "entry_machine": "manifest.json",
+    "total_files": 38,
+    "hash_note": "bytes / sha256 用于整包拷贝后的完整性自检；manifest.json 自身不参与哈希"
+  },
+  "read_order": [
+    "INDEX.md",
+    "manifest.json",
+    "mapping/design-to-code.json（先读 conflicts）",
+    "tokens/design-tokens.json",
+    "copy/copy.json",
+    "components/components.json",
+    "screens/screens.json",
+    "assets/ + preview.html",
+    "icon/app-icon-spec.md",
+    "acceptance/acceptance.md"
+  ],
+  "authority_order": [
+    "工程冻结 Kotlin 单源：ScoreBands.kt / ConfidenceBadge.kt / TideSpotStrings.kt / TideSpotTheme.kt",
+    "本包 JSON",
+    "本包 MD",
+    "✅ 已确认视觉稿",
+    "🔶 结构稿",
+    "需求文档 §8 / §9.6（交互与合规口径）"
+  ],
+  "decision_blockers": [
+    "CONFLICT-01 底部 NavigationBar vs 地图优先导航",
+    "CONFLICT-02 免责第 5 条文案差异",
+    "CONFLICT-03 源更新时间为示意值",
+    "GAP-05 design_proposed 文案待确认"
+  ],
+  "deliverable_boundary": "不含 Compose 代码、不含可编译 res 资源、不修改 tidespot-android/ 源码、无设计稿到 app 的自动同步机制",
+  "files": [
+    {
+      "path": "INDEX.md",
+      "kind": "markdown",
+      "purpose": "离线交接包入口：文件树、读取顺序、权威性、可复制给其他 agent 的指令、边界",
+      "bytes": 8722,
+      "sha256": "58fbd7718cef69fa3b5cc65d48b3ebc4ccc9b2386d924eb98dcca89f3bc238b9"
+    },
+    {
+      "path": "preview.html",
+      "kind": "html",
+      "purpose": "离线拼板预览页（相对路径引用本地资源，无外链、无需起服务）",
+      "bytes": 7476,
+      "sha256": "5455c6296c5859cc1a6d344a2f3acb0cd9137a7cf475dc80d3cb33e8b97ef1dd"
+    },
+    {
+      "path": "acceptance/acceptance.md",
+      "kind": "markdown",
+      "purpose": "标注说明 + 全局/逐屏/叠加层/图标/合规验收清单 + 决策前置项",
+      "bytes": 5359,
+      "sha256": "ffe9640f163fa5ef5ff71606324c1638f76c12b4b1df16a91b20c835959f2a1c"
+    },
+    {
+      "path": "assets/board-v2.png",
+      "kind": "png",
+      "purpose": "v2 整板效果图（1700 × 3025，用户已确认）",
+      "bytes": 342842,
+      "sha256": "5f45e9c01520ecd437879549f2354e0ceeea120e64436fb7361def7b7d69c10f",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/dark-adaptation.svg",
+      "kind": "svg",
+      "purpose": "深色对照 + Android 16 edge-to-edge 适配 + 离线陈旧 / 分维降级样张",
+      "bytes": 1149446,
+      "sha256": "8ba7e6acfa002a97ae5b20826b7b18369c530045711d78dfe40f37f5eae0560d",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/icon-system.png",
+      "kind": "png",
+      "purpose": "APP 图标系统效果稿（2x）",
+      "bytes": 148687,
+      "sha256": "5a31bc307e0765a9451a0ce5e5bbb09c65775a3ae807ffd781378235aed9b67f",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/icon-system.svg",
+      "kind": "svg",
+      "purpose": "APP 图标系统效果稿矢量版（含变体与 48 dp 校验）",
+      "bytes": 375740,
+      "sha256": "37f84f0085a33a4f311f9ba93aeb5ec54efd082dfd1ce0c098e34ee92dbd77d8",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-01-map.png",
+      "kind": "png",
+      "purpose": "S01 地图选点像素稿（2x）",
+      "bytes": 69676,
+      "sha256": "4b9c3dfa06d5364ff9b533edcc92d63bb3c92f6cbdbbf94510b53202d352d7fd",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-01-map.svg",
+      "kind": "svg",
+      "purpose": "S01 地图选点矢量稿（可解析）",
+      "bytes": 319810,
+      "sha256": "936e2fe8ea90b00146fb2cd06b879bad57f6b6f3774766f7f65834ee3f8b71eb",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-02-score.png",
+      "kind": "png",
+      "purpose": "S02 钓鱼指数像素稿（2x）",
+      "bytes": 72480,
+      "sha256": "c29fb5ef3b11233280ec3ce3b8e581e79241d61e1d860c0fea5a49ef579f0f17",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-02-score.svg",
+      "kind": "svg",
+      "purpose": "S02 钓鱼指数矢量稿（可解析）",
+      "bytes": 575427,
+      "sha256": "42bfc433c6630f7172c88b6c74a54864e3ca7fcf1c3cc173635d22541bf82ba6",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-03-settings.png",
+      "kind": "png",
+      "purpose": "S09 设置与隐私像素稿（2x）",
+      "bytes": 72678,
+      "sha256": "f2b0def28b6b04589aa9aca55a61484ae4c0c821ebf23249414688ca796a50e3",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-03-settings.svg",
+      "kind": "svg",
+      "purpose": "S09 设置与隐私矢量稿（可解析）",
+      "bytes": 699751,
+      "sha256": "0afd3b384e3a6f402ba327deadad47bb4c793b95591e046fcbc20430d99b2f0b",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-04-dark-score.png",
+      "kind": "png",
+      "purpose": "DV01 深色钓鱼指数像素稿（2x）",
+      "bytes": 64886,
+      "sha256": "81fb2dbff87253f972643730e6f0060eacffe3c1d9e9c8c3e464462d21caf964",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/screen-04-dark-score.svg",
+      "kind": "svg",
+      "purpose": "DV01 深色钓鱼指数矢量稿（可解析）",
+      "bytes": 516469,
+      "sha256": "e45b30953e52a29aefae6f6f46bca6c96a35c41591a38bde2d25ffe78f3714fd",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/visual-baseline.svg",
+      "kind": "svg",
+      "purpose": "视觉基调规范卡：主题 token / 五档色带 / 六徽标 / 字阶",
+      "bytes": 440570,
+      "sha256": "e9313af5314b8260ce4c5d79744c69d5ba4f04241ce90e522ef2a7f8567bb309",
+      "visual_status": "confirmed_baseline"
+    },
+    {
+      "path": "assets/derived/S03-factor-breakdown.svg",
+      "kind": "svg",
+      "purpose": "S03 因子分解 · 按规格推导的结构稿",
+      "bytes": 11173,
+      "sha256": "ef65907c4fc726ba061e5c4ecd071401c2fe164317a93520ce319bbb0ddc19e9",
+      "visual_status": "spec_derived"
+    },
+    {
+      "path": "assets/derived/S04-inland-wave.svg",
+      "kind": "svg",
+      "purpose": "S04 湖面风与水温（内陆降级）· 按规格推导的结构稿",
+      "bytes": 9977,
+      "sha256": "89f1f4dfacc9d25ab24a4d0aae9327126cc097a6ecf76ce5fa7cf974b4e868e0",
+      "visual_status": "spec_derived"
+    },
+    {
+      "path": "assets/derived/S05-weather.svg",
+      "kind": "svg",
+      "purpose": "S05 天气 · 按规格推导的结构稿",
+      "bytes": 9814,
+      "sha256": "a7ed5f79616697037d5736da6735065856f615e336cfbf2fab16974c1d853b15",
+      "visual_status": "spec_derived"
+    },
+    {
+      "path": "assets/derived/S06-water-quality.svg",
+      "kind": "svg",
+      "purpose": "S06 水质 · 按规格推导的结构稿",
+      "bytes": 10653,
+      "sha256": "8d03c53ca2a13c8909093e57cd74d0c3423539f2e84e20aabeba21390217b0ff",
+      "visual_status": "spec_derived"
+    },
+    {
+      "path": "assets/derived/S07-tide.svg",
+      "kind": "svg",
+      "purpose": "S07 潮流 + 校正对照 · 按规格推导的结构稿",
+      "bytes": 9868,
+      "sha256": "f9dafd786e4433fd891eb0ab62219cac5bc72874dfc0feb5525f5d94654f49c6",
+      "visual_status": "spec_derived"
+    },
+    {
+      "path": "assets/derived/S08-favorites.svg",
+      "kind": "svg",
+      "purpose": "S08 收藏列表 · 按规格推导的结构稿",
+      "bytes": 7069,
+      "sha256": "029b0a767640a2cd5c7dd2503a81b290f394461eed78c26cac3aa11c4a47f5c9",
+      "visual_status": "spec_derived"
+    },
+    {
+      "path": "components/components.json",
+      "kind": "json",
+      "purpose": "22 个组件的完整状态矩阵（触发条件 / 视觉 / 文案键 / 无障碍）",
+      "bytes": 22744,
+      "sha256": "b78e9ecfc9d4dcf40b9dfba6ef196bf40340c8efb9fb5b25a84747cfe98c77d4",
+      "schema": "tidespot.components/1.0"
+    },
+    {
+      "path": "components/components.md",
+      "kind": "markdown",
+      "purpose": "组件状态人读速查与易错点",
+      "bytes": 4256,
+      "sha256": "4fe0db818853ca29a4167d401e8d8b24b9f2ef134aadaa74ad0db1e986775a12"
+    },
+    {
+      "path": "copy/copy.json",
+      "kind": "json",
+      "purpose": "全部用户可见文案字典 keys；区分 frozen / derived / design_proposed",
+      "bytes": 8652,
+      "sha256": "c191aa36265ef4bcfe820d8cce5c2885e2eeb1c9e8dda655357c220ab67ac59c",
+      "schema": "tidespot.copy/1.0"
+    },
+    {
+      "path": "copy/copy.md",
+      "kind": "markdown",
+      "purpose": "文案人读表 + 与需求 §9.6 第 5 条的差异说明",
+      "bytes": 4144,
+      "sha256": "a34c87321256c485f4c395a1ed372b6c5a136ce2edf7ebfc4c97646add7597ef"
+    },
+    {
+      "path": "icon/app-icon-spec.md",
+      "kind": "markdown",
+      "purpose": "自适应图标几何、色值、工程落点建议、校验清单",
+      "bytes": 4523,
+      "sha256": "04b7aec1dbcef26f864c7665033b2edf9ec6e93e681fc16db9f43c43f42799f9"
+    },
+    {
+      "path": "icon/tidespot-icon-background.svg",
+      "kind": "svg",
+      "purpose": "APP 图标 adaptive icon 背景层（108 dp 蓝渐变）",
+      "bytes": 499,
+      "sha256": "bfb67c9b7feef586d2f59148d936262506adec8fd1dce8c9bdfa6f13eefc6753"
+    },
+    {
+      "path": "icon/tidespot-icon-foreground.svg",
+      "kind": "svg",
+      "purpose": "APP 图标 adaptive icon 前景层（108 dp，72 dp 安全区，准星 + 潮线）",
+      "bytes": 897,
+      "sha256": "de22f3fba9b3a7d8efbab053bf763f8e5d7cbf09b1d97a226cd70e916ea7635a"
+    },
+    {
+      "path": "icon/tidespot-icon-monochrome.svg",
+      "kind": "svg",
+      "purpose": "APP 图标单色通知小图标（24 dp 白剪影）",
+      "bytes": 558,
+      "sha256": "87778e24da763afaa30f8ac671302c32d11296e758f8bb42df221bbc53e8ae2c"
+    },
+    {
+      "path": "icon/tidespot-icon-preview.svg",
+      "kind": "svg",
+      "purpose": "APP 图标合成预览（192 × 192，圆角 44）",
+      "bytes": 1205,
+      "sha256": "407d67ee23db3a1d07cdf916d6c137cf5795eec10671960eeac25d8d230d099b"
+    },
+    {
+      "path": "mapping/design-to-code.json",
+      "kind": "json",
+      "purpose": "稿↔代码映射（token / 22 组件 / 9 屏 / 图标）+ conflicts + gaps + 红线",
+      "bytes": 17374,
+      "sha256": "6e7a095cfd2077bf3de2aa82a3a609c5928eb19e5b5afc1071d220ec6a6b9c29",
+      "schema": "tidespot.design-to-code/1.0"
+    },
+    {
+      "path": "mapping/design-to-code.md",
+      "kind": "markdown",
+      "purpose": "映射人读版、冲突清单、落地顺序",
+      "bytes": 6721,
+      "sha256": "466bcd7df443f93f5ae7e3cdafc274e4981c2646912abfa9e66f39ec286ce0d3"
+    },
+    {
+      "path": "screens/screens.json",
+      "kind": "json",
+      "purpose": "9 屏 + 3 叠加层 + 4 深色变体 + 24 行数值表规格 + 标注；layers[].box 为 x,y,w,h dp",
+      "bytes": 17472,
+      "sha256": "36f92fa4c7cd502052ab7248e568d7ceb316cc1eb8bf9846086f6fa6fbcfa397",
+      "schema": "tidespot.screens/1.0"
+    },
+    {
+      "path": "screens/screens.md",
+      "kind": "markdown",
+      "purpose": "屏组总览、导航、共用骨架、逐屏验收要点",
+      "bytes": 6986,
+      "sha256": "264b117a849a1d4dd6f6a3a757b225789ce1d80fed249199d7ccaa4b1e0b3020"
+    },
+    {
+      "path": "tokens/design-tokens.json",
+      "kind": "json",
+      "purpose": "机器可读设计 token：明暗主题、冻结语义色、字阶、间距、圆角、布局与安全区",
+      "bytes": 9887,
+      "sha256": "9d04926a86b10a8d5683c292f4298c0f9bb4333983cbcc392542e784bb59b578",
+      "schema": "tidespot.design-tokens/1.0"
+    },
+    {
+      "path": "tokens/design-tokens.md",
+      "kind": "markdown",
+      "purpose": "token 人读速查表与冻结红线",
+      "bytes": 4806,
+      "sha256": "2277f176f14f7c7704ab8973b8e63d4aded9fec1aff3e04d823735ae46f797de"
+    }
+  ]
+}

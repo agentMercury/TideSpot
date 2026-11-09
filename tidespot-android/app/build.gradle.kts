@@ -91,12 +91,13 @@ android {
     }
 
     // 产物命名（客户约定）：APP 名字 + 版本号 →「潮点TideSpot-v{versionName}.apk」；
-    // versionName 变更时产物名自动跟随，无需改脚本
+    // debug 加 -debug 后缀防同名混淆；versionName 变更时产物名自动跟随，无需改脚本
     applicationVariants.all {
         val vName = versionName
+        val suffix = if (buildType.name == "debug") "-debug" else ""
         outputs.all {
             (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl)
-                .outputFileName = "潮点TideSpot-v$vName.apk"
+                .outputFileName = "潮点TideSpot-v$vName$suffix.apk"
         }
     }
 
@@ -111,6 +112,27 @@ tasks.withType<Test>().configureEach {
     testLogging {
         events("passed", "failed", "skipped")
         showStandardStreams = false
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 产物分发（客户约定 / CHG-21）：每次编译完 APK 自动复制一份到 E:\Trans
+// 仅复制 release 交付物（debug 为本机调试件，不入分发目录）；
+// 目录不存在时 Copy 任务自动创建；finalizedBy = assemble 完成后自动执行，
+// 不得用 dependsOn（否则 assembleRelease 会连带触发 debug 全量构建）
+// ─────────────────────────────────────────────────────────────────────────────
+val transDir = "E:\\Trans"
+tasks.register<Copy>("copyApkToTrans") {
+    from(layout.buildDirectory.dir("outputs/apk/release"))
+    include("*.apk")
+    into(transDir)
+    doLast {
+        logger.lifecycle("TideSpot: release APK 已复制到 $transDir")
+    }
+}
+listOf("assembleDebug", "assembleRelease").forEach { name ->
+    tasks.matching { it.name == name }.configureEach {
+        finalizedBy("copyApkToTrans")
     }
 }
 

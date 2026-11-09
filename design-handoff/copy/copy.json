@@ -1,0 +1,116 @@
+{
+  "schema": "tidespot.copy/1.0",
+  "meta": {
+    "version": "2.0.0",
+    "status": "用户已确认（2026-11-09）",
+    "offline": true,
+    "how_to_use": "keys 是本包内所有文案的唯一字典。components.json 的 copy 字段、screens.json 的 copy 字段都是 keys 的点分键名，直接查表取值即可。值类型为 string 或 string[]（数组表示固定顺序的多条）。",
+    "authority_levels": {
+      "frozen": "来自 TideSpotStrings.kt / WaterBodyTabTitles.kt 的工程单源，逐字禁改。UI 必须引用工程常量，不得在设计侧复制一份硬编码。",
+      "derived": "由需求 §8 / §9.6 / 设计稿整理的组合值（顺序、分组），其成员字符串仍来自工程单源。",
+      "design_proposed": "设计侧建议文案，工程当前未定义。实现 agent 需与产品确认后再落地，建议统一补进 TideSpotStrings.kt（FO-01 文案唯一入口）。"
+    },
+    "known_divergence": "需求文档 §9.6 第 5 条原文为「校正仅在实测参考可用时生效；未校正点位显示\"未校正\"。」；工程 M6 / D11 的第 5 条改为「现场校潮」长文（DISCLAIMER_TIDE_CORRECTION）。本设计稿以工程版为准（恒 5 条）；§9.6 的「未校正」展示要求由 ConfidenceBadge.Kind.UNCALIBRATED 徽标承载，不是第 6 条免责。",
+    "red_lines": [
+      "免责恒 5 条，顺序 1..5 固定，原文完整、禁止 ellipsis",
+      "隐私政策不得声明「零数据传输」；设置页必须逐源列出发送经纬度",
+      "档位 / 徽标必须带文字，不靠颜色单独编码（N-7）",
+      "否决 reason 文案由 domain VetoEvaluator 产出，消费侧禁止 parse 文案"
+    ]
+  },
+
+  "authority": {
+    "frozen": [
+      "TideSpotStrings.TAB_WAVE", "TideSpotStrings.TAB_WEATHER", "TideSpotStrings.TAB_SCORE",
+      "TideSpotStrings.TAB_WATER_QUALITY", "TideSpotStrings.TAB_TIDE",
+      "TideSpotStrings.TAB_WAVE_INLAND", "TideSpotStrings.TAB_TIDE_INLAND",
+      "TideSpotStrings.TAB_WAVE_LAND", "TideSpotStrings.TAB_WATER_QUALITY_LAND", "TideSpotStrings.TAB_TIDE_LAND",
+      "TideSpotStrings.NOTICE_LAND", "TideSpotStrings.NOTICE_UNKNOWN",
+      "TideSpotStrings.DISCLAIMER_SHEET_TITLE", "TideSpotStrings.DISCLAIMER_ENTRY",
+      "TideSpotStrings.DISCLAIMER_WAVE_TIDE", "TideSpotStrings.DISCLAIMER_WEATHER",
+      "TideSpotStrings.DISCLAIMER_SCORE", "TideSpotStrings.DISCLAIMER_WATER_QUALITY",
+      "TideSpotStrings.DISCLAIMER_TIDE_CORRECTION", "TideSpotStrings.DISCLAIMER_ITEMS",
+      "TideSpotStrings.BADGE_MEASURED", "TideSpotStrings.BADGE_SATELLITE", "TideSpotStrings.BADGE_MODEL",
+      "TideSpotStrings.BADGE_ESTIMATED", "TideSpotStrings.BADGE_UNCALIBRATED", "TideSpotStrings.BADGE_LOW_CONFIDENCE",
+      "TideSpotStrings.confidenceDescription", "TideSpotStrings.MODEL_ATTRIBUTION"
+    ],
+    "derived": ["tab.sea", "tab.inland", "tab.land", "band.labels", "band.EXPLOSIVE", "band.GREAT", "band.OK", "band.POOR", "band.BAD", "attribution.map", "attribution.model"],
+    "design_proposed": [
+      "design_proposed.resolving", "design_proposed.location_denied", "design_proposed.reverse_geo_off",
+      "design_proposed.favorite_dialog_title", "design_proposed.favorite_name_hint",
+      "design_proposed.top10_this_spot", "design_proposed.top10_all", "design_proposed.top10_empty",
+      "design_proposed.window_bar", "design_proposed.record_high_tide", "design_proposed.placeholder_v11",
+      "design_proposed.offline", "design_proposed.stale", "design_proposed.dimension_degraded",
+      "design_proposed.chart_table_switch", "design_proposed.confirm_favorite", "design_proposed.cancel"
+    ]
+  },
+
+  "keys": {
+    "TideSpotStrings.TAB_WAVE": "风浪",
+    "TideSpotStrings.TAB_WEATHER": "天气",
+    "TideSpotStrings.TAB_SCORE": "钓鱼指数",
+    "TideSpotStrings.TAB_WATER_QUALITY": "水质",
+    "TideSpotStrings.TAB_TIDE": "潮流",
+    "TideSpotStrings.TAB_WAVE_INLAND": "湖面风与水温",
+    "TideSpotStrings.TAB_TIDE_INLAND": "水位（无潮汐）",
+    "TideSpotStrings.TAB_WAVE_LAND": "风浪（估算）",
+    "TideSpotStrings.TAB_WATER_QUALITY_LAND": "水质（估算）",
+    "TideSpotStrings.TAB_TIDE_LAND": "潮流（不可用）",
+    "TideSpotStrings.NOTICE_LAND": "陆地点：水质与潮流为估算或不可用，仅供参考",
+    "TideSpotStrings.NOTICE_UNKNOWN": "水体类型待判定：数据源恢复后自动更新",
+
+    "TideSpotStrings.DISCLAIMER_SHEET_TITLE": "免责声明",
+    "TideSpotStrings.DISCLAIMER_ENTRY": "免责声明",
+    "TideSpotStrings.DISCLAIMER_WAVE_TIDE": "潮位与潮流来自 ~8 km 全球模型，官方声明不适用于近岸航行；本 App 不替代航路指南与官方潮汐表。",
+    "TideSpotStrings.DISCLAIMER_WEATHER": "雷暴、大风、大浪判定仅供参考。水上安全以当地预警为准，切勿在雷电、台风、大潮汛期间出钓。",
+    "TideSpotStrings.DISCLAIMER_SCORE": "指数基于气象与天文因子的经验加权估算，不构成渔获保证。",
+    "TideSpotStrings.DISCLAIMER_WATER_QUALITY": "中国境内多数点位水质为模型估算值，非实测，不作为用水、饮用或接触安全依据。",
+    "TideSpotStrings.DISCLAIMER_TIDE_CORRECTION": "「现场校潮」为用户自记高潮观测对模型滞后的经验修正（lag 平移），仅用于相对时刻参考；校正不改变数据来源与精度，仍非官方潮汐表。",
+    "TideSpotStrings.DISCLAIMER_ITEMS": [
+      "潮位与潮流来自 ~8 km 全球模型，官方声明不适用于近岸航行；本 App 不替代航路指南与官方潮汐表。",
+      "雷暴、大风、大浪判定仅供参考。水上安全以当地预警为准，切勿在雷电、台风、大潮汛期间出钓。",
+      "指数基于气象与天文因子的经验加权估算，不构成渔获保证。",
+      "中国境内多数点位水质为模型估算值，非实测，不作为用水、饮用或接触安全依据。",
+      "「现场校潮」为用户自记高潮观测对模型滞后的经验修正（lag 平移），仅用于相对时刻参考；校正不改变数据来源与精度，仍非官方潮汐表。"
+    ],
+
+    "TideSpotStrings.BADGE_MEASURED": "实测",
+    "TideSpotStrings.BADGE_SATELLITE": "卫星",
+    "TideSpotStrings.BADGE_MODEL": "模型",
+    "TideSpotStrings.BADGE_ESTIMATED": "估算",
+    "TideSpotStrings.BADGE_UNCALIBRATED": "未校正",
+    "TideSpotStrings.BADGE_LOW_CONFIDENCE": "低置信",
+    "TideSpotStrings.confidenceDescription": "数据置信：{label}",
+    "TideSpotStrings.MODEL_ATTRIBUTION": "天气 · Open-Meteo（ICON / ECMWF 模型） · 海洋 · Open-Meteo Marine / Copernicus Marine",
+
+    "tab.sea": ["风浪", "天气", "钓鱼指数", "水质", "潮流"],
+    "tab.inland": ["湖面风与水温", "天气", "钓鱼指数", "水质", "水位（无潮汐）"],
+    "tab.land": ["风浪（估算）", "天气", "钓鱼指数", "水质（估算）", "潮流（不可用）"],
+    "band.labels": ["爆护窗口", "很适合", "可以", "较差", "别去"],
+    "band.EXPLOSIVE": "爆护窗口",
+    "band.GREAT": "很适合",
+    "band.OK": "可以",
+    "band.POOR": "较差",
+    "band.BAD": "别去",
+    "attribution.map": "Map data: OpenStreetMap contributors · CARTO Positron · Open-Meteo",
+    "attribution.model": "源更新 06:00 UTC · 本机拉取 09:38 · 模型 ICON / ECMWF",
+
+    "design_proposed.resolving": "正在解析点位…",
+    "design_proposed.location_denied": "未获得定位权限，可拖动地图手动选点",
+    "design_proposed.reverse_geo_off": "逆地理已关闭，仅显示坐标与本地 plusCode",
+    "design_proposed.favorite_dialog_title": "收藏该点位",
+    "design_proposed.favorite_name_hint": "留空则使用坐标作为名称",
+    "design_proposed.top10_this_spot": "本点最佳窗口",
+    "design_proposed.top10_all": "全部收藏 Top10",
+    "design_proposed.top10_empty": "当前范围内没有符合条件的最佳窗口",
+    "design_proposed.window_bar": "窗口",
+    "design_proposed.record_high_tide": "记录一次涨潮时刻",
+    "design_proposed.placeholder_v11": "垂钓用例、物种预设与因子权重编辑入口于 v1.1 开放（当前沿收藏点预设生效）。",
+    "design_proposed.offline": "网络不可用，显示本地缓存数据",
+    "design_proposed.stale": "数据已过期 · 显示上次成功拉取结果",
+    "design_proposed.dimension_degraded": "部分维度不可用，已按有效权重重算",
+    "design_proposed.chart_table_switch": "图表 / 数值表",
+    "design_proposed.confirm_favorite": "确认收藏",
+    "design_proposed.cancel": "取消"
+  }
+}
