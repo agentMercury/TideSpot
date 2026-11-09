@@ -74,6 +74,7 @@
 | A-12 | **新增**：M6 `:app` 接线清单执行（CHG-12④⑤：来源元数据透出 / `spot.tzOffsetSec`→ZoneId 注入 / `hourlyScoreDao` 注入 / `ReverseGeocoder` URL 单点收敛复核 / `cachedDetail` 不落评分复核） | 交付负责人 | 随 M6 派发 | ✅ **完成（11-09，随 M6 退出）**：批次 1 收敛 ReverseGeocoder 默认值 + 批次 3 收敛 CARTO（TideSpotUrls 单点）；`tideCorrection`/ZoneId 注入/全 DAO 注入落地；F-3.7 部分透出（DTO 级登记 v1.1）；`cachedDetail` 零评分计算（批次 1 D13 锁测试固化） |
 | A-13 | **新增**：M4 独立验收（第四/五轮）P0 缺陷修复：D01/D02/D03 + N15；台账口径更正；登记 CHG-13 | 交付负责人 | 11-07（M5 派发前） | ✅ **完成（11-06）**：四项全修 + 10 条锁测试；391/0/10；详见 CHG-13 |
 | A-14 | **新增**：Robolectric + ui-test Compose 冒烟四条锁（5 Tab 标题矩阵 / 切表 10 次不崩 / DaySelector 24 行 / FactorBreakdown 可见；OPT-45/54）——沙箱无 android-all 缓存且 maven 不可达，暂不可建 | 交付负责人 | 网络可用时（随 A-05 本机环境） | 待办（纯函数锁已先行覆盖 D01/D03/N15） |
+| A-16 | **新增**：真机冒烟预验（ACCEPTANCE_PRECHECK 执行单） | 客户 | 12-04 前 | ✅ **通过（2026-11-09）**：APK 安装成功 + 冒烟测试通过；其余问题待使用过程反馈（反馈处理循环见 HANDOVER §6） |
 | A-15 | **新增**：M5 开发内必修——D07（收藏编辑 patch 语义，防 `@Update` 冲掉派生字段）+ D08（`updateWaterBody` null 语义 + KDoc 统一），**必须先于收藏编辑功能**；D03 读侧收口（`HourlyScoreDao.forSpot` 接 Top10 或删表） | 交付负责人 | 随 M5 派发 | ✅ **完成（11-06，随 M5 退出）**：D07 patch 合并（集成验收补全 waterBodyType）+ D08 COALESCE（客户裁决 null=保持原值）+ D03 接 Top10 读取（恒等对拍锁测试）；详见 CHG-14 |
 
 ## 4. 里程碑评审记录
