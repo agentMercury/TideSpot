@@ -19,8 +19,9 @@
 | M6 打磨 | 11-28 ~ 12-03 | ✅ 通过 | 11-09（提前 19 天） | 八模块全量 **573 运行 / 0 失败 / 12 跳过**（domain 126 + data 134×2 + ui 34 + detail 45 + favorites 18 + map 31 + settings 21 + app 15；跳过=Room 真机 @Ignore 先例）；批次 0 契约（CHG-16）→ 批次 1 数据/算法（domain+data 394/0/12）→ 批次 2 UI → 批次 3 `:app`，每批次负责人独立复跑验证；**可安装 APK 产出**（app-release.apk 49.1MB，tidespot.jks 自签名，apksigner 实证）；红线扫描 main 源码零域名命中；F-3.7 元数据部分透出（DTO 级模型名/网格分辨率登记 v1.1）；A-14 Robolectric/BLK-04 挂网络与真机 |
 | 交付验收 | 12-04 ~ 12-08 | ⬜ 未开始 | — | |
 | V1.1 优化批次 A（验收前优化） | 11-09 | ✅ | 11-09 | 八模块 **561 运行 / 0 失败 / 0 跳过**（data 128×2，删 6 条 @Ignore 空壳后跳过清零）+ **真机仪器测试 6/6（AAK-AN00/Android 16，BLK-04 解锁）** + app-release.apk 复产出 + verify.ps1 全绿；**真机迁移锁抓出并修复 P0：MIGRATION_3_4 列名 veto_codes≠实体 vetoCodes，v3→v4 升级路径必崩**（CHG-18②）；A-2 弃用 API 迁移、A-3 verify.ps1、A-4 tools/ 清理、A-5 gradlew 首跑全清；CHG-18 登记 |
+| V1.1 优化批次 C（环境解锁） | 11-09 | ✅ | 11-09 | 客户裁定三项全做（CHG-19）：**C-1 Robolectric Compose 冒烟四条锁落地**（:core:ui +robolectric 4.14.1 + ui-test，`ComposeSmokeRobolectricTest` 8 用例：Tab 标题矩阵四水体/切表 10 轮不崩/DaySelector 回调/FactorBreakdown 三区 + 同屏唯一附锁；test worker 代理透传解锁 android-all 自下载）；**C-3** LocalLifecycleOwner 迁 lifecycle-runtime-compose（FO-25 残留清零）；**C-2** AGP 8.5.2→8.7.3（独立提交可回退，全模块重构建 + lintVital 全跑通过）；八模块 **569 运行 / 0 失败 / 0 跳过**（ui +8）+ APK 复产出（49.1MB）；jj：C-1/C-3=`kkvmrokw`、C-2=`zyynnzws` |
 
-## 2. 本期快照（2026-11-09，V1.1 优化批次 A 退出）
+## 2. 本期快照（2026-11-09，V1.1 优化批次 A+C 退出）
 
 - **完成项**（HANDOVER §6 A 类清单 A-1~A-5 全清，逐项详见台账 CHG-18）：
   - **A-1 BLK-04 解锁**：`:core:data` androidTest 基建（androidx.test 三件套 + room-testing；依赖经 maven 可达性确认后引入，runner 经本机代理下载）；`RoomDaoTest`/`RoomMigrationTest` @Ignore 空壳 6 用例落地为真机仪器测试（in-memory CRUD/REPLACE/lastSuccess + MigrationTestHelper 三段迁移强校验 + 文件库「重启不丢」）；**真机 6/6 通过**。
@@ -29,11 +30,16 @@
   - **A-3**：`verify.ps1` 一键验证脚本（subst 自愈 + JAVA_HOME + 红线扫描 URL 口径 + 八模块 + assembleRelease + 代理注入），本机实测全绿（OPT-05 CI 门禁本地形态）。
   - **A-4**：`tools/` 204MB 重复目录删除（用户确认授权；与 `.tools` 逐目录核实一致）。
   - **A-5**：本机正式 `gradlew` 首跑验证通过（发行包下载 + domain 测试全绿）；subst T: 维持标准构建路径（R-09 口径不变）。
+  - **V1.1 优化批次 C（同日续批，客户裁定三项全做，CHG-19）**：
+    - **C-1（=A-14 解锁）**：`:core:ui` 引 robolectric 4.14.1 + ui-test（compose-bom）；`ComposeSmokeRobolectricTest` 8 用例（5 Tab 标题矩阵四水体类型/切表 10 轮不崩/DaySelector 回调/FactorBreakdown 三区/同屏唯一附锁）；test worker 代理+信任库系统属性透传（Robolectric 自下载 android-all 独立 JVM）。
+    - **C-3**：`MapScreen` LocalLifecycleOwner → `androidx.lifecycle.compose`（FO-25 残留清零；:feature:map 单点放行）。
+    - **C-2**：AGP 8.5.2→8.7.3（tested-SDK 覆盖 compileSdk 35；Gradle 8.9 不动；独立提交 `zyynnzws` 便于回退；首全量重构建 22m43s）。
+    - 口径留证：LazyRow 视口裁剪下 Robolectric 触摸注入不驱动滚动（环境限制），远端 chip 断言收敛为视口内；物理中文路径 D:\ test worker 类加载不可靠再证（R-09）。
 - **进行中**：无。
 - **阻塞项**：无阻塞。挂起项更新：
   1. **A-05**：本机正式 gradle 双确认——**本机 gradlew 首跑已验证（11-09）**，subst 口径维持；正式收官挂客户确认。
   2. **A-07**：OSTIA 恢复后复测（不阻塞，CHG-09 兜底）。
-  3. **A-14/C-1**：Robolectric Compose 冒烟四条锁——**环境已解锁（本机网络经代理可用）**，下一批次可开工；C-2（AGP 升级）/C-3（lifecycle-runtime-compose）同批。
+  3. **A-14/C-1**：Robolectric Compose 冒烟四条锁——✅ **已完成（11-09，CHG-19/C-1）**：Robolectric 形态 8 用例落地 :core:ui（真机形态另行覆盖）；C-2（AGP 8.7.3）/C-3（lifecycle-runtime-compose）同批完成。
   4. **交付验收运行时项（12-04~12-08 真机）**：F-2.2、首屏 <300ms、跨时区双点、校潮观测持久化真机、APK 安装冒烟 + §13 清单逐项留证——Room v3→v4 真机迁移已由本批次仪器测试先行覆盖（6/6）。
 - **下一步**：交付验收（12-04~12-08）；C 类解锁批次（A-14/C-2/C-3）按需开工；v1.1 P0-1 凭据外部化挂正式验收后（OPT_REQUIREMENTS_V11 §2）。
 
