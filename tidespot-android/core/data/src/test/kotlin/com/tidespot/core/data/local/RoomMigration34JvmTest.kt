@@ -12,8 +12,10 @@ import kotlin.test.assertTrue
  * 三处 schema 变更与实体/列声明对齐：
  * 1. manual_observation（id autoGenerate PK + spotId 索引 + (spotId,observedAtEpochSec) 索引）；
  * 2. manual_tide_fit（spotId PK）；
- * 3. hourly_score 尾增 veto_codes TEXT NOT NULL DEFAULT '[]'（与 HourlyScoreEntity
+ * 3. hourly_score 尾增 vetoCodes TEXT NOT NULL DEFAULT '[]'（与 HourlyScoreEntity
  *    @ColumnInfo(defaultValue = "[]") 一致——不一致真机 Room schema 校验会失败）。
+ * A-1（CHG-18）后由真机 [com.tidespot.core.data.local.RoomMigrationInstrumentedTest]
+ * 承担完整迁移执行 + 旧行数据保留强校验（本类继续锁 SQL 文本 ↔ 实体声明）。
  */
 class RoomMigration34JvmTest {
 
@@ -60,14 +62,15 @@ class RoomMigration34JvmTest {
     }
 
     @Test
-    fun `SQL文本_hourly_score尾增veto_codes默认空数组`() {
+    fun `SQL文本_hourly_score尾增vetoCodes默认空数组`() {
         assertTrue(
-            sql.contains("ALTER TABLE `hourly_score` ADD COLUMN `veto_codes` TEXT NOT NULL DEFAULT '[]'"),
+            sql.contains("ALTER TABLE `hourly_score` ADD COLUMN `vetoCodes` TEXT NOT NULL DEFAULT '[]'"),
             "v3→v4 尾增列：TEXT NOT NULL DEFAULT '[]'（与 @ColumnInfo(defaultValue = \"[]\") 一致）",
         )
-        // 实体侧声明对齐（列名/defaultValue 的真机校验由 KSP schema 4.json + MigrationTestHelper 兜底；
-        // JVM 侧以编译期实体字段存在性 + SQL 文本守护）
+        // 列名对齐实体：Room 默认列名 = 属性名（vetoCodes，无 @ColumnInfo name）——
+        // A-1 真机迁移锁实证：写成 veto_codes 会使 v3→v4 升级 schema 校验崩溃（P0）
         val field = HourlyScoreEntity::class.java.getDeclaredField("vetoCodes")
+        assertEquals("vetoCodes", field.name, "ALTER 列名必须与实体属性名逐字一致")
         assertEquals(String::class.java, field.type, "vetoCodes 列类型 String（JSON 数组串）")
     }
 }

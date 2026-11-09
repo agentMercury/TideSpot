@@ -5,7 +5,7 @@
 
 ## 1. 状态总览
 
-**当前阶段：M0–M6 全部完成 → 下一步交付验收（12-04 ~ 12-08，可提前真机预验）**
+**当前阶段：M0–M6 全部完成 + A 类优化批次收口 → 下一步交付验收（12-04 ~ 12-08，可提前真机预验）**
 **整体进度：7 / 8 ｜ 目标交付日：2026-12-08（较排期领先约 19 天）｜ 健康度：🟢 正常**
 
 | 里程碑 | 计划 | 状态 | 实际完成 | 验证结论 |
@@ -18,8 +18,28 @@
 | M5 收藏 + Top10 | 11-22 ~ 11-27 | ✅ 通过 | 11-06（提前 16 天） | 六模块全量 **446 运行 / 0 失败 / 10 跳过**（domain 107 + data 116×2 + ui 27 + detail 38 + favorites 11 + map 31；跳过=Room 真机项）；A-15 前置 D07/D08/D03 全修+锁测试；FO-13/FO-14/OPT-06/OPT-08 并入必修全过；F-2.1~F-2.4/F-2.6 代码级+单测级通过，F-2.2 性能与 F-2.5 真机项挂交付验收；CHG-14 登记 |
 | M6 打磨 | 11-28 ~ 12-03 | ✅ 通过 | 11-09（提前 19 天） | 八模块全量 **573 运行 / 0 失败 / 12 跳过**（domain 126 + data 134×2 + ui 34 + detail 45 + favorites 18 + map 31 + settings 21 + app 15；跳过=Room 真机 @Ignore 先例）；批次 0 契约（CHG-16）→ 批次 1 数据/算法（domain+data 394/0/12）→ 批次 2 UI → 批次 3 `:app`，每批次负责人独立复跑验证；**可安装 APK 产出**（app-release.apk 49.1MB，tidespot.jks 自签名，apksigner 实证）；红线扫描 main 源码零域名命中；F-3.7 元数据部分透出（DTO 级模型名/网格分辨率登记 v1.1）；A-14 Robolectric/BLK-04 挂网络与真机 |
 | 交付验收 | 12-04 ~ 12-08 | ⬜ 未开始 | — | |
+| V1.1 优化批次 A（验收前优化） | 11-09 | ✅ | 11-09 | 八模块 **561 运行 / 0 失败 / 0 跳过**（data 128×2，删 6 条 @Ignore 空壳后跳过清零）+ **真机仪器测试 6/6（AAK-AN00/Android 16，BLK-04 解锁）** + app-release.apk 复产出 + verify.ps1 全绿；**真机迁移锁抓出并修复 P0：MIGRATION_3_4 列名 veto_codes≠实体 vetoCodes，v3→v4 升级路径必崩**（CHG-18②）；A-2 弃用 API 迁移、A-3 verify.ps1、A-4 tools/ 清理、A-5 gradlew 首跑全清；CHG-18 登记 |
 
-## 2. 本期快照（2026-11-09，M6 退出）
+## 2. 本期快照（2026-11-09，V1.1 优化批次 A 退出）
+
+- **完成项**（HANDOVER §6 A 类清单 A-1~A-5 全清，逐项详见台账 CHG-18）：
+  - **A-1 BLK-04 解锁**：`:core:data` androidTest 基建（androidx.test 三件套 + room-testing；依赖经 maven 可达性确认后引入，runner 经本机代理下载）；`RoomDaoTest`/`RoomMigrationTest` @Ignore 空壳 6 用例落地为真机仪器测试（in-memory CRUD/REPLACE/lastSuccess + MigrationTestHelper 三段迁移强校验 + 文件库「重启不丢」）；**真机 6/6 通过**。
+  - **P0 缺陷修复（A-1 抓出，当日闭环）**：`MIGRATION_3_4` ALTER 列名 `veto_codes` → `vetoCodes`（v3→v4 升级路径 schema 校验崩溃缺陷）；`RoomMigration34JvmTest` 增「ALTER 列名与实体属性名逐字一致」锁。
+  - **A-2**：`LocationController.kt` 弃用 `requestSingleUpdate` → `requestLocationUpdates`（首回调 removeUpdates，单次语义不变；`:feature:map` 禁改约束单点放行）。
+  - **A-3**：`verify.ps1` 一键验证脚本（subst 自愈 + JAVA_HOME + 红线扫描 URL 口径 + 八模块 + assembleRelease + 代理注入），本机实测全绿（OPT-05 CI 门禁本地形态）。
+  - **A-4**：`tools/` 204MB 重复目录删除（用户确认授权；与 `.tools` 逐目录核实一致）。
+  - **A-5**：本机正式 `gradlew` 首跑验证通过（发行包下载 + domain 测试全绿）；subst T: 维持标准构建路径（R-09 口径不变）。
+- **进行中**：无。
+- **阻塞项**：无阻塞。挂起项更新：
+  1. **A-05**：本机正式 gradle 双确认——**本机 gradlew 首跑已验证（11-09）**，subst 口径维持；正式收官挂客户确认。
+  2. **A-07**：OSTIA 恢复后复测（不阻塞，CHG-09 兜底）。
+  3. **A-14/C-1**：Robolectric Compose 冒烟四条锁——**环境已解锁（本机网络经代理可用）**，下一批次可开工；C-2（AGP 升级）/C-3（lifecycle-runtime-compose）同批。
+  4. **交付验收运行时项（12-04~12-08 真机）**：F-2.2、首屏 <300ms、跨时区双点、校潮观测持久化真机、APK 安装冒烟 + §13 清单逐项留证——Room v3→v4 真机迁移已由本批次仪器测试先行覆盖（6/6）。
+- **下一步**：交付验收（12-04~12-08）；C 类解锁批次（A-14/C-2/C-3）按需开工；v1.1 P0-1 凭据外部化挂正式验收后（OPT_REQUIREMENTS_V11 §2）。
+
+---
+
+### 上期快照（2026-11-09，M6 退出，历史存档）
 
 - **完成项**（四批次串行执行，每批次负责人独立复跑验证；契约见 CONTRACT「M6 子契约」/台账 CHG-16）：
   - **批次 0（负责人契约）**：Models.kt 只增 `VetoCode`（THUNDERSTORM/FISHABILITY_DECAY）/`FishScoreResult.vetoCodes`/`FavoriteSpot.tzOffsetSec`；M6 子契约 20 项任务书落盘。
@@ -37,7 +57,7 @@
 
 ---
 
-### 上期快照（2026-11-06，M5 退出，历史存档）
+### 历史快照（2026-11-06，M5 退出，存档）
 
 - **完成项**：
   - **M5 开工前置 A-15（CHG-13 转 M5 三项，客户三项裁决后实施，CHG-14 登记）**：① D07 `upsertFavorite` patch 语义（先读旧实体合并 waterBodyType/elevation/tzOffsetSec/speciesId/lastViewedAt/createdAt 后 @Update，编辑不再冲掉派生列；集成验收补全 waterBodyType——首轮实现遗漏致编辑回退 LAND）+ 往返锁测试；② D08 `updateWaterBody` 改 COALESCE（客户裁决 null=保持原值）+ KDoc 统一 + Fake/Room 双侧锁测试；③ D03 读侧收口（客户裁决接 Top10 读取）：`Repository.topWindows` 新增，hourly_score 重建 FishScoreResult → find，**恒等对拍锁测试**（读侧重建 find 与现算 find 输出逐字段一致，满足「Top10 与详情页/库内恒等」退出标准）。
@@ -73,8 +93,9 @@
 | A-11 | **新增**：M5/M6 任务书并入改进池项（跨点 rank/±6h 窗口/NOAA 回归台账/物种库/性能基准/i18n 雷暴隐患/MockFixtures 移位等，见 HANDOVER §5） | 交付负责人 | 随里程碑派发 | **部分完成**：MockFixtures 移位（FO-26）、hourly_score 落库映射（CHG-08④）已随 M4 完成；其余随 M5/M6 |
 | A-12 | **新增**：M6 `:app` 接线清单执行（CHG-12④⑤：来源元数据透出 / `spot.tzOffsetSec`→ZoneId 注入 / `hourlyScoreDao` 注入 / `ReverseGeocoder` URL 单点收敛复核 / `cachedDetail` 不落评分复核） | 交付负责人 | 随 M6 派发 | ✅ **完成（11-09，随 M6 退出）**：批次 1 收敛 ReverseGeocoder 默认值 + 批次 3 收敛 CARTO（TideSpotUrls 单点）；`tideCorrection`/ZoneId 注入/全 DAO 注入落地；F-3.7 部分透出（DTO 级登记 v1.1）；`cachedDetail` 零评分计算（批次 1 D13 锁测试固化） |
 | A-13 | **新增**：M4 独立验收（第四/五轮）P0 缺陷修复：D01/D02/D03 + N15；台账口径更正；登记 CHG-13 | 交付负责人 | 11-07（M5 派发前） | ✅ **完成（11-06）**：四项全修 + 10 条锁测试；391/0/10；详见 CHG-13 |
-| A-14 | **新增**：Robolectric + ui-test Compose 冒烟四条锁（5 Tab 标题矩阵 / 切表 10 次不崩 / DaySelector 24 行 / FactorBreakdown 可见；OPT-45/54）——沙箱无 android-all 缓存且 maven 不可达，暂不可建 | 交付负责人 | 网络可用时（随 A-05 本机环境） | 待办（纯函数锁已先行覆盖 D01/D03/N15） |
+| A-14 | **新增**：Robolectric + ui-test Compose 冒烟四条锁（5 Tab 标题矩阵 / 切表 10 次不崩 / DaySelector 24 行 / FactorBreakdown 可见；OPT-45/54）——原沙箱 maven 不可达 | 交付负责人 | 网络可用时（随 A-05 本机环境） | **环境已解锁（11-09：本机网络经代理可用）→ 转下一批次开工**（纯函数锁已先行覆盖 D01/D03/N15） |
 | A-16 | **新增**：真机冒烟预验（ACCEPTANCE_PRECHECK 执行单） | 客户 | 12-04 前 | ✅ **通过（2026-11-09）**：APK 安装成功 + 冒烟测试通过；其余问题待使用过程反馈（反馈处理循环见 HANDOVER §6） |
+| A-17 | **新增**：V1.1 优化批次 A（HANDOVER §6 A 类 A-1~A-5）：A-1 BLK-04 真机解锁 + P0 迁移缺陷修复、A-2 弃用 API 迁移、A-3 verify.ps1、A-4 tools/ 清理、A-5 gradlew 首跑 | 交付负责人（接手会话） | 11-09 | ✅ **完成（11-09）**：全清 + 八模块 561/0/0 + 真机仪器 6/6 + verify.ps1 全绿；CHG-18 登记；C 类三项（A-14/C-2/C-3）环境解锁转下批 |
 | A-15 | **新增**：M5 开发内必修——D07（收藏编辑 patch 语义，防 `@Update` 冲掉派生字段）+ D08（`updateWaterBody` null 语义 + KDoc 统一），**必须先于收藏编辑功能**；D03 读侧收口（`HourlyScoreDao.forSpot` 接 Top10 或删表） | 交付负责人 | 随 M5 派发 | ✅ **完成（11-06，随 M5 退出）**：D07 patch 合并（集成验收补全 waterBodyType）+ D08 COALESCE（客户裁决 null=保持原值）+ D03 接 Top10 读取（恒等对拍锁测试）；详见 CHG-14 |
 
 ## 4. 里程碑评审记录
@@ -88,6 +109,7 @@
 | 2026-11-06 | M4 | ⚠️ **有条件通过**（CHG-13 改签；原「F-3.1~F-3.8 全过」口径不实，已更正） | 第四/五轮独立复核 + 负责人逐条取证：数据/算法层达标（附加必修 1–6/8 无虚报）；UI 组装层 D01/D02/D03 三个 P0 + N15 漏网于纯 JVM 测试（组装层零覆盖），**本轮已修**并锁测试（titlesInTabOrder/resolvePreset/Ttl 三态）；五模块 **391 运行 / 0 失败 / 10 跳过**（domain 93 + data 113×2 + ui 27 + detail 14 + map 31）；F-3 口径：3.3/3.6 通过、3.1/3.2/3.4/3.8 部分达标、3.7 转 M6、3.5 属 M5；D07/D08 转 M5（A-15）、D04~D14/N16~N20 转 M6；N17 误判裁定不成立；结构性根因=组装层零测试，OPT-45/54 冒烟锁登记 A-14 |
 | 2026-11-06 | M5 | ✅ **通过** | 双批次执行（数据/算法 → UI，UI 编译依赖 topWindows API 无法并行）+ 负责人集成验收。**验收修正 subagent 4 处交付缺口**：数据 Agent 3 处测试失败（OPT-06 语义下旧用例未适配 ×1、稀疏样本误入 <24h 禁用分支 ×2）+ D07/D08/D03 锁测试零交付；UI Agent 语法错误（`as` 作标识符）+ 缺 imports + Screen 层 Top10/校潮 Sheet 未实现 + 测试零交付——负责人补齐 Sheet 组装与 35 条纯函数锁测试（组装层零覆盖教训第二次重演，CHG-14⑥）。客户三项开工裁决：全量执行 / D08=COALESCE / D03=接 Top10 读取。六模块 **446 运行 / 0 失败 / 10 跳过**（domain 107 + data 116×2 + ui 27 + detail 38 + favorites 11 + map 31）；F-2.1~F-2.4/F-2.6 代码级+单测级通过；F-2.2 性能项/F-2.5 真机项挂交付验收；CHG-14 登记 |
 | 2026-11-09 | M6 | ✅ **通过** | 四批次串行（负责人契约 → 数据/算法 → UI → 负责人 `:app`）+ 每批次负责人独立复跑验证（`--rerun-tasks`）。**验收修正 sub-agent 2 处缺口**：批次 1 首轮 3 个测试失败（迁移断言×2 + 测试漏改注入×1，agent 自修后复验）；批次 2 收尾 favorites 测试编译错误（`epoch` 助手跨类引用，负责人修复）。八模块 **573 运行 / 0 失败 / 12 跳过**（domain 126 + data 134×2 + ui 34 + detail 45 + favorites 18 + map 31 + settings 21 + app 15；跳过=Room 真机 @Ignore 先例）；黄金对拍 B1–B7 保持；基准锁 <40ms 命中；红线扫描 main 源码零域名命中；**`app-release.apk` 49.1MB 自签名产出（apksigner 实证 DN）**；CHG-16 登记 + 三项偏差负责人裁决留证；M4 遗留 D04/D05部分/D09/D10/D11/D12/D13/D14 与 N16 部分闭环，N18~N20 随 D14/组装覆盖（KDoc/色值/自愈） |
+| 2026-11-09 | V1.1 优化批次 A | ✅ 通过 | A 类五项全清（CHG-18）：真机迁移锁抓出 **P0 升级缺陷**（MIGRATION_3_4 列名与实体不一致 → v3→v4 升级崩溃）当日修复并双锁（真机 MigrationTestHelper + JVM 列名逐字一致断言）；androidTest 基建 + 真机 6/6（AAK-AN00）；八模块 561/0/0 跳过清零 + APK 复产出 + verify.ps1 门禁脚本就位。教训留证：**Room 迁移 SQL 列名必须与实体属性名逐字一致**（无 @ColumnInfo name 时默认列名=属性名）；「SQL 文本锁 ≠ 迁移行为锁」——JVM 文本对齐断言抓不住升级路径 schema 校验，必须真机 MigrationTestHelper |
 
 ## 5. 决策与变更记录
 
@@ -108,11 +130,12 @@
 | 2026-11-08 | **CHG-15① 偏差①当日修复完成（M6 必修项提前清零）**：`BestWindowFinder.find` 尾增 `nowEpochSec: Long = 0`（0=不过滤向后兼容；>0 剔除历史小时且有效小时数同步收缩，兜底最高分只在未来序列内取）；`TopWindowDerivations.top10` 尾增透传；`DetailStateHolder.onResult` 与 `TideSpotRepository.topWindows` 均传「当前小时的下一整点」（SRS §6.6）；`TopWindowsResult.validHoursPresent` 语义收紧为未来有效行数；`FavoritesSummaryFormatter.line` 兜底文案优先于「未加载」（全过期显示禁用文案）。锁测试 +8（domain 历史剔除/兜底未来域/未来不足24h禁用/now=0向后兼容 ×4、detail ×1、data 对拍同参+全过期 ×2、favorites 文案优先级 ×1）。全量 **454 运行 / 0 失败 / 10 跳过** | 偏差①闭环；M6 剩余必修清零，接手即从打磨项开工 |
 | 2026-11-09 | **CHG-16 合入基线 + M6 三批次执行完毕**：批次 0 契约（Models.kt 只增 VetoCode/vetoCodes/tzOffsetSec）；批次 1 数据/算法（OPT-M5-04/02、D09/D13、FO-15、OPT-19、OPT-05、Room v3→v4、URL 收敛）；批次 2 UI（D04/D10/D11/D12/D14、OPT-M5-03/05/07、settings 新建、主题/文案层）；批次 3 `:app` 组装 + 自签名 APK。**负责人偏差裁决**：① Copernicus 凭据构建期 BuildConfig 注入接受（CHG-02 不上架 + CHG-11 单机自用；运行期外部文件读取登记 v1.1）；② F-3.7 DTO 级模型元数据透出登记 v1.1（需扩展 M2 网络层 DTO，超 M6 打磨边界）；③ 预取开关空操作语义（真预取 v1.1）。验收修正 sub-agent 缺口：批次 2 收尾 favorites 测试编译错误（`epoch` 助手跨类引用）由负责人修复 | M6 口径固化；八模块 573/0/12；APK 产出 |
 | 2026-11-09 | **版本管理建立（jj + git colocated）**：客户选择 Jujutsu；`jj git init --colocate` 于工作区根，单提交基线 `main`/`m6-exit` = `3c018c9`（204 文件：185 工程 + 19 根目录文档/规则；磁盘/库内 .kt 145=145 核验一致）。**建库过程教训（留证）**：① `.gitignore` 必须在首次快照前生效——jj 快照的忽略规则语义随父提交树上被跟踪的 .gitignore 走，规则后补救不了已跟踪文件；② `check-ignore` 对已跟踪文件不报"被忽略"，勿以此判定入库状态，以 `git ls-tree` 为准；③ 首轮基线混入 `tools/`(286)/`.m4tmp/`(26)/`.opencode/`(2) 垃圾与 `cm账号.txt`（Copernicus 账号明文，已入 .gitignore 且从未外发——本地对象库已随重建销毁）；④ Git for Windows 默认 autocrlf 会在 jj side 产生全量假差异——已加 `.gitattributes`（`* -text`）+ 仓库级 autocrlf=false 根治。失败 checkout 曾误删磁盘 .gitignore 与根目录文档，已从 tag 指向的完好树恢复。真机修复批次起每批次一次 jj 修订提交，验收期全程可审计 diff | 交付基线可审计；APK↔tag 绑定就绪 |
+| 2026-11-09 | **CHG-17 登记后 CHG-18 合入（V1.1 优化批次 A）**：A-1~A-5 全清 + 真机迁移锁抓出 P0 升级缺陷（`MIGRATION_3_4` 列名 `veto_codes` ≠ 实体属性 `vetoCodes`，v3→v4 升级 schema 校验必崩）当日修复双锁；androidTest 基建引入 androidx.test 三件套（maven 可达性确认 + 本机代理 MITM 证书以 `trustStoreType=WINDOWS-ROOT` 过验）；verify.ps1 本地 CI 门禁就位；**环境预警转解锁**：本机网络经代理可用 → C 类（A-14 Robolectric/C-2 AGP 升级/C-3 lifecycle-runtime-compose）下一批次可开工 | 八模块 561/0/0（跳过清零）+ 真机 6/6；详见 REQUIREMENTS_REGISTER CHG-18 |
 
 ## 6. 风险快照（Top 3）
 
 | ID | 风险 | 状态 | 近期动作 |
 |---|---|---|---|
-| R-09 | 中文路径导致 Gradle 构建不稳定 | 🟢 缓解 | subst T: + `.tools` Gradle + UTF-8 jvmArgs 已稳定跑通；A-05 本机双确认收尾 |
+| R-09 | 中文路径导致 Gradle 构建不稳定 | 🟢 缓解 | subst T: + `.tools` Gradle + UTF-8 jvmArgs 已稳定跑通；**A-5 本机正式 gradlew 首跑验证通过（11-09）**——物理中文路径下 favorites 等未配 jvmArgs 的模块仍有类加载失败，**subst T: 维持标准构建路径** |
 | ~~R-02/R-07~~ | 真机资源不足 → 验收顺延 | 🟢 **关闭（CHG-11）** | 客户提供单台荣耀机（Android 16/无 GMS）作验收设备；GMS 通道书面豁免 |
 | OSTIA 图层故障 | 千岛湖掩膜复测暂缓（服务器端） | 🟡 关注中 | A-07：恢复后一条 curl 复测；CHG-09 UNKNOWN 方案已兜底 |

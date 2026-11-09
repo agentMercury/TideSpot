@@ -42,7 +42,8 @@ object GmsDetector {
 /**
  * 定位控制器（Android 侧薄封装，逻辑判定在状态机/纯函数内）：
  * - 有 GMS：FusedLocationProviderClient.getCurrentLocation（BALANCED 精度）；
- * - 无 GMS：回退 LocationManager.requestSingleUpdate(GPS_PROVIDER)；
+ * - 无 GMS：回退 LocationManager.requestLocationUpdates(GPS_PROVIDER)（FO-25：原
+ *   requestSingleUpdate 自 API 30 弃用；监听器在首次回调后 removeUpdates，保持单次语义）；
  *   GPS 关闭时退最后已知位置（GPS → NETWORK）。
  * 回调统一在主线程发出，且带超时兜底（只回调一次）。
  */
@@ -110,7 +111,15 @@ class LocationController(
         }
         try {
             if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                lm.requestSingleUpdate(LocationManager.GPS_PROVIDER, listener, Looper.getMainLooper())
+                // FO-25（A-2）：requestSingleUpdate(API 30 起弃用) → requestLocationUpdates；
+                // listener.onLocationChanged 首次回调即 removeUpdates（上方已实现），单次语义不变。
+                lm.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    0L,
+                    0f,
+                    listener,
+                    Looper.getMainLooper(),
+                )
             } else {
                 onLocation(
                     lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)

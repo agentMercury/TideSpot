@@ -11,6 +11,13 @@ android {
 
     defaultConfig {
         minSdk = 26
+        // A-1（CHG-18/BLK-04）：Room 真机仪器测试 runner
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // A-1（CHG-18/BLK-04）：MigrationTestHelper 从 instrumentation assets 加载 schema JSON
+    sourceSets.getByName("androidTest") {
+        assets.srcDir("$projectDir/schemas")
     }
 
     compileOptions {
@@ -56,4 +63,11 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.room.testing)
+
+    // A-1（CHG-18/BLK-04）：Room 真机仪器测试（RoomDaoTest/RoomMigrationTest @Ignore 解锁）
+    androidTestImplementation(kotlin("test"))
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
 }

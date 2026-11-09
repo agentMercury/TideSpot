@@ -96,7 +96,10 @@ abstract class TideSpotDatabase : RoomDatabase() {
      * MigrationTestHelper 验证沿用 RoomMigrationTest @Ignore 先例）：
      * 1. 新表 manual_observation（观测时刻 + spotId 两个索引）；
      * 2. 新表 manual_tide_fit（spotId PK，REPLACE 覆盖式）；
-     * 3. hourly_score 尾增列 veto_codes TEXT NOT NULL DEFAULT '[]'
+     * 3. hourly_score 尾增列 vetoCodes TEXT NOT NULL DEFAULT '[]'
+     *    （列名必须与 HourlyScoreEntity 属性名一致——Room 默认列名=属性名（无 @ColumnInfo name），
+     *    真机迁移校验锁（A-1/RoomMigrationInstrumentedTest）实证：列名写成 veto_codes 会导致
+     *    v3→v4 升级路径 schema 校验崩溃（P0），新装路径不受影响）。
      *    （与 HourlyScoreEntity @ColumnInfo(defaultValue = "[]") 一致，CHG-16①）。
      */
     val MIGRATION_3_4_STATEMENTS: List<String> = listOf(
@@ -111,12 +114,12 @@ abstract class TideSpotDatabase : RoomDatabase() {
             "`spotId` INTEGER NOT NULL, `lagHours` INTEGER NOT NULL, `offsetM` REAL NOT NULL, " +
             "`gain` REAL NOT NULL, `adopted` INTEGER NOT NULL, `updatedAtEpochMs` INTEGER NOT NULL, " +
             "PRIMARY KEY(`spotId`))",
-        "ALTER TABLE `hourly_score` ADD COLUMN `veto_codes` TEXT NOT NULL DEFAULT '[]'",
+        "ALTER TABLE `hourly_score` ADD COLUMN `vetoCodes` TEXT NOT NULL DEFAULT '[]'",
     )
 
     /**
      * v3→v4（M6/CHG-16⑥）：新增 manual_observation / manual_tide_fit 两表 + hourly_score
-     * 尾增 veto_codes 列。v3 既有表数据不变（ALTER 只加列，旧行取 DEFAULT '[]' =
+     * 尾增 vetoCodes 列。v3 既有表数据不变（ALTER 只加列，旧行取 DEFAULT '[]' =
      * 无否决码语义，与 vetoReason NULL 对称）。
      */
     val MIGRATION_3_4 = object : Migration(3, 4) {

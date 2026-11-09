@@ -105,15 +105,15 @@ OPT-M5-06（相对时间）/08（观测涨退潮标注+补记）/09（水质实�
 
 ### 已知可优化项清单（负责人裁定，2026-11-09；接手会话按此表执行，勿超裁）
 
-**A 类·可直接开工**（前提：不新增依赖、不放宽契约、不改变用户可见行为；走「台账登记 →（涉签名则 CONTRACT 尾增）→ 批次执行 → 八模块全量回归 → jj 修订提交」流程）：
+**A 类·可直接开工**（前提：不新增依赖、不放宽契约、不改变用户可见行为；走「台账登记 →（涉签名则 CONTRACT 尾增）→ 批次执行 → 八模块全量回归 → jj 修订提交」流程）——**✅ 2026-11-09 全清（CHG-18；含真机迁移锁抓出的 P0 缺陷修复，详见台账）**：
 
 | # | 项 | 说明 | 前置 |
 |---|---|---|---|
-| A-1 | BLK-04 RoomDaoTest / RoomMigrationTest v4 真机解锁 | `@Ignore` 用例真机跑通后移除 Ignore、留证 | 真机 USB 连接（冒烟环境已就绪） |
-| A-2 | `:feature:map` `requestSingleUpdate` 弃用 API 迁移 | FO-25 残留；需解锁「:feature:map 禁改」为本文件单点放行 | 台账登记放行范围 |
-| A-3 | 本地验证脚本 `verify.ps1` | 一键 subst+JAVA_HOME+七模块测试+红线扫描+assembleRelease（OPT-05 CI 门禁本地形态） | 无 |
-| A-4 | `tools/` 204MB 重复目录清理 | 与 `.tools/` 完全重复的副本（jj 建库时已识别） | **用户确认后删除**（用户自建目录，负责人不代删） |
-| A-5 | `settings.gradle.kts`/`gradle.properties` 中文路径决策收尾（A-05） | 本机正式 `gradlew` 首跑需联网下载发行包 | 网络可用 |
+| ✅ A-1 | BLK-04 RoomDaoTest / RoomMigrationTest v4 真机解锁 | 空壳 6 用例落地 androidTest，真机 6/6（AAK-AN00）；抓出并修复 MIGRATION_3_4 列名 P0 缺陷 | ~~真机 USB 连接~~ 已就绪 |
+| ✅ A-2 | `:feature:map` `requestSingleUpdate` 弃用 API 迁移 | `requestLocationUpdates` 单次语义等价迁移（已放行） | ~~台账登记放行范围~~ 已登记 |
+| ✅ A-3 | 本地验证脚本 `verify.ps1` | 已落盘并实测全绿（subst 自愈+JAVA_HOME+红线+八模块+assembleRelease+代理注入） | ~~无~~ — |
+| ✅ A-4 | `tools/` 204MB 重复目录清理 | 与 `.tools/` 逐目录核实一致后删除 | ~~用户确认~~ 已授权 |
+| ✅ A-5 | `settings.gradle.kts`/`gradle.properties` 中文路径决策收尾（A-05） | 本机正式 `gradlew` 首跑验证通过；subst T: 维持标准构建路径 | ~~网络可用~~ 已验证 |
 
 **B 类·需需求环节介入**（用户可见行为变化 / 算法与数据语义变化 / 契约放宽，须客户拍板排期后按 CHG 登记）：
 
@@ -126,7 +126,7 @@ OPT-M5-06（相对时间）/08（观测涨退潮标注+补记）/09（水质实�
 | B-5 | 真预取（进详情后台预刷新） | 需 `:feature:detail` API 扩展 + 行为变化 |
 | B-6 | Copernicus 凭据改运行期外部文件读取 | 安全加固方向已裁决接受 BuildConfig 方案；改动需重新裁定 |
 
-**C 类·环境阻塞（沙箱不可做，接手会话遇网络可用时执行）**：
+**C 类·环境阻塞（~~沙箱不可做~~ **2026-11-09 解锁：本机网络经代理可用，转下一批次开工**；verify.ps1 已内置代理注入）**：
 
 | # | 项 | 阻塞点 |
 |---|---|---|
