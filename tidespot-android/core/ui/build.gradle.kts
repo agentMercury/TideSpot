@@ -26,13 +26,23 @@ android {
     }
 
     testOptions {
-        unitTests.isReturnDefaultValues = true
+        unitTests {
+            isReturnDefaultValues = true
+            // C-1（CHG-19/A-14）：Robolectric 需要资源访问
+            isIncludeAndroidResources = true
+        }
     }
 }
 
 // Windows 非 ASCII 项目路径下，test worker 需显式 UTF-8 编码才能正确加载测试类（与 :feature:map 一致）
+// C-1（CHG-19）：Robolectric 运行期自下载 android-all jar 走独立 JVM——把 daemon 上的代理/信任库
+// 系统属性透传给 test worker（无代理环境为 no-op，不影响 CI/沙箱）。
 tasks.withType<Test>().configureEach {
     jvmArgs("-Dfile.encoding=UTF-8", "-Dsun.jnu.encoding=UTF-8")
+    listOf(
+        "http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort",
+        "javax.net.ssl.trustStoreType",
+    ).forEach { key -> System.getProperty(key)?.let { systemProperty(key, it) } }
     testLogging {
         events("passed", "failed", "skipped")
         showStandardStreams = false
@@ -51,4 +61,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(kotlin("test"))
+    // C-1（CHG-19/A-14）：Robolectric + Compose ui-test 组装层冒烟锁（补「组装层零覆盖」盲区）
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.androidx.compose.ui.test.manifest)
 }

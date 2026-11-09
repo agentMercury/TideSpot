@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // C-3（CHG-19/FO-25）：LocalLifecycleOwner 自 compose.ui.platform 迁至 lifecycle-runtime-compose
+    implementation(libs.androidx.lifecycle.runtime.compose)
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     // 定位双通道（F-1.2）：有 GMS 走 FusedLocationProviderClient
