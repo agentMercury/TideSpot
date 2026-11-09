@@ -1,0 +1,22 @@
+# ---- 本机配置与密钥（NEW-10/CHG-09：防泄密，禁止入库） ----
+local.properties
+local-secrets.properties
+*.keystore
+*.jks
+
+# ---- 构建产物 ----
+.gradle/
+build/
+*/build/
+*/*/build/
+
+# ---- 日志与临时文件 ----
+*_log*.txt
+*_err.txt
+*_out*.txt
+.probe/
+
+# ---- IDE ----
+.idea/
+*.iml
+.vscode/

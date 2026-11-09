@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 深色档窗口背景（Compose 内 TideSpotTheme 按系统明暗切换配色） -->
+    <style name="Theme.TideSpot" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+</resources>

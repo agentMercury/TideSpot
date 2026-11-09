@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "comment": "OPT-19/M6 CHG-16 8 物种预设库：weightOverrides 仅覆盖出现的因子（其余沿用场景预设权重）；waterBodies 为适用水体类型（WaterBodyType.name）。解析唯一入口 SpeciesPresets.load()，场景预设解析仍走 HourlyScoreStore.resolvePreset（硬约束 6 不变）。权重取值依据 §6.4 表三列量级内插。",
+  "species": [
+    {
+      "speciesId": "crucian_carp",
+      "name": "鲫鱼",
+      "waterBodies": ["INLAND_WATER"],
+      "weightOverrides": {"OXYGEN": 0.24, "PRESSURE": 0.13, "SOLUNAR": 0.15, "WIND": 0.10, "WEATHER": 0.11, "DAYPART": 0.10, "TEMP_MATCH": 0.11, "COMFORT": 0.06}
+    },
+    {
+      "speciesId": "common_carp",
+      "name": "鲤鱼",
+      "waterBodies": ["INLAND_WATER"],
+      "weightOverrides": {"OXYGEN": 0.20, "PRESSURE": 0.14, "SOLUNAR": 0.16, "WIND": 0.10, "WEATHER": 0.10, "DAYPART": 0.08, "TEMP_MATCH": 0.14, "COMFORT": 0.08}
+    },
+    {
+      "speciesId": "grass_carp",
+      "name": "草鱼",
+      "waterBodies": ["INLAND_WATER"],
+      "weightOverrides": {"OXYGEN": 0.22, "PRESSURE": 0.12, "SOLUNAR": 0.16, "WIND": 0.08, "WEATHER": 0.12, "DAYPART": 0.08, "TEMP_MATCH": 0.16, "COMFORT": 0.06}
+    },
+    {
+      "speciesId": "topmouth_culter",
+      "name": "翘嘴鲌",
+      "waterBodies": ["INLAND_WATER"],
+      "weightOverrides": {"OXYGEN": 0.20, "PRESSURE": 0.13, "SOLUNAR": 0.18, "WIND": 0.13, "WEATHER": 0.10, "DAYPART": 0.08, "TEMP_MATCH": 0.12, "COMFORT": 0.06}
+    },
+    {
+      "speciesId": "mandarin_fish",
+      "name": "鳜鱼",
+      "waterBodies": ["INLAND_WATER"],
+      "weightOverrides": {"OXYGEN": 0.19, "PRESSURE": 0.12, "SOLUNAR": 0.19, "WIND": 0.09, "WEATHER": 0.09, "DAYPART": 0.12, "TEMP_MATCH": 0.14, "COMFORT": 0.06}
+    },
+    {
+      "speciesId": "largemouth_bass",
+      "name": "大口黑鲈",
+      "waterBodies": ["INLAND_WATER"],
+      "weightOverrides": {"OXYGEN": 0.21, "PRESSURE": 0.14, "SOLUNAR": 0.17, "WIND": 0.10, "WEATHER": 0.10, "DAYPART": 0.08, "TEMP_MATCH": 0.14, "COMFORT": 0.06}
+    },
+    {
+      "speciesId": "black_porgy",
+      "name": "黑鲷",
+      "waterBodies": ["OCEAN", "NEARSHORE"],
+      "weightOverrides": {"OXYGEN": 0.14, "PRESSURE": 0.11, "SOLUNAR": 0.13, "TIDE": 0.24, "WIND": 0.11, "WEATHER": 0.09, "DAYPART": 0.06, "TEMP_MATCH": 0.06, "COMFORT": 0.06}
+    },
+    {
+      "speciesId": "sea_bass",
+      "name": "海鲈",
+      "waterBodies": ["OCEAN", "NEARSHORE"],
+      "weightOverrides": {"OXYGEN": 0.15, "PRESSURE": 0.11, "SOLUNAR": 0.14, "TIDE": 0.21, "WIND": 0.12, "WEATHER": 0.09, "DAYPART": 0.06, "TEMP_MATCH": 0.06, "COMFORT": 0.06}
+    }
+  ]
+}

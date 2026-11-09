@@ -1,0 +1,29 @@
+# 工作区根 .gitignore（覆盖 tidespot-android 之外的本机文件）
+# 密钥（最高优先级，一旦 git init 必须被忽略）
+tidespot-android/local-secrets.properties
+local-secrets.properties
+cm账号.txt
+*.keystore
+*.jks
+
+# 本机构建工具与探针产物
+.tools/
+.probe/
+# M6 建库核查（2026-11-09）：杂项目录不入库——tools/ 为 .tools/ 的 204MB 副本（jj 大文件保护拦截），
+# .m4tmp/.opencode 为会话/工具临时数据
+tools/
+.m4tmp/
+.opencode/
+
+# 构建产物（CHG-12 修正：原 `tidespot-android/*/` 会把 core/feature/gradle 源码目录整体排除出版本库）
+tidespot-android/build/
+tidespot-android/*/build/
+tidespot-android/*/*/build/
+
+# 本地归档（黄金资产/探针产物，只留本机不入库）
+archive/
+
+# IDE
+.idea/
+*.iml
+.vscode/
