@@ -15,7 +15,7 @@
 | 需求基线 | `TIDESPORT_REQUIREMENTS-修改.md`（SRS v1.3；CHG-06~15 均已回写/登记） |
 | 交付物 | **可安装 APK（自签名）**，不上架（CHG-02）；目标交付日 **2026-12-08** |
 | 排期基线 | `PROJECT_PLAN.md` v1.0：M0–M6 + 交付验收，当前**领先约 16 天** |
-| 状态台账 | `PROGRESS_TRACKER.md`（每里程碑退出必更）｜ 变更台账：`REQUIREMENTS_REGISTER.md`（至 **CHG-16**）｜ 数据源结论：`DATA_SOURCE_PROBE.md` |
+| 状态台账 | `PROGRESS_TRACKER.md`（每里程碑退出必更）｜ 变更台账：`REQUIREMENTS_REGISTER.md`（至 **CHG-16**）｜ 数据源结论：`DATA_SOURCE_PROBE.md` ｜ **版本管理**：jj+git colocated（工作区根），基线 tag `m6-exit`=`3c018c9`，修复批次每批一次修订提交 |
 
 ## 2. 当前状态（2026-11-09 M6 交接时）
 
