@@ -90,6 +90,16 @@ android {
         buildConfig = true
     }
 
+    // 产物命名（客户约定）：APP 名字 + 版本号 →「潮点TideSpot-v{versionName}.apk」；
+    // versionName 变更时产物名自动跟随，无需改脚本
+    applicationVariants.all {
+        val vName = versionName
+        outputs.all {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl)
+                .outputFileName = "潮点TideSpot-v$vName.apk"
+        }
+    }
+
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
