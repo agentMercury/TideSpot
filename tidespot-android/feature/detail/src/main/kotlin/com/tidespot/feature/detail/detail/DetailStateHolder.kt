@@ -5,6 +5,7 @@ import com.tidespot.core.data.repo.SpotDetailResult
 import com.tidespot.core.data.repo.Ttl
 import com.tidespot.core.domain.algorithm.ScenePreset
 import com.tidespot.core.domain.model.FishScoreResult
+import com.tidespot.core.domain.window.BestWindowFinder
 import com.tidespot.core.ui.breakdown.RawInputRow
 import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.selector.DaySelectorLogic
@@ -30,6 +31,24 @@ class DetailStateHolder(
     )
     val state: StateFlow<DetailUiState> = _state
 
+    /** OPT-V11-03（CHG-27）：最近一次 onResult 的「下一整点」（时段筛选重算的时间域下限）。 */
+    private var lastNextHourEpochSec = 0L
+
+    /**
+     * OPT-V11-03（CHG-27）：按输出时段重算 Top10——与全窗同源（state.scores + result.marine + 同一 find），
+     * 仅加 windowStart/End 输出过滤（不改候选/rank/去重；空结果兜底取时段内最高分）。
+     */
+    fun top10Filtered(windowStartEpochSec: Long, windowEndEpochSec: Long): BestWindowFinder.Output {
+        val s = _state.value
+        return TopWindowDerivations.top10(
+            scores = s.scores,
+            marine = s.result?.marine ?: emptyList(),
+            nowEpochSec = lastNextHourEpochSec,
+            windowStartEpochSec = windowStartEpochSec,
+            windowEndEpochSec = windowEndEpochSec,
+        )
+    }
+
     /** 数据到达（缓存先行或刷新完成）→ 一次性派生。 */
     fun onResult(result: SpotDetailResult, nowMillis: Long = System.currentTimeMillis()) {
         val weatherByEpoch = result.weather.associateBy { it.timeEpochSec }
@@ -46,6 +65,7 @@ class DetailStateHolder(
         val nowSec = nowMillis / 1000
         val nextHourEpochSec = nowSec - nowSec % 3600 + 3600
         val top10 = TopWindowDerivations.top10(scores, result.marine, nowEpochSec = nextHourEpochSec)
+        lastNextHourEpochSec = nextHourEpochSec
         val quality = if (weatherUnusable) emptyList()
         else Derivations.qualitySeries(result.slices, weatherByEpoch, zone, preset.salinityPpt)
         _state.update {

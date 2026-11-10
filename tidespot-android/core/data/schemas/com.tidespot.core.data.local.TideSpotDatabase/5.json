@@ -1,0 +1,586 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "b543b622b77f3b9dc5162ca50f42e37d",
+    "entities": [
+      {
+        "tableName": "spot",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `name` TEXT NOT NULL, `elevation` REAL, `waterBodyType` TEXT NOT NULL, `tzOffsetSec` INTEGER, `favorite` INTEGER NOT NULL, `note` TEXT, `groupPreset` TEXT, `speciesId` TEXT, `tagsJson` TEXT NOT NULL, `lastViewedAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `createdAtEpochSec` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lon",
+            "columnName": "lon",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "elevation",
+            "columnName": "elevation",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "waterBodyType",
+            "columnName": "waterBodyType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tzOffsetSec",
+            "columnName": "tzOffsetSec",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "groupPreset",
+            "columnName": "groupPreset",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "speciesId",
+            "columnName": "speciesId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tagsJson",
+            "columnName": "tagsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastViewedAt",
+            "columnName": "lastViewedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtEpochSec",
+            "columnName": "createdAtEpochSec",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "hourly_metric",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotId` INTEGER NOT NULL, `hourEpoch` INTEGER NOT NULL, `hourLocal` TEXT, `kind` TEXT NOT NULL, `field` TEXT NOT NULL, `value` REAL, `source` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`spotId`, `hourEpoch`, `field`))",
+        "fields": [
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hourEpoch",
+            "columnName": "hourEpoch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hourLocal",
+            "columnName": "hourLocal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "field",
+            "columnName": "field",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotId",
+            "hourEpoch",
+            "field"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_hourly_metric_spotId",
+            "unique": false,
+            "columnNames": [
+              "spotId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hourly_metric_spotId` ON `${TABLE_NAME}` (`spotId`)"
+          },
+          {
+            "name": "index_hourly_metric_spotId_kind",
+            "unique": false,
+            "columnNames": [
+              "spotId",
+              "kind"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hourly_metric_spotId_kind` ON `${TABLE_NAME}` (`spotId`, `kind`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "fetch_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `spotId` INTEGER NOT NULL, `source` TEXT NOT NULL, `urlHash` INTEGER NOT NULL, `httpStatus` INTEGER, `bytes` INTEGER, `costMs` INTEGER NOT NULL, `fetchedAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "urlHash",
+            "columnName": "urlHash",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "httpStatus",
+            "columnName": "httpStatus",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bytes",
+            "columnName": "bytes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "costMs",
+            "columnName": "costMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAt",
+            "columnName": "fetchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_fetch_log_spotId",
+            "unique": false,
+            "columnNames": [
+              "spotId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_fetch_log_spotId` ON `${TABLE_NAME}` (`spotId`)"
+          },
+          {
+            "name": "index_fetch_log_spotId_source",
+            "unique": false,
+            "columnNames": [
+              "spotId",
+              "source"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_fetch_log_spotId_source` ON `${TABLE_NAME}` (`spotId`, `source`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "spot_reverse_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotKey` TEXT NOT NULL, `displayName` TEXT NOT NULL, `subLabel` TEXT, `plusCode` TEXT, `locality` TEXT, `city` TEXT, `admin1` TEXT, `source` TEXT NOT NULL, `resolvedAtEpochMs` INTEGER NOT NULL, PRIMARY KEY(`spotKey`))",
+        "fields": [
+          {
+            "fieldPath": "spotKey",
+            "columnName": "spotKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subLabel",
+            "columnName": "subLabel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "plusCode",
+            "columnName": "plusCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "locality",
+            "columnName": "locality",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "city",
+            "columnName": "city",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "admin1",
+            "columnName": "admin1",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resolvedAtEpochMs",
+            "columnName": "resolvedAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "spot_water_body_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotKey` TEXT NOT NULL, `waterBodyType` TEXT NOT NULL, `judgedAtEpochMs` INTEGER NOT NULL, PRIMARY KEY(`spotKey`))",
+        "fields": [
+          {
+            "fieldPath": "spotKey",
+            "columnName": "spotKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "waterBodyType",
+            "columnName": "waterBodyType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "judgedAtEpochMs",
+            "columnName": "judgedAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "hourly_score",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotId` INTEGER NOT NULL, `hourEpoch` INTEGER NOT NULL, `hourLocal` TEXT, `score` REAL NOT NULL, `band` TEXT NOT NULL, `vetoReason` TEXT, `factorsJson` TEXT NOT NULL, `algoVersion` INTEGER NOT NULL, `vetoCodes` TEXT NOT NULL DEFAULT '[]', PRIMARY KEY(`spotId`, `hourEpoch`, `algoVersion`))",
+        "fields": [
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hourEpoch",
+            "columnName": "hourEpoch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hourLocal",
+            "columnName": "hourLocal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "score",
+            "columnName": "score",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "band",
+            "columnName": "band",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vetoReason",
+            "columnName": "vetoReason",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "factorsJson",
+            "columnName": "factorsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "algoVersion",
+            "columnName": "algoVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vetoCodes",
+            "columnName": "vetoCodes",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'[]'"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotId",
+            "hourEpoch",
+            "algoVersion"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_hourly_score_spotId",
+            "unique": false,
+            "columnNames": [
+              "spotId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hourly_score_spotId` ON `${TABLE_NAME}` (`spotId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "manual_observation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `spotId` INTEGER NOT NULL, `observedAtEpochSec` INTEGER NOT NULL, `createdAtEpochMs` INTEGER NOT NULL, `kind` TEXT NOT NULL DEFAULT 'TIDE_OBSERVATION', `value` REAL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observedAtEpochSec",
+            "columnName": "observedAtEpochSec",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtEpochMs",
+            "columnName": "createdAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'TIDE_OBSERVATION'"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_manual_observation_spotId",
+            "unique": false,
+            "columnNames": [
+              "spotId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_manual_observation_spotId` ON `${TABLE_NAME}` (`spotId`)"
+          },
+          {
+            "name": "index_manual_observation_spotId_observedAtEpochSec",
+            "unique": false,
+            "columnNames": [
+              "spotId",
+              "observedAtEpochSec"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_manual_observation_spotId_observedAtEpochSec` ON `${TABLE_NAME}` (`spotId`, `observedAtEpochSec`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "manual_tide_fit",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`spotId` INTEGER NOT NULL, `lagHours` INTEGER NOT NULL, `offsetM` REAL NOT NULL, `gain` REAL NOT NULL, `adopted` INTEGER NOT NULL, `updatedAtEpochMs` INTEGER NOT NULL, PRIMARY KEY(`spotId`))",
+        "fields": [
+          {
+            "fieldPath": "spotId",
+            "columnName": "spotId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lagHours",
+            "columnName": "lagHours",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "offsetM",
+            "columnName": "offsetM",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gain",
+            "columnName": "gain",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adopted",
+            "columnName": "adopted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtEpochMs",
+            "columnName": "updatedAtEpochMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "spotId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b543b622b77f3b9dc5162ca50f42e37d')"
+    ]
+  }
+}

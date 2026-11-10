@@ -23,10 +23,15 @@ object BestWindowFinder {
         val fallbackBestEpochSec: Long? = null,
     )
 
-    private const val CANDIDATE_MIN = 60
+    // OPT-V11-26（D12/CHG-23/27）：候选阈值 60 → 75（"很适合"档中部，Top10 名实相符）。
+    // **单点常量**：现算侧（本 find）与 CHG-14② 读侧重建共用同一入口（读侧走 find，禁另写字面量）。
+    private const val CANDIDATE_MIN = 75
     private const val MERGE_GAP_HOURS = 1
     private const val DEDUP_MIDPOINT_HOURS = 2.5
     private const val TOP_N = 10
+
+    /** OPT-V11-25（D11）：核心段半宽（峰值 ±2h，跨度 ≤4h）。 */
+    private const val CORE_HALF_HOURS = 2
 
     /**
      * @param results 逐小时分数（升序，≤240 h）
@@ -44,6 +49,10 @@ object BestWindowFinder {
         validHoursPresent: Int = results.size,
         horizonDays: Int = 7,
         nowEpochSec: Long = 0,
+        // OPT-V11-03（CHG-27）：输出时间域筛选（只过滤结果，不改候选/rank/去重公式）；
+        // 0/0 = 不筛选（现有全窗行为，恒等锁）。相交判定用**原窗**（利好延续期内仍值得入选）。
+        windowStartEpochSec: Long = 0,
+        windowEndEpochSec: Long = 0,
     ): Output {
         // 0) 时间域过滤（CHG-15 偏差①）：results 升序，filter 保序；nowEpochSec=0 时零开销直通
         val inHorizon = if (nowEpochSec > 0) results.filter { it.timeEpochSec >= nowEpochSec } else results
@@ -77,22 +86,44 @@ object BestWindowFinder {
             return Output(emptyList(), msg, best?.timeEpochSec)
         }
 
-        // 3) rank(W) = 0.62·peak + 0.23·mean + 1.4·min(len,4)
+        // 3) 核心段派生 + rank（OPT-V11-25/D11）：rank = 0.62·peak + 0.23·coreMean + 1.4·min(coreLen,4)
+        //    —— **系数不变**（附录 C-4 禁顺手美化）；core = 峰值 −2h..+2h 且夹在原窗内；原窗 ≤4h 时 core=原窗（恒等）。
         val ranked = merged.map { w ->
-            val peak = w.hours.maxOf { it.total }
-            val mean = w.hours.map { it.total }.average()
-            val len = w.hours.size
             val peakHour = w.hours.maxBy { it.total }
-            val rank = 0.62 * peak + 0.23 * mean + 1.4 * min(len, 4)
-            RankedWindow(w.startEpoch, w.endEpoch, peak, peakHour, mean, len, rank)
+            val peak = peakHour.total
+            val peakEpoch = peakHour.timeEpochSec
+            val coreStart = maxOf(w.startEpoch, peakEpoch - CORE_HALF_HOURS * 3600L)
+            val coreEnd = minOf(w.endEpoch, peakEpoch + CORE_HALF_HOURS * 3600L)
+            val coreHours = w.hours.filter { it.timeEpochSec in coreStart..coreEnd }
+            val coreMean = if (coreHours.isEmpty()) peak.toDouble() else coreHours.map { it.total }.average()
+            val coreLen = coreHours.size.coerceAtLeast(1)
+            val rank = 0.62 * peak + 0.23 * coreMean + 1.4 * min(coreLen, 4)
+            RankedWindow(
+                startEpoch = w.startEpoch,
+                endEpoch = w.endEpoch,
+                peak = peak,
+                peakHour = peakHour,
+                mean = coreMean,
+                len = coreLen,
+                rank = rank,
+                coreStartEpoch = coreStart,
+                coreEndEpoch = coreEnd,
+            )
         }
 
         // 4) 同周期去重：两窗中点差 <2.5h 且同属一个潮汐周期（dh 符号连续段定义）→ 仅保留 rank 高者
+        //    （OPT-V11-25：中点仍用**原窗**，语义不变）
         val deduped = if (tideRates.isNullOrEmpty()) ranked else dedupByTideCycle(ranked, tideRates)
 
-        // 5) rank 降序前 10
-        val top = deduped.sortedByDescending { it.rank }.take(TOP_N).map { w ->
-            val contribTop = topFactors(w.peakHour)
+        // 5) rank 降序 → OPT-V11-03 时段筛选（原窗相交）→ 前 10
+        val sorted = deduped.sortedByDescending { it.rank }
+        val filteredOut = if (windowStartEpochSec > 0 && windowEndEpochSec > windowStartEpochSec) {
+            sorted.filter { it.startEpoch <= windowEndEpochSec && it.endEpoch >= windowStartEpochSec }
+        } else {
+            sorted
+        }
+        val top = filteredOut.take(TOP_N).map { w ->
+            val coreIsWholeWindow = w.coreStartEpoch == w.startEpoch && w.coreEndEpoch == w.endEpoch
             BestWindow(
                 startEpochSec = w.startEpoch,
                 peakEpochSec = w.peakHour.timeEpochSec,
@@ -100,11 +131,33 @@ object BestWindowFinder {
                 peakScore = w.peak,
                 rank = w.rank,
                 tier = tierOf(w.peak),
-                topFactors = contribTop,
+                topFactors = topFactors(w.peakHour),
                 warnings = warningsOf(w.peakHour, tideRates),
+                coreStartEpochSec = w.coreStartEpoch,
+                coreEndEpochSec = w.coreEndEpoch,
+                // 利好延续：仅当核心段短于原窗（UI 附注「利好持续至 HH:mm」；null = 核心即原窗）
+                truncatedUntilEpochSec = if (coreIsWholeWindow) null else w.endEpoch,
             )
         }
-        return Output(top, null)
+        if (top.isNotEmpty()) return Output(top, null)
+
+        // 5b) 时段筛选后为空（或全窗本就为空）：兜底文案只在**筛选时段内**取最高分参考
+        val best = if (windowStartEpochSec > 0 && windowEndEpochSec > windowStartEpochSec) {
+            inHorizon.filter { it.timeEpochSec in windowStartEpochSec..windowEndEpochSec }.maxByOrNull { it.total }
+        } else {
+            inHorizon.maxByOrNull { it.total }
+        }
+        val msg = when {
+            windowStartEpochSec > 0 && windowEndEpochSec > windowStartEpochSec ->
+                if (best != null) {
+                    "所选时段无 ≥$CANDIDATE_MIN 分窗口，时段内最高 ${best.total} 分"
+                } else {
+                    "所选时段无 ≥$CANDIDATE_MIN 分窗口"
+                }
+            best != null -> "未来 $horizonDays 天无 ≥$CANDIDATE_MIN 分窗口，最高 ${best.total} 分"
+            else -> "未来 $horizonDays 天无 ≥$CANDIDATE_MIN 分窗口"
+        }
+        return Output(emptyList(), msg, best?.timeEpochSec)
     }
 
     /** 6) 跨收藏点模式：各点独立跑 1–5，再按 rank 全局排序取 10（由调用方拼接后调 [rankAcrossSpots]）。 */
@@ -122,9 +175,13 @@ object BestWindowFinder {
         val endEpoch: Long,
         val peak: Int,
         val peakHour: FishScoreResult,
+        /** OPT-V11-25：核心段均值（rank 用；原窗 ≤4h 时 = 原窗均值）。 */
         val mean: Double,
+        /** OPT-V11-25：核心段小时数（≤4；rank 用）。 */
         val len: Int,
         val rank: Double,
+        val coreStartEpoch: Long,
+        val coreEndEpoch: Long,
     )
 
     private fun hasThunderstorm(r: FishScoreResult): Boolean =

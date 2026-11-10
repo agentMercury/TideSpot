@@ -55,6 +55,7 @@ class AppGraph(context: Context) {
             TideSpotDatabase.MIGRATION_1_2,
             TideSpotDatabase.MIGRATION_2_3,
             TideSpotDatabase.MIGRATION_3_4,
+            TideSpotDatabase.MIGRATION_4_5,
         )
         .build()
 

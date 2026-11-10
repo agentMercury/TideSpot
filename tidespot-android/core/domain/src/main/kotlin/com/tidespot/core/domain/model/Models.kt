@@ -128,6 +128,15 @@ data class BestWindow(
     val warnings: List<String>,
     /** FO-14（M5）：窗口 rank（0.62·peak+0.23·mean+1.4·min(len,4)），跨点聚合全局排序依据（默认 0 = 未计算，登记 CHG-14 允许只增）。 */
     val rank: Double = 0.0,
+    /**
+     * OPT-V11-25（D11/CHG-27）：核心段起点（峰值 −2h，夹在原窗内）；原窗跨度 ≤4h 时 = [startEpochSec]。
+     * 0 = 未派生（向后兼容；跨点聚合/时段筛选一律用原窗 [startEpochSec]/[peakEpochSec] 相交判定）。
+     */
+    val coreStartEpochSec: Long = 0,
+    /** OPT-V11-25：核心段终点（峰值 +2h，夹在原窗内）；核心段跨度恒 ≤4h。 */
+    val coreEndEpochSec: Long = 0,
+    /** OPT-V11-25：利好延续时刻（= 原窗尾，仅当 coreEnd < 原窗尾；UI 附注「利好持续至 HH:mm」）；null = 核心即原窗。 */
+    val truncatedUntilEpochSec: Long? = null,
 )
 
 /** 收藏点（F-2）。 */

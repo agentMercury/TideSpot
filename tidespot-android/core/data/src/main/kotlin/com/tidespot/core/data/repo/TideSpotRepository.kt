@@ -313,15 +313,61 @@ class TideSpotRepository(
                 spotId = spotId,
                 observedAtEpochSec = observedAtEpochSec,
                 createdAtEpochMs = nowMillis(),
+                kind = ManualObservationEntity.KIND_TIDE_OBSERVATION,
             ),
         )
     }
 
     /**
+     * OPT-V11-02（CHG-27；尾部只增）：水质实测值录入（水温/溶氧/浊度）。
+     * 离线可录入（纯本地落库）；[kind] 区分类型，校潮拟合只读 `TIDE_OBSERVATION`（不混算）。
+     *
+     * @param value 实测值（水温 ℃ / 溶氧 mg/L / 浊度 NTU；范围校验由 UI 层 [WaterQualityEntryLogic] 负责）
+     */
+    suspend fun addWaterQualityObservation(
+        spotId: Long,
+        kind: WaterQualityObservationKind,
+        value: Double,
+        observedAtEpochSec: Long,
+    ) {
+        val dao = manualObservationDao ?: throw IllegalStateException(
+            "manualObservationDao 未注入（生产由 :app 提供 Room 实现；观测不可静默丢弃）",
+        )
+        dao.insert(
+            ManualObservationEntity(
+                spotId = spotId,
+                observedAtEpochSec = observedAtEpochSec,
+                createdAtEpochMs = nowMillis(),
+                kind = kind.name,
+                value = value,
+            ),
+        )
+    }
+
+    /**
+     * OPT-V11-02：水质实测读回（按观测时刻升序；校潮观测不混入）。
+     * [manualObservationDao] 未注入 → 空列表（未登记语义）。
+     */
+    suspend fun waterQualityObservations(spotId: Long): List<WaterQualityObservation> =
+        manualObservationDao?.forSpot(spotId)
+            ?.filter { it.kind != ManualObservationEntity.KIND_TIDE_OBSERVATION }
+            ?.map {
+                WaterQualityObservation(
+                    id = it.id,
+                    spotId = it.spotId,
+                    kind = it.kind,
+                    value = it.value,
+                    observedAtEpochSec = it.observedAtEpochSec,
+                    createdAtEpochMs = it.createdAtEpochMs,
+                )
+            }
+            ?: emptyList()
+
+    /**
      * 观测记录读回（按观测时刻升序）；[manualObservationDao] 未注入 → 空列表（未登记语义）。
      */
     suspend fun tideObservations(spotId: Long): List<TideObservation> =
-        manualObservationDao?.forSpot(spotId)
+        manualObservationDao?.forSpotKind(spotId, ManualObservationEntity.KIND_TIDE_OBSERVATION)
             ?.map { TideObservation(it.id, it.spotId, it.observedAtEpochSec, it.createdAtEpochMs) }
             ?: emptyList()
 
@@ -569,6 +615,19 @@ data class TideObservation(
     /** 用户记录的高低潮时刻（epoch 秒）。 */
     val observedAtEpochSec: Long,
     /** 记录时刻（epoch 毫秒）。 */
+    val createdAtEpochMs: Long,
+)
+
+/** OPT-V11-02（CHG-27）：水质实测类型（落 `manual_observation.kind`；与校潮 `TIDE_OBSERVATION` 互斥）。 */
+enum class WaterQualityObservationKind { WATER_TEMP, DO, TURBIDITY }
+
+/** OPT-V11-02：水质实测记录（读回用；[value] 单位随 [kind]：WATER_TEMP=℃ / DO=mg/L / TURBIDITY=NTU）。 */
+data class WaterQualityObservation(
+    val id: Long,
+    val spotId: Long,
+    val kind: String,
+    val value: Double?,
+    val observedAtEpochSec: Long,
     val createdAtEpochMs: Long,
 )
 

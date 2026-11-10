@@ -937,7 +937,7 @@ class TideSpotRepositoryTest {
                 spotId = s.id,
                 hourEpoch = nextHour + h * 3600L,
                 hourLocal = null,
-                score = if (h == 100) 90.0 else 70.0,
+                score = if (h == 100) 90.0 else 80.0,
                 band = "很适合",
                 vetoReason = if (h == 100) "[\"雷暴（安全否决）\"]" else null,
                 factorsJson = "[]",

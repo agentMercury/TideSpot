@@ -1,12 +1,15 @@
 ﻿package com.tidespot.feature.detail.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -14,6 +17,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -27,14 +32,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.data.repo.DataSource
+import com.tidespot.core.data.repo.SourceMetaRegistry
 import com.tidespot.core.data.repo.Ttl
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.ui.badge.ConfidenceBadge
 import com.tidespot.core.ui.badge.Kind
+import com.tidespot.core.ui.band.ScoreBand
 import com.tidespot.core.ui.chart.HourChart
 import com.tidespot.core.ui.chart.HourChartMode
 import com.tidespot.core.ui.breakdown.FactorBreakdown
@@ -303,7 +311,7 @@ fun DetailScreen(
     // M5（F-3.5）：Top10 Sheet——state.top10 渲染（Top10Formatter 纯函数格式化；单层 LazyColumn 不嵌套）
     if (showTop10) {
         ModalBottomSheet(onDismissRequest = { showTop10 = false }) {
-            Top10SheetContent(state.top10, zone)
+            Top10SheetContent(state.top10, zone, viewModel)
         }
     }
     // M5（§6.2b 规则 5）：现场校潮 Sheet（观测 Session 级存 DetailViewModel；持久化登记 M6）
@@ -328,36 +336,101 @@ fun DetailScreen(
 
 /** Top10 Sheet 内容（F-3.5）：有窗口逐条渲染（起始/峰值/时长/峰值分+档位/Top2 主因/注意事项），无窗口走兜底文案。 */
 @Composable
-private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId) {
+private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, viewModel: DetailViewModel) {
+    // OPT-V11-03（CHG-27）：时段筛选（ALL=不筛选 → 与全窗恒等；预设/自选走 top10Filtered 重算）
+    var preset by remember { mutableStateOf(Top10TimeFilter.Preset.ALL) }
+    var customRange by remember { mutableStateOf<Top10TimeFilter.TimeRange?>(null) }
+    var showCustom by remember { mutableStateOf(false) }
+    val shown: BestWindowFinder.Output? = when {
+        output == null -> null
+        preset == Top10TimeFilter.Preset.ALL -> output
+        preset == Top10TimeFilter.Preset.THIS_WEEKEND || preset == Top10TimeFilter.Preset.NEXT_24H -> {
+            val range = Top10TimeFilter.presetRange(preset, System.currentTimeMillis() / 1000L, zone)
+            if (range == null) output else viewModel.top10Filtered(range.startEpochSec, range.endEpochSec)
+        }
+        else -> customRange?.let { viewModel.top10Filtered(it.startEpochSec, it.endEpochSec) }
+            ?: output
+    }
     Column(Modifier.padding(12.dp)) {
         Text("未来最佳窗口 Top10", style = MaterialTheme.typography.titleMedium)
+        Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.small) {
+            Row(Modifier.fillMaxWidth().padding(4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FilterChip(selected = preset == Top10TimeFilter.Preset.ALL,
+                    onClick = { preset = Top10TimeFilter.Preset.ALL },
+                    label = { Text("全部") },
+                    modifier = Modifier.semantics { contentDescription = "时段筛选：全部" })
+                FilterChip(selected = preset == Top10TimeFilter.Preset.NEXT_24H,
+                    onClick = { preset = Top10TimeFilter.Preset.NEXT_24H },
+                    label = { Text("接下来 24h") },
+                    modifier = Modifier.semantics { contentDescription = "时段筛选：接下来 24 小时" })
+                FilterChip(selected = preset == Top10TimeFilter.Preset.THIS_WEEKEND,
+                    onClick = { preset = Top10TimeFilter.Preset.THIS_WEEKEND },
+                    label = { Text("本周末") },
+                    modifier = Modifier.semantics { contentDescription = "时段筛选：本周末" })
+                FilterChip(selected = customRange != null,
+                    onClick = { showCustom = true },
+                    label = { Text("自选") },
+                    modifier = Modifier.semantics { contentDescription = "时段筛选：自选日期与时段" })
+            }
+        }
+        if (showCustom) {
+            CustomTimeRangeDialog(
+                zone = zone,
+                onDismiss = { showCustom = false },
+                onApply = { range ->
+                    preset = Top10TimeFilter.Preset.ALL
+                    customRange = range
+                    showCustom = false
+                },
+            )
+        }
         when {
-            output == null -> Text(
+            shown == null -> Text(
                 "数据未到达，加载中…",
                 Modifier.padding(vertical = 12.dp),
                 style = MaterialTheme.typography.bodyMedium,
             )
-            output.windows.isEmpty() -> Text(
-                Top10Formatter.fallbackLine(output.fallbackMessage ?: "暂无 ≥60 分窗口", output.fallbackBestEpochSec, zone),
+            shown.windows.isEmpty() -> Text(
+                Top10Formatter.fallbackLine(shown.fallbackMessage ?: "暂无 ≥75 分窗口", shown.fallbackBestEpochSec, zone),
                 Modifier.padding(vertical = 12.dp)
                     .semantics { contentDescription = "未来无达标窗口提示" },
                 style = MaterialTheme.typography.bodyMedium,
             )
             else -> LazyColumn(Modifier.padding(vertical = 8.dp)) {
-                items(output.windows.size) { i ->
-                    val w = output.windows[i]
+                items(shown.windows.size) { i ->
+                    val w = shown.windows[i]
                     Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Column(Modifier.padding(12.dp)) {
-                            Text(
-                                "#${i + 1}  ${Top10Formatter.peakScoreLine(w)}",
-                                style = MaterialTheme.typography.titleSmall,
-                            )
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                Text(
+                                    "#${i + 1}  ${Top10Formatter.peakScoreLine(w)}",
+                                    style = MaterialTheme.typography.titleSmall,
+                                )
+                                // OPT-V11-26（CHG-27）：≥80 爆护标识（档位色复用 ScoreBands，禁新硬编码色值）
+                                Top10Formatter.burstBadge(w)?.let { badge ->
+                                    Box(
+                                        Modifier.padding(start = 6.dp)
+                                            .background(Color(ScoreBand.EXPLOSIVE.argb))
+                                            .padding(horizontal = 6.dp, vertical = 1.dp),
+                                    ) {
+                                        Text(
+                                            badge,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(ScoreBand.EXPLOSIVE.onArgb),
+                                        )
+                                    }
+                                }
+                            }
                             Text(
                                 "起始 ${Top10Formatter.time(w.startEpochSec, zone)} · " +
                                     "峰值 ${Top10Formatter.hm(w.peakEpochSec, zone)} · " +
                                     "时长 ${Top10Formatter.duration(w.durationHours)}",
                                 style = MaterialTheme.typography.bodySmall,
                             )
+                            // OPT-V11-25（CHG-27）：核心段短于原窗时标注利好延续时刻（null 不显示）
+                            Top10Formatter.sustainedLine(w, zone)?.let {
+                                Text(it, style = MaterialTheme.typography.labelSmall)
+                            }
                             Text(
                                 "主因 ${Top10Formatter.topFactorsLine(w.topFactors)}",
                                 style = MaterialTheme.typography.bodySmall,
@@ -378,6 +451,58 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId) {
             }
         }
     }
+}
+
+/**
+ * OPT-V11-03（CHG-27）：自选时段对话框（日期 yyyy-MM-dd + 起/止 HH:mm，当地时区语义）。
+ * 校验走 [Top10TimeFilter.parseCustom] 纯函数（错误码 → 提示）。
+ */
+@Composable
+private fun CustomTimeRangeDialog(
+    zone: ZoneId,
+    onDismiss: () -> Unit,
+    onApply: (Top10TimeFilter.TimeRange) -> Unit,
+) {
+    val today = java.time.LocalDate.now(zone).toString()
+    var dateText by remember { mutableStateOf(today) }
+    var startText by remember { mutableStateOf("06:00") }
+    var endText by remember { mutableStateOf("20:00") }
+    var error by remember { mutableStateOf<Top10TimeFilter.CustomError?>(null) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("自选时段") },
+        text = {
+            Column {
+                OutlinedTextField(value = dateText, onValueChange = { dateText = it },
+                    label = { Text("日期（yyyy-MM-dd）") }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "自选日期" })
+                OutlinedTextField(value = startText, onValueChange = { startText = it },
+                    label = { Text("开始（HH:mm）") }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "自选开始时间" })
+                OutlinedTextField(value = endText, onValueChange = { endText = it },
+                    label = { Text("结束（HH:mm）") }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "自选结束时间" })
+                error?.let {
+                    Text(
+                        when (it) {
+                            Top10TimeFilter.CustomError.BAD_DATE -> "日期格式应为 yyyy-MM-dd"
+                            Top10TimeFilter.CustomError.BAD_TIME -> "时间格式应为 HH:mm"
+                            Top10TimeFilter.CustomError.END_NOT_AFTER_START -> "结束时间必须晚于开始时间"
+                        },
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                val parsed = Top10TimeFilter.parseCustom(dateText, startText, endText, zone)
+                if (parsed.range == null) error = parsed.error else onApply(parsed.range)
+            }) { Text("应用") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
+    )
 }
 
 /** 现场校潮 Sheet（§6.2b 规则 5）：记录观测 → fitManual（≥2 条有效才启用，UI 只透传）。 */
@@ -491,9 +616,14 @@ private fun SourceFooter(result: com.tidespot.core.data.repo.SpotDetailResult, z
         val w = result.fetchedAtMillis[DataSource.WEATHER]?.takeIf { it > 0 }
         val m = result.fetchedAtMillis[DataSource.MARINE]?.takeIf { it > 0 }
         if (tab != DetailTab.SCORE && tab != DetailTab.WATER_QUALITY) {
-            if (m != null) add("海洋来源 · 本机拉取 ${Format.clockMillis(m, zone)}")
+            if (m != null) {
+                // OPT-V11-04（CHG-27）：模型名/分辨率/粒度取契约映射表（禁 Screen 硬编码）；禁编造源更新时间
+                add("海洋来源 · ${SourceMetaRegistry.line(DataSource.MARINE)} · 本机拉取 ${Format.clockMillis(m, zone)}")
+            }
         }
-        if (w != null) add("天气来源 · 本机拉取 ${Format.clockMillis(w, zone)}")
+        if (w != null) {
+            add("天气来源 · ${SourceMetaRegistry.line(DataSource.WEATHER)} · 本机拉取 ${Format.clockMillis(w, zone)}")
+        }
         if (result.servedFromCache.isNotEmpty()) add("当前显示为最近缓存（重试失败保留旧数据）")
     }
     Column(Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {

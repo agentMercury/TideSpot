@@ -140,6 +140,16 @@ interface ManualObservationDao {
     /** 按观测时刻升序（fitManual 与 D12 对照的确定性口径）。 */
     @Query("SELECT * FROM manual_observation WHERE spotId = :spotId ORDER BY observedAtEpochSec ASC, id ASC")
     suspend fun forSpot(spotId: Long): List<ManualObservationEntity>
+
+    /**
+     * OPT-V11-02（CHG-27）：按类型查询（校潮拟合只取 TIDE_OBSERVATION，水质实测录入取 WATER_TEMP/DO/TURBIDITY——
+     * 两类观测不得混入彼此计算）。
+     */
+    @Query(
+        "SELECT * FROM manual_observation WHERE spotId = :spotId AND kind = :kind " +
+            "ORDER BY observedAtEpochSec ASC, id ASC",
+    )
+    suspend fun forSpotKind(spotId: Long, kind: String): List<ManualObservationEntity>
 }
 
 /** 现场校潮拟合参数 DAO（每点一行，REPLACE 覆盖式登记；adopted=false 也登记）。 */

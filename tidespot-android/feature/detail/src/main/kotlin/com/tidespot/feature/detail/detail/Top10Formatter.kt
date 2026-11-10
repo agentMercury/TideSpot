@@ -32,6 +32,20 @@ object Top10Formatter {
     /** 峰值分 + 档位 → "92 分 · 爆护窗口"（tier 直接透传）。 */
     fun peakScoreLine(window: BestWindow): String = "${window.peakScore} 分 · ${window.tier}"
 
+    /**
+     * OPT-V11-26（CHG-27）：爆护标识——核心段峰值 ≥80 时返回「爆护」，否则 null。
+     * 阈值与 §6.3 档位同源（`BestWindowFinder.tierOf` 的 80 边界；禁另写数字）。
+     */
+    fun burstBadge(window: BestWindow): String? =
+        if (window.peakScore >= 80) "爆护" else null
+
+    /**
+     * OPT-V11-25（CHG-27）：持续性标注——核心段短于原窗时附「利好持续至 HH:mm」（当地时区）；
+     * core=原窗（truncatedUntil=null）→ null（不显示，禁空串）。
+     */
+    fun sustainedLine(window: BestWindow, zone: java.time.ZoneId): String? =
+        window.truncatedUntilEpochSec?.let { "利好持续至 ${hm(it, zone)}" }
+
     /** Top2 主因拼接 → "A、B"；空 → "—"（isEmpty() 判定，禁 0 填充）。 */
     fun topFactorsLine(topFactors: List<String>): String =
         if (topFactors.isEmpty()) Format.MISSING else topFactors.take(2).joinToString("、")

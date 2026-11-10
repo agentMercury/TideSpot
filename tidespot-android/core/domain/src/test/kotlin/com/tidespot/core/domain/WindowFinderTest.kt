@@ -51,20 +51,21 @@ class WindowFinderTest {
     }
 
     @Test
-    fun `rank 公式 = 0_62peak + 0_23mean + 1_4min(len,4)`() {
-        // 窗 A：peak 90、mean 90、len 1 → rank = 55.8+20.7+1.4 = 77.9
-        // 窗 B：peak 70、mean 70、len 4 → rank = 43.4+16.1+5.6 = 65.1
-        val scores = List(240) { h -> when (h) { 10 -> 90; 30, 31, 32, 33 -> 70; else -> 40 } }
+    fun `rank 公式 = 0_62peak + 0_23coreMean + 1_4min(coreLen,4)`() {
+        // OPT-V11-25：rank 用核心段（原窗 ≤4h 时核心=原窗，恒等旧口径）
+        // 窗 A：peak 90、coreLen 1 → rank = 55.8+20.7+1.4 = 77.9
+        // 窗 B：peak 76、coreLen 4 → rank = 47.12+17.48+5.6 = 70.2
+        val scores = List(240) { h -> when (h) { 10 -> 90; 30, 31, 32, 33 -> 76; else -> 40 } }
         val out = BestWindowFinder.find(scores.mapIndexed { h, s -> result(h, s) })
         assertEquals(2, out.windows.size)
         assertEquals(90, out.windows[0].peakScore)
-        assertEquals(70, out.windows[1].peakScore)
+        assertEquals(76, out.windows[1].peakScore)
     }
 
     @Test
     fun `同潮汐周期去重 - 中点差 2_5h 内同涨落段只留 rank 高者`() {
         // 两个短窗（10 与 12 时，中点差 2h <2.5h），dh 全程为正 → 同一涨潮周期 → 去重留 90
-        val scores = List(240) { h -> when (h) { 10 -> 90; 12 -> 70; else -> 40 } }
+        val scores = List(240) { h -> when (h) { 10 -> 90; 12 -> 80; else -> 40 } }
         val tideRates = (0 until 240).associate { h -> (base + h * 3600L) to 0.30 }
         val out = BestWindowFinder.find(scores.mapIndexed { h, s -> result(h, s) }, tideRates)
         assertEquals(1, out.windows.size, "同周期应去重：${out.windows.map { it.peakScore }}")
@@ -73,7 +74,7 @@ class WindowFinderTest {
 
     @Test
     fun `不同潮汐周期不去重 - dh 变号后各自保留`() {
-        val scores = List(240) { h -> when (h) { 10 -> 90; 16 -> 70; else -> 40 } }
+        val scores = List(240) { h -> when (h) { 10 -> 90; 16 -> 80; else -> 40 } }
         // 10 时 dh>0（涨），16 时 dh<0（落）→ 不同周期
         val tideRates = (0 until 240).associate { h -> (base + h * 3600L) to if (h < 13) 0.30 else -0.30 }
         val out = BestWindowFinder.find(scores.mapIndexed { h, s -> result(h, s) }, tideRates)
@@ -82,18 +83,18 @@ class WindowFinderTest {
 
     @Test
     fun `内陆点跳过同周期去重`() {
-        val scores = List(240) { h -> when (h) { 10 -> 90; 12 -> 70; else -> 40 } }
+        val scores = List(240) { h -> when (h) { 10 -> 90; 12 -> 80; else -> 40 } }
         val out = BestWindowFinder.find(scores.mapIndexed { h, s -> result(h, s) }, tideRates = null)
         assertEquals(2, out.windows.size, "无潮汐数据（内陆）不得去重")
     }
 
     @Test
-    fun `全部小于 60 - 兜底文案给出最高分与时刻`() {
+    fun `全部小于 75 - 兜底文案给出最高分与时刻`() {
         val scores = List(240) { h -> if (h == 100) 58 else 30 }
         val out = BestWindowFinder.find(scores.mapIndexed { h, s -> result(h, s) })
         assertEquals(0, out.windows.size)
         val msg = assertNotNull(out.fallbackMessage)
-        assertTrue(msg.contains("≥60"), "兜底文案应说明无 ≥60 分窗口")
+        assertTrue(msg.contains("≥75"), "兜底文案应说明无 ≥75 分窗口（OPT-V11-26 阈值 75）：$msg")
         assertTrue(msg.contains("58"), "兜底文案应给出最高分：$msg")
     }
 
@@ -175,8 +176,8 @@ class WindowFinderTest {
             confidence = Confidence.MODEL,
         )
         val rows = listOf(
-            at(1800, 10, 80), at(1800, 11, 75), at(0, 12, 70),
-            at(0, 20, 65),
+            at(1800, 10, 80), at(1800, 11, 76), at(0, 12, 75),
+            at(0, 20, 76),
         )
         // 稀疏样本仅 4 行，显式声明有效窗口 240h（默认取 results.size 会误入 <24h 禁用分支）
         val out = BestWindowFinder.find(rows, validHoursPresent = 240)
@@ -198,7 +199,7 @@ class WindowFinderTest {
             vetoReasons = emptyList(),
             confidence = Confidence.MODEL,
         )
-        val rows = listOf(at(1800, 10, 90), at(1800, 12, 70))
+        val rows = listOf(at(1800, 10, 90), at(1800, 12, 80))
         val tideRates = mapOf(
             base + 10 * 3600L + 1800 to 0.30,
             base + 11 * 3600L + 1800 to 0.30,
@@ -214,13 +215,14 @@ class WindowFinderTest {
 
     @Test
     fun `FO14_跨点聚合按rank全局排序_长窗加权反超高peak短窗`() {
-        // A 点：peak 88、len 4 → rank = 0.62·88 + 0.23·88 + 1.4·4 = 80.40
-        // B 点：peak 90、len 1 → rank = 0.62·90 + 0.23·90 + 1.4·1 = 77.90（peak 更高但 rank 更低）
+        // OPT-V11-25 后 rank 用核心段：A 窗 peak 在窗首（10 时）→ core 被窗界截断为 10..12（3h）：
+        //   rank = 0.62·88 + 0.23·88 + 1.4·3 = 54.56+20.24+4.2 = 79.0
+        // B 点：peak 90、coreLen 1 → rank = 0.62·90 + 0.23·90 + 1.4·1 = 77.9（peak 更高但 rank 更低）
         val scoresA = List(240) { h -> if (h in 10..13) 88 else 40 }
         val scoresB = List(240) { h -> if (h == 10) 90 else 40 }
         val winA = BestWindowFinder.find(scoresA.mapIndexed { h, s -> result(h, s) }).windows
         val winB = BestWindowFinder.find(scoresB.mapIndexed { h, s -> result(h, s) }).windows
-        assertEquals(80.4, winA.first().rank, 1e-9, "BestWindow.rank 必须在公开侧可携带（Models.kt 只增合规）")
+        assertEquals(79.0, winA.first().rank, 1e-9, "核心段 rank（窗首峰值 → core 截断为 3h）")
         assertEquals(77.9, winB.first().rank, 1e-9)
 
         val merged = BestWindowFinder.rankAcrossSpots(listOf("B短窗" to winB, "A长窗" to winA))
@@ -232,7 +234,7 @@ class WindowFinderTest {
     // ─────────────── M5 Output 尾增 fallbackBestEpochSec ───────────────
 
     @Test
-    fun `M5_fallbackBestEpochSec_全部低于60时给出最高分时刻`() {
+    fun `M5_fallbackBestEpochSec_全部低于75时给出最高分时刻`() {
         val scores = List(240) { h -> if (h == 100) 58 else 30 }
         val out = BestWindowFinder.find(scores.mapIndexed { h, s -> result(h, s) })
         assertEquals(0, out.windows.size)

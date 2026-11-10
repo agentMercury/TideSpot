@@ -66,12 +66,17 @@ object TopWindowDerivations {
         marine: List<HourlyMarine>,
         horizonDays: Int = 7,
         nowEpochSec: Long = 0,
+        // OPT-V11-03（CHG-27）：输出时段筛选（0/0 = 不筛选，零行为漂移）
+        windowStartEpochSec: Long = 0,
+        windowEndEpochSec: Long = 0,
     ): BestWindowFinder.Output = BestWindowFinder.find(
         results = scores,
         tideRates = tideRatesFromMarine(marine),
         validHoursPresent = scores.size,
         horizonDays = horizonDays,
         nowEpochSec = nowEpochSec,
+        windowStartEpochSec = windowStartEpochSec,
+        windowEndEpochSec = windowEndEpochSec,
     )
 
     /** 现场校潮拟合（§6.2b 规则 5）：模型极值时刻由 [extremeTimes] 提取；≥2 条有效才启用（fitManual 内置，UI 只透传）。 */

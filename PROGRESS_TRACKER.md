@@ -36,6 +36,19 @@
 
 ---
 
+## 2b. P0-2 第一批（2026-11-10，已合入）
+
+- **完成项**（CHG-27）：
+  - **OPT-V11-26**：候选阈值 `CANDIDATE_MIN 60→75`（单点常量，现算/读侧共用）+ 兜底文案 ≥75 + **爆护徽标**（`peakScore ≥80`，`ScoreBand.EXPLOSIVE` 档位色）。
+  - **OPT-V11-25**：**核心段派生**（峰值 ±2h 夹原窗内，跨度 ≤4h）；`BestWindow` 尾增 core 三字段（只增）；rank 改用核心段（**系数不变**；原窗 ≤4h 恒等旧公式）；去重中点仍用原窗；UI「利好持续至 HH:mm」（null 不显示）；`durationHours` = 核心段小时数（口径见台账）。
+  - **OPT-V11-03**：`find` 尾增时段参数（0/0 恒等锁）；仅输出过滤（原窗相交）；`Top10TimeFilter` 纯函数（全部/24h/本周末/自选）；Top10 Sheet chips + 自选对话框；空结果兜底含「所选时段」+时段内最高分。
+  - **OPT-V11-04**：`SourceMetaRegistry` 静态映射表 → SourceFooter「模型 · 分辨率 · 粒度 · 本机拉取 HH:mm」（禁编造源更新时间）。
+  - **OPT-V11-02 数据层**：Room **v4→v5**（`manual_observation.kind/value`）+ 迁移锁；`forSpotKind` 隔离校潮/水质观测；Repository 只增 API（`addWaterQualityObservation`/`waterQualityObservations`）。
+- **验证**：八模块 **619 运行 / 0 失败 / 0 跳过**（domain +6、data +v4→v5 4、detail +8）+ verify.ps1 全绿 + APK v1.1 重建（49.2MB）。
+- **剩余（P0-2 待续）**：OPT-V11-02 **UI**（水质 Tab「录入实测」Sheet：水温/DO/浊度表单 + 时刻 ±24h + 范围校验 + 已录入列表 + §6.1.3 融合徽标「实测+模型」）；本批真机冒烟（Top10 核心段/筛选/爆护/持续标注 + v4→v5 升级）。
+
+---
+
 ### 上期快照（2026-11-09，V1.1 优化批次 A+C 退出，历史存档）
 
 - **完成项**（HANDOVER §6 A 类清单 A-1~A-5 全清，逐项详见台账 CHG-18）：

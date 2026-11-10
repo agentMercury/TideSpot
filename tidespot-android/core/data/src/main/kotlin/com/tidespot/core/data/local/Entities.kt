@@ -171,7 +171,19 @@ data class ManualObservationEntity(
     val observedAtEpochSec: Long,
     /** 记录时刻（epoch 毫秒）。 */
     val createdAtEpochMs: Long,
-)
+    /**
+     * OPT-V11-02（CHG-27，v4→v5）：观测类型——`TIDE_OBSERVATION`（校潮，默认）/
+     * `WATER_TEMP` / `DO` / `TURBIDITY`（水质实测录入）。
+     * defaultValue 必须与 MIGRATION_4_5 的 `DEFAULT 'TIDE_OBSERVATION'` 一致（否则真机 schema 校验失败）。
+     */
+    @ColumnInfo(defaultValue = "TIDE_OBSERVATION") val kind: String = KIND_TIDE_OBSERVATION,
+    /** OPT-V11-02：实测数值（水温 ℃ / 溶氧 mg/L / 浊度 NTU）；校潮观测为 null（禁 0 填充）。 */
+    val value: Double? = null,
+) {
+    companion object {
+        const val KIND_TIDE_OBSERVATION = "TIDE_OBSERVATION"
+    }
+}
 
 /**
  * 现场校潮拟合参数（每点一行，PK=spotId 覆盖式更新）。

@@ -7,6 +7,7 @@ import com.tidespot.core.data.repo.TideSpotRepository
 import com.tidespot.core.domain.algorithm.ScenePreset
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.tide.TideCalibrator
+import com.tidespot.core.domain.window.BestWindowFinder
 import com.tidespot.core.ui.zone.SpotZones
 import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
@@ -118,6 +119,13 @@ class DetailViewModel(
 
     // 供 Screen 消费（保持单测可对 holder 纯逻辑断言）
     internal fun holderInternal(): DetailStateHolder = holder
+
+    /**
+     * OPT-V11-03（CHG-27）：Top10 时段筛选重算（转发 holder；与全窗同源、只加输出过滤）。
+     * 0/0 = 不筛选（与 state.top10 恒等）。
+     */
+    fun top10Filtered(windowStartEpochSec: Long, windowEndEpochSec: Long): BestWindowFinder.Output =
+        holder.top10Filtered(windowStartEpochSec, windowEndEpochSec)
 }
 
 

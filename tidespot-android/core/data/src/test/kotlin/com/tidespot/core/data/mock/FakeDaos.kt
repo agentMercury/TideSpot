@@ -166,6 +166,10 @@ class FakeManualObservationDao : ManualObservationDao {
     override suspend fun forSpot(spotId: Long): List<ManualObservationEntity> =
         rows.filter { it.spotId == spotId }
             .sortedWith(compareBy({ it.observedAtEpochSec }, { it.id }))
+
+    /** CHG-27（OPT-V11-02）：按类型查询，与 Room `forSpotKind` 同语义。 */
+    override suspend fun forSpotKind(spotId: Long, kind: String): List<ManualObservationEntity> =
+        forSpot(spotId).filter { it.kind == kind }
 }
 
 /** 现场校潮拟合内存 Fake（spotId PK REPLACE 覆盖，对齐 Room 口径）。 */

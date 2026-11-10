@@ -22,7 +22,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ManualObservationEntity::class,
         ManualTideFitEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class TideSpotDatabase : RoomDatabase() {
@@ -125,6 +125,23 @@ abstract class TideSpotDatabase : RoomDatabase() {
     val MIGRATION_3_4 = object : Migration(3, 4) {
         override fun migrate(db: SupportSQLiteDatabase) {
             MIGRATION_3_4_STATEMENTS.forEach { db.execSQL(it) }
+        }
+    }
+    /**
+     * v4→v5（OPT-V11-02 / CHG-27）：`manual_observation` 尾增两列（只加列，旧行取默认值）：
+     * 1. `kind TEXT NOT NULL DEFAULT 'TIDE_OBSERVATION'`（观测类型；旧行=校潮观测）；
+     * 2. `value REAL`（实测数值，可空；校潮观测无值，禁 0 填充）。
+     * 列名/类型/defaultValue 必须与 [ManualObservationEntity] 声明逐字一致。
+     */
+    val MIGRATION_4_5_STATEMENTS: List<String> = listOf(
+        "ALTER TABLE `manual_observation` ADD COLUMN `kind` TEXT NOT NULL DEFAULT 'TIDE_OBSERVATION'",
+        "ALTER TABLE `manual_observation` ADD COLUMN `value` REAL",
+    )
+
+    /** v4→v5（OPT-V11-02）：水质实测录入支撑列（kind/value）；v4 既有数据不变。 */
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            MIGRATION_4_5_STATEMENTS.forEach { db.execSQL(it) }
         }
     }
     }
