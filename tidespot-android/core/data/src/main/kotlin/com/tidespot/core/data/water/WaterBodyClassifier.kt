@@ -63,7 +63,7 @@ class WaterBodyClassifier(
         marineHasValue: Boolean?,
         elevation: Double?,
     ): WaterBodyType {
-        val key = CacheKeys.spotKey(lat, lon)
+        val key = "${CacheKeys.spotKey(lat, lon)}#v$JUDGE_VERSION"
         waterBodyCacheDao.getByKey(key)?.let { e ->
             if (clock() - e.judgedAtEpochMs <= ttlMillisFor(e.waterBodyType)) {
                 return WaterBodyType.valueOf(e.waterBodyType)
@@ -87,6 +87,16 @@ class WaterBodyClassifier(
     }
 
     companion object {
+        /**
+         * CHG-35（水体判定修复）：判定**版本号**——参与缓存键（`spotKey#vN`）。
+         *
+         * 历史缺陷：v1 判定依赖「OSTIA 全球 SST 是否有值」当湖泊掩膜，**海洋必然有 SST**
+         * → 海域被误判 `INLAND_WATER`（浪潮 Tab 显示「水位（无潮汐）」）并按 30 d 缓存。
+         * v2 起主判据改为调用方透传的真实 `marineHasValue`（`probeMarineHasValue`），
+         * 键升级使旧错误缓存自然失效（不删表、不迁移）。
+         */
+        const val JUDGE_VERSION = 2
+
         /** §6.9：成功判定结果缓存 30 d/点。 */
         const val TTL_MILLIS = 30L * 24 * 3600 * 1000
 

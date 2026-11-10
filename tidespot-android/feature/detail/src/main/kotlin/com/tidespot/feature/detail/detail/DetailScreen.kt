@@ -75,7 +75,9 @@ fun DetailScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val zone: ZoneId = viewModel.zoneId
-    val titles = WaterBodyTabTitles.titlesFor(spot.waterBody)
+    // CHG-35：优先用详情自愈结果（历史误判 INLAND/UNKNOWN 的海洋点，首屏即恢复「潮流/NEARSHORE」）
+    val effectiveWaterBody = state.result?.effectiveWaterBody ?: spot.waterBody
+    val titles = WaterBodyTabTitles.titlesFor(effectiveWaterBody)
     // M5（F-3.5 / §6.2b）：Top10 与现场校潮 Sheet（模块内接线；:app 导航 M6）
     var showTop10 by remember { mutableStateOf(false) }
     var showCalibration by remember { mutableStateOf(false) }
@@ -213,8 +215,8 @@ fun DetailScreen(
             // D12（CHG-16⑭）：潮 Tab 高低潮标记 + dt（dh/dt）副轴 + 校正对照
             if (state.selectedTab == DetailTab.TIDE) {
                 // UX-23（OPT-V11-23）：海水点潮 Tab 顶部潮汛 chip（大潮/小潮 × 活汛/死汛；内陆不显示）
-                if (spot.waterBody == com.tidespot.core.domain.model.WaterBodyType.OCEAN ||
-                    spot.waterBody == com.tidespot.core.domain.model.WaterBodyType.NEARSHORE
+                if (effectiveWaterBody == com.tidespot.core.domain.model.WaterBodyType.OCEAN ||
+                    effectiveWaterBody == com.tidespot.core.domain.model.WaterBodyType.NEARSHORE
                 ) {
                     val chipDay = chips.getOrNull(state.selectedDay)?.localDate
                     if (chipDay != null) {

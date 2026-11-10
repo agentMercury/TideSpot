@@ -197,3 +197,16 @@
 - **遗留**：P2（OPT-V11-12 批量 / 13 i18n 存量外移 / 14 智能排序 / 15 详情卡片 / 16 分组 Room v5→v6 / 17 缩略图）未开工；地图「本点 Top10」未做（浮动 Top10 落为跨点 Top10）。
 - **风险**：UX-18/20/21 属组装层改动，必须真机逐屏冒烟（本次仅 JVM 锁 + 编译/打包验证）；P2-16 Room v5→v6 需真机 `MigrationTestHelper`。
 - **下一步**：① 真机冒烟 P1（重点：浮动按钮 insets、返回手势、地图样式切换、冷启动定位）；② P2 按 14/15/12/16/17/13 顺序开工；③ **已回写（CHG-30，2026-11-10）**：`OPT_REQUIREMENTS_V11.md` §3 OPT-V11-22 已补「三处联动」实现口径 + 默认选中「钓鱼指数」+ 顺序锁 GWT；SRS v1.4 §8.1 同步（CHG-31）。
+
+## 8. v1.1.1 缺陷修复（2026-11-10，CHG-35）
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| Bug A：海域显示「水位（无潮汐）」 | ✅ 已修 | 根因＝用全球 SST 当湖泊掩膜 + 确认时从不传真实海况；改：`probeMarineHasValue`（true→NEARSHORE，false→OSTIA，失败→UNKNOWN）+ 判定缓存 v2 |
+| Bug B：拖动地图信息条不更新 | ✅ 已修 | `onMapMoved` Idle + 用户手势 → Preview；MapScreen 以 `REASON_API_GESTURE` 区分手势/程序动画 |
+| 存量自愈 | ✅ | 详情刷新把 `INLAND/UNKNOWN`（海洋有值）回写 `NEARSHORE`；`effectiveWaterBody` 首屏纠正标题与潮汛 chip |
+| 版本 | v1.1.1 | `versionCode=3` / `versionName=1.1.1`；APK 51,618,176 B 已分发 `E:\Trans`（SHA256 与构建产物一致） |
+
+- **验证**：八模块 **716 / 0 / 0** + `assembleRelease` 成功。
+- **已知风险**：OSTIA 图层本质是全球 SST，**不能再当湖泊掩膜**；内陆湖判定现依赖「marine 全 null/4xx → OSTIA」，后续如恢复该探针需换真湖泊产品。
+- **下一步**：真机复测两 bug（南海点标题/潮汛 chip；冷启动与返回地图后拖动信息条跟随），并确认老收藏点首屏自愈。

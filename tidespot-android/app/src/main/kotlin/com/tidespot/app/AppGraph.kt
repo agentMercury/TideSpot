@@ -142,7 +142,11 @@ class AppGraph(context: Context) {
 
     val geocoder: GeocoderApi = DataGeocoder(geocodingClient)
 
-    val waterBodyResolver: WaterBodyResolver = DataWaterBodyResolver(waterBodyClassifier)
+    val waterBodyResolver: WaterBodyResolver =
+        DataWaterBodyResolver(waterBodyClassifier) { lat, lon ->
+            // CHG-35：§6.9 主判据——确认选点时先探真实海况（true→近岸，false→交由 OSTIA 分湖/陆）
+            repository.probeMarineHasValue(lat, lon)
+        }
 
     val locationController: LocationController = LocationController(appContext)
 

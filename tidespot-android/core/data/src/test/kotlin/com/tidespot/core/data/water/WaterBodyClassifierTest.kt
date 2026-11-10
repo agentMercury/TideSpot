@@ -99,8 +99,36 @@ class WaterBodyClassifierTest {
         assertEquals(1, probe.calls)
         assertEquals(
             "UNKNOWN",
-            dao.rows[CacheKeys.spotKey(29.55, 118.95)]!!.waterBodyType,
-            "UNKNOWN 判定同样入库（供短 TTL 判定）",
+            dao.rows["${CacheKeys.spotKey(29.55, 118.95)}#v${WaterBodyClassifier.JUDGE_VERSION}"]!!.waterBodyType,
+            "UNKNOWN 判定同样入库（供短 TTL 判定；CHG-35 起缓存键带判定版本号）",
+        )
+    }
+
+    // ── CHG-35：缓存键版本化（旧 v1 错误判定不得命中） ──
+
+    @Test
+    fun `classify_旧v1缓存键不被命中_按新判据重算`() = runTest {
+        val dao = FakeWaterBodyCacheDao()
+        val key = CacheKeys.spotKey(36.06, 120.38)
+        val now = 1_700_000_000_000L
+        // 旧版（v1，无版本后缀）错误判定：海域被 OSTIA SST 误判为内陆
+        dao.upsert(
+            com.tidespot.core.data.local.WaterBodyCacheEntity(
+                spotKey = key,
+                waterBodyType = "INLAND_WATER",
+                judgedAtEpochMs = now,
+            ),
+        )
+        val classifier = WaterBodyClassifier(waterBodyCacheDao = dao, probe = null, clock = { now })
+        // 真实海况 = true → NEARSHORE（即便旧缓存写的是 INLAND_WATER 也不得命中）
+        assertEquals(
+            WaterBodyType.NEARSHORE,
+            classifier.classify(36.06, 120.38, marineHasValue = true, elevation = 0.0),
+        )
+        assertEquals(
+            "NEARSHORE",
+            dao.rows["$key#v${WaterBodyClassifier.JUDGE_VERSION}"]!!.waterBodyType,
+            "新判定写入 v2 键；旧 v1 行保留但不再被读取",
         )
     }
 

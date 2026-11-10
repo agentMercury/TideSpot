@@ -124,6 +124,8 @@ fun MapScreen(
     var appliedStyleUrl by remember { mutableStateOf<String?>(null) }
     /** UX-18：程序驱动相机移动（冷启动定位/返回定位）时抑制 idle → 准星状态机（F-1.4 唯一真源不受影响）。 */
     var suppressNextIdle by remember { mutableStateOf(false) }
+    /** CHG-35：最近一次相机移动是否来自用户手势（决定 Idle 是否进入 Preview）。 */
+    var lastMoveWasGesture by remember { mutableStateOf(false) }
 
     // F-1.1 + CHG-09⑦（NEW-07）：冷启动先查系统权限——已授权直接可用（不重复弹窗），
     // 未授权才发请求；Denied(permanent) 后状态机不再放行（无死循环）
@@ -182,6 +184,11 @@ fun MapScreen(
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng))
                 true
             }
+            map.addOnCameraMoveStartedListener { reason ->
+                // CHG-35：仅用户手势导致的相机移动才允许 Idle → Preview（程序动画不误建预览）。
+                // MapLibre 11.8 常量：REASON_API_GESTURE=1（手势）/ REASON_DEVELOPER_ANIMATION=2 / REASON_API_ANIMATION=3
+                lastMoveWasGesture = reason == MapLibreMap.OnCameraMoveStartedListener.REASON_API_GESTURE
+            }
             // CHG-09③（NEW-05）：相机坐标只在 **onCameraIdle** 采样（最小正确方案）。
             // animateCamera 飞行与手势拖动的中间帧都不再喂给状态机（onCameraMoveListener 已移除），
             // 飞行结束 idle 时 target 恰为动画目标坐标 → 等价于「飞行期间 center 锁定到目标」；
@@ -194,7 +201,11 @@ fun MapScreen(
                 }
                 val target = map.cameraPosition.target
                 if (target != null) {
-                    crosshair.onMapMoved(GeoPoint(target.latitude, target.longitude))
+                    // CHG-35：冷启动/返回地图（Idle 态）用户拖动 → 进入 Preview，信息条随中心更新
+                    crosshair.onMapMoved(
+                        GeoPoint(target.latitude, target.longitude),
+                        fromUserGesture = lastMoveWasGesture,
+                    )
                 }
             }
         }

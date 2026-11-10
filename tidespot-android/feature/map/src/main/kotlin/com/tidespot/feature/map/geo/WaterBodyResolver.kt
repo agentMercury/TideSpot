@@ -19,10 +19,25 @@ fun interface WaterBodyResolver {
     suspend fun classify(lat: Double, lon: Double, elevation: Double?): WaterBodyType
 }
 
-/** 数据层实现：委托 :core:data WaterBodyClassifier（判定缓存仍在 classifier 内部 WaterBodyCacheDao，无第二缓存）。 */
-class DataWaterBodyResolver(private val classifier: WaterBodyClassifier) : WaterBodyResolver {
+/**
+ * 数据层实现：委托 :core:data WaterBodyClassifier（判定缓存仍在 classifier 内部 WaterBodyCacheDao，无第二缓存）。
+ *
+ * CHG-35（水体判定修复）：尾增可选 [marineHasValue] 探测注入——
+ * 确认选点时先探「该坐标是否有海况」作 §6.9 **主判据**（true → NEARSHORE，不再问 OSTIA；
+ * false → 交 OSTIA 分湖/陆；null/未注入 → 维持旧行为走探针路径）。
+ * 默认 null 保持既有调用与测试零改动。
+ */
+class DataWaterBodyResolver(
+    private val classifier: WaterBodyClassifier,
+    private val marineHasValue: (suspend (Double, Double) -> Boolean?)? = null,
+) : WaterBodyResolver {
     override suspend fun classify(lat: Double, lon: Double, elevation: Double?): WaterBodyType =
-        classifier.classify(lat, lon, marineHasValue = null, elevation = elevation)
+        classifier.classify(
+            lat,
+            lon,
+            marineHasValue = marineHasValue?.invoke(lat, lon),
+            elevation = elevation,
+        )
 }
 
 /** Fake 实现：仅用于 Compose 预览与 JVM 单测，无网络/缓存行为。 */

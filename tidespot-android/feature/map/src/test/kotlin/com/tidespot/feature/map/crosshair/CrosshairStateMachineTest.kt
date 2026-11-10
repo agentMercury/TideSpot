@@ -11,12 +11,30 @@ class CrosshairStateMachineTest {
     private val b = GeoPoint(29.61, 119.05)
 
     @Test
-    fun idle_ignoresConfirmCancelAndMove() {
+    fun idle_ignoresConfirmCancel_andProgrammaticMove() {
         val m = CrosshairStateMachine()
         assertEquals(CrosshairState.Idle, m.onConfirm())
         assertEquals(CrosshairState.Idle, m.onCancel())
+        // 程序驱动 idle（样式重建/定位动画收尾）默认不创建预览
         m.onMapMoved(b)
         assertEquals(CrosshairState.Idle, m.state.value)
+    }
+
+    // ── CHG-35：Idle + 用户手势拖动 → Preview（修复信息条不更新） ──
+
+    @Test
+    fun idle_userGestureMove_entersPreviewAtCenter() {
+        val m = CrosshairStateMachine()
+        m.onMapMoved(b, fromUserGesture = true)
+        val s = m.state.value
+        assertTrue(s is CrosshairState.Preview)
+        assertEquals(b, s.center)
+        assertEquals(b, s.movedFrom)
+        // 继续拖动 → 只更新 center，movedFrom 保持首个拖动点
+        m.onMapMoved(a, fromUserGesture = true)
+        val s2 = m.state.value as CrosshairState.Preview
+        assertEquals(a, s2.center)
+        assertEquals(b, s2.movedFrom)
     }
 
     @Test

@@ -15,7 +15,7 @@
 | **P1** | 05 真预取、06 相对时间、07 涨退潮观测、08 跨点缓存、09 校正提示、10 搜索筛选、11 陈旧标记、18~24 UX 七项 | ✅ 完成（2026-11-10，**CHG-28**；八模块 701/0/0 + APK 复产出；**真机冒烟待执行**） |
 | **P2** | 12 批量操作、13 i18n 全量外移、14 智能排序、15 详情卡片、16 分组、17 缩略图 | ⬜ **待开工（本次交接起点）** |
 
-- **基线**：八模块 **701 运行 / 0 失败 / 0 跳过**（`verify.ps1` 全绿）；APK `潮点TideSpot-v1.1.apk`（`versionCode=2`，49.2MB，自签名，自动分发 `E:\Trans`）
+- **基线**：八模块 **716 运行 / 0 失败 / 0 跳过**（`verify.ps1` 全绿）；APK `潮点TideSpot-v1.1.1.apk`（`versionCode=3 / versionName=1.1.1`，51,618,176 B，自签名，自动分发 `E:\Trans`）
 - **v1（M0–M6）交付验收窗口**：2026-12-04 ~ 12-08（原计划），v1.1 为提前启动（客户 2026-11-10 指令）
 - 版本管理：jj + git colocated；当前 git `main` 与 jj `@` 同步（每次提交后需手动 `git update-ref`，见 §4.4）
 
@@ -26,6 +26,13 @@
 - **UX**：18 冷启动定位动画（不设准星）+ 返回地图定位｜19 默认 Voyager + 设置三选｜20 删底部 dock + 地图浮动三按钮 + insets｜21 `sourcePage` + `BackHandler`（详情→来源、收藏/设置→地图、地图 2s 双退）｜22 Tab 序 = 钓鱼指数→潮流→天气→水质→风浪（三处联动，默认 `SCORE`）｜23 `TidePhase` 月龄制 + 潮 Tab chip｜24 DaySelector 日期+星期
 - **验证**：八模块 **701/0/0** + `assembleRelease` 成功；APK `潮点TideSpot-v1.1.apk` 已分发 `E:\Trans`；jj 提交 `3f1c9df`
 - **细节与口径**：见 `PROGRESS_TRACKER.md` §7、`REQUIREMENTS_REGISTER.md` CHG-28、`tidespot-android/CONTRACT.md`「v1.1 子契约 P1」、本文件 §9 末尾「P1 落地要点」
+
+### v1.1.1 缺陷修复（CHG-35，2026-11-10，客户真机报障两例）
+- **Bug A｜海域点显示「水位（无潮汐）」且无潮汛 chip**：根因＝确认选点恒传 `marineHasValue=null` → OSTIA（**全球 SST，海洋必然有值**）被当湖泊掩膜 → 误判 `INLAND_WATER` 并 30d 缓存落库。修复：`TideSpotRepository.probeMarineHasValue`（有海况→`NEARSHORE`，无→OSTIA 分湖/陆，失败→`UNKNOWN`）+ 判定缓存键 **v2**（旧错误判定失效）。
+- **Bug B｜地图拖动信息条恒「未命名水域」**：根因＝`CrosshairStateMachine.onMapMoved` 忽略 `Idle`。修复：`Idle + 用户手势 → Preview`（`fromUserGesture`；`MapScreen` 用 `REASON_API_GESTURE` 区分手势/程序动画）。
+- **存量自愈**：详情刷新若「海洋有值」且 spot 为 `INLAND/UNKNOWN` → 回写 `NEARSHORE`，并透出 `SpotDetailResult.effectiveWaterBody`（契约尾增）；`DetailScreen` 以此取标题与潮汛 chip → 老收藏点首屏即恢复。
+- **版本/验证**：`versionCode=3`、`versionName=1.1.1`；八模块 **716/0/0**；`潮点TideSpot-v1.1.1.apk`（SHA256 `D66A3F18…3E77E`）已分发 `E:\Trans`；寄存器 CHG-35。
+- **遗留风险**：OSTIA 图层本质是全球 SST，**不可再作湖泊掩膜**；内陆湖现依赖「marine 全 null/4xx → OSTIA」，后续如恢复该探针需换真湖泊产品。
 
 ### P0-1（CHG-25/26）
 - **凭据外部化**：`:core:data/water/CopernicusCredentialStore.kt`（`CopernicusCredential` + `FileCopernicusCredentialStore`，java.io 原子写）、`CopernicusCredentialValidator.kt`（四态 `Missing/Valid/Invalid/Unreachable`）；`WaterBodyClassifier.setProbe`（@Volatile 运行期切换）；`:app` **移除 BuildConfig 凭据注入**、`AppGraph.checkAndApply/hasCopernicusCredential/clearCopernicusCredential`；Manifest `allowBackup=false`
@@ -170,8 +177,8 @@ D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease 
 
 ## 9. 下一步（接手第一件事）
 
-1. 跑 `verify.ps1` 确认基线 **701/0/0**（P1 收口值）
-2. **真机冒烟 P1**（AAK-AN00）：浮动三按钮 insets / 返回手势（详情→来源、收藏→地图、地图 2s 双退）/ 地图样式三选即时生效 / 冷启动定位不设准星 / 收藏搜索与陈旧徽标 / 校潮四类观测补记 / Top10 校正提示与潮汛 chip
+1. 跑 `verify.ps1` 确认基线 **716/0/0**
+2. **真机复测 v1.1.1 两处修复**：① 南海/近岸点 → 详情标题应为「潮流」、潮 Tab 出现「大潮/小潮 · 活汛/死汛」chip；老收藏点首屏自愈；② 冷启动与从收藏返回地图后**拖动地图**，底部信息条经纬度/名称应实时跟随（无需点「我的位置」）
 3. 从 **P2** 起手（建议顺序：**14 智能排序 → 15 详情卡片 → 12 批量操作 → 16 分组（Room v5→v6，真机 MigrationTestHelper 必配）→ 17 缩略图 → 13 i18n 存量外移**）
 4. 每完成一项：登记台账 CHG → 纯函数锁测试 → 全量回归 → 真机冒烟（可行时）→ jj 提交（描述用 cmd 管道）
 5. P2 收口后更新本文件或再交接

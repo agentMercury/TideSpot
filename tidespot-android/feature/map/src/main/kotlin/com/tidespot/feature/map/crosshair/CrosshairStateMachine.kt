@@ -28,13 +28,14 @@ class CrosshairStateMachine(initial: CrosshairState = CrosshairState.Idle) {
     }
 
     /**
-     * 拖动地图，准星（地图中心）跟随（CHG-09③ / NEW-05 修正）：
+     * 拖动地图，准星（地图中心）跟随（CHG-09③ / NEW-05 修正；CHG-35 补 Idle）：
      * - Preview 态：更新 center（movedFrom 不变）；
      * - Confirmed 态：**也进 Preview**（movedFrom = 已确认点，保留语义——从已确认点移动），
      *   信息条走「移动中，点确定切换」；已确认数据在确认前不切换（F-1.4）；
-     * - Idle 态：忽略（拖动不凭空创建预览，长按/搜索/定位才进入 Preview）。
+     * - Idle 态：**用户手势拖动时进入 Preview**（CHG-35：修复「冷启动/返回地图后拖动不更新信息条」）；
+     *   程序驱动 idle（样式重建、冷启动定位/返回定位动画）传 `fromUserGesture=false`，不凭空创建预览。
      */
-    fun onMapMoved(point: GeoPoint) {
+    fun onMapMoved(point: GeoPoint, fromUserGesture: Boolean = false) {
         when (val current = _state.value) {
             is CrosshairState.Preview -> if (current.center != point) {
                 _state.value = current.copy(center = point)
@@ -44,7 +45,10 @@ class CrosshairStateMachine(initial: CrosshairState = CrosshairState.Idle) {
                     _state.value = CrosshairState.Preview(center = point, movedFrom = current.spot)
                 }
             }
-            CrosshairState.Idle -> {}
+            CrosshairState.Idle ->
+                if (fromUserGesture) {
+                    _state.value = CrosshairState.Preview(center = point, movedFrom = point)
+                }
         }
     }
 

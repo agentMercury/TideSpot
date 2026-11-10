@@ -72,6 +72,12 @@ data class SpotDetailResult(
      * hourly_score 落库（读侧重建天然一致，无双口径）。
      */
     val tideCorrection: TideCorrectionSummary? = null,
+    /**
+     * CHG-35（水体判定修复）：自愈后的真实水体类型——仅当详情已确认「海洋有值」而 spot 仍是
+     * 历史误判（`INLAND_WATER` / `UNKNOWN`）时非 null（= `NEARSHORE`，并已回写 spot 表）。
+     * UI 取 `state.result.effectiveWaterBody ?: spot.waterBody` 作为标题/chip 的类型来源。
+     */
+    val effectiveWaterBody: WaterBodyType? = null,
 )
 
 /**
@@ -206,6 +212,21 @@ class TideSpotRepository(
         val tideCorrection = fitEntity
             ?.takeIf { it.adopted && isMarineSpot }
             ?.let { TideCorrectionSummary(it.lagHours, it.offsetM, it.gain, it.adopted) }
+        // CHG-35 存量自愈：海洋已确认有值，但 spot 仍是历史误判（OSTIA SST 当湖泊掩膜 → INLAND/UNKNOWN）
+        // → 回写 NEARSHORE；本结果透出 effectiveWaterBody 供首屏立即纠正标题与潮汛 chip。
+        val currentWaterBody = spotRow?.waterBodyType
+            ?.let { runCatching { WaterBodyType.valueOf(it) }.getOrNull() }
+        val healedType = if (
+            isMarineSpot &&
+            (currentWaterBody == WaterBodyType.INLAND_WATER || currentWaterBody == WaterBodyType.UNKNOWN)
+        ) {
+            WaterBodyType.NEARSHORE
+        } else {
+            null
+        }
+        if (healedType != null) {
+            spotDao.updateWaterBody(spot.id, healedType.name, null, tzOffsetSec)
+        }
         val marineForScoring = fitEntity
             ?.takeIf { it.adopted }
             ?.let { fit -> applyManualTideCorrection(marine!!, TideCalibrator.ManualTideFit(fit.lagHours, fit.offsetM, fit.gain, fit.adopted, null)) }
@@ -236,6 +257,7 @@ class TideSpotRepository(
                 DataSource.MARINE to (fetchLogDao.lastSuccess(spot.id, DataSource.MARINE.wire)?.fetchedAt ?: 0L),
             ),
             tideCorrection = tideCorrection,
+            effectiveWaterBody = healedType,
         )
     }
 
@@ -307,6 +329,35 @@ class TideSpotRepository(
         DataSource.entries.associateWith { src ->
             fetchLogDao.lastSuccess(spotId, src.wire)?.fetchedAt ?: 0L
         }
+
+    /**
+     * CHG-35（水体判定修复，SRS §6.9 主判据「海洋字段是否非 null」）：
+     * 轻量探测某坐标**是否有海况**，供确认选点时的水体判定使用。
+     *
+     * - 200 且任一小时 `sea_level_height_msl` / `wave_height` 非 null → `true`（海洋/近岸）；
+     * - 200 但全 null → `false`（内陆/陆地）；
+     * - 4xx（源对该坐标无数据，常见于内陆/陆地）→ `false`（同样表示「无海况」，不是失败）；
+     * - 429 / 5xx / 网络异常 / 其它异常 → `null`（未知，调用方走 UNKNOWN 降级，禁编造）。
+     *
+     * 频控：复用 [OpenMeteoClient] 全局 6 req/min 令牌桶与 fetch_log；每点判定结果另由
+     * [WaterBodyClassifier] 缓存 30 d（本轮升级 v2 键，旧错误判定失效）。
+     */
+    suspend fun probeMarineHasValue(lat: Double, lon: Double): Boolean? = try {
+        val dto = client.fetchMarine(lat, lon)
+        val series = DtoMappers.toHourlyMarineList(dto)
+        series.any { it.seaLevelHeightMslM != null || it.waveHeightM != null }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: com.tidespot.core.data.DataError) {
+        when (e) {
+            // 源明确「该坐标无海况」：4xx（BadRequest / SourceParamError）→ false；其余（429/5xx/网络）→ 未知
+            is com.tidespot.core.data.DataError.BadRequest,
+            is com.tidespot.core.data.DataError.SourceParamError -> false
+            else -> null
+        }
+    } catch (_: Exception) {
+        null
+    }
 
     // ────────────────────── 现场校潮（M6/OPT-M5-02，§6.2b 规则 5） ──────────────────────
 
@@ -495,6 +546,15 @@ class TideSpotRepository(
         val lastWeather = fetchLogDao.lastSuccess(spot.id, DataSource.WEATHER.wire)
         val lastMarine = fetchLogDao.lastSuccess(spot.id, DataSource.MARINE.wire)
         val marineAllNull = marine.isNotEmpty() && marine.all { it.isAllNull }
+        // CHG-35：缓存路径同样透出自愈类型（只读不改库；真正回写发生在 refreshSpotDetail）
+        val cachedEffectiveWaterBody = if (
+            marine.isNotEmpty() && !marineAllNull &&
+            (spot.waterBody == WaterBodyType.INLAND_WATER || spot.waterBody == WaterBodyType.UNKNOWN)
+        ) {
+            WaterBodyType.NEARSHORE
+        } else {
+            null
+        }
         // OPT-M5-02：缓存路径同口径透出校潮摘要（评分序列已在刷新时按校正落库，读侧天然一致）
         val tideCorrection = manualTideFitDao?.getBySpot(spot.id)
             ?.takeIf { it.adopted && marine.isNotEmpty() && !marineAllNull }
@@ -515,6 +575,7 @@ class TideSpotRepository(
                 DataSource.MARINE to (lastMarine?.fetchedAt ?: 0L),
             ),
             tideCorrection = tideCorrection,
+            effectiveWaterBody = cachedEffectiveWaterBody,
         )
     }
 
