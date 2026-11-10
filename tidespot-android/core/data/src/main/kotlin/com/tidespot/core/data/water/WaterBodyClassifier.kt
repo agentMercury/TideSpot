@@ -25,12 +25,26 @@ import kotlinx.coroutines.Dispatchers
  */
 class WaterBodyClassifier(
     private val waterBodyCacheDao: WaterBodyCacheDao,
-    private val probe: InlandWaterProbe? = null,
+    probe: InlandWaterProbe? = null,
     private val clock: () -> Long = System::currentTimeMillis,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     /** 探针未注入等异常状态的告警回调（:core:domain 纯 Kotlin 无日志；默认空实现，M6 接日志系统）。 */
     private val onWarn: (String) -> Unit = {},
 ) {
+
+    /** CHG-25 批次 A：运行期可切换探针（构造签名不变；@Volatile 保证跨线程可见）。 */
+    @Volatile
+    private var probeRef: InlandWaterProbe? = probe
+
+    /**
+     * CHG-25（P0-1 批次 A，只增）：设置页保存/清除 Copernicus 凭据后运行期切换探针。
+     *
+     * `null` = 探针禁用 → 判定走 UNKNOWN 降级（CHG-09② 语义不变，不落 LAND）；
+     * 线程安全（@Volatile 写，[classify] 读单次快照）。
+     */
+    fun setProbe(probe: InlandWaterProbe?) {
+        probeRef = probe
+    }
 
     /**
      * 判定（成功结果缓存 30 d/点、UNKNOWN 缓存 24 h/点，仅显式选点时查询，§12）。
@@ -57,13 +71,15 @@ class WaterBodyClassifier(
         }
         // 探针发起条件：海洋「未知或全 null」时查询 OSTIA（海洋有值即主判据，无需探针）。
         // CHG-09②：低海拔不再跳过探针（原 ≤3m 捷径已删除，SRS §6.9 无此规则）。
+        // CHG-25：探针读单次快照（设置页运行期切换与判定并发安全）。
+        val currentProbe = probeRef
         val lakeProbe: Boolean? = when {
             marineHasValue == true -> null
-            probe == null -> {
+            currentProbe == null -> {
                 onWarn("WaterBodyClassifier: probe not injected, lat=$lat lon=$lon -> UNKNOWN")
                 null
             }
-            else -> probe.hasLakeValue(lat, lon)
+            else -> currentProbe.hasLakeValue(lat, lon)
         }
         val type = decide(marineHasValue = marineHasValue, elevation = elevation, lakeProbe = lakeProbe)
         waterBodyCacheDao.upsert(WaterBodyCacheEntity(spotKey = key, waterBodyType = type.name, judgedAtEpochMs = clock()))

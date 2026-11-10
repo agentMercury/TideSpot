@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  潮点 TideSpot · 用户可见文案资源（CHG-25 P0-1 i18n 框架，中文默认）
+  规范（CONTRACT「v1.1 子契约 P0-1」）：
+  - 新增用户可见文案一律进本文件（key 前缀 ts_），禁止 Screen/Formatter 硬编码、禁止新增 object 常量；
+  - 存量 TideSpotStrings object（中文）P2 全量外移，本期不动（零行为漂移）；
+  - 英文初稿见 values-en/strings.xml（语言集=中/英，不含日文）。
+  GAP-05 17 条为设计稿定稿文案（design-handoff/DECISIONS.md §2，已产品确认）。
+-->
+<resources>
+    <!-- ── GAP-05 定稿文案（17 条；design-handoff/DECISIONS.md §2） ── -->
+    <string name="ts_resolving">正在解析点位…</string>
+    <string name="ts_location_denied">未获得定位权限，可拖动地图手动选点</string>
+    <string name="ts_reverse_geo_off">逆地理已关闭，仅显示坐标与本地 plusCode</string>
+    <string name="ts_favorite_dialog_title">收藏该点位</string>
+    <string name="ts_favorite_name_hint">留空则使用坐标作为名称</string>
+    <string name="ts_top10_this_spot">本点最佳窗口</string>
+    <string name="ts_top10_all">全部收藏 Top10</string>
+    <string name="ts_top10_empty">当前范围内没有符合条件的最佳窗口</string>
+    <string name="ts_window_bar">窗口</string>
+    <string name="ts_record_high_tide">记录一次涨潮时刻</string>
+    <string name="ts_placeholder_v11">垂钓用例、物种预设与因子权重编辑入口于 v1.1 开放（当前沿收藏点预设生效）。</string>
+    <string name="ts_offline">网络不可用，显示本地缓存数据</string>
+    <string name="ts_stale">数据已过期 · 显示上次成功拉取结果</string>
+    <string name="ts_dimension_degraded">部分维度不可用，已按有效权重重算</string>
+    <string name="ts_chart_table_switch">图表 / 数值表</string>
+    <string name="ts_confirm_favorite">确认收藏</string>
+    <string name="ts_cancel">取消</string>
+
+    <!-- ── P0-1 新增：Copernicus 凭据版块（设置页） ── -->
+    <string name="ts_copernicus_section_title">数据源凭据 · Copernicus</string>
+    <string name="ts_copernicus_not_configured">当前未配置：内陆点水质按模型估算显示（估算徽标）。填写你自己的免费 Copernicus 账号可启用卫星数据增强。</string>
+    <string name="ts_copernicus_configured">当前已配置：内陆水质增强启用（卫星/模型徽标）。可修改或清除。</string>
+    <string name="ts_copernicus_username_label">Copernicus 用户名</string>
+    <string name="ts_copernicus_password_label">Copernicus 密码</string>
+    <string name="ts_copernicus_check_save">校验并保存</string>
+    <string name="ts_copernicus_checking">校验中…</string>
+    <string name="ts_copernicus_clear">清除凭据</string>
+    <string name="ts_copernicus_show">显示</string>
+    <string name="ts_copernicus_hide">隐藏</string>
+    <string name="ts_copernicus_privacy">隐私说明：账号密码仅保存在本机 App 私有目录（系统备份已关闭），仅用于向 Copernicus Marine 换取访问令牌；不上传第三方。</string>
+    <string name="ts_copernicus_register">没有账号？免费注册：%1$s</string>
+    <string name="ts_copernicus_result_valid">校验通过，凭据已保存并即时生效（无需重启）</string>
+    <string name="ts_copernicus_result_missing">凭据为空，未保存</string>
+    <string name="ts_copernicus_result_invalid">凭据无效：%1$s。请检查用户名/密码后重试</string>
+    <string name="ts_copernicus_result_unreachable">暂时无法连接校验服务：%1$s。凭据未保存，请稍后重试</string>
+    <string name="ts_copernicus_cleared">凭据已清除（内陆水质恢复模型估算）</string>
+    <string name="ts_copernicus_err_username">请填写 Copernicus 用户名</string>
+    <string name="ts_copernicus_err_username_long">用户名过长（≤128 字符）</string>
+    <string name="ts_copernicus_err_password">请填写 Copernicus 密码</string>
+    <string name="ts_copernicus_err_password_long">密码过长（≤128 字符）</string>
+
+    <!-- ── P0-1 新增：内陆水质首次引导卡（详情页水质 Tab） ── -->
+    <string name="ts_guide_inland_title">启用内陆水质卫星增强（可选）</string>
+    <string name="ts_guide_inland_body">当前水质数据为模型估算。填写你自己的免费 Copernicus Marine 账号，可获得卫星/模型融合数据（水温/溶解氧/浊度更准）。</string>
+    <string name="ts_guide_inland_steps">步骤：① 免费注册（%1$s）② 设置页填写账号密码 ③ 返回自动生效</string>
+    <string name="ts_guide_inland_privacy">账号仅保存在本机，不上传；不配置不影响其他维度且不会崩溃。</string>
+    <string name="ts_guide_inland_open_settings">去设置配置</string>
+    <string name="ts_guide_inland_skip">暂不配置</string>
+</resources>

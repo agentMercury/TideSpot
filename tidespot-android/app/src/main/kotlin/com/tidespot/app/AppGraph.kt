@@ -9,6 +9,11 @@ import com.tidespot.core.data.remote.GeocodingClient
 import com.tidespot.core.data.remote.OpenMeteoClient
 import com.tidespot.core.data.repo.TideSpotRepository
 import com.tidespot.core.data.water.CopernicusAuthClient
+import com.tidespot.core.data.water.CopernicusCredential
+import com.tidespot.core.data.water.CopernicusCredentialStore
+import com.tidespot.core.data.water.CopernicusCredentialValidator
+import com.tidespot.core.data.water.CredentialCheck
+import com.tidespot.core.data.water.FileCopernicusCredentialStore
 import com.tidespot.core.data.water.InlandWaterProbe
 import com.tidespot.core.data.water.OstiaLakeProbe
 import com.tidespot.core.data.water.WaterBodyClassifier
@@ -21,6 +26,8 @@ import com.tidespot.feature.map.geo.WaterBodyResolver
 import com.tidespot.feature.map.location.LocationController
 import com.tidespot.feature.settings.SettingsStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import java.io.File
 
 /**
  * 手工 DI 组装（M6 批次 3；无 DI 框架）：单例持有 Room / 各 Client / Repository。
@@ -61,28 +68,59 @@ class AppGraph(context: Context) {
         reverseCacheDao = db.reverseCacheDao(),
     )
 
+    // ────────────── 凭据（CHG-25 P0-1：运行期外部存储，APK 内零凭据） ──────────────
+
+    /**
+     * Copernicus 凭据存储：App 私有目录 `filesDir/copernicus.properties`（0600 尽力收紧；
+     * Manifest `allowBackup=false` 防云备份带出）。构建期 BuildConfig 注入已移除。
+     */
+    val credentialStore: CopernicusCredentialStore =
+        FileCopernicusCredentialStore(File(appContext.filesDir, CREDENTIAL_FILE))
+
+    private val credentialValidator = CopernicusCredentialValidator()
+
     // ────────────── 水体判定（CHG-09：凭据缺失/探针失败 → UNKNOWN 短 TTL） ──────────────
 
-    private val inlandProbe: InlandWaterProbe? = run {
-        val username = BuildConfig.COPERNICUS_USERNAME
-        val password = BuildConfig.COPERNICUS_PASSWORD
-        if (username.isBlank() || password.isBlank()) {
-            Log.w(
-                TAG,
-                "Copernicus 凭据缺失（local-secrets.properties 未配置），OSTIA 探针禁用 " +
-                    "→ 水体判定走 UNKNOWN 降级（CHG-09）",
-            )
-            null
-        } else {
-            OstiaLakeProbe(CopernicusAuthClient(username, password))
+    private val waterBodyClassifier: WaterBodyClassifier = run {
+        val stored = runBlocking { credentialStore.load() }
+        if (stored == null) {
+            Log.i(TAG, "Copernicus 凭据未配置：OSTIA 探针禁用 → 水体判定 UNKNOWN 降级（设置页可配置）")
         }
+        WaterBodyClassifier(
+            waterBodyCacheDao = db.waterBodyCacheDao(),
+            probe = stored?.let { OstiaLakeProbe(CopernicusAuthClient(it.username, it.password)) },
+            onWarn = { Log.w(TAG, it) },
+        )
     }
 
-    private val waterBodyClassifier = WaterBodyClassifier(
-        waterBodyCacheDao = db.waterBodyCacheDao(),
-        probe = inlandProbe,
-        onWarn = { Log.w(TAG, it) },
-    )
+    /**
+     * 校验并应用凭据（CHG-25 GWT）：仅 [CredentialCheck.Valid] 落库并即时切换探针（无需重启）；
+     * 失败不落库、不改变现状（Invalid=凭据错误 / Unreachable=网络问题，均由 UI 提示）。
+     * `credential == null` 或空凭据 = 清除。
+     */
+    suspend fun checkAndApply(credential: CopernicusCredential?, persist: Boolean = true): CredentialCheck {
+        if (credential == null || credential.isBlank) {
+            if (persist) credentialStore.clear()
+            waterBodyClassifier.setProbe(null)
+            return CredentialCheck.Missing
+        }
+        val result = credentialValidator.check(credential)
+        if (result is CredentialCheck.Valid) {
+            if (persist) credentialStore.save(credential)
+            waterBodyClassifier.setProbe(
+                OstiaLakeProbe(CopernicusAuthClient(credential.username, credential.password)),
+            )
+            Log.i(TAG, "Copernicus 凭据已生效（运行期切换探针，无需重启）")
+        }
+        return result
+    }
+
+    suspend fun hasCopernicusCredential(): Boolean = credentialStore.load() != null
+
+    suspend fun clearCopernicusCredential() {
+        credentialStore.clear()
+        waterBodyClassifier.setProbe(null)
+    }
 
     // ────────────── Repository（M4/M6 DAO 全量注入 + D13 scoringDispatcher） ──────────────
 
@@ -113,6 +151,9 @@ class AppGraph(context: Context) {
 
     companion object {
         private const val TAG = "TideSpotApp"
+
+        /** CHG-25：运行期凭据文件名（App 私有目录；不入库、不打包）。 */
+        private const val CREDENTIAL_FILE = "copernicus.properties"
     }
 }
 

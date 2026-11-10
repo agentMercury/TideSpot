@@ -221,6 +221,88 @@ OPT-M5-07 准星一键收藏主路径 + CHG-12④⑤ 接线清单 + 自签名 ke
 - 共同红线沿用 §冻结点 + HANDOVER §7 全部 11 条硬约束；UI 逻辑先抽纯函数再进 Composable；沙箱禁新增依赖（maplibre/compose 等已有 catalog 项可用）。
 - 验证命令：同 HANDOVER §2（subst T: + `.tools\gradle-8.9`）；新增模块 include 行追加后全量跑。
 
+## 并行分工（v1.1 P0-1 进行中，2026-11-10 起）
+
+> 执行模式：负责人批次 0 契约（本节，已落盘）→ 批次 A 数据/凭据链 → 批次 B settings/detail UI → 批次 C i18n 骨架 + 图标 → 负责人集成验收。**串行执行**（同一 Gradle root 并行会锁冲突）。台账 CHG-25。
+
+| 批次 | 范围 | 禁区 |
+|---|---|---|
+| 负责人（0/验收） | 本节契约、版本号 1.1/2、Manifest 安全项、i18n 规范、集成验收、APK 解包零凭据红线 | — |
+| A 数据/凭据链 | `:core:data`（water/ 凭据存储+校验、`WaterBodyClassifier.setProbe`）、`:app`（AppGraph 运行期凭据接线、移除 BuildConfig 注入、`allowBackup=false`） | 不碰 `:feature:*`、不碰 `:core:domain`、不碰 i18n 资源 |
+| B settings/detail UI | `:feature:settings`（凭据版块）、`:feature:detail`（首次引导卡） | 不碰 `:core:data`/`:core:domain` 源码；新文案一律进资源（批次 C 骨架 id） |
+| C i18n + 图标 | `:core:ui`（`res/values{-en}/strings.xml` 骨架 + 17 条 GAP-05 文案 + bridge 规范）、`:app`（adaptive/vector 图标替换 `sym_def_app_icon`） | 不碰任何业务逻辑与主题色值（`ScoreBands`/`ConfidenceBadge`/`TideSpotTheme` 取值禁止修改） |
+
+### v1.1 子契约 P0-1（批次 A/B/C 共同遵守）
+
+```
+// ── :core:data 新增（批次 A；新文件，不改既有签名）──
+data class CopernicusCredential(val username: String, val password: String)
+
+/** 运行期凭据存储（CHG-25①）：java.io 实现，纯 JVM 可测；文件 = Properties(username/password) */
+interface CopernicusCredentialStore {
+    suspend fun load(): CopernicusCredential?   // 不存在/损坏/空值 → null（不得抛）
+    suspend fun save(credential: CopernicusCredential)
+    suspend fun clear()                          // 幂等
+}
+class FileCopernicusCredentialStore(private val file: java.io.File) : CopernicusCredentialStore
+// :app 接线：FileCopernicusCredentialStore(File(context.filesDir, "copernicus.properties"))
+// 写入后尽力设为「仅属主可读」；Manifest allowBackup=false 防云备份带出
+
+/** 凭据校验（批次 A）：一次 token 校验，四态分类（禁抛给 UI） */
+sealed interface CredentialCheck {
+    data object Missing : CredentialCheck                       // 本地未配置
+    data object Valid : CredentialCheck                         // token 成功
+    data class Invalid(val reason: String) : CredentialCheck    // 凭据错误（401/403 等）
+    data class Unreachable(val reason: String) : CredentialCheck // 网络/超时/5xx
+}
+class CopernicusCredentialValidator(
+    private val authFactory: (CopernicusCredential) -> CopernicusAuthClient =
+        { CopernicusAuthClient(it.username, it.password) },
+) {
+    suspend fun check(credential: CopernicusCredential?): CredentialCheck
+}
+
+// ── :core:data WaterBodyClassifier（批次 A；只增，构造签名不动）──
+fun setProbe(probe: InlandWaterProbe?)   // 内部 @Volatile 线程安全；null=探针禁用（UNKNOWN 降级语义不变，CHG-09）
+
+// ── :app（批次 A）──
+// 1) build.gradle.kts 删除 COPERNICUS_USERNAME/PASSWORD 两处 buildConfigField（BuildConfig 零凭据）；
+// 2) AppGraph：运行期 store.load() → 非空则 OstiaLakeProbe(CopernicusAuthClient(u,p)) 注入 classifier.setProbe(...)；
+//    暴露 suspend fun checkAndApply(credential, persist: Boolean): CredentialCheck
+//    （校验通过 → save/clear + setProbe 即时生效，无需重启，GWT「改密码重启生效且旧值不残留」）；
+// 3) AndroidManifest：android:allowBackup="false"。
+
+// ── :feature:settings（批次 B；只增）──
+// 注入接口（:app 实现，避免 settings→data 直连扩散）：
+interface CopernicusCredentialActions {
+    suspend fun check(username: String, password: String): CredentialCheck
+    suspend fun save(username: String, password: String): CredentialCheck  // 内部先 validate 再落库
+    suspend fun clear()
+    suspend fun isConfigured(): Boolean
+}
+// SettingsState 尾增 copernicusConfigured: Boolean = false；
+// SettingsLogic 尾增纯函数：表单校验（非空/trim/长度上限）+ 状态机 Idle→Checking→(Valid|Invalid|Unreachable)；
+// SettingsScreen 增版块「数据源凭据 · Copernicus」：账号/密码（密码可见性切换）、校验并保存、清除、注册链接、隐私说明
+//   （仅存本机私有目录、不上传、未配置时水质走模型估算）。
+
+// ── :feature:detail（批次 B；只增）──
+// 首次引导卡（内陆点 + 水质 Tab + !isConfigured + 未跳过）：InlandCredentialGuideCard，
+// 含注册链接/3 步说明/免责，「跳过」标记经注入接口持久化（一次后不再显示）。
+
+// ── :core:ui + :app（批次 C）──
+// 1) i18n 骨架：core/ui/src/main/res/values/strings.xml（中文默认）+ values-en/strings.xml（英文初稿），
+//    key 前缀 ts_；17 条 GAP-05 定稿文案 + P0-1 新增串（引导卡/凭据版块）全部入资源；
+//    规范：新增用户可见文案禁新增 object 常量、禁 Screen 硬编码；Composable 侧 stringResource(R.string.ts_*)；
+//    存量 TideSpotStrings object（中文）本期不动（P2 全量外移，零行为漂移）。
+// 2) APP 图标（GAP-01）：design-handoff/icon/*.svg → app/src/main/res：
+//    drawable/ic_launcher_foreground.xml（vector）+ values/ic_launcher_background.xml +
+//    mipmap-anydpi-v26/ic_launcher.xml(adaptive, foreground/background) + ic_launcher_round.xml +
+//    drawable/ic_launcher_monochrome.xml（Android 13 主题图标，纯白剪影）；Manifest android:icon/roundIcon=@mipmap/ic_launcher。
+```
+
+- 共同红线沿用 §冻结点 + HANDOVER §7 十一条；**新增**：凭据禁入 BuildConfig/源码/资源/日志（APK 解包零命中为退出标准）；`allowBackup=false`；图标不改主题色值单源。
+- 验证命令同 HANDOVER §2（subst T: + `.tools\gradle-8.9` + verify.ps1）；批次串行。
+
 ## 冻结点
 
 1. `core/domain/src/main/kotlin/com/tidespot/core/domain/model/Models.kt`：共享模型。扩展=只新增，禁改名/删除。

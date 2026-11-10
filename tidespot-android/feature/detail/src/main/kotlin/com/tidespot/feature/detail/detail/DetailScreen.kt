@@ -61,6 +61,8 @@ fun DetailScreen(
     spot: FavoriteSpot,
     viewModel: DetailViewModel,
     modifier: Modifier = Modifier,
+    /** CHG-25（P0-1）：内陆水质首次引导卡槽位（:app 判定条件后注入；null = 不渲染，零行为漂移）。 */
+    credentialGuideSlot: (@Composable () -> Unit)? = null,
 ) {
     val state by viewModel.state.collectAsState()
     val zone: ZoneId = viewModel.zoneId
@@ -255,6 +257,8 @@ fun DetailScreen(
                 qConf?.let { conf ->
                     Row(Modifier.padding(horizontal = 12.dp)) { ConfidenceBadge(Kind.fromConfidence(conf)) }
                 }
+                // CHG-25（P0-1）：内陆点首次配置引导卡（:app 判定：内陆 + 未配置 + 未跳过）
+                credentialGuideSlot?.invoke()
             }
 
             // F-3.7 每 Tab 底部：来源与更新时间（由 SpotDetailResult 元数据生成，禁硬编码来源文案）

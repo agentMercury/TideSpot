@@ -45,6 +45,9 @@ object TideSpotUrls {
     /** §6.9 第 3 级 OSTIA WMTS 生产域（DATA_SOURCE_PROBE M3.0 A6-r3）。 */
     const val WMTS_BASE = "https://wmts.marine.copernicus.eu"
 
+    /** CHG-25（P0-1）：Copernicus Marine 免费注册页（设置页凭据版块链接；URL 单点收敛）。 */
+    const val COPERNICUS_REGISTER_URL = "https://data.marine.copernicus.eu/register"
+
     // ───────────────────── §5.1/§5.2 字段清单（query 的 hourly/daily 内容） ─────────────────────
 
     /** §5.1 hourly 参数（顺序与契约一致，21 项）。 */

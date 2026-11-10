@@ -41,6 +41,8 @@ fun SettingsScreen(
     onReverseGeoChange: (Boolean) -> Unit,
     onApiKeyChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
+    /** CHG-25（P0-1）：Copernicus 凭据版块槽位（:app 注入 [CopernicusCredentialSection]；null = 不渲染，零行为漂移）。 */
+    credentialSection: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -98,6 +100,7 @@ fun SettingsScreen(
             onChange = onReverseGeoChange,
             desc = "逆地理总开关",
         )
+        credentialSection?.invoke()
         SectionDivider()
 
         // ── 用例 / 物种 / 权重（占位） ──

@@ -37,21 +37,13 @@ android {
         applicationId = "com.tidespot.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         // FO-25：显式声明 targetSdk，消除 AGP 缺省推断告警
-        // Copernicus 凭据构建期注入（缺文件→空串→探针失败走 UNKNOWN 降级 CHG-09；禁硬编码）
-        buildConfigField(
-            "String",
-            "COPERNICUS_USERNAME",
-            "\"${secrets.getProperty("copernicus.username") ?: ""}\"",
-        )
-        buildConfigField(
-            "String",
-            "COPERNICUS_PASSWORD",
-            "\"${secrets.getProperty("copernicus.password") ?: ""}\"",
-        )
+        // CHG-25（P0-1）：Copernicus 凭据**构建期注入已移除**——APK 内零凭据；
+        // 用户经设置页录入，运行期存 App 私有目录（FileCopernicusCredentialStore）。
+        // 本文件仅保留签名配置读取（local-secrets.properties 的 signing.* 仍不入库）。
     }
 
     signingConfigs {

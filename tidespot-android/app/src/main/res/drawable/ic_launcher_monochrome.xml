@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- TideSpot monochrome notification / themed icon（design-handoff/icon/tidespot-icon-monochrome.svg）
+         纯白剪影：圆环 + 四向刻度 + 中心点（潮线省略） -->
+    <path
+        android:pathData="M19,11 A7,7 0 1,1 5,11 A7,7 0 1,1 19,11"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M12,2 L12,4.4 M12,17.6 L12,20 M3,11 L5.4,11 M18.6,11 L21,11"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,9 A2,2 0 1,1 12,13 A2,2 0 1,1 12,9" />
+</vector>

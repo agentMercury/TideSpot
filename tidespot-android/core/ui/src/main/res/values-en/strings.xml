@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  潮点 TideSpot · English strings (initial draft, machine-translated with manual review pending).
+  Keep semantic parity with values/strings.xml; numbers/units semantics must not change with language (N-8).
+-->
+<resources>
+    <!-- GAP-05 finalized copy (17) -->
+    <string name="ts_resolving">Resolving location…</string>
+    <string name="ts_location_denied">Location permission not granted. Drag the map to pick a spot.</string>
+    <string name="ts_reverse_geo_off">Reverse geocoding is off; showing coordinates and local plus code.</string>
+    <string name="ts_favorite_dialog_title">Save this spot</string>
+    <string name="ts_favorite_name_hint">Leave blank to use coordinates as the name</string>
+    <string name="ts_top10_this_spot">Best windows for this spot</string>
+    <string name="ts_top10_all">Top 10 across all favorites</string>
+    <string name="ts_top10_empty">No matching best windows in the current range</string>
+    <string name="ts_window_bar">Window</string>
+    <string name="ts_record_high_tide">Record a high-tide time</string>
+    <string name="ts_placeholder_v11">Fishing use-cases, species presets and factor weight editing open in v1.1 (currently following the favorite\'s preset).</string>
+    <string name="ts_offline">Network unavailable; showing cached data</string>
+    <string name="ts_stale">Data expired · showing last successful fetch</string>
+    <string name="ts_dimension_degraded">Some dimensions unavailable; recalculated with effective weights</string>
+    <string name="ts_chart_table_switch">Chart / Table</string>
+    <string name="ts_confirm_favorite">Confirm</string>
+    <string name="ts_cancel">Cancel</string>
+
+    <!-- P0-1: Copernicus credentials section -->
+    <string name="ts_copernicus_section_title">Data Source Credentials · Copernicus</string>
+    <string name="ts_copernicus_not_configured">Not configured: inland water quality uses model estimates (estimated badge). Enter your own free Copernicus account to enable satellite enhancement.</string>
+    <string name="ts_copernicus_configured">Configured: inland water enhancement enabled (satellite/model badge). You can update or clear it.</string>
+    <string name="ts_copernicus_username_label">Copernicus username</string>
+    <string name="ts_copernicus_password_label">Copernicus password</string>
+    <string name="ts_copernicus_check_save">Verify &amp; save</string>
+    <string name="ts_copernicus_checking">Verifying…</string>
+    <string name="ts_copernicus_clear">Clear credentials</string>
+    <string name="ts_copernicus_show">Show</string>
+    <string name="ts_copernicus_hide">Hide</string>
+    <string name="ts_copernicus_privacy">Privacy: credentials are stored only in this app\'s private storage (system backup disabled) and used only to obtain an access token from Copernicus Marine. They are not uploaded elsewhere.</string>
+    <string name="ts_copernicus_register">No account? Register free: %1$s</string>
+    <string name="ts_copernicus_result_valid">Verified. Credentials saved and active immediately (no restart needed).</string>
+    <string name="ts_copernicus_result_missing">Credentials are empty; not saved.</string>
+    <string name="ts_copernicus_result_invalid">Invalid credentials: %1$s. Check username/password and retry.</string>
+    <string name="ts_copernicus_result_unreachable">Verification service unreachable: %1$s. Credentials not saved; please retry later.</string>
+    <string name="ts_copernicus_cleared">Credentials cleared (inland water reverted to model estimates).</string>
+    <string name="ts_copernicus_err_username">Enter your Copernicus username</string>
+    <string name="ts_copernicus_err_username_long">Username too long (max 128 characters)</string>
+    <string name="ts_copernicus_err_password">Enter your Copernicus password</string>
+    <string name="ts_copernicus_err_password_long">Password too long (max 128 characters)</string>
+
+    <!-- P0-1: Inland water first-run guide card -->
+    <string name="ts_guide_inland_title">Enable satellite enhancement for inland water (optional)</string>
+    <string name="ts_guide_inland_body">Water quality is currently model-estimated. Enter your own free Copernicus Marine account for satellite/model fused data (more accurate temperature, dissolved oxygen and turbidity).</string>
+    <string name="ts_guide_inland_steps">Steps: (1) register free (%1$s) (2) enter credentials in Settings (3) return — it works automatically</string>
+    <string name="ts_guide_inland_privacy">Credentials stay on this device and are never uploaded. Skipping does not affect other tabs or cause crashes.</string>
+    <string name="ts_guide_inland_open_settings">Open Settings</string>
+    <string name="ts_guide_inland_skip">Not now</string>
+</resources>

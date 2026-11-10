@@ -16,6 +16,8 @@ data class SettingsState(
     val reverseGeoEnabled: Boolean = true,
     /** 可选 API Key 占位（null=未设置；当前无消费方，M6 仅存储展示）。 */
     val apiKey: String? = null,
+    /** CHG-25（P0-1）：Copernicus 凭据是否已配置（运行期由 :app 从凭据存储读取，不落本状态持久化）。 */
+    val copernicusConfigured: Boolean = false,
 )
 
 /** 设置键名唯一清单（:app 批次 3 SharedPreferences 实现按此对齐）。 */

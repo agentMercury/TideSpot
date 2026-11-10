@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,16 +28,20 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.data.repo.TideSpotRepository
+import com.tidespot.core.data.water.CopernicusCredential
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.theme.TideSpotTheme
 import com.tidespot.feature.detail.detail.DetailScreen
 import com.tidespot.feature.detail.detail.DetailViewModel
+import com.tidespot.feature.detail.detail.InlandCredentialGuideCard
 import com.tidespot.feature.favorites.favorites.FavoritesSaveRules
 import com.tidespot.feature.favorites.favorites.FavoritesScreen
 import com.tidespot.feature.favorites.favorites.FavoritesViewModel
 import com.tidespot.feature.map.MapScreen
 import com.tidespot.feature.map.model.SpotConfirmed
+import com.tidespot.feature.settings.CopernicusCredentialSection
 import com.tidespot.feature.settings.SettingsLogic
 import com.tidespot.feature.settings.SettingsScreen
 import com.tidespot.feature.settings.SettingsState
@@ -60,6 +65,9 @@ class MainActivity : ComponentActivity() {
 }
 
 /** 底部导航四项（顺序 = §8.1 主流程：地图选点 → 收藏 → 详情 → 设置）。 */
+/** CHG-25（P0-1）：Copernicus 首次引导卡「跳过」标记键（SharedPreferences；一次后不再显示）。 */
+private const val GUIDE_SKIP_COPERNICUS = "guide.copernicus.skipped"
+
 private val TAB_ORDER = listOf(AppPage.MAP, AppPage.FAVORITES, AppPage.DETAIL, AppPage.SETTINGS)
 
 private val TAB_LABELS = mapOf(
@@ -73,6 +81,13 @@ private val TAB_LABELS = mapOf(
 private fun AppRoot(graph: AppGraph) {
     var navState by remember { mutableStateOf(AppNavState()) }
     var settingsState by remember { mutableStateOf(AppSettings.read(graph.settingsStore)) }
+    // CHG-25（P0-1）：Copernicus 凭据配置态（运行期读凭据存储；保存/清除即时刷新）
+    var copernicusConfigured by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { copernicusConfigured = graph.hasCopernicusCredential() }
+    // 首次引导卡「跳过」标记（一次后不再显示）
+    var credentialGuideSkipped by remember {
+        mutableStateOf(graph.settingsStore.readBoolean(GUIDE_SKIP_COPERNICUS, false))
+    }
     // OPT-M5-07：确认选点 → 收藏对话框（预填逆地理名称）
     var pendingConfirm by remember { mutableStateOf<SpotConfirmed?>(null) }
 
@@ -138,15 +153,34 @@ private fun AppRoot(graph: AppGraph) {
                             spot = spot,
                             viewModel = vm,
                             onBack = { navState = AppNav.reduce(navState, AppNavEvent.BackFromDetail) },
+                            showCredentialGuide = spot.waterBody == WaterBodyType.INLAND_WATER &&
+                                !copernicusConfigured && !credentialGuideSkipped,
+                            onOpenCredentialSettings = {
+                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.SETTINGS))
+                            },
+                            onSkipCredentialGuide = {
+                                credentialGuideSkipped = true
+                                graph.settingsStore.writeBoolean(GUIDE_SKIP_COPERNICUS, true)
+                            },
                         )
                     }
                 }
 
                 AppPage.SETTINGS -> SettingsPage(
-                    state = settingsState,
+                    state = settingsState.copy(copernicusConfigured = copernicusConfigured),
                     onChange = { next ->
                         persistSettings(graph, next)
-                        settingsState = next
+                        settingsState = next.copy(copernicusConfigured = copernicusConfigured)
+                    },
+                    credentialSection = {
+                        CopernicusCredentialSection(
+                            configured = copernicusConfigured,
+                            onCheckAndSave = { username, password ->
+                                graph.checkAndApply(CopernicusCredential(username, password))
+                            },
+                            onClear = { graph.clearCopernicusCredential() },
+                            onConfiguredChanged = { copernicusConfigured = it },
+                        )
                     },
                 )
             }
@@ -177,6 +211,9 @@ private fun DetailPage(
     spot: FavoriteSpot,
     viewModel: DetailViewModel,
     onBack: () -> Unit,
+    showCredentialGuide: Boolean,
+    onOpenCredentialSettings: () -> Unit,
+    onSkipCredentialGuide: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -187,7 +224,21 @@ private fun DetailPage(
                 Text("← 返回收藏")
             }
         }
-        DetailScreen(spot = spot, viewModel = viewModel, modifier = Modifier.weight(1f))
+        DetailScreen(
+            spot = spot,
+            viewModel = viewModel,
+            modifier = Modifier.weight(1f),
+            credentialGuideSlot = if (showCredentialGuide) {
+                {
+                    InlandCredentialGuideCard(
+                        onOpenSettings = onOpenCredentialSettings,
+                        onSkip = onSkipCredentialGuide,
+                    )
+                }
+            } else {
+                null
+            },
+        )
         Text(
             TideSpotStrings.MODEL_ATTRIBUTION,
             style = MaterialTheme.typography.labelSmall,
@@ -200,7 +251,11 @@ private fun DetailPage(
 }
 
 @Composable
-private fun SettingsPage(state: SettingsState, onChange: (SettingsState) -> Unit) {
+private fun SettingsPage(
+    state: SettingsState,
+    onChange: (SettingsState) -> Unit,
+    credentialSection: (@Composable () -> Unit)? = null,
+) {
     SettingsScreen(
         state = state,
         onUnitSystemChange = { unit -> onChange(SettingsLogic.withUnitSystem(state, unit)) },
@@ -209,6 +264,7 @@ private fun SettingsPage(state: SettingsState, onChange: (SettingsState) -> Unit
         onReverseGeoChange = { enabled -> onChange(SettingsLogic.withReverseGeo(state, enabled)) },
         onApiKeyChange = { raw -> onChange(SettingsLogic.withApiKey(state, raw)) },
         modifier = Modifier.fillMaxSize(),
+        credentialSection = credentialSection,
     )
 }
 

@@ -5,8 +5,8 @@
 
 ## 1. 状态总览
 
-**当前阶段：M0–M6 全部完成 + A 类优化批次收口 → 下一步交付验收（12-04 ~ 12-08，可提前真机预验）**
-**整体进度：7 / 8 ｜ 目标交付日：2026-12-08（较排期领先约 19 天）｜ 健康度：🟢 正常**
+**当前阶段：v1.1 开工（客户 2026-11-10 提前启动）→ P0-1 凭据外部化批次完成，P0-2 可开工**
+**整体进度：7 / 8（v1 交付验收待 12-04~12-08）｜ v1.1：P0-1 ✅ / P0-2 待开工 ｜ 健康度：🟢 正常**
 
 | 里程碑 | 计划 | 状态 | 实际完成 | 验证结论 |
 |---|---|---|---|---|
@@ -21,7 +21,22 @@
 | V1.1 优化批次 A（验收前优化） | 11-09 | ✅ | 11-09 | 八模块 **561 运行 / 0 失败 / 0 跳过**（data 128×2，删 6 条 @Ignore 空壳后跳过清零）+ **真机仪器测试 6/6（AAK-AN00/Android 16，BLK-04 解锁）** + app-release.apk 复产出 + verify.ps1 全绿；**真机迁移锁抓出并修复 P0：MIGRATION_3_4 列名 veto_codes≠实体 vetoCodes，v3→v4 升级路径必崩**（CHG-18②）；A-2 弃用 API 迁移、A-3 verify.ps1、A-4 tools/ 清理、A-5 gradlew 首跑全清；CHG-18 登记 |
 | V1.1 优化批次 C（环境解锁） | 11-09 | ✅ | 11-09 | 客户裁定三项全做（CHG-19）：**C-1 Robolectric Compose 冒烟四条锁落地**（:core:ui +robolectric 4.14.1 + ui-test，`ComposeSmokeRobolectricTest` 8 用例：Tab 标题矩阵四水体/切表 10 轮不崩/DaySelector 回调/FactorBreakdown 三区 + 同屏唯一附锁；test worker 代理透传解锁 android-all 自下载）；**C-3** LocalLifecycleOwner 迁 lifecycle-runtime-compose（FO-25 残留清零）；**C-2** AGP 8.5.2→8.7.3（独立提交可回退，全模块重构建 + lintVital 全跑通过）；八模块 **569 运行 / 0 失败 / 0 跳过**（ui +8）+ APK 复产出（49.1MB）；jj：C-1/C-3=`kkvmrokw`、C-2=`zyynnzws` |
 
-## 2. 本期快照（2026-11-09，V1.1 优化批次 A+C 退出）
+## 2. 本期快照（2026-11-10，v1.1 P0-1 退出）
+
+- **完成项**（CHG-25：客户提前启动 v1.1 + 三项裁定 D13–D15）：
+  - **版本号**：`versionName=1.1` / `versionCode=2` 开工即升；APK `潮点TideSpot-v1.1.apk` 与 v1.0 在 E:\Trans 共存。
+  - **OPT-V11-01 凭据外部化（批次 A）**：`:core:data` 新增 `CopernicusCredentialStore`/`FileCopernicusCredentialStore`（java.io 原子写，JVM 可测）+ `CopernicusCredentialValidator`（四态 Missing/Valid/Invalid/Unreachable，4xx→Invalid、429/5xx/网络→Unreachable）；`WaterBodyClassifier.setProbe` 尾增（@Volatile 运行期切换）；`:app` 移除 BuildConfig 凭据注入、AppGraph 运行期读凭据、`checkAndApply` 校验通过才落库并即时生效；Manifest `allowBackup=false`。锁测试 12 条（store 5 + validator 7）×2 variant。
+  - **设置页凭据版块（批次 B）**：`CopernicusCredentialSection`（账号/密码/可见性切换/校验并保存/清除/四态反馈/隐私说明/免费注册链接经 TideSpotUrls 单点）；`CopernicusFormLogic` 纯函数（错误码枚举）×5 锁测试；`SettingsScreen` 尾增 `credentialSection` slot（null 零行为漂移）。
+  - **首次引导卡（批次 B）**：`InlandCredentialGuideCard`（内陆点+水质Tab+未配置+未跳过；可跳过一次，标记持久化）；`DetailScreen` 尾增 `credentialGuideSlot` slot。
+  - **i18n 框架（批次 C）**：`:core:ui/res/values/strings.xml`（中文默认）+ `values-en/strings.xml`（英文初稿）——17 条 GAP-05 定稿文案 + P0-1 新增串（凭据版块/引导卡/表单错误）；规范：新增可见文案必须进资源，禁 Screen 硬编码/新增 object 常量；存量 TideSpotStrings P2 外移（零行为漂移）。
+  - **APP 图标（批次 C/GAP-01）**：design-handoff SVG → `ic_launcher_foreground/background/monochrome`（vector+gradient）+ adaptive `mipmap-anydpi-v26/ic_launcher(.round)`；Manifest icon/roundIcon 替换 `sym_def_app_icon`。
+- **验证留证**：八模块 **598 运行 / 0 失败 / 0 跳过**（v1.0 基线 569 + 29 新增锁）+ verify.ps1 全绿 + **APK 解包 dex 零凭据字段**（`COPERNICUS_USERNAME`/`copernicus.username` findstr 零命中）+ aapt 实证 `versionCode=2/versionName=1.1` + adaptive icon 生效。
+- **阻塞/遗留**：真机首次配置向导冒烟**挂起**（adb 无设备在线，用户需重连 USB）；冒烟项：安装 v1.1 → 内陆点水质Tab 引导卡可跳过 → 设置页配置 → 水质徽标转卫星/模型 → 清除凭据不残留。
+- **下一步**：P0-2（OPT-V11-02/03/04 + 25 Top10 核心段 + 26 阈值 75）；真机 P0-1 冒烟随设备重连补验。
+
+---
+
+### 上期快照（2026-11-09，V1.1 优化批次 A+C 退出，历史存档）
 
 - **完成项**（HANDOVER §6 A 类清单 A-1~A-5 全清，逐项详见台账 CHG-18）：
   - **A-1 BLK-04 解锁**：`:core:data` androidTest 基建（androidx.test 三件套 + room-testing；依赖经 maven 可达性确认后引入，runner 经本机代理下载）；`RoomDaoTest`/`RoomMigrationTest` @Ignore 空壳 6 用例落地为真机仪器测试（in-memory CRUD/REPLACE/lastSuccess + MigrationTestHelper 三段迁移强校验 + 文件库「重启不丢」）；**真机 6/6 通过**。
