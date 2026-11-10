@@ -44,6 +44,7 @@ import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.selector.DaySelector
 import com.tidespot.core.ui.selector.DaySelectorLogic
 import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.titles.WaterBodyTabTitles
 import com.tidespot.core.domain.window.BestWindowFinder
 import java.time.LocalDate
@@ -255,7 +256,15 @@ fun DetailScreen(
                 // D10：禁硬编码 ESTIMATED——徽标档位按推导序列 domain confidence 透出
                 val qConf = daySlices.firstNotNullOfOrNull { qualityByEpoch[it.timeEpochSec]?.confidence }
                 qConf?.let { conf ->
-                    Row(Modifier.padding(horizontal = 12.dp)) { ConfidenceBadge(Kind.fromConfidence(conf)) }
+                    Row(Modifier.padding(horizontal = 12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        ConfidenceBadge(Kind.fromConfidence(conf))
+                        // CHG-26：置信口径说明——徽标冻结不改（设计包 DECISIONS），以旁注说明「卫星数据未接入」
+                        Text(
+                            androidx.compose.ui.res.stringResource(UiR.string.ts_water_quality_estimate_note),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(start = 6.dp),
+                        )
+                    }
                 }
                 // CHG-25（P0-1）：内陆点首次配置引导卡（:app 判定：内陆 + 未配置 + 未跳过）
                 credentialGuideSlot?.invoke()

@@ -29,8 +29,8 @@
 
     <!-- ── P0-1 新增：Copernicus 凭据版块（设置页） ── -->
     <string name="ts_copernicus_section_title">数据源凭据 · Copernicus</string>
-    <string name="ts_copernicus_not_configured">当前未配置：内陆点水质按模型估算显示（估算徽标）。填写你自己的免费 Copernicus 账号可启用卫星数据增强。</string>
-    <string name="ts_copernicus_configured">当前已配置：内陆水质增强启用（卫星/模型徽标）。可修改或清除。</string>
+    <string name="ts_copernicus_not_configured">当前未配置：内陆点水体判定可能显示「待判定」；水质数值按模型估算显示（估算徽标）。</string>
+    <string name="ts_copernicus_configured">当前已配置：水体判定探针可用（内陆点可判为湖泊/水库）。水质数值仍为模型估算，卫星水质数据待后续版本接入。</string>
     <string name="ts_copernicus_username_label">Copernicus 用户名</string>
     <string name="ts_copernicus_password_label">Copernicus 密码</string>
     <string name="ts_copernicus_check_save">校验并保存</string>
@@ -50,9 +50,12 @@
     <string name="ts_copernicus_err_password">请填写 Copernicus 密码</string>
     <string name="ts_copernicus_err_password_long">密码过长（≤128 字符）</string>
 
+    <!-- ── CHG-26：水质置信口径说明（不改冻结徽标；配置凭据不解锁卫星水质数据） ── -->
+    <string name="ts_water_quality_estimate_note">模型估算 · Copernicus 卫星水质数据未接入（凭据仅影响水体判定）</string>
+
     <!-- ── P0-1 新增：内陆水质首次引导卡（详情页水质 Tab） ── -->
-    <string name="ts_guide_inland_title">启用内陆水质卫星增强（可选）</string>
-    <string name="ts_guide_inland_body">当前水质数据为模型估算。填写你自己的免费 Copernicus Marine 账号，可获得卫星/模型融合数据（水温/溶解氧/浊度更准）。</string>
+    <string name="ts_guide_inland_title">配置 Copernicus 账号（可选）</string>
+    <string name="ts_guide_inland_body">用于辅助水体判定（内陆点判为湖泊/水库，标题与水质 Tab 更准确）。当前水质数值仍为模型估算；卫星水质数据待后续版本接入。</string>
     <string name="ts_guide_inland_steps">步骤：① 免费注册（%1$s）② 设置页填写账号密码 ③ 返回自动生效</string>
     <string name="ts_guide_inland_privacy">账号仅保存在本机，不上传；不配置不影响其他维度且不会崩溃。</string>
     <string name="ts_guide_inland_open_settings">去设置配置</string>

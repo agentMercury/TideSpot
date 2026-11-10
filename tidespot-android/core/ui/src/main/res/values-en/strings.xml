@@ -25,8 +25,8 @@
 
     <!-- P0-1: Copernicus credentials section -->
     <string name="ts_copernicus_section_title">Data Source Credentials · Copernicus</string>
-    <string name="ts_copernicus_not_configured">Not configured: inland water quality uses model estimates (estimated badge). Enter your own free Copernicus account to enable satellite enhancement.</string>
-    <string name="ts_copernicus_configured">Configured: inland water enhancement enabled (satellite/model badge). You can update or clear it.</string>
+    <string name="ts_copernicus_not_configured">Not configured: water-body classification for inland spots may show \"undetermined\"; water quality values are model estimates (estimated badge).</string>
+    <string name="ts_copernicus_configured">Configured: the water-body probe is available (inland spots can be classified as lake/reservoir). Water quality values remain model estimates; satellite water data will be connected in a future version.</string>
     <string name="ts_copernicus_username_label">Copernicus username</string>
     <string name="ts_copernicus_password_label">Copernicus password</string>
     <string name="ts_copernicus_check_save">Verify &amp; save</string>
@@ -46,9 +46,12 @@
     <string name="ts_copernicus_err_password">Enter your Copernicus password</string>
     <string name="ts_copernicus_err_password_long">Password too long (max 128 characters)</string>
 
+    <!-- CHG-26: water-quality confidence note (frozen badge unchanged; credentials do not unlock satellite water data) -->
+    <string name="ts_water_quality_estimate_note">Model estimate · Copernicus satellite water data not connected (credentials affect water-body classification only)</string>
+
     <!-- P0-1: Inland water first-run guide card -->
-    <string name="ts_guide_inland_title">Enable satellite enhancement for inland water (optional)</string>
-    <string name="ts_guide_inland_body">Water quality is currently model-estimated. Enter your own free Copernicus Marine account for satellite/model fused data (more accurate temperature, dissolved oxygen and turbidity).</string>
+    <string name="ts_guide_inland_title">Configure a Copernicus account (optional)</string>
+    <string name="ts_guide_inland_body">Used to assist water-body classification (inland spots classified as lake/reservoir, so titles and the water-quality tab are more accurate). Water quality values remain model estimates; satellite water data will be connected in a future version.</string>
     <string name="ts_guide_inland_steps">Steps: (1) register free (%1$s) (2) enter credentials in Settings (3) return — it works automatically</string>
     <string name="ts_guide_inland_privacy">Credentials stay on this device and are never uploaded. Skipping does not affect other tabs or cause crashes.</string>
     <string name="ts_guide_inland_open_settings">Open Settings</string>
