@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.mock
+package com.tidespot.core.data.mock
 
 import com.tidespot.core.data.local.FetchLogDao
 import com.tidespot.core.data.local.ReverseCacheDao
@@ -55,6 +55,25 @@ class FakeSpotDao : SpotDao {
         val old = rows[id] ?: return
         rows[id] = old.copy(tzOffsetSec = tzOffsetSec)
     }
+
+    // OPT-V11-12 / OPT-V11-16（P2/CHG-37）：批量操作 Fake（与 Room @Query 同语义）
+
+    override suspend fun getByIds(ids: List<Long>): List<SpotEntity> =
+        ids.mapNotNull { rows[it] }
+
+    override suspend fun deleteByIds(ids: List<Long>) {
+        ids.forEach { rows.remove(it) }
+    }
+
+    override suspend fun updateGroupName(ids: List<Long>, groupName: String?) {
+        ids.forEach { id ->
+            rows[id]?.let { rows[id] = it.copy(groupName = groupName) }
+        }
+    }
+
+    override suspend fun updateTagsJson(id: Long, tagsJson: String) {
+        rows[id]?.let { rows[id] = it.copy(tagsJson = tagsJson) }
+    }
 }
 
 class FakeHourlyDao : HourlyMetricDao {
@@ -79,6 +98,10 @@ class FakeHourlyDao : HourlyMetricDao {
     override suspend fun deleteForSpot(spotId: Long) {
         rows.removeAll { it.spotId == spotId }
     }
+
+    override suspend fun deleteForSpots(spotIds: List<Long>) {
+        rows.removeAll { it.spotId in spotIds }
+    }
 }
 
 class FakeFetchLogDao : FetchLogDao {
@@ -100,6 +123,10 @@ class FakeFetchLogDao : FetchLogDao {
 
     override suspend fun forSpot(spotId: Long): List<FetchLogEntity> =
         rows.filter { it.spotId == spotId }.sortedByDescending { it.fetchedAt }
+
+    override suspend fun deleteForSpots(spotIds: List<Long>) {
+        rows.removeAll { it.spotId in spotIds }
+    }
 }
 
 // ────────────────────────────── M3 新增（CONTRACT M3 子契约） ──────────────────────────────
@@ -148,6 +175,10 @@ class FakeHourlyScoreDao : HourlyScoreDao {
     override suspend fun deleteForSpot(spotId: Long) {
         rows.removeAll { it.spotId == spotId }
     }
+
+    override suspend fun deleteForSpots(spotIds: List<Long>) {
+        rows.removeAll { it.spotId in spotIds }
+    }
 }
 
 // ────────────────────────────── M6 新增（CONTRACT M6 子契约 / OPT-M5-02） ──────────────────────────────
@@ -170,6 +201,10 @@ class FakeManualObservationDao : ManualObservationDao {
     /** CHG-27（OPT-V11-02）：按类型查询，与 Room `forSpotKind` 同语义。 */
     override suspend fun forSpotKind(spotId: Long, kind: String): List<ManualObservationEntity> =
         forSpot(spotId).filter { it.kind == kind }
+
+    override suspend fun deleteForSpots(spotIds: List<Long>) {
+        rows.removeAll { it.spotId in spotIds }
+    }
 }
 
 /** 现场校潮拟合内存 Fake（spotId PK REPLACE 覆盖，对齐 Room 口径）。 */
@@ -181,4 +216,8 @@ class FakeManualTideFitDao : ManualTideFitDao {
     }
 
     override suspend fun getBySpot(spotId: Long): ManualTideFitEntity? = rows[spotId]
+
+    override suspend fun deleteForSpots(spotIds: List<Long>) {
+        spotIds.forEach { rows.remove(it) }
+    }
 }

@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.favorites.favorites
+package com.tidespot.feature.favorites.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -87,6 +87,8 @@ class FavoritesViewModel(
                 loaded.associate { it.id to (it.result?.windows ?: emptyList()) }
             // F-2.4 分数序依据：各点最高窗口 peakScore（无窗口/未加载的点不入 map → 排序时排最后）
             val scoreBySpotId = perSpot.mapNotNull { (id, s) -> s.window?.let { id to it.peakScore } }.toMap()
+            // OPT-V11-14（P2/CHG-37）：「综合推荐」排序依据 = 各点最高窗口 rank（无窗口/未加载不入 map）
+            val rankBySpotId = perSpot.mapNotNull { (id, s) -> s.window?.let { id to it.rank } }.toMap()
             // F-2.6 跨点 Top10：仅含「有窗口」的点（兜底/未加载无窗口可聚合）
             // OPT-M5-03：跨点 Top10 携带各点时区（rankAcrossSpots 全局 rank 降序序不变）
             val top10Inputs = spots.mapNotNull { spot ->
@@ -102,9 +104,12 @@ class FavoritesViewModel(
                     spots = spots,
                     summaries = perSpot,
                     scoreBySpotId = scoreBySpotId,
+                    rankBySpotId = rankBySpotId,
                     top10 = top10,
                     // OPT-V11-06：列表摘要按「今天/明天/周X」渲染 → 每次加载刷新「现在」
                     nowEpochSec = System.currentTimeMillis() / 1000L,
+                    // OPT-V11-12：重载后剔除已不存在点的选中项（防幽灵选中计数/误删）
+                    selection = it.selection.filter { id -> spots.any { spot -> spot.id == id } }.toSet(),
                 )
             }
         }
@@ -147,6 +152,11 @@ class FavoritesViewModel(
         tags: List<String>,
         lat: Double? = null,
         lon: Double? = null,
+        /**
+         * OPT-V11-16（P2/CHG-37）：分组名（空白已由调用方归一为 null = 未分组）。
+         * 编辑路径由 UI 传入「对话框最终值」；新建路径 null = 未分组。
+         */
+        groupName: String? = null,
     ) {
         if (name.isBlank()) return
         if (existing == null && !FavoritesSaveRules.canCreate(lat, lon)) {
@@ -156,7 +166,7 @@ class FavoritesViewModel(
         viewModelScope.launch(ioDispatcher) {
             val favorite = if (existing != null) {
                 existing.copy(name = name.trim(), memo = memo?.trim()?.ifEmpty { null },
-                    preset = preset, tags = tags)
+                    preset = preset, tags = tags, groupName = groupName)
             } else {
                 FavoriteSpot(
                     id = 0,
@@ -166,6 +176,7 @@ class FavoritesViewModel(
                     memo = memo?.trim()?.ifEmpty { null },
                     preset = preset,
                     tags = tags,
+                    groupName = groupName,
                 )
             }
             runCatching { repository.upsertFavorite(favorite) }
@@ -191,6 +202,127 @@ class FavoritesViewModel(
         viewModelScope.launch(ioDispatcher) {
             runCatching { repository.markViewed(spotId) }
         }
+    }
+
+    // ────────────── OPT-V11-12 / 15 / 16（P2/CHG-37）：多选、批量、信息卡、分组 ──────────────
+
+    /**
+     * 长按卡片进入多选（客户裁定 D16：长按 = 多选，不占信息卡片手势）。
+     * 取消最后一个选中项即退出多选（[FavoritesUiState.isSelecting] = 选中集合非空）。
+     */
+    fun toggleSelection(id: Long) {
+        _state.update {
+            it.copy(selection = FavoritesBatchLogic.toggle(it.selection, id), batchMessage = null)
+        }
+    }
+
+    /** 全选（域 = 当前可见列表，被筛掉的点不会被「看不见地被删」）。 */
+    fun selectAllVisible(visible: List<FavoriteSpot>) {
+        _state.update {
+            it.copy(
+                selection = FavoritesBatchLogic.selectAll(visible.map { spot -> spot.id }),
+                batchMessage = null,
+            )
+        }
+    }
+
+    /** 反选（域 = 当前可见列表；域外既有选择保留）。 */
+    fun invertSelection(visible: List<FavoriteSpot>) {
+        _state.update {
+            it.copy(
+                selection = FavoritesBatchLogic.invertSelection(
+                    it.selection,
+                    visible.map { spot -> spot.id },
+                ),
+                batchMessage = null,
+            )
+        }
+    }
+
+    /** 退出多选。 */
+    fun clearSelection() {
+        _state.update { it.copy(selection = emptySet(), batchMessage = null) }
+    }
+
+    /**
+     * OPT-V11-12：批量删除（UI 二次确认后调用；Repository 单事务 + 级联清理 6 张表）。
+     * 完成后清空多选并整体重载（列表/摘要/缓存同步，验收 GWT 要求）。
+     */
+    fun deleteSelected(visible: List<FavoriteSpot>) {
+        val ids = FavoritesBatchLogic.selectedIds(visible, _state.value.selection)
+        if (ids.isEmpty()) return
+        viewModelScope.launch(ioDispatcher) {
+            val result = runCatching { repository.deleteFavorites(ids) }
+            // 删除后跨点缓存整体失效（已删点不得残留窗口）
+            topCache.clear()
+            _state.update {
+                it.copy(
+                    selection = emptySet(),
+                    batchMessage = result.exceptionOrNull()?.let { "批量删除失败，未做任何改动" },
+                )
+            }
+            load()
+        }
+    }
+
+    /**
+     * OPT-V11-12：批量改标签（追加 / 替换二选一，D3）。
+     * 合并语义由 [FavoritesBatchLogic.mergeTags] 决定；数据层只落最终标签（D07 patch 语义不破坏）。
+     */
+    fun saveSelectedTags(raw: String, replace: Boolean, visible: List<FavoriteSpot>) {
+        val selected = FavoritesBatchLogic.selectedIds(visible, _state.value.selection).toSet()
+        if (selected.isEmpty()) return
+        val input = FavoritesBatchLogic.parseTags(raw)
+        val updates = visible
+            .filter { selected.contains(it.id) }
+            .associate { spot ->
+                spot.id to FavoritesBatchLogic.mergeTags(spot.tags, input, replace)
+            }
+        viewModelScope.launch(ioDispatcher) {
+            val result = runCatching { repository.updateFavoritesTags(updates) }
+            _state.update {
+                it.copy(
+                    selection = emptySet(),
+                    batchMessage = result.exceptionOrNull()?.let { "批量改标签失败，未做任何改动" },
+                )
+            }
+            load()
+        }
+    }
+
+    /**
+     * OPT-V11-16：批量改分组（空白 → 移回「未分组」）。
+     */
+    fun saveSelectedGroup(raw: String?, visible: List<FavoriteSpot>) {
+        val selected = FavoritesBatchLogic.selectedIds(visible, _state.value.selection)
+        if (selected.isEmpty()) return
+        viewModelScope.launch(ioDispatcher) {
+            val result = runCatching { repository.updateFavoritesGroup(selected, raw) }
+            _state.update {
+                it.copy(
+                    selection = emptySet(),
+                    batchMessage = result.exceptionOrNull()?.let { "批量改分组失败，未做任何改动" },
+                )
+            }
+            load()
+        }
+    }
+
+    /** OPT-V11-15：展开/收起信息卡片（同一时刻最多一个）。 */
+    fun toggleInfo(spotId: Long) {
+        _state.update { it.copy(infoSpotId = if (it.infoSpotId == spotId) null else spotId) }
+    }
+
+    /** OPT-V11-16：分组折叠切换（仅展示态，不触 DB/网络）。 */
+    fun toggleGroup(groupName: String) {
+        _state.update {
+            it.copy(collapsedGroups = FavoritesGroupLogic.toggleCollapsed(groupName, it.collapsedGroups))
+        }
+    }
+
+    /** 清空批量操作提示。 */
+    fun clearBatchMessage() {
+        _state.update { it.copy(batchMessage = null) }
     }
 }
 

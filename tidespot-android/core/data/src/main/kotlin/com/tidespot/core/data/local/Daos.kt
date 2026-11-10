@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.local
+package com.tidespot.core.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -49,6 +49,27 @@ interface SpotDao {
      */
     @Query("UPDATE spot SET tzOffsetSec = :tzOffsetSec WHERE id = :id")
     suspend fun updateTzOffset(id: Long, tzOffsetSec: Int?)
+
+    // ── OPT-V11-12 / OPT-V11-16（P2/CHG-37）：批量操作支撑（单条删除/批量删除共用级联清理） ──
+
+    /** 按 id 批量读（批量标签合并、分组校验输入）。 */
+    @Query("SELECT * FROM spot WHERE id IN (:ids)")
+    suspend fun getByIds(ids: List<Long>): List<SpotEntity>
+
+    /** 批量删除收藏点行（**调用方负责事务**，见 `TideSpotRepository.deleteFavorites`）。 */
+    @Query("DELETE FROM spot WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Long>)
+
+    /**
+     * OPT-V11-16：批量改分组。`:groupName` 传 null = 移回「未分组」（**禁空串**，写入侧归一）。
+     * 定向 UPDATE，不触派生列（D07 patch 语义保持）。
+     */
+    @Query("UPDATE spot SET groupName = :groupName WHERE id IN (:ids)")
+    suspend fun updateGroupName(ids: List<Long>, groupName: String?)
+
+    /** OPT-V11-12：批量改标签（定向 UPDATE tagsJson，不冲 waterBodyType/elevation/时区等派生列）。 */
+    @Query("UPDATE spot SET tagsJson = :tagsJson WHERE id = :id")
+    suspend fun updateTagsJson(id: Long, tagsJson: String)
 }
 
 @Dao
@@ -66,6 +87,10 @@ interface HourlyMetricDao {
 
     @Query("DELETE FROM hourly_metric WHERE spotId = :spotId")
     suspend fun deleteForSpot(spotId: Long)
+
+    /** OPT-V11-12（P2/CHG-37）：批量删除时级联清理逐小时指标缓存（事务由仓储包裹）。 */
+    @Query("DELETE FROM hourly_metric WHERE spotId IN (:spotIds)")
+    suspend fun deleteForSpots(spotIds: List<Long>)
 }
 
 @Dao
@@ -86,6 +111,10 @@ interface FetchLogDao {
 
     @Query("SELECT * FROM fetch_log WHERE spotId = :spotId ORDER BY fetchedAt DESC")
     suspend fun forSpot(spotId: Long): List<FetchLogEntity>
+
+    /** OPT-V11-12（P2/CHG-37）：删除收藏点时级联清理访问日志（事务由仓储包裹）。 */
+    @Query("DELETE FROM fetch_log WHERE spotId IN (:spotIds)")
+    suspend fun deleteForSpots(spotIds: List<Long>)
 }
 
 // ────────────────────────────── M3 新增（CONTRACT M3 子契约） ──────────────────────────────
@@ -126,6 +155,10 @@ interface HourlyScoreDao {
 
     @Query("DELETE FROM hourly_score WHERE spotId = :spotId")
     suspend fun deleteForSpot(spotId: Long)
+
+    /** OPT-V11-12（P2/CHG-37）：批量删除时级联清理评分缓存（事务由仓储包裹）。 */
+    @Query("DELETE FROM hourly_score WHERE spotId IN (:spotIds)")
+    suspend fun deleteForSpots(spotIds: List<Long>)
 }
 
 // ────────────────────────────── M6 新增（CONTRACT M6 子契约 / OPT-M5-02） ──────────────────────────────
@@ -150,6 +183,10 @@ interface ManualObservationDao {
             "ORDER BY observedAtEpochSec ASC, id ASC",
     )
     suspend fun forSpotKind(spotId: Long, kind: String): List<ManualObservationEntity>
+
+    /** OPT-V11-12（P2/CHG-37）：删除收藏点时级联清理观测记录（含校潮与水质实测）。 */
+    @Query("DELETE FROM manual_observation WHERE spotId IN (:spotIds)")
+    suspend fun deleteForSpots(spotIds: List<Long>)
 }
 
 /** 现场校潮拟合参数 DAO（每点一行，REPLACE 覆盖式登记；adopted=false 也登记）。 */
@@ -161,4 +198,8 @@ interface ManualTideFitDao {
 
     @Query("SELECT * FROM manual_tide_fit WHERE spotId = :spotId")
     suspend fun getBySpot(spotId: Long): ManualTideFitEntity?
+
+    /** OPT-V11-12（P2/CHG-37）：删除收藏点时级联清理拟合参数。 */
+    @Query("DELETE FROM manual_tide_fit WHERE spotId IN (:spotIds)")
+    suspend fun deleteForSpots(spotIds: List<Long>)
 }

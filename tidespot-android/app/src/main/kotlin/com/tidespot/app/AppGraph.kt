@@ -1,4 +1,4 @@
-﻿package com.tidespot.app
+package com.tidespot.app
 
 import android.content.Context
 import android.util.Log
@@ -44,7 +44,7 @@ class AppGraph(context: Context) {
 
     private val appContext: Context = context.applicationContext
 
-    // ────────────── Room（v4 全量迁移） ──────────────
+    // ────────────── Room（v6 全量迁移） ──────────────
 
     private val db: TideSpotDatabase = Room.databaseBuilder(
         appContext,
@@ -56,6 +56,7 @@ class AppGraph(context: Context) {
             TideSpotDatabase.MIGRATION_2_3,
             TideSpotDatabase.MIGRATION_3_4,
             TideSpotDatabase.MIGRATION_4_5,
+            TideSpotDatabase.MIGRATION_5_6,
         )
         .build()
 
@@ -134,6 +135,8 @@ class AppGraph(context: Context) {
         manualObservationDao = db.manualObservationDao(),
         manualTideFitDao = db.manualTideFitDao(),
         scoringDispatcher = Dispatchers.Default,
+        // OPT-V11-12（P2/CHG-37）：批量删除/批量更新走单事务
+        db = db,
     )
 
     // ────────────── :feature:map 装配面（DataWiring 适配） ──────────────

@@ -13,13 +13,15 @@ object FavoritesSortLogic {
 
     /**
      * @param spots 收藏点列表（保持原序输入）
-     * @param order 三选一排序方式
+     * @param order 四选一排序方式（OPT-V11-14 新增「综合推荐」）
      * @param scoreBySpotId 各点最高窗口 peakScore（加载后填充；缺 key = 未加载，排最后）
+     * @param rankBySpotId 各点最高窗口 rank（OPT-V11-14「综合推荐」排序依据；缺 key = 未加载，排最后）
      */
     fun sort(
         spots: List<FavoriteSpot>,
         order: SortOrder,
         scoreBySpotId: Map<Long, Int> = emptyMap(),
+        rankBySpotId: Map<Long, Double> = emptyMap(),
     ): List<FavoriteSpot> = when (order) {
         SortOrder.NAME -> spots.sortedWith(compareBy { it.name })
         SortOrder.LAST_VIEWED -> spots.sortedWith(
@@ -43,6 +45,20 @@ object FavoritesSortLogic {
                     aScore == null -> 1    // 未加载/无窗口 → 排最后
                     bScore == null -> -1
                     else -> bScore.compareTo(aScore)  // 分数降序
+                }
+            },
+        )
+        // OPT-V11-14（P2/CHG-37）：综合推荐 = BestWindow.rank 降序；同 rank 按 name 字典序（稳定、无旁路）
+        SortOrder.RECOMMENDED -> spots.sortedWith(
+            Comparator { a, b ->
+                val aRank = rankBySpotId[a.id]
+                val bRank = rankBySpotId[b.id]
+                when {
+                    aRank == null && bRank == null -> a.name.compareTo(b.name)
+                    aRank == null -> 1      // 未加载/无窗口 → 排最后（缺值禁 0 填充）
+                    bRank == null -> -1
+                    aRank != bRank -> bRank.compareTo(aRank)  // rank 降序
+                    else -> a.name.compareTo(b.name)          // 同 rank → 名称升序
                 }
             },
         )

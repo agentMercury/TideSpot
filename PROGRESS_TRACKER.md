@@ -166,6 +166,7 @@
 | 2026-11-09 | **CHG-16 合入基线 + M6 三批次执行完毕**：批次 0 契约（Models.kt 只增 VetoCode/vetoCodes/tzOffsetSec）；批次 1 数据/算法（OPT-M5-04/02、D09/D13、FO-15、OPT-19、OPT-05、Room v3→v4、URL 收敛）；批次 2 UI（D04/D10/D11/D12/D14、OPT-M5-03/05/07、settings 新建、主题/文案层）；批次 3 `:app` 组装 + 自签名 APK。**负责人偏差裁决**：① Copernicus 凭据构建期 BuildConfig 注入接受（CHG-02 不上架 + CHG-11 单机自用；运行期外部文件读取登记 v1.1）；② F-3.7 DTO 级模型元数据透出登记 v1.1（需扩展 M2 网络层 DTO，超 M6 打磨边界）；③ 预取开关空操作语义（真预取 v1.1）。验收修正 sub-agent 缺口：批次 2 收尾 favorites 测试编译错误（`epoch` 助手跨类引用）由负责人修复 | M6 口径固化；八模块 573/0/12；APK 产出 |
 | 2026-11-09 | **版本管理建立（jj + git colocated）**：客户选择 Jujutsu；`jj git init --colocate` 于工作区根，单提交基线 `main`/`m6-exit` = `3c018c9`（204 文件：185 工程 + 19 根目录文档/规则；磁盘/库内 .kt 145=145 核验一致）。**建库过程教训（留证）**：① `.gitignore` 必须在首次快照前生效——jj 快照的忽略规则语义随父提交树上被跟踪的 .gitignore 走，规则后补救不了已跟踪文件；② `check-ignore` 对已跟踪文件不报"被忽略"，勿以此判定入库状态，以 `git ls-tree` 为准；③ 首轮基线混入 `tools/`(286)/`.m4tmp/`(26)/`.opencode/`(2) 垃圾与 `cm账号.txt`（Copernicus 账号明文，已入 .gitignore 且从未外发——本地对象库已随重建销毁）；④ Git for Windows 默认 autocrlf 会在 jj side 产生全量假差异——已加 `.gitattributes`（`* -text`）+ 仓库级 autocrlf=false 根治。失败 checkout 曾误删磁盘 .gitignore 与根目录文档，已从 tag 指向的完好树恢复。真机修复批次起每批次一次 jj 修订提交，验收期全程可审计 diff | 交付基线可审计；APK↔tag 绑定就绪 |
 | 2026-11-09 | **CHG-17 登记后 CHG-18 合入（V1.1 优化批次 A）**：A-1~A-5 全清 + 真机迁移锁抓出 P0 升级缺陷（`MIGRATION_3_4` 列名 `veto_codes` ≠ 实体属性 `vetoCodes`，v3→v4 升级 schema 校验必崩）当日修复双锁；androidTest 基建引入 androidx.test 三件套（maven 可达性确认 + 本机代理 MITM 证书以 `trustStoreType=WINDOWS-ROOT` 过验）；verify.ps1 本地 CI 门禁就位；**环境预警转解锁**：本机网络经代理可用 → C 类（A-14 Robolectric/C-2 AGP 升级/C-3 lifecycle-runtime-compose）下一批次可开工 | 八模块 561/0/0（跳过清零）+ 真机 6/6；详见 REQUIREMENTS_REGISTER CHG-18 |
+| 2026-11-10 | **CHG-36 已裁定**：高德地图接入（`AMAP_FEASIBILITY.md`）→ **单 APK 应用内开关 + 发行 BYOK + 个人非商用 + 境外自动回退开源 + 排入 V1.2 backlog**；登记 `OPT_REQUIREMENTS_V11.md` §7 **OPT-V12-05（D-AM）**；工程量 8–12 人日（含 1–2 天 spike），**不触碰 v1.1 交付，不动代码** | 范围变更定案；开工前置=客户提供开发测试 Key |
 
 ## 6. 风险快照（Top 3）
 
@@ -210,3 +211,26 @@
 - **验证**：八模块 **716 / 0 / 0** + `assembleRelease` 成功。
 - **已知风险**：OSTIA 图层本质是全球 SST，**不能再当湖泊掩膜**；内陆湖判定现依赖「marine 全 null/4xx → OSTIA」，后续如恢复该探针需换真湖泊产品。
 - **下一步**：真机复测两 bug（南海点标题/潮汛 chip；冷启动与返回地图后拖动信息条跟随），并确认老收藏点首屏自愈。
+
+## 9. v1.1 P2 批次（2026-11-10，CHG-37）
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| OPT-V11-14 智能排序 | ✅ 代码+锁测试 | `SortOrder.RECOMMENDED` = `BestWindow.rank` 降序、同 rank 按 name、未加载排最后 |
+| OPT-V11-15 收藏详情卡片 | ✅ | `FavoritesInfoCardLogic`（坐标 6 位/精度说明/海拔/水体徽标/最近拉取/分组；读库、离线完整、缺值 `—`）；卡片内「信息」按钮展开（D16） |
+| OPT-V11-16 收藏分组 | ✅ | Room **v5→v6** `groupName`（可空无 DEFAULT）；默认组「未分组」置末、折叠、编辑/批量可改组 |
+| OPT-V11-12 批量操作 | ✅ | 长按进多选、全选/反选、批量删除（**单事务 + 级联 6 表**，D19）、批量改标签（追加/替换）、批量改分组；**不做导出**（D3） |
+| OPT-V11-17 缩略图 | ⛔ **已移除（客户裁定 D21）** | 实现期实证：CARTO `rastertiles/*` 已要求 API key，无 key 返回「API KEY REQUIRED」占位图（v1.2.0 真机截图留证）→ 客户裁定删除该功能；`MapThumbnailStore`/`ThumbnailCachePolicy`/`TileMath`/`cartoStaticTile` 全量移除，本轮不做 |
+| OPT-V11-13 i18n 存量全量外移 | ⬜ **未开工（评估完成，需专项批次）** | 见下「i18n 评估」 |
+
+- **验证**：`core:ui` / `core:data` / `feature:favorites` 单测全绿；`assembleRelease` 产出 `潮点TideSpot-v1.2.0.apk`（`versionCode=4`，自动分发 `E:\Trans`）。
+- **开发期发现并修正的既有缺陷**：① `Format.value(v, digits)` 的 digits 上限 3 → 收藏列表「坐标 6 位小数」实际只有 3 位 → 新增 `Format.coordinate`（6 位专用，`value()` 上限不变以免行为漂移）；② `deleteFavorite` 只删 `spot` + `hourly_score`，遗留 4 张表孤儿行 → 按 D19 一并级联清理。
+- **风险**：① 缩略图在列表滚动时的帧率与磁盘缓存增长（30 d × 每点 1 张 ≈ 数十 KB/点，可接受；真机滚动冒烟验证）；② Room v5→v6 需真机 `MigrationTestHelper`（`RoomMigrationInstrumentedTest` 需补 v5→v6 用例）；③ 长按/点按手势区分需真机确认（多选态点按 = 选择、非多选态点按 = 进详情）。
+- **下一步**：① 真机冒烟 P2 五项；② 补 `RoomMigrationInstrumentedTest` v5→v6 用例并真机跑；③ **OPT-V11-13 专项批次**（方案见下）。
+
+### i18n（OPT-V11-13）评估（未开工，供客户裁定）
+
+- **现状取证**：main 源码含中文字面量 **468 处 / 47 个文件**（`DetailScreen` 72、`FavoritesScreen` 49、`SettingsScreen` 30、`TideSpotStrings` 28、`BestWindowFinder` 20、`VetoEvaluator` 11、`TideCalibrator` 11、`Derivations` 16、`MainActivity` 16…）。
+- **技术难点**：① `:core:domain` 为纯 Kotlin（无 Android），产出中文文案（档位名/否决 reason/观测类型/预设计算），**不能直接读 res** → 需新增可注入文案接口 + 中文默认实现；② `TideSpotStrings` 现为 `const` 常量对象，全量外移需改为 `object` + `stringResource` 双轨（测试拿不到 res）；③ 30+ 现有测试断言中文字符串，必须按「外移前后渲染文本逐一相等」改写为枚举锁；④ 红线扫描需升级为**注释感知**（KDoc 中文字面量不算）；
+- **预估**：2–3 天（含英文首版机翻 + 人工复核标记 + 全量回归）；风险等级 **中-高**。
+- **建议**：单开专项批次，先做 `:core:ui` + `:feature:*`（用户可见文案 90%），再处理 `:core:domain` 注入层；`spot.groupPreset` 按 D18 改稳定 id（旧中文值读取兼容）。

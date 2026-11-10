@@ -344,3 +344,27 @@ interface CopernicusCredentialActions {
 4. `DataWaterBodyResolver` 构造器尾增可选 `marineHasValue: (suspend (Double, Double) -> Boolean?)? = null`（默认 null = 旧行为走探针路径）。
 5. `CrosshairStateMachine.onMapMoved(point: GeoPoint, fromUserGesture: Boolean = false)` 尾增参数：`Idle + true → Preview`；默认 false 保持旧语义（程序动画不建预览）。
 6. 版本：`versionCode=3 / versionName=1.1.1`（非契约项，随 CHG-35 出包；APK `潮点TideSpot-v1.1.1.apk`）。
+## v1.1 子契约 P2（2026-11-10，CHG-37）
+
+> 口径遵循 **契约只增不改**：`Models.kt` 仅尾增可选字段；Room **v5→v6** 只加列；既有方法签名零改动；
+> 新增 DAO 方法/仓储方法均为新增（不复用旧语义）。客户裁定：**D16** 长按=多选、**D17** 缩略图同底图口径、
+> **D18** 预设稳定 id、**D19** 删除级联清理、**D20** 版本升 1.2.0。
+
+1. `Models.kt` `FavoriteSpot` 尾增：
+   - `groupName: String? = null`（OPT-V11-16；NULL = 未分组，禁空串语义）；
+   - `elevation: Double? = null`（OPT-V11-15 信息卡片只读透出；null = 未回写 → `—`）。
+2. Room **v5→v6**（`MIGRATION_5_6`）：`ALTER TABLE spot ADD COLUMN groupName TEXT`（可空、无 DEFAULT；列名与实体属性逐字一致）。
+3. `SpotDao` 新增（批量操作支撑；定向 UPDATE 不冲派生列，D07 patch 语义保持）：
+   `getByIds` / `deleteByIds` / `updateGroupName(ids, groupName?)` / `updateTagsJson(id, tagsJson)`。
+4. `HourlyMetricDao` / `HourlyScoreDao` / `FetchLogDao` / `ManualObservationDao` / `ManualTideFitDao` 各新增 `deleteForSpots(spotIds)`（批量级联清理）。
+5. `TideSpotRepository` 构造器尾增可选 `db: TideSpotDatabase? = null`（单事务入口；null = JVM 测试顺序执行）；新增方法：
+   - `deleteFavorites(ids: List<Long>)`（单事务，级联 6 张表；`deleteFavorite(id)` 改为复用本方法——**行为变更登记 D19**）；
+   - `updateFavoritesGroup(ids, groupName: String?)`（空白归一为 NULL）；
+   - `updateFavoritesTags(tagsBySpotId: Map<Long, List<String>>)`（只改 `tagsJson`，合并语义在 feature 层纯函数）。
+6. `TideSpotUrls` 新增 `CARTO_RASTER_TILES_BASE` / `THUMBNAIL_ZOOM` / `cartoStaticTile(lat, lon, zoom)`（URL 单点不变）；
+   `TileMath`（core:data）为 Web Mercator 纯函数；`MapThumbnailStore : ThumbnailSource`（Android 侧，30 d 磁盘 + 内存 LRU + 并发 3）。
+7. Feature 层新增纯函数（JVM 锁）：`FavoritesSortLogic.SortOrder.RECOMMENDED`（尾增 `rankBySpotId` 参数）、
+   `FavoritesBatchLogic`、`FavoritesGroupLogic`、`FavoritesInfoCardLogic`；
+   `FavoritesViewModel` 构造器尾增可选 `thumbnailSource: ThumbnailSource? = null`，并新增多选/批量/分组/信息卡方法。
+8. `core:ui` `Format.coordinate(v)` 新增（6 位小数；`value()` 的 digits 上限 3 不变，避免既有行为漂移）。
+9. 版本：`versionCode=4 / versionName=1.2.0`（APK `潮点TideSpot-v1.2.0.apk`）。

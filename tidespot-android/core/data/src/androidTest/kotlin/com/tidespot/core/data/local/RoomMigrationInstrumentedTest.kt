@@ -211,9 +211,87 @@ class RoomMigrationInstrumentedTest {
         }
     }
 
+    /**
+     * v4→v5（CHG-27）：manual_observation 尾增 kind/value。
+     * 旧行 kind = DEFAULT 'TIDE_OBSERVATION'（= 校潮观测）、value = NULL（禁 0 填充）；
+     * 新写入可指定水质实测类型与数值（OPT-V11-02）。
+     */
+    @Test
+    fun `v4到v5_观测表增kind与value_旧行默认校潮`() {
+        helper.createDatabase(TEST_DB_4, 4).also {
+            it.insert("spot", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, spotRow(4))
+            it.insert("hourly_score", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, scoreRow(4, 1, null))
+            val oldObs = ContentValues().apply {
+                put("spotId", 4L); put("observedAtEpochSec", 1_700_000_200L); put("createdAtEpochMs", 1_000L)
+            }
+            it.insert("manual_observation", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, oldObs)
+            it.close()
+        }
+        val migrated = helper.runMigrationsAndValidate(TEST_DB_4, 5, true, TideSpotDatabase.MIGRATION_4_5)
+        try {
+            assertEquals("千岛湖", queryScalar(migrated, "SELECT name FROM spot WHERE id = 4"))
+            // 旧行 kind 回填校潮默认值、value 保持 NULL
+            assertEquals(
+                ManualObservationEntity.KIND_TIDE_OBSERVATION,
+                queryScalar(migrated, "SELECT kind FROM manual_observation WHERE spotId = 4"),
+            )
+            migrated.query("SELECT value FROM manual_observation WHERE spotId = 4").use { c ->
+                assertTrue(c.moveToFirst()); assertTrue(c.isNull(0))
+            }
+            // 新行可写水质实测（kind=WATER_TEMP + value）
+            val waterObs = ContentValues().apply {
+                put("spotId", 4L); put("observedAtEpochSec", 1_700_000_300L); put("createdAtEpochMs", 2_000L)
+                put("kind", "WATER_TEMP"); put("value", 18.5 as Double?)
+            }
+            migrated.insert("manual_observation", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, waterObs)
+            assertEquals(2, queryCount(migrated, "SELECT COUNT(*) FROM manual_observation"))
+            assertEquals(
+                "18.5",
+                queryScalar(migrated, "SELECT value FROM manual_observation WHERE observedAtEpochSec = 1700000300"),
+            )
+        } finally {
+            migrated.close()
+        }
+    }
+
+    /**
+     * v5→v6（CHG-37 / OPT-V11-16）：spot 尾增 groupName（可空无 DEFAULT）。
+     * 旧收藏全部 groupName = NULL（= 未分组，UI 归入默认组不丢项）；新写入可指定分组，
+     * 且定向 UPDATE 语义可区分「未分组（NULL）」与「有分组」。
+     */
+    @Test
+    fun `v5到v6_收藏点增分组列_旧行归未分组`() {
+        helper.createDatabase(TEST_DB_5, 5).also {
+            it.insert("spot", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, spotRow(5))
+            it.insert("hourly_metric", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, metricRow(5, 500L))
+            it.close()
+        }
+        val migrated = helper.runMigrationsAndValidate(TEST_DB_5, 6, true, TideSpotDatabase.MIGRATION_5_6)
+        try {
+            // 旧数据保留 + 新列 NULL = 未分组
+            assertEquals("千岛湖", queryScalar(migrated, "SELECT name FROM spot WHERE id = 5"))
+            assertEquals(1, queryCount(migrated, "SELECT COUNT(*) FROM hourly_metric"))
+            migrated.query("SELECT groupName FROM spot WHERE id = 5").use { c ->
+                assertTrue(c.moveToFirst()); assertTrue(c.isNull(0), "旧收藏 groupName 必须为 NULL（未分组）")
+            }
+            // 新列可写入并读回
+            migrated.execSQL("UPDATE spot SET groupName = '常去' WHERE id = 5")
+            assertEquals("常去", queryScalar(migrated, "SELECT groupName FROM spot WHERE id = 5"))
+            // 可回到未分组（NULL，禁空串语义）
+            migrated.execSQL("UPDATE spot SET groupName = NULL WHERE id = 5")
+            migrated.query("SELECT groupName FROM spot WHERE id = 5").use { c ->
+                assertTrue(c.moveToFirst()); assertTrue(c.isNull(0))
+            }
+        } finally {
+            migrated.close()
+        }
+    }
+
     private companion object {
         const val TEST_DB_1 = "migration-test-1to2.db"
         const val TEST_DB_2 = "migration-test-2to3.db"
         const val TEST_DB_3 = "migration-test-3to4.db"
+        const val TEST_DB_4 = "migration-test-4to5.db"
+        const val TEST_DB_5 = "migration-test-5to6.db"
     }
 }

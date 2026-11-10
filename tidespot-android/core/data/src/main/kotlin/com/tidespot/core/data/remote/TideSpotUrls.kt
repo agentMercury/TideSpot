@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.remote
+package com.tidespot.core.data.remote
 
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl

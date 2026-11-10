@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.repo
+package com.tidespot.core.data.repo
 
 import com.tidespot.core.data.dto.MarineHourlyDto
 import com.tidespot.core.data.dto.MarineResponseDto
@@ -337,6 +337,12 @@ object EntityMappers {
 private val spotJson = Json { ignoreUnknownKeys = true }
 private val tagsSerializer = ListSerializer(String.serializer())
 
+/**
+ * OPT-V11-12（P2/CHG-37）：标签列表 → `spot.tagsJson` 列串（与 [SpotEntity.toDomain] 的解析对称）。
+ * 供批量改标签走定向 UPDATE 使用（不经 `@Update` 全列覆盖，D07 patch 语义保持）。
+ */
+fun tagsToJson(tags: List<String>): String = spotJson.encodeToString(tagsSerializer, tags)
+
 fun SpotEntity.toDomain(): FavoriteSpot = FavoriteSpot(
     id = id,
     name = name,
@@ -351,6 +357,10 @@ fun SpotEntity.toDomain(): FavoriteSpot = FavoriteSpot(
     lastViewedAtEpochSec = lastViewedAt,
     // M6（CHG-16⑨/OPT-M5-03）：选点时区偏移秒映射（列已存在；编辑路径由 D07 patch 合并保护）
     tzOffsetSec = tzOffsetSec,
+    // OPT-V11-16（P2/CHG-37）：分组名（v5→v6 列；NULL = 未分组）
+    groupName = groupName,
+    // OPT-V11-15（P2/CHG-37）：海拔透出（详情卡片只读；null = 未回写 → 「—」，禁 0 填充）
+    elevation = elevation,
 )
 
 fun FavoriteSpot.toEntity(nowEpochSec: Long): SpotEntity = SpotEntity(
@@ -369,4 +379,6 @@ fun FavoriteSpot.toEntity(nowEpochSec: Long): SpotEntity = SpotEntity(
     //（elevation/tzOffsetSec/speciesId 等派生列以库内旧值为准，toEntity 携带值不回退派生列）
     tzOffsetSec = tzOffsetSec,
     createdAtEpochSec = if (createdAtEpochSec > 0) createdAtEpochSec else nowEpochSec,
+    // OPT-V11-16（P2/CHG-37）：分组名随 domain 映射（空串归一为 null = 未分组，禁空串语义）
+    groupName = groupName?.trim()?.ifEmpty { null },
 )

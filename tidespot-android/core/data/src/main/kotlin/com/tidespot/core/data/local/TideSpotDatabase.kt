@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.local
+package com.tidespot.core.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -22,7 +22,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ManualObservationEntity::class,
         ManualTideFitEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 abstract class TideSpotDatabase : RoomDatabase() {
@@ -142,6 +142,23 @@ abstract class TideSpotDatabase : RoomDatabase() {
     val MIGRATION_4_5 = object : Migration(4, 5) {
         override fun migrate(db: SupportSQLiteDatabase) {
             MIGRATION_4_5_STATEMENTS.forEach { db.execSQL(it) }
+        }
+    }
+
+    /**
+     * v5→v6（OPT-V11-16 / CHG-37）：`spot` 尾增 `groupName TEXT`（**可空、无 DEFAULT**）。
+     * - 只加列，旧行 = NULL = 未分组（UI 归入默认组「未分组」，不丢项）；
+     * - 列声明必须与 [SpotEntity.groupName] 逐字一致（可空无默认），否则真机
+     *   RoomMigrationInstrumentedTest 的 schema 校验失败（CHG-18② 教训）。
+     */
+    val MIGRATION_5_6_STATEMENTS: List<String> = listOf(
+        "ALTER TABLE `spot` ADD COLUMN `groupName` TEXT",
+    )
+
+    /** v5→v6（OPT-V11-16）：收藏分组列（旧收藏全部落入「未分组」，零数据丢失）。 */
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            MIGRATION_5_6_STATEMENTS.forEach { db.execSQL(it) }
         }
     }
     }

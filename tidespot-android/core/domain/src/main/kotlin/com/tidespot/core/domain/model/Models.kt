@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain.model
+package com.tidespot.core.domain.model
 
 /**
  * 模块间共享契约（冻结）。两个并行开发的模块（:core:domain 算法核 / :core:data 网络存储）
@@ -157,6 +157,16 @@ data class FavoriteSpot(
      * 收藏列表/跨点 Top10 渲染按此换算 ZoneOffset；null = 未回写（落系统默认，UI 注明口径）。
      */
     val tzOffsetSec: Int? = null,
+    /**
+     * OPT-V11-16（P2/CHG-37）：收藏分组名（spot.groupName 列，Room v5→v6 尾增，可空）。
+     * null = 未分组（UI 归入默认组「未分组」）；空串视为未分组（写入侧已归一为空 → null）。
+     */
+    val groupName: String? = null,
+    /**
+     * OPT-V11-15（P2/CHG-37）：海拔 m（spot.elevation 列，§6.9 判定时回写）。
+     * null = 未回写（详情卡片显示「—」，禁 0 填充，§5.0）。
+     */
+    val elevation: Double? = null,
 )
 
 /** 逆地理名称（§5.8；M0 结论：Photon 唯一源 + 坐标文本兜底，Nominatim 移除）。 */

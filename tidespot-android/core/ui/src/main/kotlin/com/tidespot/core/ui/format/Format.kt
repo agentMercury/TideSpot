@@ -38,6 +38,12 @@ object Format {
         return "${value(v, digits)} $unit"
     }
 
+    /**
+     * 坐标 6 位小数（OPT-V11-15 验收口径：收藏卡片坐标 = 6 位小数；列表卡片同口径）。
+     * **不复用 [value]**（其 digits 上限 3，会把 6 位截成 3 位——P2 开发期实测发现）。
+     */
+    fun coordinate(v: Double): String = String.format(Locale.ROOT, "%.6f", v)
+
     /** 角度（"148°"；null → "—"）。 */
     fun deg(v: Double?): String = if (v == null) MISSING else "${v.roundToInt0()}°"
 

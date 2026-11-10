@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.local
+package com.tidespot.core.data.local
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -36,6 +36,11 @@ data class SpotEntity(
     val updatedAt: Long = 0,
     /** 创建时刻（epoch 秒，domain `createdAtEpochSec`）。 */
     val createdAtEpochSec: Long = 0,
+    /**
+     * OPT-V11-16（P2/CHG-37，v5→v6）：收藏分组名（用户自定义，如「常去/计划去」）。
+     * 可空且无默认值（NULL = 未分组；**禁用空串表达未分组**，写入侧归一为空 → NULL）。
+     */
+    val groupName: String? = null,
 )
 
 /**

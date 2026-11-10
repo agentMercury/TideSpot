@@ -1,6 +1,8 @@
-﻿package com.tidespot.core.data.repo
+package com.tidespot.core.data.repo
 
+import androidx.room.withTransaction
 import com.tidespot.core.data.DataError
+import com.tidespot.core.data.local.TideSpotDatabase
 import com.tidespot.core.data.dto.WeatherDailyDto
 import com.tidespot.core.data.local.FetchLogDao
 import com.tidespot.core.data.local.ManualObservationDao
@@ -117,6 +119,11 @@ class TideSpotRepository(
      * 仅 persistHourlyScores 一处计算入口，cached 路径零计算）。
      */
     private val scoringDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    /**
+     * OPT-V11-12（P2/CHG-37）：Room 实例（批量删除/批量更新的**单事务**入口）。
+     * null = 未注入（JVM 测试路径 → 顺序执行无事务，行为等价）；生产由 `:app` 注入。
+     */
+    private val db: TideSpotDatabase? = null,
 ) {
 
     private val scoreCalculator = FishScoreCalculator()
@@ -305,8 +312,59 @@ class TideSpotRepository(
     }
 
     suspend fun deleteFavorite(id: Long) {
-        spotDao.getById(id)?.let { spotDao.delete(it) }
-        hourlyDao.deleteForSpot(id)
+        deleteFavorites(listOf(id))
+    }
+
+    /**
+     * OPT-V11-12（P2/CHG-37）：批量删除收藏点（**单事务**；任一表失败整体回滚，验收 GWT
+     * 「删除中杀进程 → 重启后无半删状态」由此保证）。
+     *
+     * 级联清理口径（客户裁定 D19）：`spot` + `hourly_score` + `hourly_metric` + `manual_observation`
+     * + `manual_tide_fit` 5 张表 + `fetch_log` 访问日志——旧版 [deleteFavorite] 只删前两张，
+     * 遗留孤儿行（既有缺陷同批修正，单条删除复用本方法）。
+     *
+     * [db] 未注入（JVM 测试路径）时退化为顺序执行（无事务），生产路径由 `:app` 注入 Room 实例。
+     */
+    suspend fun deleteFavorites(ids: List<Long>) {
+        if (ids.isEmpty()) return
+        runAtomic {
+            hourlyDao.deleteForSpots(ids)
+            hourlyScoreDao?.deleteForSpots(ids)
+            fetchLogDao.deleteForSpots(ids)
+            manualObservationDao?.deleteForSpots(ids)
+            manualTideFitDao?.deleteForSpots(ids)
+            spotDao.deleteByIds(ids)
+        }
+    }
+
+    /**
+     * OPT-V11-16（P2/CHG-37）：批量改分组。空白/空串归一为 null = 移回「未分组」（禁空串语义）。
+     * 定向 UPDATE 仅触 `groupName` 列（D07 patch 语义：派生列与备注/标签不动）。
+     */
+    suspend fun updateFavoritesGroup(ids: List<Long>, groupName: String?) {
+        if (ids.isEmpty()) return
+        val normalized = groupName?.trim()?.ifEmpty { null }
+        runAtomic { spotDao.updateGroupName(ids, normalized) }
+    }
+
+    /**
+     * OPT-V11-12（P2/CHG-37）：批量写标签（**按点给出最终标签**——追加/替换的合并语义由
+     * `:feature:favorites` 纯函数 `FavoritesBatchLogic.mergeTags` 决定，数据层只负责落库）。
+     * 定向 UPDATE `tagsJson`，不触派生列（D07 patch 语义）。
+     */
+    suspend fun updateFavoritesTags(tagsBySpotId: Map<Long, List<String>>) {
+        if (tagsBySpotId.isEmpty()) return
+        runAtomic {
+            tagsBySpotId.forEach { (spotId, tags) ->
+                spotDao.updateTagsJson(spotId, tagsToJson(tags))
+            }
+        }
+    }
+
+    /** 单事务包装：生产路径（注入 [db]）走 Room `withTransaction`；JVM 测试路径顺序执行。 */
+    private suspend fun runAtomic(block: suspend () -> Unit) {
+        val database = db
+        if (database != null) database.withTransaction { block() } else block()
     }
 
     suspend fun favorites(): List<FavoriteSpot> = spotDao.getAll().map { it.toDomain() }

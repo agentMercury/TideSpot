@@ -13,9 +13,9 @@
 | **P0-1** | OPT-V11-01 凭据外部化 + 首次配置向导 + i18n 框架 + APP 图标 | ✅ 完成（真机冒烟通过，CHG-25/26） |
 | **P0-2** | 02 水质实测录入、03 出发时间筛选、04 F-3.7 元数据、25 Top10 核心段、26 阈值 75+爆护 | ✅ 完成（真机冒烟通过，CHG-27） |
 | **P1** | 05 真预取、06 相对时间、07 涨退潮观测、08 跨点缓存、09 校正提示、10 搜索筛选、11 陈旧标记、18~24 UX 七项 | ✅ 完成（2026-11-10，**CHG-28**；八模块 701/0/0 + APK 复产出；**真机冒烟待执行**） |
-| **P2** | 12 批量操作、13 i18n 全量外移、14 智能排序、15 详情卡片、16 分组、17 缩略图 | ⬜ **待开工（本次交接起点）** |
+| **P2** | 12 批量操作、13 i18n 全量外移、14 智能排序、15 详情卡片、16 分组、17 缩略图 | ✅ **4/6 完成（2026-11-10，CHG-37）**：12/14/15/16 落地（真机冒烟通过）；**17 缩略图按 D21 移除**（CARTO 栅格瓦片需 key）；**13 i18n 存量外移未开工**（评估见 `PROGRESS_TRACKER.md` §9） |
 
-- **基线**：八模块 **716 运行 / 0 失败 / 0 跳过**（`verify.ps1` 全绿）；APK `潮点TideSpot-v1.1.1.apk`（`versionCode=3 / versionName=1.1.1`，51,618,176 B，自签名，自动分发 `E:\Trans`）
+- **基线**：八模块 **767 运行 / 0 失败 / 0 跳过**（`verify.ps1` 全绿）；APK `潮点TideSpot-v1.2.0.apk`（`versionCode=4 / versionName=1.2.0`，51,667,332 B，自签名，自动分发 `E:\Trans`；v1.0/v1.1/v1.1.1 三包仍保留可回退）
 - **v1（M0–M6）交付验收窗口**：2026-12-04 ~ 12-08（原计划），v1.1 为提前启动（客户 2026-11-10 指令）
 - 版本管理：jj + git colocated；当前 git `main` 与 jj `@` 同步（每次提交后需手动 `git update-ref`，见 §4.4）
 
@@ -79,6 +79,12 @@
 | **UX-24 日期选择器** | DaySelector 改「今天 周二」「11/12 周三」（当地时区）；跨零点自愈保持 | `:core:ui`（`DaySelectorLogic`） |
 
 ### P2
+
+> **状态（2026-11-10，CHG-37）**：OPT-V11-12 / 14 / 15 / 16 **已完成**（纯函数 + JVM 锁 + UI 接线 + 真机冒烟）；**OPT-V11-17 缩略图按 D21 移除**（CARTO 栅格瓦片已需 API key，无 key 返回鉴权占位图）；
+> **OPT-V11-13 i18n 存量全量外移未开工**（需专项批次，评估见 `PROGRESS_TRACKER.md` §9）。下表为原始要点，备查。
+>
+> 本批落地补充裁定（D16–D20）：**D16** 长按 = 多选（信息卡片改「信息」按钮展开）；**D17** 缩略图同底图瓦片口径（不占令牌桶、不写 fetch_log）；**D18** 预设改稳定 id + 旧中文值兼容；**D19** 删除级联清理 6 张表；**D20** 版本 `1.2.0`（versionCode=4）。Room **v5→v6**（`spot.groupName`）；新增 `Format.coordinate`（6 位小数）。
+
 | 项 | 要点 | 落点 |
 |---|---|---|
 | OPT-V11-12 批量操作 | 多选/全选/批量删除（事务）/批量改标签；**不做导出**（D3） | favorites + data |
@@ -178,11 +184,20 @@ D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease 
 
 ## 9. 下一步（接手第一件事）
 
-1. 跑 `verify.ps1` 确认基线 **716/0/0**
-2. **真机复测 v1.1.1 两处修复**：① 南海/近岸点 → 详情标题应为「潮流」、潮 Tab 出现「大潮/小潮 · 活汛/死汛」chip；老收藏点首屏自愈；② 冷启动与从收藏返回地图后**拖动地图**，底部信息条经纬度/名称应实时跟随（无需点「我的位置」）
-3. 从 **P2** 起手（建议顺序：**14 智能排序 → 15 详情卡片 → 12 批量操作 → 16 分组（Room v5→v6，真机 MigrationTestHelper 必配）→ 17 缩略图 → 13 i18n 存量外移**）
-4. 每完成一项：登记台账 CHG → 纯函数锁测试 → 全量回归 → 真机冒烟（可行时）→ jj 提交（描述用 cmd 管道）
-5. P2 收口后更新本文件或再交接
+1. 跑 `verify.ps1` 确认基线 **767/0/0**
+2. **真机冒烟 P2 五项**（APK `潮点TideSpot-v1.2.0.apk` 已分发）：① 分组：新建/编辑点设分组 → 组头折叠/展开 → 组内顺序随排序 → 「未分组」恒在最后；② 长按卡片进多选 → 全选/反选 → 批量删除二次确认（条数）→ 列表与缓存同步；批量改标签（追加/替换）、批量改分组；③ 点按（非多选态）进详情、多选态点按 = 选择；④ 卡片「信息」展开：坐标 6 位、海拔/最近拉取缺值显示 `—`；⑤ 缩略图：滚动帧率、断网 → 占位不破图；⑥ **Room v5→v6 升级不丢数据**（老收藏全部进「未分组」）
+3. **真机迁移测试**：`RoomMigrationInstrumentedTest` 已补 v4→v5 / v5→v6 用例（需连 AAK-AN00 跑 `connectedDebugAndroidTest`）
+4. **OPT-V11-13 i18n 存量全量外移**：单开专项批次（评估见 `PROGRESS_TRACKER.md` §9：468 处/47 文件、domain 注入层、30+ 测试改造、注释感知红线扫描；预估 2–3 天）
+5. 每完成一项：登记台账 CHG → 纯函数锁测试 → 全量回归 → 真机冒烟（可行时）→ jj 提交（描述用 cmd 管道）
+6. P2 收口后更新本文件或再交接
+
+> **P2 落地要点（CHG-37 摘要，接手先读）**
+> - **长按 = 多选**（`FavoritesViewModel.toggleSelection`）；卡片 `combinedClickable`：非多选态点按=进详情、多选态点按=切换选择。信息卡片由卡片内「信息」按钮（`toggleInfo`）展开——**不要改回长按**（与批量手势冲突，客户裁定 D16）。
+> - **删除级联（D19）**：`TideSpotRepository.deleteFavorites(ids)` 单事务清 6 表（`db: TideSpotDatabase?` 注入才走 `withTransaction`；JVM 测试为顺序执行）。`deleteFavorite(id)` 已复用该路径，**不得**恢复只删 spot+hourly_score 的旧实现。
+> - **分组（v6）**：`spot.groupName` 可空无 DEFAULT（NULL = 未分组，**禁空串**）；`FavoritesGroupLogic` 组间自定义升序 + 「未分组」置末；组内沿用排序结果。
+> - **综合推荐排序（14）**：`SortOrder.RECOMMENDED` 用 `rankBySpotId`（`BestWindow.rank` 降序，同 rank 按 name，未加载排最后）；排序切换仍清空 `TopWindowsLruCache`（P1 口径）。
+> - **缩略图（17）已按 D21 移除**：CARTO `rastertiles/*` 实测需 API key（返回「API KEY REQUIRED」占位图）→ 客户裁定删除该功能，相关类/URL/测试已全量删除。**若后续重启该需求**：须先验证图片源可用（MapLibre Snapshotter 本地渲染 / 自备 key / 免 key 合法源），并同步修订 SRS §12 瓦片口径。
+> - **坐标 6 位**：用 `Format.coordinate`（`Format.value` 的 digits 上限仍是 3——直接传 6 会静默截成 3 位，P2 开发期实证）。
 
 > **P1 落地要点（CHG-28 摘要，接手先读）**
 > - 详情 Tab 顺序已改为 **钓鱼指数→潮流→天气→水质→风浪**（`DetailTab` 枚举序 + `DetailScreen` TabRow + `titlesInTabOrder` **三处联动**，默认落地 Tab = `SCORE`）；改任一必须三处同改并跑 `WaterBodyTabTitlesTest`/`ComposeSmokeRobolectricTest`。

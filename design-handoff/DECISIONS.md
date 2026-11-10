@@ -48,3 +48,30 @@
 ## 4. 登记建议
 
 本批裁定建议由需求负责人登记 `REQUIREMENTS_REGISTER.md` 下一个 CHG 条目（CONFLICT-01/02 + GAP-05 定稿 + 方案① 导航改造范围），并在 `PROGRESS_TRACKER.md` 立对应 UI 落地里程碑。
+
+## 5. 登记与落地现状（2026-11-10 复核）
+
+- **台账**：本裁定已登记 `REQUIREMENTS_REGISTER.md` **CHG-38**（与 CHG-25③ 同口径，本文件补逐条明细）。
+- **GAP-05 现状修正**：17 条文案**已定稿入资源**（`:core:ui/src/main/res/values/strings.xml:12-28` 的 `ts_resolving` … `ts_cancel`，与设计稿逐字一致；values-en 62/62 对齐），但全仓 `.kt` **0 处引用**——UI 仍走硬编码。剩余工作＝**接线替换**，不是新增文案。
+- **CONFLICT-01 现状**：方案① **已落地**（`MainActivity` 无 NavigationBar；`AppRoot` 改 Scaffold ＋ `when(page)` ＋ 地图 `floatingActions` 浮动三按钮，UX-21 返回手势在位）。§3 红线第 1 条中的「移除底栏」动作**已完成，无需重复执行**；仅剩 edge-to-edge 视觉项。
+- **GAP-01 现状**：**已落地**（manifest 为 `@mipmap/ic_launcher`，background/foreground/monochrome 四件齐全）。
+- **GAP-03 现状**：无显式 `navigationBarsPadding`/`WindowInsets`，依赖 Scaffold 默认 contentWindowInsets——insets 生效无遮挡，但地图未全屏铺入系统栏区，与设计稿 edge-to-edge 口径存在视觉偏差 → **P2 视觉遗留**。
+  - **客户裁定（2026-11-10）：暂不单独开工**——不构成功能缺陷（遮挡已由 Scaffold 默认 insets 消除，纯色条与底图同色而不可见），**随下次 UI 更新批次一并做**；届时改动点＝`MainActivity`（Scaffold insets）＋`MapScreen`（地图全屏、浮层单独 insets），预算 1–2 h，改后跑 map/app 模块测试。
+
+## 6. GAP-05 待复核项（等 OPT-V11-13 完成后执行）
+
+**归属确认（2026-11-10）**：GAP-05 的 17 条接线属 **OPT-V11-13 全量 i18n 文案外移**（`OPT_REQUIREMENTS_V11.md:133`，P2 第 6 项）。P2 其余 5 项（12/14/15/16/17）已随 CHG-37 落地，台账记「13 待专项批次」——故 **GAP-05 无需另立批次**，随 OPT-V11-13 关闭即可。
+
+**复核触发**：OPT-V11-13 落地后（客户通知或 P2 收官时）。
+
+**机械复核清单（逐项打勾才算闭环）**：
+
+1. 17 个 `ts_*` key 在 `.kt` 中每 key ≥1 处 `R.string.` 引用（**基线 2026-11-10：0 处**）。
+2. 旧硬编码消失：`MapScreen`「逆地理解析中…」、`MainActivity` 对话框标题「确认收藏」与「取消」、`DetailScreen`「未来最佳窗口 Top10」「记录一条高潮观测」「图表」「数值表」等。
+3. 资源对齐：`values/` 与 `values-en/` 的 `ts_*` 条目数相等（基线 62/62）。
+4. 冻结链未动：`BestWindowFinder` fallbackMessage、`Top10Formatter` 兜底、`:core:domain` VetoEvaluator reason、`ScoreBands` / `ConfidenceBadge` / `TideSpotTheme` 取值零变更（jj/git diff 比对）。
+5. #8/#13/#14 兼容：StaleBanner 两态合并后相关测试**更新而非删除**；降级卡文案仅改 UI 层。
+6. 测试：`:core:ui` / `:feature:map` / `:feature:detail` / `:app` 全绿；文案枚举锁测试在位。
+7. OPT-V11-13 自有验收：红线扫描扩展（非资源文件含中文字面量=FAIL）生效；切英文后五 Tab/免责/徽标/按钮全英文且无截断。
+
+**结论口径**：1–7 全绿才可把 GAP-05 记为「已闭环」；任一项不满足，登记偏差并回推 OPT-V11-13。

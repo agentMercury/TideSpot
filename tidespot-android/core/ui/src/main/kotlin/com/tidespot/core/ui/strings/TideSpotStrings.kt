@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.strings
+package com.tidespot.core.ui.strings
 
 /**
  * 用户可见文案唯一入口（FO-01，M6 批次 2 部分落地；CHG-16⑳）：
@@ -84,4 +84,24 @@ object TideSpotStrings {
     /** 天气/海洋模型静态署名（Open-Meteo 底层模型；DTO 级模型名/网格分辨率透出登记 v1.1）。 */
     const val MODEL_ATTRIBUTION =
         "天气 · Open-Meteo（ICON / ECMWF 模型） · 海洋 · Open-Meteo Marine / Copernicus Marine"
+
+    // ────────────── 水体类型徽标与收藏信息卡片（OPT-V11-15 / P2 CHG-37） ──────────────
+
+    /** 水体类型徽标文案（[com.tidespot.core.domain.model.WaterBodyType] 展示名）。 */
+    const val WATER_BODY_OCEAN = "海域"
+    const val WATER_BODY_NEARSHORE = "近岸"
+    const val WATER_BODY_INLAND = "内陆水域"
+    const val WATER_BODY_LAND = "陆地"
+    const val WATER_BODY_UNKNOWN = "待判定"
+
+    /** 收藏信息卡片（OPT-V11-15）：仅读库，字段缺值一律 `—`（禁 0 填充，§5.0）。 */
+    const val INFO_CARD_COORDINATE_PREFIX = "坐标"
+    const val INFO_CARD_ELEVATION_PREFIX = "海拔"
+    const val INFO_CARD_LAST_FETCHED_PREFIX = "最近拉取"
+    const val INFO_CARD_GROUP_PREFIX = "分组"
+    const val INFO_CARD_WATER_BODY_PREFIX = "水体"
+
+    /** 坐标精度来源说明（口径：选点坐标即 WGS84 原始值，存 6 位小数；不做偏移纠偏）。 */
+    const val INFO_CARD_ACCURACY_NOTE =
+        "坐标为选点原始 WGS84 值，保留 6 位小数（≈0.11 m），未做偏移纠偏"
 }
