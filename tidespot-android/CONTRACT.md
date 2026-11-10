@@ -333,3 +333,14 @@ interface CopernicusCredentialActions {
 8. `TideObservation`（data 层门面类型，非 `Models.kt` 冻结点）尾增 `kind: String = TIDE_OBSERVATION` 与派生 `type`。
 9. `MapStyle` 枚举 + `SettingsKeys.MAP_STYLE` 新增（设置持久化键，新增不覆盖）。
 10. Manifest 新增 `ACCESS_NETWORK_STATE`（预取联网判定；飞行模式零请求）。
+
+## v1.1.1 子契约（2026-11-10，CHG-35）
+
+> 全部为「尾部可选参数 / 新增方法 / 新增只读字段」，既有调用零改动（**契约只增不改**）；`Models.kt` 本期未改动。
+
+1. `TideSpotRepository.probeMarineHasValue(lat: Double, lon: Double): Boolean?` 新增——海况探测（`true` 有海况 / `false` 无 / `null` 未知；失败不编造）。
+2. `SpotDetailResult`（data 层门面，非 `Models.kt` 冻结点）尾增 `effectiveWaterBody: WaterBodyType? = null`——自愈后的真实水体；UI 取 `result.effectiveWaterBody ?: spot.waterBody` 作为标题与潮汛 chip 的类型来源。
+3. `WaterBodyClassifier.JUDGE_VERSION: Int = 2` 新增；判定缓存键 = `CacheKeys.spotKey(lat, lon) + "#v${JUDGE_VERSION}"`（**改判据必须升版本号**；旧行不复用、不迁移）。
+4. `DataWaterBodyResolver` 构造器尾增可选 `marineHasValue: (suspend (Double, Double) -> Boolean?)? = null`（默认 null = 旧行为走探针路径）。
+5. `CrosshairStateMachine.onMapMoved(point: GeoPoint, fromUserGesture: Boolean = false)` 尾增参数：`Idle + true → Preview`；默认 false 保持旧语义（程序动画不建预览）。
+6. 版本：`versionCode=3 / versionName=1.1.1`（非契约项，随 CHG-35 出包；APK `潮点TideSpot-v1.1.1.apk`）。

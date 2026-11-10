@@ -24,7 +24,7 @@
 ### P1（CHG-28，2026-11-10，14/14）
 - **OPT**：05 `DetailPrefetcher`（前 5 / TTL÷2 / 令牌不足放弃 / 并发 2 / 离线零请求）｜06 `RelativeTimeFormatter`（收藏摘要 + 详情 Top10）｜07 四类观测 + 时刻补记 + 模型对照 + 按类型 `fitManual` + 落库读回｜08 `TopWindowsLruCache`（100/LRU/不落库）｜09 `find(manualTideLagHours)` 注意事项校正句｜10 `FavoritesFilterLogic` + 搜索/标签/预设 chips｜11 `lastFetchedMillis` + `FavoritesStaleLogic`（复用 `Ttl`）
 - **UX**：18 冷启动定位动画（不设准星）+ 返回地图定位｜19 默认 Voyager + 设置三选｜20 删底部 dock + 地图浮动三按钮 + insets｜21 `sourcePage` + `BackHandler`（详情→来源、收藏/设置→地图、地图 2s 双退）｜22 Tab 序 = 钓鱼指数→潮流→天气→水质→风浪（三处联动，默认 `SCORE`）｜23 `TidePhase` 月龄制 + 潮 Tab chip｜24 DaySelector 日期+星期
-- **验证**：八模块 **701/0/0** + `assembleRelease` 成功；APK `潮点TideSpot-v1.1.apk` 已分发 `E:\Trans`；jj 提交 `3f1c9df`
+- **验证**：八模块 **701/0/0** + `assembleRelease` 成功；APK `潮点TideSpot-v1.1.apk` 已分发 `E:\Trans`；jj 提交 `3f1c9df`（**P1 当时基线；含 v1.1.1 修复后的当前基线见 §1**）
 - **细节与口径**：见 `PROGRESS_TRACKER.md` §7、`REQUIREMENTS_REGISTER.md` CHG-28、`tidespot-android/CONTRACT.md`「v1.1 子契约 P1」、本文件 §9 末尾「P1 落地要点」
 
 ### v1.1.1 缺陷修复（CHG-35，2026-11-10，客户真机报障两例）
@@ -109,7 +109,7 @@ D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease 
 
 ### 4.2 APK 产物
 - 命名 `潮点TideSpot-v{versionName}.apk`（`versionName` 变更自动跟随）；debug 带 `-debug`
-- **编译完成自动复制 release 到 `E:\Trans`**（`copyApkToTrans` + `finalizedBy`）；当前 `versionCode=2 / versionName=1.1`
+- **编译完成自动复制 release 到 `E:\Trans`**（`copyApkToTrans` + `finalizedBy`）；当前 `versionCode=3 / versionName=1.1.1`（v1.1.1 缺陷修复包；v1.1 包仍保留于 `E:\Trans` 便于回退）
 - 签名：`keystore/tidespot.jks`（自签名，密码在 `local-secrets.properties` 的 `signing.*`，不入库）
 
 ### 4.3 真机
@@ -147,6 +147,7 @@ D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease 
 | 徽标/时长口径 | Top10 条目「爆护」徽标 ≥80（`ScoreBand.EXPLOSIVE`） |
 | 源更新时间 | 数据层未透出 → 显示「—」，**禁编造**（CONFLICT-03） |
 | 校潮 vs 水质观测 | 同表 `manual_observation`，靠 `kind` 隔离；校潮拟合**只读** `TIDE_OBSERVATION` |
+| **OSTIA 图层口径（CHG-35 起）** | 该图层是**全球 SST**（海洋必然有值），**不可再作湖泊掩膜**；水体判定主判据＝`probeMarineHasValue` 的真实海况（true→NEARSHORE / false→OSTIA 分湖陆 / null→UNKNOWN）；判定缓存键带 `JUDGE_VERSION`，改判据必须升版本号 |
 
 ## 7. 关键文件索引
 
