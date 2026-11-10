@@ -19,6 +19,7 @@ object Format {
 
     private val HH_MM = DateTimeFormatter.ofPattern("HH:mm")
     private val MM_DD = DateTimeFormatter.ofPattern("MM-dd")
+    private val M_D = DateTimeFormatter.ofPattern("M/d")
 
     /**
      * 数值格式化（F-3.3 验收口径：0.42 → "0.4"；null → "—"）。
@@ -51,6 +52,9 @@ object Format {
 
     /** 日期 MM-dd（DaySelector 副标签）。 */
     fun mmdd(date: LocalDate): String = MM_DD.format(date)
+
+    /** 紧凑日期 M/d（OPT-V11-24 DaySelector 主标签：「11/12 周三」，无前导零）。 */
+    fun md(date: LocalDate): String = M_D.format(date)
 
     private fun Double.roundToInt0(): Int {
         val r = kotlin.math.round(this)

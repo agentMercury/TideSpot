@@ -53,6 +53,9 @@ object BestWindowFinder {
         // 0/0 = 不筛选（现有全窗行为，恒等锁）。相交判定用**原窗**（利好延续期内仍值得入选）。
         windowStartEpochSec: Long = 0,
         windowEndEpochSec: Long = 0,
+        // OPT-V11-09（P1）：有效现场校潮 lag（小时；null = 无校正）。仅影响「注意事项」追加一句，
+        // 不改候选/rank/去重/时间域（校正已由数据层作用于潮位序列）。
+        manualTideLagHours: Int? = null,
     ): Output {
         // 0) 时间域过滤（CHG-15 偏差①）：results 升序，filter 保序；nowEpochSec=0 时零开销直通
         val inHorizon = if (nowEpochSec > 0) results.filter { it.timeEpochSec >= nowEpochSec } else results
@@ -132,7 +135,7 @@ object BestWindowFinder {
                 rank = w.rank,
                 tier = tierOf(w.peak),
                 topFactors = topFactors(w.peakHour),
-                warnings = warningsOf(w.peakHour, tideRates),
+                warnings = warningsOf(w.peakHour, tideRates, manualTideLagHours),
                 coreStartEpochSec = w.coreStartEpoch,
                 coreEndEpochSec = w.coreEndEpoch,
                 // 利好延续：仅当核心段短于原窗（UI 附注「利好持续至 HH:mm」；null = 核心即原窗）
@@ -219,7 +222,11 @@ object BestWindowFinder {
     private fun topFactors(peakHour: FishScoreResult): List<String> =
         peakHour.factors.sortedByDescending { it.sub * it.weight }.take(2).map { it.id }
 
-    private fun warningsOf(peakHour: FishScoreResult, tideRates: Map<Long, Double>?): List<String> {
+    private fun warningsOf(
+        peakHour: FishScoreResult,
+        tideRates: Map<Long, Double>?,
+        manualTideLagHours: Int?,
+    ): List<String> {
         val warnings = mutableListOf<String>()
         peakHour.vetoReasons.firstOrNull()?.let { warnings.add(it) }
         if (tideRates != null) {
@@ -228,7 +235,19 @@ object BestWindowFinder {
         }
         val gust = peakHour.factors.firstOrNull { it.id == "wind" }?.detail
         if (gust != null && gust.toDoubleOrNull()?.let { it > 40 } == true) warnings.add("阵风超过 40 km/h，注意抛投安全")
+        // OPT-V11-09（P1）：有效现场校潮 → 注意事项追加校正状态（无校正不出现空串，CHG-08④）
+        manualTideLagHours?.let { warnings.add(manualCalibrationWarning(it)) }
         return warnings
+    }
+
+    /**
+     * OPT-V11-09：校潮状态文案（唯一入口，UI/测试共用）。
+     * lag>0 = 模型滞后参考 → 校正后时刻**延后** lag 小时；lag<0 = **提前**。
+     */
+    fun manualCalibrationWarning(lagHours: Int): String = when {
+        lagHours > 0 -> "已按现场校潮校正：时刻延后 ${lagHours}h"
+        lagHours < 0 -> "已按现场校潮校正：时刻提前 ${-lagHours}h"
+        else -> "已按现场校潮校正：时刻无偏移"
     }
 
     /** 档位文案（SRS §6.3）。 */

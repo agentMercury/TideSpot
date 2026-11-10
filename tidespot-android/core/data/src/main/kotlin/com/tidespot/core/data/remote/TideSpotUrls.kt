@@ -191,4 +191,10 @@ object TideSpotUrls {
     }
     /** §7.1 CARTO Positron 免费矢量底图样式（M6/CHG-12⑤ URL 单点收敛：MapScreen 引用本常量；已验证 200，无 Key）。 */
     const val CARTO_POSITRON_STYLE_URL = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+
+    /** UX-19（OPT-V11-19 / D8）：CARTO Voyager 彩色底图（默认样式；同域免费、attribution 不变）。 */
+    const val CARTO_VOYAGER_STYLE_URL = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+
+    /** UX-19：CARTO Dark Matter 深色底图（设置三选之一）。 */
+    const val CARTO_DARK_MATTER_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 }

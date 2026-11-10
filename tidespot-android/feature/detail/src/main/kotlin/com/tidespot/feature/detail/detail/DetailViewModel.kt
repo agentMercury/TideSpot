@@ -68,6 +68,8 @@ class DetailViewModel(
                 .onFailure { holder.setRefreshing(false) }
             holder.setLoading(false)
             loadWaterQualityObservations()
+            // OPT-V11-07：读回已登记观测（空闲时无副作用；失败静默）
+            loadTideObservations()
         }
     }
 
@@ -112,18 +114,30 @@ class DetailViewModel(
     // ────────────────── §6.2b 规则 5 现场校潮（Session 级观测记录） ──────────────────
 
     /**
-     * 用户记录的高潮观测时刻（epoch 秒，Session 级暂存；持久化经 [saveTideFit] 走 repository）。
-     * ≥2 条才启用语义由 TideCalibrator.fitManual 内置，UI 只透传。
+     * OPT-V11-07（P1）：用户记录的现场观测（四类 + 时刻，落 `manual_observation`；
+     * 读回时含历史无类型行 → type=null）。≥2 条才启用语义由 TideCalibrator.fitManual 内置。
      */
-    private val _manualObservations = MutableStateFlow<List<Long>>(emptyList())
-    val manualObservations: StateFlow<List<Long>> = _manualObservations
+    private val _manualObservations = MutableStateFlow<List<TideObservationDraft>>(emptyList())
+    val manualObservations: StateFlow<List<TideObservationDraft>> = _manualObservations
 
-    /** 「记录一条高潮观测」：取当前时刻 append（重复同秒去重）。 */
-    fun recordObservation(nowEpochSec: Long = System.currentTimeMillis() / 1000L) {
-        _manualObservations.update { cur -> if (cur.lastOrNull() == nowEpochSec) cur else cur + nowEpochSec }
+    /** 「记录一条观测」：默认当前时刻；离线可落库（后续经 [loadTideObservations] 回读）。 */
+    fun recordObservation(
+        type: com.tidespot.core.domain.tide.TideObservationType = com.tidespot.core.domain.tide.TideObservationType.HIGH,
+        atEpochSec: Long = System.currentTimeMillis() / 1000L,
+    ) {
+        viewModelScope.launch(ioDispatcher) {
+            runCatching { repository.addTideObservation(spotRef.id, atEpochSec, type) }
+            loadTideObservations()
+        }
     }
 
-    /** 清空本次会话观测记录。 */
+    /** 观测读回（含历史无类型行；按观测时刻升序）。 */
+    suspend fun loadTideObservations() {
+        val rows = runCatching { repository.tideObservations(spotRef.id) }.getOrDefault(emptyList())
+        _manualObservations.value = rows.map { TideObservationDraft(it.type, it.observedAtEpochSec) }
+    }
+
+    /** 清空本次会话观测记录（库内已登记行保留——观测只增不改，v1 无删除入口）。 */
     fun clearObservations() {
         _manualObservations.value = emptyList()
     }

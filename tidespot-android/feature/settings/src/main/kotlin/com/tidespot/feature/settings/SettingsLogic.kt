@@ -56,6 +56,10 @@ object SettingsLogic {
     fun withReverseGeo(state: SettingsState, enabled: Boolean): SettingsState =
         state.copy(reverseGeoEnabled = enabled)
 
+    /** UX-19：地图样式三选（片刻生效；深色系统不覆盖用户显式选择）。 */
+    fun withMapStyle(state: SettingsState, style: MapStyle): SettingsState =
+        state.copy(mapStyle = style)
+
     // ────────────── 可选 API Key 占位 ──────────────
 
     /** API Key 清洗：trim；空白 → null（不存空白键）。 */

@@ -3,6 +3,7 @@ package com.tidespot.feature.detail.detail
 import com.tidespot.core.domain.model.FishScoreResult
 import com.tidespot.core.domain.model.HourlyMarine
 import com.tidespot.core.domain.tide.TideCalibrator
+import com.tidespot.core.domain.tide.TideObservationType
 import com.tidespot.core.domain.window.BestWindowFinder
 
 /**
@@ -69,6 +70,8 @@ object TopWindowDerivations {
         // OPT-V11-03（CHG-27）：输出时段筛选（0/0 = 不筛选，零行为漂移）
         windowStartEpochSec: Long = 0,
         windowEndEpochSec: Long = 0,
+        // OPT-V11-09（P1）：有效校潮 lag（null = 无校正）；只影响注意事项文案
+        manualTideLagHours: Int? = null,
     ): BestWindowFinder.Output = BestWindowFinder.find(
         results = scores,
         tideRates = tideRatesFromMarine(marine),
@@ -77,6 +80,7 @@ object TopWindowDerivations {
         nowEpochSec = nowEpochSec,
         windowStartEpochSec = windowStartEpochSec,
         windowEndEpochSec = windowEndEpochSec,
+        manualTideLagHours = manualTideLagHours,
     )
 
     /** 现场校潮拟合（§6.2b 规则 5）：模型极值时刻由 [extremeTimes] 提取；≥2 条有效才启用（fitManual 内置，UI 只透传）。 */
@@ -84,4 +88,43 @@ object TopWindowDerivations {
         observations: List<Long>,
         marine: List<HourlyMarine>,
     ): TideCalibrator.ManualTideFit = TideCalibrator.fitManual(observations, extremeTimes(marine))
+
+    /**
+     * OPT-V11-07（P1）：分类型模型标记时刻（§6.2b 对照与按类型匹配输入）。
+     * 涨→落翻转点 = 高潮 / 开始退潮；落→涨翻转点 = 低潮 / 开始涨潮（模型逐小时分辨率下同刻）。
+     */
+    fun tideMarkers(marine: List<HourlyMarine>): Map<TideObservationType, List<Long>> {
+        val rates = tideRatesFromMarine(marine)
+        val times = rates.keys.sorted()
+        val highs = ArrayList<Long>()
+        val lows = ArrayList<Long>()
+        for (i in 1 until times.size) {
+            val t0 = times[i - 1]
+            val t1 = times[i]
+            if (t1 - t0 != 3600L) continue
+            val r0 = rates.getValue(t0)
+            val r1 = rates.getValue(t1)
+            when {
+                r0 > 0 && r1 < 0 -> highs.add(t0)
+                r0 < 0 && r1 > 0 -> lows.add(t0)
+            }
+        }
+        return mapOf(
+            TideObservationType.HIGH to highs,
+            TideObservationType.FALLING_START to highs,
+            TideObservationType.LOW to lows,
+            TideObservationType.RISING_START to lows,
+        )
+    }
+
+    /** OPT-V11-07：按观测类型拟合（类型可为 null = 历史无类型观测）。 */
+    fun manualFitTyped(
+        observations: List<Pair<TideObservationType?, Long>>,
+        marine: List<HourlyMarine>,
+    ): TideCalibrator.ManualTideFit = TideCalibrator.fitManual(
+        observationTimesEpochSec = observations.map { it.second },
+        modelExtremeTimesEpochSec = extremeTimes(marine),
+        observationTypes = observations.map { it.first },
+        modelMarkersByType = tideMarkers(marine),
+    )
 }

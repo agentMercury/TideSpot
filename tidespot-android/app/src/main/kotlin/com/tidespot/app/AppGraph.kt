@@ -150,6 +150,24 @@ class AppGraph(context: Context) {
 
     val settingsStore: SettingsStore = SharedPreferencesSettingsStore(appContext)
 
+    // ────────────── OPT-V11-05（P1）：收藏列表真预取 ──────────────
+
+    /**
+     * 真预取编排器：最近查看 5 条 / TTL 过半 / 全局 6 req/min 令牌 / 并发 ≤2 / 离线零请求；
+     * 与手动刷新同一落库路径（`refreshSpotDetail`），失败静默（fetch_log 留痕）。
+     */
+    val prefetcher: com.tidespot.core.data.repo.DetailPrefetcher =
+        com.tidespot.core.data.repo.DetailPrefetcher.from(repository) { isNetworkAvailable() }
+
+    /** 联网判定（无权限/异常按离线处理；飞行模式 → 零请求）。 */
+    fun isNetworkAvailable(): Boolean = runCatching {
+        val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+            ?: return@runCatching false
+        val network = cm.activeNetwork ?: return@runCatching false
+        val caps = cm.getNetworkCapabilities(network) ?: return@runCatching false
+        caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }.getOrDefault(false)
+
     companion object {
         private const val TAG = "TideSpotApp"
 

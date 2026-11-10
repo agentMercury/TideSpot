@@ -12,10 +12,10 @@
 |---|---|---|
 | **P0-1** | OPT-V11-01 凭据外部化 + 首次配置向导 + i18n 框架 + APP 图标 | ✅ 完成（真机冒烟通过，CHG-25/26） |
 | **P0-2** | 02 水质实测录入、03 出发时间筛选、04 F-3.7 元数据、25 Top10 核心段、26 阈值 75+爆护 | ✅ 完成（真机冒烟通过，CHG-27） |
-| **P1** | 05 真预取、06 相对时间、07 涨退潮观测、08 跨点缓存、09 校正提示、10 搜索筛选、11 陈旧标记、18~24 UX 七项 | ⬜ **待开工（本次交接起点）** |
-| **P2** | 12 批量操作、13 i18n 全量外移、14 智能排序、15 详情卡片、16 分组、17 缩略图 | ⬜ 待开工 |
+| **P1** | 05 真预取、06 相对时间、07 涨退潮观测、08 跨点缓存、09 校正提示、10 搜索筛选、11 陈旧标记、18~24 UX 七项 | ✅ 完成（2026-11-10，**CHG-28**；八模块 701/0/0 + APK 复产出；**真机冒烟待执行**） |
+| **P2** | 12 批量操作、13 i18n 全量外移、14 智能排序、15 详情卡片、16 分组、17 缩略图 | ⬜ **待开工（本次交接起点）** |
 
-- **基线**：八模块 **625 运行 / 0 失败 / 0 跳过**（`verify.ps1` 全绿）；APK `潮点TideSpot-v1.1.apk`（`versionCode=2`，49.2MB，自签名，自动分发 `E:\Trans`）
+- **基线**：八模块 **701 运行 / 0 失败 / 0 跳过**（`verify.ps1` 全绿）；APK `潮点TideSpot-v1.1.apk`（`versionCode=2`，49.2MB，自签名，自动分发 `E:\Trans`）
 - **v1（M0–M6）交付验收窗口**：2026-12-04 ~ 12-08（原计划），v1.1 为提前启动（客户 2026-11-10 指令）
 - 版本管理：jj + git colocated；当前 git `main` 与 jj `@` 同步（每次提交后需手动 `git update-ref`，见 §4.4）
 
@@ -164,7 +164,16 @@ D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease 
 
 ## 9. 下一步（接手第一件事）
 
-1. 跑 `verify.ps1` 确认基线 625/0/0
-2. 从 **P1 OPT-V11-06（相对时间）** 或 **OPT-V11-10（搜索筛选）** 起手（纯函数、无依赖、风险最低）；UX 批次建议在 P1 后半段集中做（UX-20/22 会改动共享 UI 结构）
-3. 每完成一项：登记台账 CHG → 纯函数锁测试 → 全量回归 → 真机冒烟（可行时）→ jj 提交（描述用 cmd 管道）
-4. P1 收口后更新本文件或再交接
+1. 跑 `verify.ps1` 确认基线 **701/0/0**（P1 收口值）
+2. **真机冒烟 P1**（AAK-AN00）：浮动三按钮 insets / 返回手势（详情→来源、收藏→地图、地图 2s 双退）/ 地图样式三选即时生效 / 冷启动定位不设准星 / 收藏搜索与陈旧徽标 / 校潮四类观测补记 / Top10 校正提示与潮汛 chip
+3. 从 **P2** 起手（建议顺序：**14 智能排序 → 15 详情卡片 → 12 批量操作 → 16 分组（Room v5→v6，真机 MigrationTestHelper 必配）→ 17 缩略图 → 13 i18n 存量外移**）
+4. 每完成一项：登记台账 CHG → 纯函数锁测试 → 全量回归 → 真机冒烟（可行时）→ jj 提交（描述用 cmd 管道）
+5. P2 收口后更新本文件或再交接
+
+> **P1 落地要点（CHG-28 摘要，接手先读）**
+> - 详情 Tab 顺序已改为 **钓鱼指数→潮流→天气→水质→风浪**（`DetailTab` 枚举序 + `DetailScreen` TabRow + `titlesInTabOrder` **三处联动**，默认落地 Tab = `SCORE`）；改任一必须三处同改并跑 `WaterBodyTabTitlesTest`/`ComposeSmokeRobolectricTest`。
+> - 地图为**唯一首页**：无底部 dock，浮动按钮由 `MapScreen.floatingActions` 注入（`:app` 组装）；地图「Top10」落为**进收藏并展开跨点 Top10 Sheet**（`openTop10OnStart`），地图本点 Top10 未做。
+> - 地图相机程序驱动动画（冷启动定位/返回定位）必须置 `suppressNextIdle`，否则 idle 回调会把坐标喂给准星状态机（破坏 F-1.4 唯一真源）。
+> - 真预取 = `DetailPrefetcher`（前 5 / TTL/2 / `tryAcquire` 不足放弃剩余 / 并发 2 / 离线零请求），触发点在 `MainActivity` 收藏页 `LaunchedEffect`，受「后台预取」开关；Manifest 已加 `ACCESS_NETWORK_STATE`。
+> - 收藏 Top10 用 `TopWindowsLruCache`（不落库；**排序切换会清空**——规格口径）；列表摘要/陈旧判定都依赖 `FavoritesUiState.nowEpochSec`。
+> - 校潮观测四类落 `manual_observation.kind`（`HIGH/LOW/RISING_START/FALLING_START`，历史 `TIDE_OBSERVATION` 兼容），**无需 Room 迁移**；水质观测读回已按「非校潮 kind」隔离。

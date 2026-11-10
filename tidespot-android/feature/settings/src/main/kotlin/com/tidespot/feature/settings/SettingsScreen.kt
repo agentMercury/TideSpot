@@ -40,6 +40,8 @@ fun SettingsScreen(
     onPrefetchChange: (Boolean) -> Unit,
     onReverseGeoChange: (Boolean) -> Unit,
     onApiKeyChange: (String?) -> Unit,
+    /** UX-19（OPT-V11-19）：地图样式三选（彩色/素色/深色）。 */
+    onMapStyleChange: (MapStyle) -> Unit,
     modifier: Modifier = Modifier,
     /** CHG-25（P0-1）：Copernicus 凭据版块槽位（:app 注入 [CopernicusCredentialSection]；null = 不渲染，零行为漂移）。 */
     credentialSection: (@Composable () -> Unit)? = null,
@@ -78,6 +80,20 @@ fun SettingsScreen(
                     onClick = { onDetailDaysChange(d) },
                     label = { Text("$d 天") },
                     modifier = Modifier.semantics { contentDescription = "详情页天数：$d 天" },
+                )
+            }
+        }
+        // UX-19（OPT-V11-19 / D8）：地图样式三选（默认彩色；深色系统不覆盖用户选择）
+        Text("地图样式", style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            MapStyle.entries.forEach { style ->
+                FilterChip(
+                    selected = state.mapStyle == style,
+                    onClick = { onMapStyleChange(style) },
+                    label = { Text(style.label) },
+                    modifier = Modifier.semantics {
+                        contentDescription = "地图样式：${style.label}（${style.description}）"
+                    },
                 )
             }
         }

@@ -67,6 +67,8 @@ class DetailStateHolder(
             nowEpochSec = lastNextHourEpochSec,
             windowStartEpochSec = windowStartEpochSec,
             windowEndEpochSec = windowEndEpochSec,
+            // OPT-V11-09：与全窗同源透传有效校潮 lag（无校正 = null）
+            manualTideLagHours = s.result?.tideCorrection?.takeIf { it.adopted }?.lagHours,
         )
     }
 
@@ -85,7 +87,13 @@ class DetailStateHolder(
         // CHG-15 偏差①：时间域 = 当前小时的下一整点起（SRS §6.6），历史窗口不入选
         val nowSec = nowMillis / 1000
         val nextHourEpochSec = nowSec - nowSec % 3600 + 3600
-        val top10 = TopWindowDerivations.top10(scores, result.marine, nowEpochSec = nextHourEpochSec)
+        val top10 = TopWindowDerivations.top10(
+            scores,
+            result.marine,
+            nowEpochSec = nextHourEpochSec,
+            // OPT-V11-09（P1）：有效现场校潮 → Top10 注意事项追加「已按现场校潮校正：提前/延后 Xh」
+            manualTideLagHours = result.tideCorrection?.takeIf { it.adopted }?.lagHours,
+        )
         lastNextHourEpochSec = nextHourEpochSec
         val quality = if (weatherUnusable) emptyList()
         else Derivations.qualitySeries(

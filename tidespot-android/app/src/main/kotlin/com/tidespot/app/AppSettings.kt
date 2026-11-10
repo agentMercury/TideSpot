@@ -1,5 +1,6 @@
 ﻿package com.tidespot.app
 
+import com.tidespot.feature.settings.MapStyle
 import com.tidespot.feature.settings.SettingsKeys
 import com.tidespot.feature.settings.SettingsLogic
 import com.tidespot.feature.settings.SettingsState
@@ -28,6 +29,15 @@ object AppSettings {
     fun parseUnit(raw: String?): UnitSystem =
         if (raw == UNIT_IMPERIAL) UnitSystem.IMPERIAL else UnitSystem.SI
 
+    // ────────────── UX-19：地图样式（三选；非法/缺失 → Voyager 默认） ──────────────
+
+    fun parseMapStyle(raw: String?): MapStyle =
+        MapStyle.entries.firstOrNull { it.name == raw } ?: MapStyle.VOYAGER
+
+    fun writeMapStyle(store: SettingsStore, style: MapStyle) {
+        store.writeString(SettingsKeys.MAP_STYLE, style.name)
+    }
+
     // ────────────── 读取（store → state） ──────────────
 
     fun read(store: SettingsStore): SettingsState = SettingsState(
@@ -38,6 +48,7 @@ object AppSettings {
         prefetchEnabled = store.readBoolean(SettingsKeys.PREFETCH_ENABLED, default = true),
         reverseGeoEnabled = store.readBoolean(SettingsKeys.REVERSE_GEO_ENABLED, default = true),
         apiKey = store.readString(SettingsKeys.API_KEY)?.ifEmpty { null },
+        mapStyle = parseMapStyle(store.readString(SettingsKeys.MAP_STYLE)),
     )
 
     // ────────────── 写回（state 片段 → store） ──────────────

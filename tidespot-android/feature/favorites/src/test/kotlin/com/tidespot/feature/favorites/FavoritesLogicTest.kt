@@ -150,6 +150,33 @@ class FavoritesLogicTest {
         val nextDay = FavoritesSummaryFormatter.time(epoch(0, 30) + 24 * 3600, zone)
         assertEquals("11月7日 00:30", nextDay)
     }
+
+    // ── OPT-V11-06（P1）：相对时间摘要 ──
+
+    @Test
+    fun `相对时间_同日为今天`() {
+        val line = FavoritesSummaryFormatter.line(
+            FavoritesSpotSummary(validHoursPresent = 240, window = window(92)),
+            zone,
+            nowEpochSec = epoch(12),
+        )
+        assertEquals("今天 17:00 · 92 分 · 爆护窗口", line)
+    }
+
+    @Test
+    fun `相对时间_次日为明天`() {
+        val line = FavoritesSummaryFormatter.windowLine(window(92), zone, nowEpochSec = epoch(17) - 24 * 3600)
+        assertEquals("明天 17:00 · 92 分 · 爆护窗口", line)
+    }
+
+    @Test
+    fun `相对时间_未注入now回落绝对格式_零行为漂移`() {
+        val line = FavoritesSummaryFormatter.line(
+            FavoritesSpotSummary(validHoursPresent = 240, window = window(92)),
+            zone,
+        )
+        assertEquals("11月6日 17:00 · 92 分 · 爆护窗口", line)
+    }
 }
 
 // ──────────────────── OPT-M5-03 / OPT-M5-07（CHG-16⑯⑰） ────────────────────

@@ -6,8 +6,15 @@ import com.tidespot.core.domain.model.FishScoreResult
 import com.tidespot.core.domain.window.BestWindowFinder
 import com.tidespot.core.domain.model.WaterQualitySample
 
-/** 详情页 5 Tab（§8.1 顺序；标题按 WaterBodyType 切换，不隐藏 Tab）。 */
-enum class DetailTab { WAVE, WEATHER, SCORE, WATER_QUALITY, TIDE }
+/**
+ * 详情页 5 Tab（UX-22 / CHG-21 顺序：**钓鱼指数 → 潮流(水位) → 天气 → 水质 → 风浪(湖面风与水温)**；
+ * 标题按 WaterBodyType 切换，不隐藏 Tab）。
+ *
+ * 枚举序 = TabRow 展示序（`ordinal` 直接作 `selectedTabIndex`），必须与
+ * `WaterBodyTabTitles.titlesInTabOrder()` 逐位对应——两处任一单独改动都会造成标题与 Tab 错位
+ * （= CHG-13/D01 回归），故成对修改并由顺序锁测试守护。
+ */
+enum class DetailTab { SCORE, TIDE, WEATHER, WATER_QUALITY, WAVE }
 
 /**
  * F-3.6 分维降级状态（互不影响：某维度失败只影响其 Tab，其余照常）。
@@ -22,6 +29,14 @@ sealed class DimensionStatus {
         val lastFetchedSource: DataSource?,
     ) : DimensionStatus()
 }
+
+/**
+ * OPT-V11-07（P1）：现场观测草稿（四类 + 时刻）。[type] = null 仅历史无类型观测读回时出现。
+ */
+data class TideObservationDraft(
+    val type: com.tidespot.core.domain.tide.TideObservationType?,
+    val epochSec: Long,
+)
 
 /**
  * 详情页 UI 状态。scores/quality/tideRates 等派生序列只在 [SpotDetailResult] 到达时计算一次
@@ -40,7 +55,8 @@ data class DetailUiState(
     /** 水质本地推导序列（§5.3 Q-兜底；徽标「估算」）。 */
     val quality: List<WaterQualitySample> = emptyList(),
     val selectedDay: Int = 0,
-    val selectedTab: DetailTab = DetailTab.WAVE,
+    /** UX-22：默认落地 Tab = 钓鱼指数（Tab 序首位）。 */
+    val selectedTab: DetailTab = DetailTab.SCORE,
     /** 当前选中小时（当地 0–23 下标位；null = 未选中）。 */
     val selectedHour: Int? = null,
     val daysRange: Int = 7,

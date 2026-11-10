@@ -298,13 +298,28 @@ class TideSpotRepository(
     /** fetch_log 可查（F-4.6 / N-6 设置页频控可视化）。 */
     suspend fun fetchLogs(spotId: Long): List<FetchLogEntity> = fetchLogDao.forSpot(spotId)
 
+    /**
+     * OPT-V11-11（P1）：逐源最近一次成功拉取时刻（epoch 毫秒；0 = 无记录）。
+     *
+     * 收藏列表「数据时间 + 陈旧/已过期」判定输入；TTL 判定仍只走 [Ttl]（禁另造阈值）。
+     */
+    suspend fun lastFetchedMillis(spotId: Long): Map<DataSource, Long> =
+        DataSource.entries.associateWith { src ->
+            fetchLogDao.lastSuccess(spotId, src.wire)?.fetchedAt ?: 0L
+        }
+
     // ────────────────────── 现场校潮（M6/OPT-M5-02，§6.2b 规则 5） ──────────────────────
 
     /**
-     * 登记一条现场校潮观测（高低潮时刻）。[manualObservationDao] 未注入 →
-     * 抛 [IllegalStateException]（防静默丢观测；:app 批次 3 注入 Room 实现后可用）。
+     * 登记一条现场校潮观测（高低潮/涨落时刻）。
+     * OPT-V11-07（P1，尾部只增）：[type] = 四类观测；null = 历史无类型（`TIDE_OBSERVATION`）。
+     * [manualObservationDao] 未注入 → 抛 [IllegalStateException]（防静默丢观测）。
      */
-    suspend fun addTideObservation(spotId: Long, observedAtEpochSec: Long) {
+    suspend fun addTideObservation(
+        spotId: Long,
+        observedAtEpochSec: Long,
+        type: com.tidespot.core.domain.tide.TideObservationType? = null,
+    ) {
         val dao = manualObservationDao ?: throw IllegalStateException(
             "manualObservationDao 未注入（生产由 :app 提供 Room 实现；观测不可静默丢弃）",
         )
@@ -313,7 +328,7 @@ class TideSpotRepository(
                 spotId = spotId,
                 observedAtEpochSec = observedAtEpochSec,
                 createdAtEpochMs = nowMillis(),
-                kind = ManualObservationEntity.KIND_TIDE_OBSERVATION,
+                kind = type?.name ?: ManualObservationEntity.KIND_TIDE_OBSERVATION,
             ),
         )
     }
@@ -350,7 +365,7 @@ class TideSpotRepository(
      */
     suspend fun waterQualityObservations(spotId: Long): List<WaterQualityObservation> =
         manualObservationDao?.forSpot(spotId)
-            ?.filter { it.kind != ManualObservationEntity.KIND_TIDE_OBSERVATION }
+            ?.filter { !isTideObservationKind(it.kind) }
             ?.map {
                 WaterQualityObservation(
                     id = it.id,
@@ -365,11 +380,18 @@ class TideSpotRepository(
 
     /**
      * 观测记录读回（按观测时刻升序）；[manualObservationDao] 未注入 → 空列表（未登记语义）。
+     * OPT-V11-07：含历史无类型行与四类观测（水质实测不混入）。
      */
     suspend fun tideObservations(spotId: Long): List<TideObservation> =
-        manualObservationDao?.forSpotKind(spotId, ManualObservationEntity.KIND_TIDE_OBSERVATION)
-            ?.map { TideObservation(it.id, it.spotId, it.observedAtEpochSec, it.createdAtEpochMs) }
+        manualObservationDao?.forSpot(spotId)
+            ?.filter { isTideObservationKind(it.kind) }
+            ?.map { TideObservation(it.id, it.spotId, it.observedAtEpochSec, it.createdAtEpochMs, it.kind) }
             ?: emptyList()
+
+    /** 校潮类观测 kind 判定（历史 `TIDE_OBSERVATION` + 四类枚举名）。 */
+    private fun isTideObservationKind(kind: String): Boolean =
+        kind == ManualObservationEntity.KIND_TIDE_OBSERVATION ||
+            com.tidespot.core.domain.tide.TideObservationType.entries.any { it.name == kind }
 
     /**
      * 登记现场校潮拟合参数（**adopted=false 也登记**，D12 校正前后对照与「再记 N 条」
@@ -563,12 +585,15 @@ class TideSpotRepository(
         val nowSec = nowMillis() / 1000
         val nextHourEpochSec = nowSec - nowSec % 3600 + 3600
         val futureCount = rebuilt.count { it.timeEpochSec >= nextHourEpochSec }
+        // OPT-V11-09（P1）：读侧与现算同口径——有效校潮 lag 透传给 find（只影响注意事项文案）
+        val manualTideLagHours = manualTideFitDao?.getBySpot(spot.id)?.takeIf { it.adopted }?.lagHours
         val out = BestWindowFinder.find(
             results = rebuilt,
             tideRates = null,
             validHoursPresent = rebuilt.size,
             horizonDays = horizonDays,
             nowEpochSec = nextHourEpochSec,
+            manualTideLagHours = manualTideLagHours,
         )
         // validHoursPresent = 未来窗口内有效行数（历史行不计；全过期 = 0 → UI「未加载」或禁用文案）
         return TopWindowsResult(out.windows, out.fallbackMessage, out.fallbackBestEpochSec, futureCount)
@@ -608,15 +633,27 @@ data class TopWindowsResult(
 
 /**
  * 现场校潮观测（M6/OPT-M5-02 读侧门面类型；data 层类型，不放 Models.kt——CHG-16⑦）。
+ *
+ * OPT-V11-07（P1）：尾增 [kind]（`TIDE_OBSERVATION` = 历史无类型观测；其余 = 四类观测枚举名）。
  */
 data class TideObservation(
     val id: Long,
     val spotId: Long,
-    /** 用户记录的高低潮时刻（epoch 秒）。 */
+    /** 用户记录的高低潮/涨落时刻（epoch 秒）。 */
     val observedAtEpochSec: Long,
     /** 记录时刻（epoch 毫秒）。 */
     val createdAtEpochMs: Long,
-)
+    val kind: String = KIND_TIDE_OBSERVATION,
+) {
+    /** 观测类型；历史无类型行 → null（拟合按「任意极值最近匹配」处理）。 */
+    val type: com.tidespot.core.domain.tide.TideObservationType?
+        get() = com.tidespot.core.domain.tide.TideObservationType.entries
+            .firstOrNull { it.name == kind }
+
+    companion object {
+        const val KIND_TIDE_OBSERVATION = ManualObservationEntity.KIND_TIDE_OBSERVATION
+    }
+}
 
 /** OPT-V11-02（CHG-27）：水质实测类型（落 `manual_observation.kind`；与校潮 `TIDE_OBSERVATION` 互斥）。 */
 enum class WaterQualityObservationKind { WATER_TEMP, DO, TURBIDITY }

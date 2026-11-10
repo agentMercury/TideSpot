@@ -3,6 +3,7 @@ package com.tidespot.feature.detail.detail
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.domain.tide.TideCalibrator
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.format.RelativeTimeFormatter
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -28,6 +29,14 @@ object Top10Formatter {
 
     /** 时长（durationHours 整数小时）→ "2 小时"。 */
     fun duration(durationHours: Int): String = "${durationHours} 小时"
+
+    /**
+     * OPT-V11-06（P1）：Top10 条目时间标签改相对格式（今天/明天/周X/M月d日，当地时区语义）。
+     * [nowEpochSec] 由调用方注入（可测试；禁 System 时钟渗入纯函数）。
+     */
+    fun startLine(window: BestWindow, zone: ZoneId, nowEpochSec: Long): String =
+        "起始 ${RelativeTimeFormatter.format(window.startEpochSec, zone, nowEpochSec)} · " +
+            "峰值 ${hm(window.peakEpochSec, zone)} · 时长 ${duration(window.durationHours)}"
 
     /** 峰值分 + 档位 → "92 分 · 爆护窗口"（tier 直接透传）。 */
     fun peakScoreLine(window: BestWindow): String = "${window.peakScore} 分 · ${window.tier}"

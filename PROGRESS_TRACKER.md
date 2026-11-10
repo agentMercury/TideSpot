@@ -174,3 +174,26 @@
 | R-09 | 中文路径导致 Gradle 构建不稳定 | 🟢 缓解 | subst T: + `.tools` Gradle + UTF-8 jvmArgs 已稳定跑通；**A-5 本机正式 gradlew 首跑验证通过（11-09）**——物理中文路径下 favorites 等未配 jvmArgs 的模块仍有类加载失败，**subst T: 维持标准构建路径** |
 | ~~R-02/R-07~~ | 真机资源不足 → 验收顺延 | 🟢 **关闭（CHG-11）** | 客户提供单台荣耀机（Android 16/无 GMS）作验收设备；GMS 通道书面豁免 |
 | OSTIA 图层故障 | 千岛湖掩膜复测暂缓（服务器端） | 🟡 关注中 | A-07：恢复后一条 curl 复测；CHG-09 UNKNOWN 方案已兜底 |
+## 7. v1.1 P1 批次（2026-11-10，CHG-28）
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| OPT-V11-05 真预取 | ✅ 代码+锁测试 | 前 5 / TTL/2 / 令牌不足放弃剩余 / 并发 2 / 离线零请求 / 失败静默；收藏页触发，受预取开关 |
+| OPT-V11-06 相对时间 | ✅ | `RelativeTimeFormatter`（今天/明天/周X/日期，选点当地时区）；收藏摘要 + 详情 Top10 起始 |
+| OPT-V11-07 涨退潮观测 | ✅ | 四类观测 + 时刻补记（±72h）+ 模型对照 + 按类型 `fitManual` + 落库读回 |
+| OPT-V11-08 跨点 Top10 缓存 | ✅ | `TopWindowsLruCache`（100/LRU/不落库；二次进入 0 次读库） |
+| OPT-V11-09 校正提示 | ✅ | `find(manualTideLagHours)` → 注意事项「已按现场校潮校正：提前/延后 Xh」；现算/读侧同口径 |
+| OPT-V11-10 搜索筛选 | ✅ | `FavoritesFilterLogic` + 搜索框/标签/预设 chips + 空态清除；先筛后排 |
+| OPT-V11-11 陈旧标记 | ✅ | 逐源 `lastFetchedMillis` + `FavoritesStaleLogic`（复用 Ttl）→ 陈旧/已过期 + 数据时间 |
+| UX-18 地图定位 | ✅ | 冷启动定位动画 800ms（不设准星）+ 返回地图回上一查看点/lastViewed |
+| UX-19 地图样式 | ✅ | 默认 Voyager + 设置三选（Voyager/Positron/Dark Matter，URL 单点） |
+| UX-20 移除底栏 + 浮动按钮 | ✅ | 删 NavigationBar；地图浮动收藏/Top10/设置 + insets |
+| UX-21 返回手势 | ✅ | 详情→来源页（sourcePage）、收藏/设置→地图、地图 2s 双返回退出 |
+| UX-22 Tab 顺序 | ✅ | 钓鱼指数→潮流→天气→水质→风浪（枚举/列表/标题三处联动，默认落地钓鱼指数） |
+| UX-23 潮汐术语 | ✅ | `TidePhase`（月龄制）+ 海水点潮 Tab chip；不入评分 |
+| UX-24 日期选择器 | ✅ | DaySelector → 「今天 周二」/「11/12 周三」 |
+
+- **验证**：八模块 **701 运行 / 0 失败 / 0 跳过** + `BUILD SUCCESSFUL`（八模块测试 + assembleRelease，退出码 0）+ APK 复产出（`潮点TideSpot-v1.1.apk`，E:\Trans 已同步）。
+- **遗留**：P2（OPT-V11-12 批量 / 13 i18n 存量外移 / 14 智能排序 / 15 详情卡片 / 16 分组 Room v5→v6 / 17 缩略图）未开工；地图「本点 Top10」未做（浮动 Top10 落为跨点 Top10）。
+- **风险**：UX-18/20/21 属组装层改动，必须真机逐屏冒烟（本次仅 JVM 锁 + 编译/打包验证）；P2-16 Room v5→v6 需真机 `MigrationTestHelper`。
+- **下一步**：① 真机冒烟 P1（重点：浮动按钮 insets、返回手势、地图样式切换、冷启动定位）；② P2 按 14/15/12/16/17/13 顺序开工；③ `OPT_REQUIREMENTS_V11.md` §3 中 OPT-V11-22 的「仅改 titlesInTabOrder」表述待回写为实际三处联动口径。

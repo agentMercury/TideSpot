@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -20,12 +21,16 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -47,6 +52,9 @@ fun FavoritesScreen(
     viewModel: FavoritesViewModel,
     onOpenSpot: (FavoriteSpot) -> Unit,
     modifier: Modifier = Modifier,
+    /** UX-20（OPT-V11-20）：从地图浮动「Top10」按钮进入时自动展开跨点 Top10 Sheet。 */
+    openTop10OnStart: Boolean = false,
+    onTop10Opened: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
     // OPT-M5-03（CHG-16⑯）：时刻渲染按 spot.tzOffsetSec → ZoneOffset（SpotZones 单源）；
@@ -56,12 +64,68 @@ fun FavoritesScreen(
     var editingSpot by remember { mutableStateOf<FavoriteSpot?>(null) }
     var deleteTarget by remember { mutableStateOf<FavoriteSpot?>(null) }
     var showTop10 by remember { mutableStateOf(false) }
+    // UX-20：地图浮动 Top10 入口 → 自动展开（消费后回调复位，避免重复打开）
+    LaunchedEffect(openTop10OnStart) {
+        if (openTop10OnStart) {
+            showTop10 = true
+            onTop10Opened()
+        }
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize()
             .semantics { contentDescription = "收藏列表：收藏点与最佳窗口摘要" },
     ) {
         item {
+            // OPT-V11-10（P1）：搜索框（名称/备注实时过滤）+ 标签/预设 chips（先筛后排）
+            OutlinedTextField(
+                value = state.filter.query,
+                onValueChange = { viewModel.setFilter(state.filter.copy(query = it)) },
+                label = { Text("搜索名称或备注") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+                    .semantics { contentDescription = "搜索收藏点" },
+            )
+            val tags = FavoritesFilterLogic.availableTags(state.spots)
+            val presets = FavoritesFilterLogic.availablePresets(state.spots)
+            if (tags.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    items(tags, key = { "tag-$it" }) { tag ->
+                        FilterChip(
+                            selected = state.filter.tag == tag,
+                            onClick = {
+                                viewModel.setFilter(
+                                    state.filter.copy(tag = if (state.filter.tag == tag) null else tag),
+                                )
+                            },
+                            label = { Text(tag) },
+                            modifier = Modifier.semantics { contentDescription = "标签筛选：$tag" },
+                        )
+                    }
+                }
+            }
+            if (presets.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    items(presets, key = { "preset-$it" }) { preset ->
+                        FilterChip(
+                            selected = state.filter.preset == preset,
+                            onClick = {
+                                viewModel.setFilter(
+                                    state.filter.copy(preset = if (state.filter.preset == preset) null else preset),
+                                )
+                            },
+                            label = { Text(preset) },
+                            modifier = Modifier.semantics { contentDescription = "场景筛选：$preset" },
+                        )
+                    }
+                }
+            }
             // F-2.4 排序三选一
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
@@ -70,6 +134,12 @@ fun FavoritesScreen(
                 SortChip("按名称", state.sortOrder == SortOrder.NAME) { viewModel.setSortOrder(SortOrder.NAME) }
                 SortChip("按最近查看", state.sortOrder == SortOrder.LAST_VIEWED) { viewModel.setSortOrder(SortOrder.LAST_VIEWED) }
                 SortChip("按分数", state.sortOrder == SortOrder.SCORE) { viewModel.setSortOrder(SortOrder.SCORE) }
+                if (state.filter.isActive) {
+                    TextButton(
+                        onClick = { viewModel.setFilter(FavoritesFilterLogic.Filter()) },
+                        modifier = Modifier.semantics { contentDescription = "清除搜索与筛选条件" },
+                    ) { Text("清除") }
+                }
             }
             Button(
                 onClick = { showTop10 = true },
@@ -85,8 +155,16 @@ fun FavoritesScreen(
             }
         }
 
-        val sorted = FavoritesSortLogic.sort(state.spots, state.sortOrder, state.scoreBySpotId)
+        // OPT-V11-10：「先筛后排」——过滤纯函数与排序纯函数正交
+        val filtered = FavoritesFilterLogic.apply(state.spots, state.filter)
+        val sorted = FavoritesSortLogic.sort(filtered, state.sortOrder, state.scoreBySpotId)
         items(sorted, key = { it.id }) { spot ->
+            // OPT-V11-11：列表级陈旧标记（TTL 判定复用 Ttl；无记录不编造数据时间）
+            val stale = FavoritesStaleLogic.mark(
+                fetchedAtMillis = state.summaries[spot.id]?.fetchedAtMillis ?: emptyMap(),
+                nowMillis = state.nowEpochSec * 1000L,
+                zone = SpotZones.zoneForSpot(spot),
+            )
             FavoriteCard(
                 spot = spot,
                 summaryLine = buildString {
@@ -94,10 +172,15 @@ fun FavoritesScreen(
                         FavoritesSummaryFormatter.line(
                             state.summaries[spot.id] ?: FavoritesSpotSummary(),
                             SpotZones.zoneForSpot(spot),
+                            // OPT-V11-06：相对时间（今天/明天/周X）；now=0（未加载）回落绝对格式
+                            state.nowEpochSec.takeIf { it > 0 },
                         ),
                     )
+                    // OPT-V11-11：副标题附数据时间
+                    stale.dataTimeLabel?.let { append(" · ").append(it) }
                     SpotZones.zoneNote(spot.tzOffsetSec)?.let { append(" · ") }
                 },
+                stale = stale,
                 onOpen = {
                     viewModel.markViewed(spot.id)
                     onOpenSpot(spot)
@@ -107,7 +190,19 @@ fun FavoritesScreen(
             )
         }
         if (!state.loading && sorted.isEmpty()) {
-            item { Text("暂无收藏点", Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall) }
+            item {
+                if (state.filter.isActive) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text("无匹配收藏", style = MaterialTheme.typography.bodySmall)
+                        TextButton(
+                            onClick = { viewModel.setFilter(FavoritesFilterLogic.Filter()) },
+                            modifier = Modifier.semantics { contentDescription = "清除搜索与筛选条件" },
+                        ) { Text("清除筛选") }
+                    }
+                } else {
+                    Text("暂无收藏点", Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall)
+                }
+            }
         }
     }
 
@@ -162,17 +257,35 @@ private fun SortChip(label: String, selected: Boolean, onClick: () -> Unit) {
 private fun FavoriteCard(
     spot: FavoriteSpot,
     summaryLine: String,
+    stale: StaleMark,
     onOpen: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    val staleBadge = FavoritesStaleLogic.badge(stale.level)
     Card(
         onClick = onOpen,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
-            .semantics { contentDescription = "收藏点 ${spot.name}，坐标 ${spot.lat} ${spot.lon}，摘要 $summaryLine" },
+            // OPT-V11-11：陈旧/已过期整项降透明度
+            .alpha(if (stale.level == StaleLevel.NONE) 1f else FavoritesStaleLogic.ALPHA_STALE)
+            .semantics {
+                contentDescription = "收藏点 ${spot.name}，坐标 ${spot.lat} ${spot.lon}，摘要 $summaryLine" +
+                    (staleBadge?.let { "，状态 $it" } ?: "")
+            },
     ) {
         Column(Modifier.padding(12.dp)) {
-            Text(spot.name, style = MaterialTheme.typography.titleMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(spot.name, style = MaterialTheme.typography.titleMedium)
+                // OPT-V11-11：陈旧 / 已过期徽标（NONE 不渲染，禁空串）
+                staleBadge?.let { badge ->
+                    AssistChip(
+                        onClick = {},
+                        label = { Text(badge) },
+                        modifier = Modifier.padding(start = 6.dp)
+                            .semantics { contentDescription = "数据状态：$badge" },
+                    )
+                }
+            }
             Text(
                 "${Format.value(spot.lat, 6)}, ${Format.value(spot.lon, 6)}",
                 style = MaterialTheme.typography.bodySmall,
@@ -183,8 +296,17 @@ private fun FavoriteCard(
                     spot.tags.take(4).forEach { tag -> AssistChip(onClick = {}, label = { Text(tag) }) }
                 }
             }
-            // F-2.5 最佳窗口摘要副标题
-            Text(summaryLine, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
+            // F-2.5 最佳窗口摘要副标题（OPT-V11-11：已过期置灰）
+            Text(
+                summaryLine,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (stale.level == StaleLevel.EXPIRED) {
+                    MaterialTheme.colorScheme.outline
+                } else {
+                    Color.Unspecified
+                },
+                modifier = Modifier.padding(top = 4.dp),
+            )
             Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = onEdit, modifier = Modifier.semantics { contentDescription = "编辑收藏点 ${spot.name}" }) { Text("编辑") }
                 TextButton(onClick = onDelete, modifier = Modifier.semantics { contentDescription = "删除收藏点 ${spot.name}" }) { Text("删除") }

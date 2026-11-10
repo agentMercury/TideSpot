@@ -6,12 +6,14 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -93,6 +95,12 @@ fun MapScreen(
     waterBodyResolver: WaterBodyResolver? = null,
     reverseGeoEnabled: Boolean = true,
     onSpotConfirmed: (SpotConfirmed) -> Unit = {},
+    /** UX-19（OPT-V11-19）：底图样式 URL（默认 Voyager 彩色；URL 单点在 TideSpotUrls）。 */
+    styleUrl: String = com.tidespot.core.data.remote.TideSpotUrls.CARTO_VOYAGER_STYLE_URL,
+    /** UX-18（OPT-V11-18）：返回地图时的相机目标（上一查看点 / lastViewed 最新点；null = 世界视图）。 */
+    initialCameraTarget: GeoPoint? = null,
+    /** UX-20（OPT-V11-20）：右下浮动按钮组（收藏/Top10/设置）由 :app 注入。 */
+    floatingActions: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -112,6 +120,10 @@ fun MapScreen(
     var mapLibre by remember { mutableStateOf<MapLibreMap?>(null) }
     /** CHG-09①：判定辅助输入（§6.9）；搜索候选携带 elevation，长按/定位暂无来源 → null。 */
     var pendingElevation by remember { mutableStateOf<Double?>(null) }
+    /** UX-19：当前已生效的样式 URL（切换时重建 style；防重复 setStyle）。 */
+    var appliedStyleUrl by remember { mutableStateOf<String?>(null) }
+    /** UX-18：程序驱动相机移动（冷启动定位/返回定位）时抑制 idle → 准星状态机（F-1.4 唯一真源不受影响）。 */
+    var suppressNextIdle by remember { mutableStateOf(false) }
 
     // F-1.1 + CHG-09⑦（NEW-07）：冷启动先查系统权限——已授权直接可用（不重复弹窗），
     // 未授权才发请求；Denied(permanent) 后状态机不再放行（无死循环）
@@ -162,8 +174,9 @@ fun MapScreen(
     DisposableEffect(mapView) {
         mapView.getMapAsync { map ->
             mapLibre = map
-            // §12 红线：Positron 样式自带 attribution，由 MapLibre 默认控件渲染，禁止关闭或遮挡
-            map.setStyle(Style.Builder().fromUri(CARTO_POSITRON_STYLE_URL))
+            // §12 红线：底图样式自带 attribution，由 MapLibre 默认控件渲染，禁止关闭或遮挡
+            map.setStyle(Style.Builder().fromUri(styleUrl))
+            appliedStyleUrl = styleUrl
             map.addOnMapLongClickListener { latLng ->
                 crosshair.onLongPress(GeoPoint(latLng.latitude, latLng.longitude))
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng))
@@ -174,6 +187,11 @@ fun MapScreen(
             // 飞行结束 idle 时 target 恰为动画目标坐标 → 等价于「飞行期间 center 锁定到目标」；
             // 长按/搜索/定位先同步设好 Preview 点，idle 回调送同一坐标 → no-op，不会抖动。
             map.addOnCameraIdleListener {
+                // UX-18：程序驱动定位/返回动画不产生选点状态变化（准星唯一真源 F-1.4 不破坏）
+                if (suppressNextIdle) {
+                    suppressNextIdle = false
+                    return@addOnCameraIdleListener
+                }
                 val target = map.cameraPosition.target
                 if (target != null) {
                     crosshair.onMapMoved(GeoPoint(target.latitude, target.longitude))
@@ -181,6 +199,40 @@ fun MapScreen(
             }
         }
         onDispose { }
+    }
+
+    // UX-19（OPT-V11-19）：样式切换即刻生效（重进地图同样生效；attribution 由 MapLibre 默认控件保持）
+    LaunchedEffect(styleUrl, mapLibre) {
+        val map = mapLibre ?: return@LaunchedEffect
+        if (appliedStyleUrl != styleUrl) {
+            map.setStyle(Style.Builder().fromUri(styleUrl))
+            appliedStyleUrl = styleUrl
+        }
+    }
+
+    // UX-18（OPT-V11-18）①：冷启动已授权 → 相机动画到当前位置（≤800ms；不设准星/不进 Preview）
+    var autoLocated by remember { mutableStateOf(false) }
+    LaunchedEffect(permissionState, mapLibre, locationController) {
+        val map = mapLibre ?: return@LaunchedEffect
+        if (autoLocated || initialCameraTarget != null) return@LaunchedEffect
+        val controller = locationController ?: return@LaunchedEffect
+        if (permissionState !is PermissionUiState.Granted) return@LaunchedEffect
+        autoLocated = true
+        controller.requestCurrentLocation { fix ->
+            fix?.let {
+                lastFix = it
+                suppressNextIdle = true
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.lat, it.lon), 12.0), 800)
+            }
+        }
+    }
+
+    // UX-18（OPT-V11-18）②：返回地图 → 相机回到上一查看点 / lastViewed 最新点（无目标维持世界视图）
+    LaunchedEffect(initialCameraTarget, mapLibre) {
+        val map = mapLibre ?: return@LaunchedEffect
+        val target = initialCameraTarget ?: return@LaunchedEffect
+        suppressNextIdle = true
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(target.lat, target.lon), 11.0), 800)
     }
 
     /** CHG-09①：水体判定（§6.9）。marineHasValue=null（M3 无海洋数据 → 探针路径）；异常不中断确认。 */
@@ -287,18 +339,25 @@ fun MapScreen(
                 resolving = resolving,
                 onConfirm = { confirmCurrent() },
                 onCancel = { crosshair.onCancel() },
-                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                // GAP-03：edge-to-edge 安全区（信息条不被手势条遮挡）
+                modifier = Modifier.fillMaxWidth().padding(12.dp).navigationBarsPadding(),
             )
         }
 
-        if (permissionState is PermissionUiState.Granted && locationController != null) {
-            FloatingActionButton(
-                onClick = { locateMe() },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 120.dp),
-            ) {
-                Text("我的位置")
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(end = 16.dp, bottom = 120.dp),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // UX-20（OPT-V11-20）：浮动三按钮（收藏/Top10/设置）由 :app 注入
+            floatingActions?.invoke()
+            if (permissionState is PermissionUiState.Granted && locationController != null) {
+                FloatingActionButton(onClick = { locateMe() }) {
+                    Text("我的位置")
+                }
             }
         }
     }

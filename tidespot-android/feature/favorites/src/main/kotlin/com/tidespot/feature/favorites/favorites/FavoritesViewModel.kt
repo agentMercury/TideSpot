@@ -2,7 +2,10 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tidespot.core.data.repo.DataSource
 import com.tidespot.core.data.repo.TideSpotRepository
+import com.tidespot.core.data.repo.TopWindowsResult
+import com.tidespot.core.domain.FishScoreCalculator
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.window.BestWindowFinder
 import java.util.concurrent.ConcurrentHashMap
@@ -35,35 +38,53 @@ class FavoritesViewModel(
     private val _state = MutableStateFlow(FavoritesUiState())
     val state: StateFlow<FavoritesUiState> = _state
 
+    /** OPT-V11-08（P1）：跨点 Top10 内存 LRU（容量 = 收藏上限 100；**不落库**）。 */
+    private val topCache = TopWindowsLruCache()
+
+    /** 单点装载中间结果（OPT-V11-11 需要逐源拉取时刻）。 */
+    private data class SpotLoad(
+        val id: Long,
+        val result: TopWindowsResult?,
+        val fetchedAtMillis: Map<DataSource, Long>,
+    )
+
     init {
         load()
     }
 
-    /** 全量加载：favorites → 并发 per-spot topWindows（缓存命中）→ 摘要/分数/Top10 一次性填充。 */
-    fun load() {
+    /** 全量加载：favorites → 并发 per-spot topWindows（LRU 命中即跳过读库）→ 摘要/分数/Top10 一次性填充。 */
+    fun load(showLoading: Boolean = true) {
         viewModelScope.launch(ioDispatcher) {
-            _state.update { it.copy(loading = true) }
+            if (showLoading) _state.update { it.copy(loading = true) }
             val spots = runCatching { repository.favorites() }.getOrDefault(emptyList())
-            // 每点只读一次 topWindows（无网 DB 读）；summary（F-2.5）与完整 windows（F-2.6 聚合输入）同源
-            val loaded: List<Triple<Long, FavoritesSpotSummary, List<com.tidespot.core.domain.model.BestWindow>>> = coroutineScope {
+            // 每点只读一次 topWindows（OPT-V11-08：LRU 命中即 0 次读库/0 次 find）；summary（F-2.5）与
+            // 完整 windows（F-2.6 聚合输入）同源；OPT-V11-11：顺带取逐源拉取时刻（陈旧标记）
+            val algoVersion = FishScoreCalculator.ALGO_VERSION
+            val loaded: List<SpotLoad> = coroutineScope {
                 spots.map { spot ->
                     async {
-                        val result = runCatching { repository.topWindows(spot) }.getOrNull()
-                        val summary = result?.let {
-                            FavoritesSpotSummary(
-                                validHoursPresent = it.validHoursPresent,
-                                window = it.windows.maxByOrNull { w -> w.rank },
-                                fallbackMessage = it.fallbackMessage,
-                                fallbackBestEpochSec = it.fallbackBestEpochSec,
-                            )
-                        } ?: FavoritesSpotSummary()
-                        Triple(spot.id, summary, result?.windows ?: emptyList())
+                        val result = runCatching {
+                            topCache.getOrLoad(spot, algoVersion, 7) { repository.topWindows(it) }
+                        }.getOrNull()
+                        val fetched = runCatching { repository.lastFetchedMillis(spot.id) }
+                            .getOrDefault(emptyMap())
+                        SpotLoad(spot.id, result, fetched)
                     }
                 }.awaitAll()
             }
-            val perSpot: Map<Long, FavoritesSpotSummary> = loaded.associate { it.first to it.second }
+            val perSpot: Map<Long, FavoritesSpotSummary> = loaded.associate { l ->
+                l.id to (l.result?.let { r ->
+                    FavoritesSpotSummary(
+                        validHoursPresent = r.validHoursPresent,
+                        window = r.windows.maxByOrNull { w -> w.rank },
+                        fallbackMessage = r.fallbackMessage,
+                        fallbackBestEpochSec = r.fallbackBestEpochSec,
+                        fetchedAtMillis = l.fetchedAtMillis,
+                    )
+                } ?: FavoritesSpotSummary(fetchedAtMillis = l.fetchedAtMillis))
+            }
             val windowsBySpotId: Map<Long, List<com.tidespot.core.domain.model.BestWindow>> =
-                loaded.associate { it.first to it.third }
+                loaded.associate { it.id to (it.result?.windows ?: emptyList()) }
             // F-2.4 分数序依据：各点最高窗口 peakScore（无窗口/未加载的点不入 map → 排序时排最后）
             val scoreBySpotId = perSpot.mapNotNull { (id, s) -> s.window?.let { id to it.peakScore } }.toMap()
             // F-2.6 跨点 Top10：仅含「有窗口」的点（兜底/未加载无窗口可聚合）
@@ -82,14 +103,30 @@ class FavoritesViewModel(
                     summaries = perSpot,
                     scoreBySpotId = scoreBySpotId,
                     top10 = top10,
+                    // OPT-V11-06：列表摘要按「今天/明天/周X」渲染 → 每次加载刷新「现在」
+                    nowEpochSec = System.currentTimeMillis() / 1000L,
                 )
             }
         }
     }
 
-    /** F-2.4 排序切换（纯函数 [FavoritesSortLogic.sort]，仅改展示序不改数据）。 */
+    /**
+     * F-2.4 排序切换（纯函数 [FavoritesSortLogic.sort]，仅改展示序不改数据）。
+     * OPT-V11-08：规格口径——排序切换属于 Top10 缓存失效条件之一（本次实现为清空，重进列表重算）。
+     */
     fun setSortOrder(order: SortOrder) {
+        topCache.clear()
         _state.update { it.copy(sortOrder = order) }
+    }
+
+    /** OPT-V11-10（P1）：搜索/筛选条件变更（纯展示，不触网络/不触 DB）。 */
+    fun setFilter(filter: FavoritesFilterLogic.Filter) {
+        _state.update { it.copy(filter = filter) }
+    }
+
+    /** OPT-V11-08：单点缓存失效入口（该点数据刷新/修改后调用）。 */
+    fun invalidateSpot(spotId: Long) {
+        topCache.invalidateSpot(spotId)
     }
 
     /**
@@ -132,6 +169,8 @@ class FavoritesViewModel(
                 )
             }
             runCatching { repository.upsertFavorite(favorite) }
+            // OPT-V11-08：编辑已存在点 → 单点缓存失效（新建点 id 尚无缓存项）
+            if (existing != null) topCache.invalidateSpot(existing.id)
             _state.update { it.copy(lastSaveError = null) }
             load()
         }
@@ -141,6 +180,8 @@ class FavoritesViewModel(
     fun deleteFavorite(id: Long) {
         viewModelScope.launch(ioDispatcher) {
             runCatching { repository.deleteFavorite(id) }
+            // OPT-V11-08：删除 → 单点缓存失效（防已删点残留窗口）
+            topCache.invalidateSpot(id)
             load()
         }
     }

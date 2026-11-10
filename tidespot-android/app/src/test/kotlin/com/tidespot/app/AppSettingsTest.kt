@@ -33,6 +33,22 @@ class AppSettingsTest {
         assertEquals(true, s.prefetchEnabled)
         assertEquals(true, s.reverseGeoEnabled)
         assertNull(s.apiKey)
+        // UX-19：默认彩色 Voyager
+        assertEquals(com.tidespot.feature.settings.MapStyle.VOYAGER, s.mapStyle)
+    }
+
+    // ── UX-19：地图样式持久化 ──
+
+    @Test
+    fun 地图样式序列化往返_非法值回落默认() {
+        val store = FakeStore()
+        AppSettings.writeMapStyle(store, com.tidespot.feature.settings.MapStyle.DARK_MATTER)
+        assertEquals(com.tidespot.feature.settings.MapStyle.DARK_MATTER, AppSettings.read(store).mapStyle)
+        AppSettings.writeMapStyle(store, com.tidespot.feature.settings.MapStyle.POSITRON)
+        assertEquals(com.tidespot.feature.settings.MapStyle.POSITRON, AppSettings.read(store).mapStyle)
+        // 脏值 → Voyager（保守默认，不 crash）
+        store.writeString(SettingsKeys.MAP_STYLE, "NOT_A_STYLE")
+        assertEquals(com.tidespot.feature.settings.MapStyle.VOYAGER, AppSettings.read(store).mapStyle)
     }
 
     @Test

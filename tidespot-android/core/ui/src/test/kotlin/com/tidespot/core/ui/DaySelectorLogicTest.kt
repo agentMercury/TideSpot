@@ -39,15 +39,34 @@ class DaySelectorLogicTest {
         assertEquals(0, chips[0].offsetDays)
         assertTrue(chips[0].chipLabel.startsWith("今天 "))
         assertEquals("11-06", chips[0].dateLabel)
-        assertEquals("+1", chips[1].chipLabel)
+        // OPT-V11-24：去 +N → 日期 + 星期（11-07 为周六）
+        assertEquals("11/7 周六", chips[1].chipLabel)
         assertEquals(LocalDate.of(2026, 11, 7), chips[1].localDate)
+    }
+
+    @Test
+    fun chips_todayLabelCarriesWeekday_andMonthDayForOthers() {
+        // 2026-11-06 为周五 → 首位「今天 周五」；次日「11/7 周六」
+        val chips = DaySelectorLogic.chips(7, zone, lateEvening)
+        assertEquals("今天 周五", chips[0].chipLabel)
+        assertEquals("11/9 周一", chips[3].chipLabel)
+    }
+
+    @Test
+    fun chips_crossMonth_usesCompactDate() {
+        // 2026-11-30 为周一 → 次月首日显示「12/1 周二」（跨月分支）
+        val nowEpoch = LocalDateTime.of(2026, 11, 30, 12, 0)
+            .toInstant(ZoneOffset.ofHours(9)).epochSecond
+        val chips = DaySelectorLogic.chips(7, zone, nowEpoch)
+        assertEquals("今天 周一", chips[0].chipLabel)
+        assertEquals("12/1 周二", chips[1].chipLabel)
     }
 
     @Test
     fun chips_tenDays_lastIsPlusNine() {
         val chips = DaySelectorLogic.chips(10, zone, lateEvening)
         assertEquals(10, chips.size)
-        assertEquals("+9", chips[9].chipLabel)
+        assertEquals("11/15 周日", chips[9].chipLabel)
         assertEquals(LocalDate.of(2026, 11, 15), chips[9].localDate)
     }
 

@@ -1,17 +1,19 @@
 ﻿package com.tidespot.app
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -40,6 +43,7 @@ import com.tidespot.feature.favorites.favorites.FavoritesSaveRules
 import com.tidespot.feature.favorites.favorites.FavoritesScreen
 import com.tidespot.feature.favorites.favorites.FavoritesViewModel
 import com.tidespot.feature.map.MapScreen
+import com.tidespot.feature.map.model.GeoPoint
 import com.tidespot.feature.map.model.SpotConfirmed
 import com.tidespot.feature.settings.CopernicusCredentialSection
 import com.tidespot.feature.settings.SettingsLogic
@@ -68,14 +72,8 @@ class MainActivity : ComponentActivity() {
 /** CHG-25（P0-1）：Copernicus 首次引导卡「跳过」标记键（SharedPreferences；一次后不再显示）。 */
 private const val GUIDE_SKIP_COPERNICUS = "guide.copernicus.skipped"
 
-private val TAB_ORDER = listOf(AppPage.MAP, AppPage.FAVORITES, AppPage.DETAIL, AppPage.SETTINGS)
-
-private val TAB_LABELS = mapOf(
-    AppPage.MAP to "地图",
-    AppPage.FAVORITES to "收藏",
-    AppPage.DETAIL to "详情",
-    AppPage.SETTINGS to "设置",
-)
+/** UX-21（OPT-V11-21）：地图页「2 秒内二次返回退出」窗口。 */
+private const val EXIT_BACK_WINDOW_MILLIS = 2_000L
 
 @Composable
 private fun AppRoot(graph: AppGraph) {
@@ -92,6 +90,17 @@ private fun AppRoot(graph: AppGraph) {
     var pendingConfirm by remember { mutableStateOf<SpotConfirmed?>(null) }
 
     val favoritesVm = remember { FavoritesViewModel(graph.repository) }
+    // OPT-V11-05（P1）：进入收藏列表 → 后台预刷新最近查看 5 条（TTL/2 + 令牌桶；失败静默、无 UI 状态）
+    LaunchedEffect(navState.page, settingsState.prefetchEnabled) {
+        if (navState.page == AppPage.FAVORITES && settingsState.prefetchEnabled) {
+            val spots = runCatching { graph.repository.favorites() }.getOrDefault(emptyList())
+            if (spots.isNotEmpty()) {
+                graph.prefetcher.prefetch(spots)
+                // 预取落库 → 静默刷新摘要（不显示「加载中」）
+                favoritesVm.load(showLoading = false)
+            }
+        }
+    }
     // CHG-12④b：ZoneId 由 DetailViewModel 构造器默认值按 spot.tzOffsetSec 单源解析；
     // 设置 detailDays 变化或换点 → 重建（缓存先行语义不变）
     val detailSpot = navState.detailSpot
@@ -99,25 +108,40 @@ private fun AppRoot(graph: AppGraph) {
         detailSpot?.let { DetailViewModel(graph.repository, it, daysRange = settingsState.detailDays) }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            NavigationBar(
-                modifier = Modifier.semantics { contentDescription = "底部导航：地图、收藏、详情、设置" },
-            ) {
-                TAB_ORDER.forEach { page ->
-                    NavigationBarItem(
-                        icon = { Text(TAB_LABELS.getValue(page).take(1)) },
-                        selected = navState.page == page,
-                        onClick = { navState = AppNav.reduce(navState, AppNavEvent.TabSelected(page)) },
-                        // 详情不是常驻 tab：无详情上下文时禁用（不变量 1）
-                        enabled = page != AppPage.DETAIL || navState.detailSpot != null,
-                        label = { Text(TAB_LABELS.getValue(page)) },
-                    )
-                }
-            }
-        },
-    ) { innerPadding ->
+    // ── v1.1 UX 批次（18/20/21）：浮动按钮 + 返回手势 + 返回地图定位 ──
+    val context = LocalContext.current
+    /** UX-18：返回地图的相机目标（上一查看点 → 否则 lastViewedAt 最新；null = 世界视图）。 */
+    var pendingMapTarget by remember { mutableStateOf<GeoPoint?>(null) }
+    /** UX-20：地图浮动「Top10」→ 进收藏并自动展开 Top10 Sheet。 */
+    var openFavoritesTop10 by remember { mutableStateOf(false) }
+    var lastViewedSpot by remember { mutableStateOf<FavoriteSpot?>(null) }
+    var lastBackAt by remember { mutableStateOf(0L) }
+
+    fun latestViewedSpot(): FavoriteSpot? =
+        favoritesVm.state.value.spots.filter { it.lastViewedAtEpochSec > 0 }
+            .maxByOrNull { it.lastViewedAtEpochSec }
+
+    // UX-21（OPT-V11-21）：系统返回——详情→来源页；收藏/设置→地图；地图 2s 内二次返回退出
+    BackHandler(enabled = navState.page != AppPage.MAP) {
+        navState = if (navState.page == AppPage.DETAIL) {
+            AppNav.reduce(navState, AppNavEvent.BackFromDetail)
+        } else {
+            val target = lastViewedSpot ?: latestViewedSpot()
+            pendingMapTarget = target?.let { GeoPoint(it.lat, it.lon) }
+            AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.MAP))
+        }
+    }
+    BackHandler(enabled = navState.page == AppPage.MAP) {
+        val now = System.currentTimeMillis()
+        if (now - lastBackAt <= EXIT_BACK_WINDOW_MILLIS) {
+            (context as? android.app.Activity)?.finish()
+        } else {
+            lastBackAt = now
+            Toast.makeText(context, "再按一次退出", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -132,16 +156,49 @@ private fun AppRoot(graph: AppGraph) {
                     // N16：逆地理总开关（关 → MapScreen 内短路走 RG-D 兜底文案）
                     reverseGeoEnabled = settingsState.reverseGeoEnabled,
                     onSpotConfirmed = { confirmed -> pendingConfirm = confirmed },
+                    // UX-19：底图样式（默认 Voyager；设置三选持久化）
+                    styleUrl = settingsState.mapStyle.url,
+                    // UX-18：返回地图 → 上一查看点 / lastViewed 最新（冷启动 null → 定位/世界视图）
+                    initialCameraTarget = pendingMapTarget,
+                    // UX-20：右下浮动三按钮（收藏 / Top10 / 设置）
+                    floatingActions = {
+                        FloatingActionButton(
+                            onClick = {
+                                openFavoritesTop10 = false
+                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
+                            },
+                            modifier = Modifier.semantics { contentDescription = "收藏" },
+                        ) { Text("收藏") }
+                        FloatingActionButton(
+                            onClick = {
+                                openFavoritesTop10 = true
+                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
+                            },
+                            modifier = Modifier.semantics { contentDescription = "全部收藏 Top10" },
+                        ) { Text("Top10") }
+                        FloatingActionButton(
+                            onClick = {
+                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.SETTINGS))
+                            },
+                            modifier = Modifier.semantics { contentDescription = "设置" },
+                        ) { Text("设置") }
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
 
                 AppPage.FAVORITES -> FavoritesScreen(
                     viewModel = favoritesVm,
-                    // 导航闭环：收藏列表 → 详情（markViewed 先行，F-2.4 最近查看排序）
+                    // 导航闭环：收藏列表 → 详情（markViewed 先行，F-2.4 最近查看排序；来源页 = 收藏）
                     onOpenSpot = { spot ->
+                        lastViewedSpot = spot
                         favoritesVm.markViewed(spot.id)
-                        navState = AppNav.reduce(navState, AppNavEvent.OpenDetail(spot))
+                        navState = AppNav.reduce(
+                            navState,
+                            AppNavEvent.OpenDetail(spot, source = AppPage.FAVORITES),
+                        )
                     },
+                    openTop10OnStart = openFavoritesTop10,
+                    onTop10Opened = { openFavoritesTop10 = false },
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -153,6 +210,8 @@ private fun AppRoot(graph: AppGraph) {
                             spot = spot,
                             viewModel = vm,
                             onBack = { navState = AppNav.reduce(navState, AppNavEvent.BackFromDetail) },
+                            // UX-21：详情返回按来源页呈现（从地图进 → 回地图）
+                            backLabel = if (navState.sourcePage == AppPage.MAP) "← 返回地图" else "← 返回收藏",
                             showCredentialGuide = spot.waterBody == WaterBodyType.INLAND_WATER &&
                                 !copernicusConfigured && !credentialGuideSkipped,
                             onOpenCredentialSettings = {
@@ -194,7 +253,9 @@ private fun AppRoot(graph: AppGraph) {
             favoritesVm = favoritesVm,
             onSaved = { saved ->
                 pendingConfirm = null
-                navState = AppNav.reduce(navState, AppNavEvent.OpenDetail(saved))
+                lastViewedSpot = saved
+                // UX-21：来源页 = 地图（返回手势/按钮回地图）
+                navState = AppNav.reduce(navState, AppNavEvent.OpenDetail(saved, source = AppPage.MAP))
             },
             onDismiss = { pendingConfirm = null },
         )
@@ -211,6 +272,7 @@ private fun DetailPage(
     spot: FavoriteSpot,
     viewModel: DetailViewModel,
     onBack: () -> Unit,
+    backLabel: String,
     showCredentialGuide: Boolean,
     onOpenCredentialSettings: () -> Unit,
     onSkipCredentialGuide: () -> Unit,
@@ -219,9 +281,9 @@ private fun DetailPage(
         Row(modifier = Modifier.fillMaxWidth()) {
             TextButton(
                 onClick = onBack,
-                modifier = Modifier.semantics { contentDescription = "返回收藏列表" },
+                modifier = Modifier.semantics { contentDescription = "返回上一页" },
             ) {
-                Text("← 返回收藏")
+                Text(backLabel)
             }
         }
         DetailScreen(
@@ -263,6 +325,8 @@ private fun SettingsPage(
         onPrefetchChange = { enabled -> onChange(SettingsLogic.withPrefetch(state, enabled)) },
         onReverseGeoChange = { enabled -> onChange(SettingsLogic.withReverseGeo(state, enabled)) },
         onApiKeyChange = { raw -> onChange(SettingsLogic.withApiKey(state, raw)) },
+        // UX-19：地图样式三选（持久化 + 地图页即时生效）
+        onMapStyleChange = { style -> onChange(SettingsLogic.withMapStyle(state, style)) },
         modifier = Modifier.fillMaxSize(),
         credentialSection = credentialSection,
     )
@@ -276,6 +340,7 @@ private fun persistSettings(graph: AppGraph, next: SettingsState) {
     AppSettings.writePrefetch(store, next.prefetchEnabled)
     AppSettings.writeReverseGeo(store, next.reverseGeoEnabled)
     AppSettings.writeApiKey(store, next.apiKey)
+    AppSettings.writeMapStyle(store, next.mapStyle)
 }
 
 /**

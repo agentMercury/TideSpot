@@ -163,9 +163,30 @@ class SettingsLogicTest {
     }
 
     @Test
-    fun `settingsKeys_五个键名非空`() {
+    fun `settingsKeys_六个键名非空`() {
         listOf(SettingsKeys.UNIT_SYSTEM, SettingsKeys.DETAIL_DAYS, SettingsKeys.PREFETCH_ENABLED,
-            SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.API_KEY).forEach { assertTrue(it.isNotBlank()) }
+            SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.API_KEY, SettingsKeys.MAP_STYLE)
+            .forEach { assertTrue(it.isNotBlank()) }
+    }
+
+    // ── UX-19：地图样式三选 ──
+
+    @Test
+    fun `withMapStyle_三选且不改原状态`() {
+        val base = SettingsState()
+        assertEquals(MapStyle.VOYAGER, base.mapStyle, "默认必须是彩色 Voyager（D8）")
+        val dark = SettingsLogic.withMapStyle(base, MapStyle.DARK_MATTER)
+        assertEquals(MapStyle.DARK_MATTER, dark.mapStyle)
+        assertEquals(MapStyle.VOYAGER, base.mapStyle)
+        assertEquals(MapStyle.VOYAGER, SettingsLogic.withMapStyle(base, MapStyle.VOYAGER).mapStyle)
+        assertEquals(MapStyle.POSITRON, SettingsLogic.withMapStyle(base, MapStyle.POSITRON).mapStyle)
+    }
+
+    @Test
+    fun `mapStyleUrl_三样式URL各不相同且均为CARTO`() {
+        val urls = MapStyle.entries.map { it.url }
+        assertEquals(3, urls.toSet().size)
+        assertTrue(urls.all { it.startsWith("https://basemaps.cartocdn.com/gl/") })
     }
 }
 

@@ -24,6 +24,8 @@ data class FavoritesSpotSummary(
     val fallbackMessage: String? = null,
     /** 兜底最高分时刻（epoch 秒；UI 渲染「（时刻…）」）。 */
     val fallbackBestEpochSec: Long? = null,
+    /** OPT-V11-11（P1）：逐源最近成功拉取时刻（epoch 毫秒；0 = 无记录）——列表级陈旧标记输入。 */
+    val fetchedAtMillis: Map<com.tidespot.core.data.repo.DataSource, Long> = emptyMap(),
 )
 
 /** 收藏列表 UI 状态（ViewModel 单一 StateFlow；派生只在数据到达时算一次，N-2 同源约束）。 */
@@ -39,6 +41,10 @@ data class FavoritesUiState(
     val lastSaveError: String? = null,
     /** F-2.6 跨收藏点 Top10（rankAcrossSpots 全局 rank 降序；OPT-M5-03 携带各点时区）。 */
     val top10: List<CrossSpotTop10Entry> = emptyList(),
+    /** OPT-V11-06：加载时刻（相对时间摘要的「现在」，epoch 秒；0 = 未加载 → 回落绝对格式）。 */
+    val nowEpochSec: Long = 0L,
+    /** OPT-V11-10（P1）：搜索/筛选条件（与排序正交：先筛后排）。 */
+    val filter: FavoritesFilterLogic.Filter = FavoritesFilterLogic.Filter(),
 )
 
 /**

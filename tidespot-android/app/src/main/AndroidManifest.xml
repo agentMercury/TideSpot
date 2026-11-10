@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- OPT-V11-05（P1 真预取）：联网判定（ConnectivityManager.activeNetwork）；飞行模式/无网 → 零请求 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- F-1.2 定位选点（MapScreen 权限状态机运行时请求；无 GMS 依赖声明，运行时双通道自探测） -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

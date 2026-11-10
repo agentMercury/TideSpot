@@ -253,6 +253,25 @@ object TideCalibrator {
         sqrt(diffs.map { it * it }.sum() / diffs.size)
 
     /**
+     * OPT-V11-07：按观测类型取模型候选标记时刻。
+     * 「开始涨潮」与低潮同刻（落→涨翻转）、「开始退潮」与高潮同刻（涨→落翻转）；
+     * 分类型表缺失时退回极值全集（历史数据语义），绝不丢观测。
+     */
+    private fun candidatesFor(
+        type: TideObservationType?,
+        markers: Map<TideObservationType, List<Long>>,
+        allExtremes: List<Long>,
+    ): List<Long> = when (type) {
+        null -> allExtremes
+        TideObservationType.HIGH -> markers[TideObservationType.HIGH] ?: allExtremes
+        TideObservationType.FALLING_START ->
+            markers[TideObservationType.FALLING_START] ?: markers[TideObservationType.HIGH] ?: allExtremes
+        TideObservationType.LOW -> markers[TideObservationType.LOW] ?: allExtremes
+        TideObservationType.RISING_START ->
+            markers[TideObservationType.RISING_START] ?: markers[TideObservationType.LOW] ?: allExtremes
+    }
+
+    /**
      * §6.2b 规则 5（CHG-04）：无合法参考序列地区（含中国沿海）的现场校潮。
      * 用户记录高低潮时刻，≥2 条（±6h 内有匹配模型极值，OPT-06/M5）才启用拟合（gain 固定 1.0，仅拟合 lag/offset）；
      * 仅 1 条时只落 manual_observation 不启用。
@@ -260,6 +279,10 @@ object TideCalibrator {
     fun fitManual(
         observationTimesEpochSec: List<Long>,
         modelExtremeTimesEpochSec: List<Long>,
+        // OPT-V11-07（P1，尾部只增）：观测类型（与时刻逐条对齐；空 = 历史数据「任意极值最近匹配」）
+        observationTypes: List<TideObservationType?> = emptyList(),
+        // OPT-V11-07：模型分类型标记时刻（高潮/低潮/开始涨/开始退；缺键按极值全集兜底）
+        modelMarkersByType: Map<TideObservationType, List<Long>> = emptyMap(),
     ): ManualTideFit {
         if (observationTimesEpochSec.size < 2) {
             return ManualTideFit(
@@ -272,8 +295,10 @@ object TideCalibrator {
         // lag = 有效观测与最近模型极值时刻差值的中位数（四舍五入到整小时）。
         // 现场观测只记录时刻、无水位值 → offset 无数据可拟合，固定 0；gain 固定 1.0（SRS §6.2b 规则 5）。
         val matchWindowSec = 6 * 3600L
-        val lags = observationTimesEpochSec.mapNotNull { obs ->
-            modelExtremeTimesEpochSec
+        val lags = observationTimesEpochSec.mapIndexedNotNull { i, obs ->
+            val type = observationTypes.getOrNull(i)
+            val candidates = candidatesFor(type, modelMarkersByType, modelExtremeTimesEpochSec)
+            candidates
                 .filter { abs(it - obs) <= matchWindowSec }
                 .minByOrNull { abs(it - obs) }
                 ?.let { (obs - it) / 3600.0 }

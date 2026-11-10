@@ -16,14 +16,15 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.format.RelativeTimeFormatter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 
 /**
- * DaySelector 纯逻辑（F-3.1 / §8.2-1）：「今天 MM-dd」+「+1」…「+N」chip 序列。
- * 可选天数范围仅 7/10（设置项 M6 接入，非法值收敛到 7）；
+ * DaySelector 纯逻辑（F-3.1 / §8.2-1 / OPT-V11-24）：首位「今天 周二」，其余「11/12 周三」…
+ * （日期 + 星期，当地时区语义，横向滚动）。可选天数范围仅 7/10（设置项 M6 接入，非法值收敛到 7）；
  * 「今天」按**选点当地时区**判定（F-3.8 / N-9：比较用 epoch、边界用 zone 墙钟）。
  */
 object DaySelectorLogic {
@@ -46,14 +47,18 @@ object DaySelectorLogic {
     data class DayChip(
         val offsetDays: Int,
         val localDate: LocalDate,
-        /** chip 主文案：今天 / +1 / +2 … */
+        /** chip 主文案：`今天 周二` / `11/12 周三`（OPT-V11-24：日期 + 星期）。 */
         val chipLabel: String,
-        /** chip 副文案：MM-dd（今天为「今天 11-06」合并态）。 */
+        /** chip 副文案：MM-dd（TalkBack 与跨月核对用）。 */
         val dateLabel: String,
     ) {
-        /** TalkBack 读法（N-7）。 */
+        /** TalkBack 读法（N-7；含星期，与主文案同源）。 */
         val contentDescription: String
-            get() = if (offsetDays == 0) "今天，$dateLabel" else "未来第 $offsetDays 天，$dateLabel"
+            get() = if (offsetDays == 0) {
+                "今天 ${RelativeTimeFormatter.weekdayLabel(localDate)}，$dateLabel"
+            } else {
+                "未来第 $offsetDays 天 ${RelativeTimeFormatter.weekdayLabel(localDate)}，$dateLabel"
+            }
     }
 
     /**
@@ -68,7 +73,12 @@ object DaySelectorLogic {
             DayChip(
                 offsetDays = offset,
                 localDate = d,
-                chipLabel = if (offset == 0) "今天 ${Format.mmdd(d)}" else "+$offset",
+                // OPT-V11-24：去 +N 相对格式 → 日期 + 星期（今天为「今天 周二」合并态）
+                chipLabel = if (offset == 0) {
+                    "今天 ${RelativeTimeFormatter.weekdayLabel(d)}"
+                } else {
+                    "${Format.md(d)} ${RelativeTimeFormatter.weekdayLabel(d)}"
+                },
                 dateLabel = Format.mmdd(d),
             )
         }

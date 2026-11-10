@@ -1,6 +1,7 @@
 ﻿package com.tidespot.feature.favorites.favorites
 
 import com.tidespot.core.domain.model.BestWindow
+import com.tidespot.core.ui.format.RelativeTimeFormatter
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -26,6 +27,16 @@ object FavoritesSummaryFormatter {
     fun windowLine(window: BestWindow, zone: ZoneId): String =
         "${time(window.peakEpochSec, zone)} · ${window.peakScore} 分 · ${window.tier}"
 
+    /**
+     * OPT-V11-06（P1）：相对时间摘要行——时刻改「今天/明天/周X/M月d日 HH:mm」（当地时区语义）。
+     * [nowEpochSec] 由调用方注入（纯函数可测，禁 System 时钟渗入）。null = 回落绝对格式（既有行为）。
+     */
+    fun windowLine(window: BestWindow, zone: ZoneId, nowEpochSec: Long?): String {
+        val timeText = nowEpochSec?.let { RelativeTimeFormatter.format(window.peakEpochSec, zone, it) }
+            ?: time(window.peakEpochSec, zone)
+        return "$timeText · ${window.peakScore} 分 · ${window.tier}"
+    }
+
     /** 兜底行：fallbackMessage + 「（M月d日 HH:mm）」（兜底最高分时刻；无时刻则只显示文案）。 */
     fun fallbackLine(message: String, fallbackBestEpochSec: Long?, zone: ZoneId): String =
         message + (fallbackBestEpochSec?.let { "（${time(it, zone)}）" } ?: "")
@@ -36,10 +47,10 @@ object FavoritesSummaryFormatter {
      * - 无窗口但有兜底（含「有效数据不足 24 小时」禁用文案，CHG-15 偏差①后全过期也走此分支）→ [fallbackLine]；
      * - 其余（未算过/无库内行/无兜底）→ 「未加载」。
      */
-    fun line(summary: FavoritesSpotSummary, zone: ZoneId = ZoneId.systemDefault()): String {
+    fun line(summary: FavoritesSpotSummary, zone: ZoneId = ZoneId.systemDefault(), nowEpochSec: Long? = null): String {
         val window = summary.window
         return when {
-            window != null -> windowLine(window, zone)
+            window != null -> windowLine(window, zone, nowEpochSec)
             summary.fallbackMessage != null ->
                 fallbackLine(summary.fallbackMessage, summary.fallbackBestEpochSec, zone)
             else -> "未加载"

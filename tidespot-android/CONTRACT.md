@@ -316,3 +316,20 @@ interface CopernicusCredentialActions {
 - Gradle 未入 PATH：使用 `D:\tools\gradle-8.9\bin\gradle.bat`
 - 验证命令：`:core:domain` → `gradle.bat :core:domain:test`；`:core:data` → `gradle.bat :core:data:test`
 - 同一 root 并行构建遇锁（Lock timeout）请等待 60 s 重试；最终验证由交付负责人统一执行。
+
+
+## v1.1 子契约 P1（2026-11-10，CHG-28）
+
+> 全部为「尾部可选参数 / 新增方法」，既有调用零改动（**契约只增不改**）；`Models.kt` 本期未改动。
+> 同步登记见 `REQUIREMENTS_REGISTER.md` CHG-28 与 `PROGRESS_TRACKER.md` §7。
+
+1. `BestWindowFinder.find(...)` 尾增 `manualTideLagHours: Int? = null`（null = 无校正；仅「注意事项」追加一句，不改候选/rank/去重/时间域）。
+2. `BestWindowFinder.manualCalibrationWarning(lagHours: Int): String` 新增（校潮文案唯一入口）。
+3. `TideCalibrator.fitManual(...)` 尾增 `observationTypes: List<TideObservationType?> = emptyList()`、`modelMarkersByType: Map<TideObservationType, List<Long>> = emptyMap()`；新增枚举 `TideObservationType`（HIGH / LOW / RISING_START / FALLING_START，只增）。
+4. `TideSpotRepository`：`addTideObservation(..., type: TideObservationType? = null)` 尾增；`tideObservations` 读回 `TideObservation.kind/type`（历史 `TIDE_OBSERVATION` 兼容）；新增 `lastFetchedMillis(spotId): Map<DataSource, Long>`。
+5. `TopWindowDerivations`：新增 `tideMarkers(marine)`、`manualFitTyped(observations, marine)`；`top10(...)` 尾增 `manualTideLagHours`。
+6. `TideSpotUrls`：新增 `CARTO_VOYAGER_STYLE_URL`（默认彩色）/ `CARTO_DARK_MATTER_STYLE_URL`（URL 仍单点收敛）。
+7. UI 组装面（均有默认值，旧调用零改动）：`MapScreen` 尾增 `styleUrl` / `initialCameraTarget` / `floatingActions`；`FavoritesScreen` 尾增 `openTop10OnStart` / `onTop10Opened`；`FavoritesViewModel.load(showLoading)` 尾增；`SettingsScreen` 尾增 `onMapStyleChange`；`AppNavState` 尾增 `sourcePage`、`AppNavEvent.OpenDetail` 尾增 `source`（默认 FAVORITES）、`AppNavEvent.BackFromDetail` 语义改为「回来源页」。
+8. `TideObservation`（data 层门面类型，非 `Models.kt` 冻结点）尾增 `kind: String = TIDE_OBSERVATION` 与派生 `type`。
+9. `MapStyle` 枚举 + `SettingsKeys.MAP_STYLE` 新增（设置持久化键，新增不覆盖）。
+10. Manifest 新增 `ACCESS_NETWORK_STATE`（预取联网判定；飞行模式零请求）。

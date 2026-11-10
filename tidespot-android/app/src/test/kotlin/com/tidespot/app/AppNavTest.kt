@@ -81,4 +81,53 @@ class AppNavTest {
         assertEquals(AppPage.FAVORITES, s.page)
         assertNull(s.detailSpot)
     }
+
+    // ── UX-21（P1）：返回手势来源页 ──
+
+    @Test
+    fun 从地图进详情_返回回地图() {
+        val detail = AppNav.reduce(
+            AppNavState(page = AppPage.MAP),
+            AppNavEvent.OpenDetail(spot(), source = AppPage.MAP),
+        )
+        assertEquals(AppPage.MAP, detail.sourcePage)
+        val back = AppNav.reduce(detail, AppNavEvent.BackFromDetail)
+        assertEquals(AppPage.MAP, back.page)
+        assertNull(back.detailSpot)
+        assertNull(back.sourcePage)
+    }
+
+    @Test
+    fun 从收藏进详情_返回回收藏() {
+        val detail = AppNav.reduce(
+            AppNavState(page = AppPage.FAVORITES),
+            AppNavEvent.OpenDetail(spot(), source = AppPage.FAVORITES),
+        )
+        assertEquals(AppPage.FAVORITES, detail.sourcePage)
+        assertEquals(AppPage.FAVORITES, AppNav.reduce(detail, AppNavEvent.BackFromDetail).page)
+    }
+
+    @Test
+    fun 切往其他页清除来源页_保持不变量() {
+        val detail = AppNav.reduce(AppNavState(), AppNavEvent.OpenDetail(spot(), source = AppPage.MAP))
+        val settings = AppNav.reduce(detail, AppNavEvent.TabSelected(AppPage.SETTINGS))
+        assertNull(settings.sourcePage)
+        assertNull(settings.detailSpot)
+        assertEquals(AppPage.SETTINGS, settings.page)
+    }
+
+    @Test
+    fun 默认来源页为收藏_返回回收藏() {
+        // OpenDetail 的 source 默认 FAVORITES（旧调用零改动语义）
+        val detail = AppNav.reduce(AppNavState(), AppNavEvent.OpenDetail(spot()))
+        assertEquals(AppPage.FAVORITES, detail.sourcePage)
+        assertEquals(AppPage.FAVORITES, AppNav.reduce(detail, AppNavEvent.BackFromDetail).page)
+    }
+
+    @Test
+    fun 无来源页状态的详情返回仍回落收藏页_兼容旧状态() {
+        // 旧状态对象可能无 sourcePage → 返回回落收藏
+        val legacy = AppNavState(page = AppPage.DETAIL, detailSpot = spot(), sourcePage = null)
+        assertEquals(AppPage.FAVORITES, AppNav.reduce(legacy, AppNavEvent.BackFromDetail).page)
+    }
 }

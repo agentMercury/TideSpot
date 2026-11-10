@@ -112,7 +112,7 @@ fun DetailScreen(
                 selectedTabIndex = state.selectedTab.ordinal,
                 modifier = Modifier.semantics { contentDescription = "五维度标签页" },
             ) {
-                listOf(DetailTab.WAVE, DetailTab.WEATHER, DetailTab.SCORE, DetailTab.WATER_QUALITY, DetailTab.TIDE)
+                listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
                     .forEachIndexed { i, tab ->
                         Tab(
                             selected = state.selectedTab == tab,
@@ -212,6 +212,25 @@ fun DetailScreen(
             DailySummaryLine(state.selectedTab, values, daySlices, zone, state)
             // D12（CHG-16⑭）：潮 Tab 高低潮标记 + dt（dh/dt）副轴 + 校正对照
             if (state.selectedTab == DetailTab.TIDE) {
+                // UX-23（OPT-V11-23）：海水点潮 Tab 顶部潮汛 chip（大潮/小潮 × 活汛/死汛；内陆不显示）
+                if (spot.waterBody == com.tidespot.core.domain.model.WaterBodyType.OCEAN ||
+                    spot.waterBody == com.tidespot.core.domain.model.WaterBodyType.NEARSHORE
+                ) {
+                    val chipDay = chips.getOrNull(state.selectedDay)?.localDate
+                    if (chipDay != null) {
+                        val phaseText = TidePhaseChipLogic.chipText(chipDay, zone)
+                        Row(
+                            Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            AssistChip(
+                                onClick = { },
+                                label = { Text(phaseText) },
+                                modifier = Modifier.semantics { contentDescription = "潮汛：$phaseText" },
+                            )
+                        }
+                    }
+                }
                 val dayExtremes = TideChartDerivations.dayExtremes(
                     TideChartDerivations.classifiedExtremes(result.marine), state.selectedDay, zone, today)
                 TideChartDerivations.extremesLine(dayExtremes, zone)?.let {
@@ -368,6 +387,8 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, vi
     var preset by remember { mutableStateOf(Top10TimeFilter.Preset.ALL) }
     var customRange by remember { mutableStateOf<Top10TimeFilter.TimeRange?>(null) }
     var showCustom by remember { mutableStateOf(false) }
+    // OPT-V11-06：相对时间标签的「现在」（Sheet 打开时定格，避免逐帧抖动）
+    val nowEpochSec = remember { System.currentTimeMillis() / 1000L }
     val shown: BestWindowFinder.Output? = when {
         output == null -> null
         preset == Top10TimeFilter.Preset.ALL -> output
@@ -449,9 +470,7 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, vi
                                 }
                             }
                             Text(
-                                "起始 ${Top10Formatter.time(w.startEpochSec, zone)} · " +
-                                    "峰值 ${Top10Formatter.hm(w.peakEpochSec, zone)} · " +
-                                    "时长 ${Top10Formatter.duration(w.durationHours)}",
+                                Top10Formatter.startLine(w, zone, nowEpochSec),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                             // OPT-V11-25（CHG-27）：核心段短于原窗时标注利好延续时刻（null 不显示）
@@ -532,7 +551,11 @@ private fun CustomTimeRangeDialog(
     )
 }
 
-/** 现场校潮 Sheet（§6.2b 规则 5）：记录观测 → fitManual（≥2 条有效才启用，UI 只透传）。 */
+/**
+ * 现场校潮 Sheet（§6.2b 规则 5 / OPT-V11-07）：
+ * 四类观测（高潮/低潮/开始涨/开始退）+ 时刻可补记 + 模型标记对照 → fitManual（≥2 条有效才启用，UI 只透传）。
+ * 操作按钮置顶（GAP-03 教训：Sheet 底部手势条区域触摸不可靠）。
+ */
 @Composable
 private fun CalibrationSheetContent(
     viewModel: DetailViewModel,
@@ -541,31 +564,83 @@ private fun CalibrationSheetContent(
 ) {
     val observations by viewModel.manualObservations.collectAsState()
     val marine = state.result?.marine ?: emptyList()
-    // 观测数量或潮位数据变化时重算拟合（纯函数；持久化经 saveTideFit 走 repository，M6 起）
-    val fit = remember(observations.size, observations.lastOrNull(), state.result) {
-        TopWindowDerivations.manualFit(observations, marine)
+    val markers = remember(marine) { TopWindowDerivations.tideMarkers(marine) }
+    // 观测（类型 + 时刻）变化或潮位数据变化时重算拟合（纯函数；持久化经 repository 落库）
+    val fit = remember(observations, state.result) {
+        TopWindowDerivations.manualFitTyped(observations.map { it.type to it.epochSec }, marine)
     }
+    val nowEpochSec = remember { System.currentTimeMillis() / 1000L }
+    var selectedType by remember { mutableStateOf(com.tidespot.core.domain.tide.TideObservationType.HIGH) }
+    var timeText by remember(zone) {
+        mutableStateOf(TideObservationEntryLogic.defaultText(nowEpochSec, zone))
+    }
+    var error by remember { mutableStateOf<TideObservationEntryLogic.ParseError?>(null) }
+    val parsed = TideObservationEntryLogic.parse(timeText, zone, nowEpochSec)
+
     Column(Modifier.padding(12.dp)) {
         Text("现场校潮", style = MaterialTheme.typography.titleMedium)
         Text(
-            "在现场记录高潮时刻（≥2 条、与模型极值偏差 ±6h 内才启用；只校正滞后 lag）",
+            "记录现场观测（≥2 条、与模型标记 ±6h 内才启用；只校正滞后 lag）。时刻可改，支持事后补记。",
             Modifier.padding(vertical = 4.dp),
             style = MaterialTheme.typography.bodySmall,
         )
-        Text(
-            if (observations.isEmpty()) "已记录 0 条" else
-                "已记录 ${observations.size} 条，最近 ${Top10Formatter.time(observations.last(), zone)}",
-            Modifier.padding(vertical = 4.dp),
-            style = MaterialTheme.typography.bodyMedium,
+        // ① 操作区置顶：类型 chips
+        Text("观测类型", style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 4.dp))
+        Row(Modifier.padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            com.tidespot.core.domain.tide.TideObservationType.entries.forEach { type ->
+                FilterChip(
+                    selected = selectedType == type,
+                    onClick = { selectedType = type },
+                    label = { Text(type.label) },
+                    modifier = Modifier.semantics { contentDescription = "观测类型：${type.label}" },
+                )
+            }
+        }
+        // ② 时刻（默认当前，可补记）
+        OutlinedTextField(
+            value = timeText,
+            onValueChange = { timeText = it; error = null },
+            label = { Text("观测时刻（yyyy-MM-dd HH:mm）") },
+            singleLine = true,
+            isError = error != null,
+            supportingText = { error?.let { Text(TideObservationEntryLogic.errorText(it)) } },
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "观测时刻输入框" },
         )
+        // ③ 模型对照（辅助对齐；无 ±6h 匹配 → 不显示，禁编造）
+        parsed.epochSec?.let { epoch ->
+            TideObservationEntryLogic.comparisonLine(markers, selectedType, epoch, zone)?.let {
+                Text(it, Modifier.padding(vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
+            }
+        }
         Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { viewModel.recordObservation() }) { Text("记录一条高潮观测") }
+            Button(
+                onClick = {
+                    val value = parsed.epochSec
+                    if (value == null) error = parsed.error else viewModel.recordObservation(selectedType, value)
+                },
+                modifier = Modifier.semantics { contentDescription = "记录观测" },
+            ) { Text("记录") }
             if (!observations.isEmpty()) {
-                Button(onClick = { viewModel.clearObservations() }) { Text("清空") }
+                Button(onClick = { viewModel.clearObservations() }) { Text("清空本页记录") }
             }
         }
         Text(
+            "已记录 ${observations.size} 条" + observations.lastOrNull()?.let {
+                "，最近 ${Top10Formatter.time(it.epochSec, zone)}"
+            }.orEmpty(),
+            Modifier.padding(vertical = 2.dp),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        // ④ 已记录列表（类型 + 时刻）
+        observations.takeLast(5).reversed().forEach { o ->
+            Text(
+                TideObservationEntryLogic.observationLine(o.type, o.epochSec, zone),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Text(
             "拟合结果：${Top10Formatter.calibrationLine(fit)}",
+            Modifier.padding(top = 4.dp),
             style = MaterialTheme.typography.bodyMedium,
         )
         // M6：拟合启用 → saveTideFit 持久化 + force 刷新（tideCorrection 透出 → 潮 Tab「校正前/后」对照）

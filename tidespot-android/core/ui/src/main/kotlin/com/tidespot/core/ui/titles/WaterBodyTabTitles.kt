@@ -76,16 +76,16 @@ object WaterBodyTabTitles {
     }
 
     /**
-     * DetailScreen Tab 顺序（§8.1：风浪|天气|钓鱼指数|水质|潮流）→ 标题数组（CHG-13/D01 锁）。
-     * **恒为 5 项**且与 [DetailTab 顺序] 一一对应；禁止调用方手工再组数组（D01 根因即 6 项错位 +
-     * `.also` 无效自赋值，潮流 Tab 被水质标题覆盖）。UI 组装层唯一取标题入口。
+     * DetailScreen Tab 顺序（UX-22 / CHG-21：钓鱼指数 → 潮流(水位) → 天气 → 水质 → 风浪）→ 标题数组
+     * （CHG-13/D01 锁）。**恒为 5 项**且与 [DetailTab 顺序] 一一对应；禁止调用方手工再组数组
+     * （D01 根因即 6 项错位 + `.also` 无效自赋值，潮流 Tab 被水质标题覆盖）。UI 组装层唯一取标题入口。
      */
     fun titlesInTabOrder(titles: WaterTabTitles): List<String> = listOf(
-        titles.waveTab,
-        titles.weatherTab,
         titles.scoreTab,
-        titles.waterQualityTab,
         titles.tideTab,
+        titles.weatherTab,
+        titles.waterQualityTab,
+        titles.waveTab,
     )
 }
 

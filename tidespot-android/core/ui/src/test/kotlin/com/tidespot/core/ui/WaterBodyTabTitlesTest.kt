@@ -50,18 +50,28 @@ class WaterBodyTabTitlesTest {
         assertTrue(t.notice!!.contains("待判定"))
     }
 
-    /** CHG-13/D01 锁：Tab 标题数组恒 5 项、顺序固定、互异、tideTab 必在位（防 6 项错位回归）。 */
+    /**
+     * CHG-13/D01 锁 + UX-22（CHG-21）顺序锁：Tab 标题数组恒 5 项、**顺序固定**
+     * （钓鱼指数 → 潮流 → 天气 → 水质 → 风浪）、互异、钓鱼指数首位、潮流次位。
+     */
     @Test
-    fun titlesInTabOrder_alwaysFiveDistinct_withTideLast() {
+    fun titlesInTabOrder_alwaysFiveDistinct_scoreFirstTideSecond() {
         for (type in WaterBodyType.entries) {
             val titles = WaterBodyTabTitles.titlesFor(type)
             val ordered = WaterBodyTabTitles.titlesInTabOrder(titles)
             assertEquals(5, ordered.size, "$type 标题数组必须 5 项")
-            assertEquals(listOf(titles.waveTab, titles.weatherTab, titles.scoreTab, titles.waterQualityTab, titles.tideTab), ordered)
-            assertEquals(titles.tideTab, ordered[4], "$type 第 5 个 Tab 必须是潮流标题")
+            assertEquals(
+                listOf(titles.scoreTab, titles.tideTab, titles.weatherTab, titles.waterQualityTab, titles.waveTab),
+                ordered,
+            )
+            assertEquals(titles.scoreTab, ordered[0], "$type 第 1 个 Tab 必须是钓鱼指数标题")
+            assertEquals(titles.tideTab, ordered[1], "$type 第 2 个 Tab 必须是潮流标题")
+            assertEquals(titles.waveTab, ordered[4], "$type 第 5 个 Tab 必须是风浪标题")
             assertEquals(5, ordered.toSet().size, "$type 五个 Tab 标题不得重复（D01：水质覆盖潮流）")
         }
-        // 内陆矩阵抽查：第 5 Tab 标题 = 「水位（无潮汐）」（F-1.6 降级文案可达）
-        assertEquals("水位（无潮汐）", WaterBodyTabTitles.titlesInTabOrder(WaterBodyTabTitles.titlesFor(WaterBodyType.INLAND_WATER))[4])
+        // 内陆矩阵抽查：第 2 Tab = 「水位（无潮汐）」、第 5 Tab = 「湖面风与水温」（F-1.6 降级文案可达）
+        val inland = WaterBodyTabTitles.titlesInTabOrder(WaterBodyTabTitles.titlesFor(WaterBodyType.INLAND_WATER))
+        assertEquals("水位（无潮汐）", inland[1])
+        assertEquals("湖面风与水温", inland[4])
     }
 }
