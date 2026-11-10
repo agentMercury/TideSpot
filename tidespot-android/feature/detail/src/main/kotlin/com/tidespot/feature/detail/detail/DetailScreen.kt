@@ -81,6 +81,8 @@ fun DetailScreen(
     var showCalibration by remember { mutableStateOf(false) }
     // OPT-V11-02（CHG-27）：水质实测录入 Sheet
     var showQualityEntry by remember { mutableStateOf(false) }
+    // 全展开（避免半展开态内容被裁、贴底按钮不可点）；无条件声明以满足 Compose slot 表规则
+    val qualityEntrySheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
     // D11：常驻免责入口（CHG-16⑬）
     var showDisclaimer by remember { mutableStateOf(false) }
     // CHG-13/D01：标题数组唯一来源（5 项、与 Tab 顺序一一对应）；禁止手组（原 6 项错位致潮流 Tab 显示「水质」）
@@ -263,17 +265,25 @@ fun DetailScreen(
                 }
             }
             if (state.selectedTab == DetailTab.WATER_QUALITY) {
-                // D10：禁硬编码 ESTIMATED——徽标档位按推导序列 domain confidence 透出
-                val qConf = daySlices.firstNotNullOfOrNull { qualityByEpoch[it.timeEpochSec]?.confidence }
+                // D10：禁硬编码 ESTIMATED——徽标档位按推导序列 domain confidence 透出。
+                // OPT-V11-02（CHG-27）：当日**任一小时**含实测融合（MEASURED）即显示「实测」，否则取首个非空档位。
+                val dayConfs = daySlices.mapNotNull { qualityByEpoch[it.timeEpochSec]?.confidence }
+                val qConf = if (dayConfs.any { it == com.tidespot.core.domain.model.Confidence.MEASURED }) {
+                    com.tidespot.core.domain.model.Confidence.MEASURED
+                } else {
+                    dayConfs.firstOrNull()
+                }
                 qConf?.let { conf ->
                     Row(Modifier.padding(horizontal = 12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         ConfidenceBadge(Kind.fromConfidence(conf))
-                        // CHG-26：置信口径说明——徽标冻结不改（设计包 DECISIONS），以旁注说明「卫星数据未接入」
-                        Text(
-                            androidx.compose.ui.res.stringResource(UiR.string.ts_water_quality_estimate_note),
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(start = 6.dp),
-                        )
+                        // CHG-26：估算态旁注口径说明（实测融合态不显示，避免自相矛盾）
+                        if (conf == com.tidespot.core.domain.model.Confidence.ESTIMATED) {
+                            Text(
+                                androidx.compose.ui.res.stringResource(UiR.string.ts_water_quality_estimate_note),
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(start = 6.dp),
+                            )
+                        }
                     }
                 }
                 // CHG-25（P0-1）：内陆点首次配置引导卡（:app 判定：内陆 + 未配置 + 未跳过）
@@ -322,9 +332,12 @@ fun DetailScreen(
             Top10SheetContent(state.top10, zone, viewModel)
         }
     }
-    // OPT-V11-02（CHG-27）：水质实测录入 Sheet（记录 → 水温融合重算）
+    // OPT-V11-02（CHG-27）：水质实测录入 Sheet（操作按钮置顶；全展开避免半展开态按钮不可点）
     if (showQualityEntry) {
-        ModalBottomSheet(onDismissRequest = { showQualityEntry = false }) {
+        ModalBottomSheet(
+            onDismissRequest = { showQualityEntry = false },
+            sheetState = qualityEntrySheetState,
+        ) {
             WaterQualityEntrySheet(viewModel = viewModel, zone = zone, onDismiss = { showQualityEntry = false })
         }
     }
