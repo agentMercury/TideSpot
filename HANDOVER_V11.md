@@ -1,7 +1,7 @@
 # 交接文档 · 潮点 TideSpot v1.1（HANDOVER_V11）
 
-> 交接日期：**2026-11-10** ｜ 交接方：v1.1 P0-1/P0-2 开发会话 ｜ 接手方：**下一开发会话**
-> 交接起点：**v1.1 P1 批次开工**（P0-1/P0-2 已全部完成并真机冒烟通过）
+> 交接日期：**2026-11-10** ｜ 交接方：v1.1 P1 批次开发会话（交付负责人） ｜ 接手方：**下一开发会话**
+> 交接起点：**v1.1 P2 批次开工**（P0-1 / P0-2 / **P1 全部完成**；P1 真机冒烟待执行，见 §9）
 > **必读顺序**：本文件 → `OPT_REQUIREMENTS_V11.md`（v1.3 需求规格，含 D1–D15 裁定）→ `REQUIREMENTS_REGISTER.md`（**CHG-17/19/20/21/23/24/25/26/27** 为 v1.1 相关）→ `tidespot-android/CONTRACT.md`（「v1.1 子契约 P0-1」）→ `PROGRESS_TRACKER.md`（§2/§2b）→ `design-handoff/INDEX.md` + `DECISIONS.md`（UI v2 设计包）→ 本仓库根 `HANDOVER.md`（v1 历史交接，环境须知仍有效）
 
 ---
@@ -20,6 +20,12 @@
 - 版本管理：jj + git colocated；当前 git `main` 与 jj `@` 同步（每次提交后需手动 `git update-ref`，见 §4.4）
 
 ## 2. 本次会话已完成（接手无需重复）
+
+### P1（CHG-28，2026-11-10，14/14）
+- **OPT**：05 `DetailPrefetcher`（前 5 / TTL÷2 / 令牌不足放弃 / 并发 2 / 离线零请求）｜06 `RelativeTimeFormatter`（收藏摘要 + 详情 Top10）｜07 四类观测 + 时刻补记 + 模型对照 + 按类型 `fitManual` + 落库读回｜08 `TopWindowsLruCache`（100/LRU/不落库）｜09 `find(manualTideLagHours)` 注意事项校正句｜10 `FavoritesFilterLogic` + 搜索/标签/预设 chips｜11 `lastFetchedMillis` + `FavoritesStaleLogic`（复用 `Ttl`）
+- **UX**：18 冷启动定位动画（不设准星）+ 返回地图定位｜19 默认 Voyager + 设置三选｜20 删底部 dock + 地图浮动三按钮 + insets｜21 `sourcePage` + `BackHandler`（详情→来源、收藏/设置→地图、地图 2s 双退）｜22 Tab 序 = 钓鱼指数→潮流→天气→水质→风浪（三处联动，默认 `SCORE`）｜23 `TidePhase` 月龄制 + 潮 Tab chip｜24 DaySelector 日期+星期
+- **验证**：八模块 **701/0/0** + `assembleRelease` 成功；APK `潮点TideSpot-v1.1.apk` 已分发 `E:\Trans`；jj 提交 `3f1c9df`
+- **细节与口径**：见 `PROGRESS_TRACKER.md` §7、`REQUIREMENTS_REGISTER.md` CHG-28、`tidespot-android/CONTRACT.md`「v1.1 子契约 P1」、本文件 §9 末尾「P1 落地要点」
 
 ### P0-1（CHG-25/26）
 - **凭据外部化**：`:core:data/water/CopernicusCredentialStore.kt`（`CopernicusCredential` + `FileCopernicusCredentialStore`，java.io 原子写）、`CopernicusCredentialValidator.kt`（四态 `Missing/Valid/Invalid/Unreachable`）；`WaterBodyClassifier.setProbe`（@Volatile 运行期切换）；`:app` **移除 BuildConfig 凭据注入**、`AppGraph.checkAndApply/hasCopernicusCredential/clearCopernicusCredential`；Manifest `allowBackup=false`
