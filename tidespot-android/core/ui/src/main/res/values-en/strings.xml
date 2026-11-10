@@ -49,6 +49,25 @@
     <!-- CHG-26: water-quality confidence note (frozen badge unchanged; credentials do not unlock satellite water data) -->
     <string name="ts_water_quality_estimate_note">Model estimate · Copernicus satellite water data not connected (credentials affect water-body classification only)</string>
 
+    <!-- OPT-V11-02 (CHG-27): water quality manual entry sheet -->
+    <string name="ts_wq_entry_open">Add measurement</string>
+    <string name="ts_wq_title">Add water quality measurement</string>
+    <string name="ts_wq_temp_label">Water temp (−5~45 °C)</string>
+    <string name="ts_wq_do_label">Dissolved oxygen (0~20 mg/L)</string>
+    <string name="ts_wq_turb_label">Turbidity (0~1000 NTU)</string>
+    <string name="ts_wq_time_label">Time (yyyy-MM-dd HH:mm, within ±24h)</string>
+    <string name="ts_wq_save">Save</string>
+    <string name="ts_wq_cancel">Cancel</string>
+    <string name="ts_wq_saved">Saved (water temp now fused)</string>
+    <string name="ts_wq_err_number">Enter a number</string>
+    <string name="ts_wq_err_range">Out of allowed range</string>
+    <string name="ts_wq_err_time_format">Time must be yyyy-MM-dd HH:mm</string>
+    <string name="ts_wq_err_time_window">Time must be within ±24 hours of now</string>
+    <string name="ts_wq_at_least_one">Fill at least one measurement</string>
+    <string name="ts_wq_err_save">Save failed: %1$s</string>
+    <string name="ts_wq_saved_list">Recorded (this spot)</string>
+    <string name="ts_wq_empty_list">No measurements yet</string>
+
     <!-- P0-1: Inland water first-run guide card -->
     <string name="ts_guide_inland_title">Configure a Copernicus account (optional)</string>
     <string name="ts_guide_inland_body">Used to assist water-body classification (inland spots classified as lake/reservoir, so titles and the water-quality tab are more accurate). Water quality values remain model estimates; satellite water data will be connected in a future version.</string>

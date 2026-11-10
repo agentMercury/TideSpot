@@ -53,6 +53,25 @@
     <!-- ── CHG-26：水质置信口径说明（不改冻结徽标；配置凭据不解锁卫星水质数据） ── -->
     <string name="ts_water_quality_estimate_note">模型估算 · Copernicus 卫星水质数据未接入（凭据仅影响水体判定）</string>
 
+    <!-- ── OPT-V11-02（CHG-27）：水质实测录入 Sheet ── -->
+    <string name="ts_wq_entry_open">录入实测</string>
+    <string name="ts_wq_title">录入水质实测</string>
+    <string name="ts_wq_temp_label">水温（−5~45 ℃）</string>
+    <string name="ts_wq_do_label">溶解氧（0~20 mg/L）</string>
+    <string name="ts_wq_turb_label">浊度（0~1000 NTU）</string>
+    <string name="ts_wq_time_label">录入时刻（yyyy-MM-dd HH:mm，±24h 内）</string>
+    <string name="ts_wq_save">保存</string>
+    <string name="ts_wq_cancel">取消</string>
+    <string name="ts_wq_saved">已保存（水温将参与融合）</string>
+    <string name="ts_wq_err_number">请输入数字</string>
+    <string name="ts_wq_err_range">超出允许范围</string>
+    <string name="ts_wq_err_time_format">时刻格式应为 yyyy-MM-dd HH:mm</string>
+    <string name="ts_wq_err_time_window">录入时刻须在当前 ±24 小时内</string>
+    <string name="ts_wq_at_least_one">至少填写一项实测值</string>
+    <string name="ts_wq_err_save">保存失败：%1$s</string>
+    <string name="ts_wq_saved_list">已录入（本点）</string>
+    <string name="ts_wq_empty_list">暂无实测记录</string>
+
     <!-- ── P0-1 新增：内陆水质首次引导卡（详情页水质 Tab） ── -->
     <string name="ts_guide_inland_title">配置 Copernicus 账号（可选）</string>
     <string name="ts_guide_inland_body">用于辅助水体判定（内陆点判为湖泊/水库，标题与水质 Tab 更准确）。当前水质数值仍为模型估算；卫星水质数据待后续版本接入。</string>

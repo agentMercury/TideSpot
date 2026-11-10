@@ -34,6 +34,27 @@ class DetailStateHolder(
     /** OPT-V11-03（CHG-27）：最近一次 onResult 的「下一整点」（时段筛选重算的时间域下限）。 */
     private var lastNextHourEpochSec = 0L
 
+    /** OPT-V11-02（CHG-27）：已加载的水温实测（epoch 秒 → ℃），onResult 与录入后重算共用。 */
+    private var waterTempObservations: List<Pair<Long, Double>> = emptyList()
+
+    /**
+     * OPT-V11-02（CHG-27）：应用/刷新水温实测 → 重算 quality（其他派生不动）。
+     * ±6h 融合与徽标口径在 [Derivations.qualitySeries]（§6.1.3）。
+     */
+    fun applyWaterQualityObservations(observations: List<Pair<Long, Double>>) {
+        waterTempObservations = observations
+        val s = _state.value
+        val result = s.result ?: return
+        val quality = Derivations.qualitySeries(
+            result.slices,
+            result.weather.associateBy { it.timeEpochSec },
+            zone,
+            preset.salinityPpt,
+            waterTempObservations = waterTempObservations,
+        )
+        _state.update { it.copy(quality = quality) }
+    }
+
     /**
      * OPT-V11-03（CHG-27）：按输出时段重算 Top10——与全窗同源（state.scores + result.marine + 同一 find），
      * 仅加 windowStart/End 输出过滤（不改候选/rank/去重；空结果兜底取时段内最高分）。
@@ -67,7 +88,13 @@ class DetailStateHolder(
         val top10 = TopWindowDerivations.top10(scores, result.marine, nowEpochSec = nextHourEpochSec)
         lastNextHourEpochSec = nextHourEpochSec
         val quality = if (weatherUnusable) emptyList()
-        else Derivations.qualitySeries(result.slices, weatherByEpoch, zone, preset.salinityPpt)
+        else Derivations.qualitySeries(
+            result.slices,
+            weatherByEpoch,
+            zone,
+            preset.salinityPpt,
+            waterTempObservations = waterTempObservations,
+        )
         _state.update {
             it.copy(result = result, scores = scores, tideRates = rates, quality = quality, top10 = top10, loading = false, refreshing = false)
         }

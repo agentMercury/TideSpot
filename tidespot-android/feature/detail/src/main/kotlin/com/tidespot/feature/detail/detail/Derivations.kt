@@ -132,6 +132,12 @@ object Derivations {
         weatherByEpoch: Map<Long, HourlyWeather>,
         zone: ZoneId,
         salinityPpt: Double,
+        /**
+         * OPT-V11-02（CHG-27）：水温实测观测（epoch 秒 → 实测 ℃）。
+         * ±6h 内命中的小时按 §6.1.3 融合 `Tw = 0.6·实测 + 0.4·模型`（模型缺值则取实测），
+         * 且该小时 confidence = [com.tidespot.core.domain.model.Confidence.MEASURED]（徽标「实测」）。
+         */
+        waterTempObservations: List<Pair<Long, Double>> = emptyList(),
     ): List<WaterQualitySample> {
         if (weatherByEpoch.isEmpty()) return emptyList()
         val sortedWeather = weatherByEpoch.toSortedMap().values.toList()
@@ -140,7 +146,14 @@ object Derivations {
         return sortedWeather.map { w ->
             val i = indexOfEpoch.getValue(w.timeEpochSec)
             val sst = slices.firstOrNull { it.timeEpochSec == w.timeEpochSec }?.marine?.seaSurfaceTempC
-            val tw = WaterTempFusion.fuse(airTemps, i, w.temperatureC, sst)
+            val twModel = WaterTempFusion.fuse(airTemps, i, w.temperatureC, sst)
+            // OPT-V11-02：±6h 内最近一条实测参与融合（§6.1.3）
+            val obs = nearestObservation(w.timeEpochSec, waterTempObservations)
+            val tw = when {
+                obs == null -> twModel
+                twModel == null -> obs
+                else -> 0.6 * obs + 0.4 * twModel
+            }
             val doPotential = if (tw != null && w.pressureMslHpa != null) {
                 DoPhysics.doPotential(tw, w.pressureMslHpa!!, salinityPpt)
             } else {
@@ -156,9 +169,22 @@ object Derivations {
                 doMgL = doPotential,
                 turbidityProxy = SubScores.turbidityIndex(w.cloudCoverPct, rain24 ?: 0.0),
                 chlorophyllProxy = SubScores.chlorophyllIndex(null, tw, w.cloudCoverPct),
-                confidence = com.tidespot.core.domain.model.Confidence.ESTIMATED,
+                confidence = if (obs != null) {
+                    com.tidespot.core.domain.model.Confidence.MEASURED
+                } else {
+                    com.tidespot.core.domain.model.Confidence.ESTIMATED
+                },
             )
         }
+    }
+
+    /** OPT-V11-02：±6h 内最近的实测水温（无命中 → null；多条取时间最近）。 */
+    private fun nearestObservation(epochSec: Long, observations: List<Pair<Long, Double>>): Double? {
+        val window = 6 * 3600L
+        return observations
+            .filter { kotlin.math.abs(it.first - epochSec) <= window }
+            .minByOrNull { kotlin.math.abs(it.first - epochSec) }
+            ?.second
     }
 
     // ────────────────────────── F-3.4 钓鱼指数 ──────────────────────────

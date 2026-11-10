@@ -79,6 +79,8 @@ fun DetailScreen(
     // M5（F-3.5 / §6.2b）：Top10 与现场校潮 Sheet（模块内接线；:app 导航 M6）
     var showTop10 by remember { mutableStateOf(false) }
     var showCalibration by remember { mutableStateOf(false) }
+    // OPT-V11-02（CHG-27）：水质实测录入 Sheet
+    var showQualityEntry by remember { mutableStateOf(false) }
     // D11：常驻免责入口（CHG-16⑬）
     var showDisclaimer by remember { mutableStateOf(false) }
     // CHG-13/D01：标题数组唯一来源（5 项、与 Tab 顺序一一对应）；禁止手组（原 6 项错位致潮流 Tab 显示「水质」）
@@ -276,6 +278,12 @@ fun DetailScreen(
                 }
                 // CHG-25（P0-1）：内陆点首次配置引导卡（:app 判定：内陆 + 未配置 + 未跳过）
                 credentialGuideSlot?.invoke()
+                // OPT-V11-02（CHG-27）：水质实测录入入口（离线可用；水温参与 §6.1.3 融合）
+                Button(
+                    onClick = { showQualityEntry = true },
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                        .semantics { contentDescription = "录入水质实测值" },
+                ) { Text(androidx.compose.ui.res.stringResource(UiR.string.ts_wq_entry_open)) }
             }
 
             // F-3.7 每 Tab 底部：来源与更新时间（由 SpotDetailResult 元数据生成，禁硬编码来源文案）
@@ -312,6 +320,12 @@ fun DetailScreen(
     if (showTop10) {
         ModalBottomSheet(onDismissRequest = { showTop10 = false }) {
             Top10SheetContent(state.top10, zone, viewModel)
+        }
+    }
+    // OPT-V11-02（CHG-27）：水质实测录入 Sheet（记录 → 水温融合重算）
+    if (showQualityEntry) {
+        ModalBottomSheet(onDismissRequest = { showQualityEntry = false }) {
+            WaterQualityEntrySheet(viewModel = viewModel, zone = zone, onDismiss = { showQualityEntry = false })
         }
     }
     // M5（§6.2b 规则 5）：现场校潮 Sheet（观测 Session 级存 DetailViewModel；持久化登记 M6）

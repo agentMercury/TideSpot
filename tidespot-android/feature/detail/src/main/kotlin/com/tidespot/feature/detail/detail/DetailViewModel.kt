@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tidespot.core.data.repo.HourlyScoreStore
 import com.tidespot.core.data.repo.TideSpotRepository
+import com.tidespot.core.data.repo.WaterQualityObservation
+import com.tidespot.core.data.repo.WaterQualityObservationKind
 import com.tidespot.core.domain.algorithm.ScenePreset
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.tide.TideCalibrator
@@ -65,6 +67,7 @@ class DetailViewModel(
                 .onSuccess { holder.onResult(it) }
                 .onFailure { holder.setRefreshing(false) }
             holder.setLoading(false)
+            loadWaterQualityObservations()
         }
     }
 
@@ -76,6 +79,34 @@ class DetailViewModel(
                 .onSuccess { holder.onResult(it) }
                 .onFailure { holder.setRefreshing(false) }
         }
+    }
+
+    // ────────────────── OPT-V11-02 水质实测录入（CHG-27） ──────────────────
+
+    /** 已录入的水质实测（读库；Sheet 展示原值与录入时间）。 */
+    suspend fun waterQualityObservations(): List<WaterQualityObservation> =
+        repository.waterQualityObservations(spot.id)
+
+    /**
+     * 保存水质实测（离线可录入；逐条落库 `manual_observation(kind/value)`），
+     * 随后重算水温融合与徽标（±6h → `Tw=0.6·实测+0.4·模型`，confidence=MEASURED）。
+     */
+    suspend fun saveWaterQualitySelections(
+        entries: List<Pair<WaterQualityObservationKind, Double>>,
+        observedAtEpochSec: Long,
+    ) {
+        entries.forEach { (kind, value) ->
+            repository.addWaterQualityObservation(spot.id, kind, value, observedAtEpochSec)
+        }
+        loadWaterQualityObservations()
+    }
+
+    /** 读取水温实测 → holder 融合重算 quality（其他维度不动）。 */
+    suspend fun loadWaterQualityObservations() {
+        val temps = repository.waterQualityObservations(spot.id)
+            .filter { it.kind == WaterQualityObservationKind.WATER_TEMP.name }
+            .mapNotNull { o -> o.value?.let { v -> o.observedAtEpochSec to v } }
+        holder.applyWaterQualityObservations(temps)
     }
 
     // ────────────────── §6.2b 规则 5 现场校潮（Session 级观测记录） ──────────────────

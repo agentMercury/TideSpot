@@ -1,0 +1,12 @@
+feat(v1.1 P0-2 收口)：OPT-V11-02 水质实测录入 Sheet + 水温融合(CHG-27)
+
+- WaterQualityEntryLogic: 三项可选填(空=跳过/非数字/超范围错误码: 水温-5~45℃, DO 0~20 mg/L,
+  浊度 0~1000 NTU) + 录入时刻 ±24h 校验
+- WaterQualityEntrySheet: 水质 Tab 入口按钮 + 底部面板(三项输入 + 时刻默认当前可改 + 离线保存 +
+  已录入列表); 文案全走资源(中/英 18 条)
+- 融合: Derivations.qualitySeries 尾增 waterTempObservations(±6h 最近实测 -> Tw=0.6*实测+0.4*模型,
+  该小时 confidence=MEASURED); StateHolder.applyWaterQualityObservations 重算 quality;
+  ViewModel 只增 saveWaterQualitySelections/waterQualityObservations/loadWaterQualityObservations
+- 徽标口径: 设计六枚徽标冻结, 融合态用既有 MEASURED(实测), 不新增第七枚
+留证: 八模块 625 运行 / 0 失败 / 0 跳过 + verify.ps1 全绿 + APK v1.1 重建(49.2MB, 14:28)
+剩余: 本批真机冒烟(设备未在线): Top10 核心段/时段筛选/爆护/持续标注 + 水质录入 + v4->v5 升级不丢数据
