@@ -1,10 +1,10 @@
-# 钓鱼指数 App「潮点 TideSpot」需求规格说明书 v1.3
+# 钓鱼指数 App「潮点 TideSpot」需求规格说明书 v1.4
 
 > Android · 纯客户端（无自有服务端）· 面向 vibe coding，可独立执行
 >
 > 本文档自包含：接口 URL 与字段路径、算法公式、单位、数据库结构、UI 状态机、验收标准、红线清单、黄金测试值均已写清。实现者无需再问"数据从哪来""这个数怎么算"。
 > 标注 **[已验证]** = 本规格编写时实测请求成功；**[M0验证]** = 必须在里程碑 M0 用附录 A 探针确认后才可依赖。
-> 变更历史：v1.3（2026-11-02）逆地理契约重构为 §5.8 四级降级链 RG-A/B/C/D（台账 CHG-05，取代 v1.1 简版方案），新增 §5.9 正/逆地理分工、N-5 逐源披露与逆地理总开关、§7.3 `spot_reverse_cache`、§10.1 测试 9–11、§12 四行新红线、附录 A5b–A5e/B7b。v1.2：N-3 删"省流量"开关（CHG-03）、§6.2b 现场校潮 ≥2 条门槛（CHG-04）。v1.1：首版逆地理契约。v1.0：首版基线。
+> 变更历史：**v1.4（2026-11-10）§8/§7.1 与 CHG-21/CHG-28 实际实现对齐**——§8.1 MapScreen 改浮动按钮组（去底部 dock）/Top10 入口口径、DetailScreen Tab 新序 + 默认选中钓鱼指数 + 三处联动实现口径警告；§8.2-1 DaySelector 改日期+星期；§7.1 底图默认 Voyager + 三选；附录 A10 扩至三样式探针（台账 CHG-31）。v1.3：逆地理四级降级链（CHG-05）。v1.2：N-3 删省流量开关（CHG-03）、§6.2b 校潮门槛（CHG-04）。v1.1：首版逆地理契约。v1.0：首版基线。
 
 ---
 
@@ -441,7 +441,7 @@ UI 影响：内陆点风浪 Tab 更名"湖面风与水温"、潮流 Tab 更名"�
 | 层 | 选择 | 备注 |
 |---|---|---|
 | 语言/UI | Kotlin 2.x + Jetpack Compose（Material 3） | 禁止 XML 布局混写 |
-| 地图 | MapLibre Android v11 + 免费矢量样式（CARTO Positron `https://basemaps.cartocdn.com/gl/positron-gl-style/style.json` [已验证 200]） | 必须保留底图 attribution；不得内置他人 Key 的高德/天地图样式（用户可自配） |
+| 地图 | MapLibre Android v11 + 免费矢量样式：**默认 CARTO Voyager**（彩色，CHG-21/D8），设置页可选 Positron（素色）/ Dark Matter（深色）；三个 URL 一律收敛 `TideSpotUrls` | 必须保留底图 attribution；不得内置他人 Key 的高德/天地图样式（用户可自配） |
 | 网络 | OkHttp 直连 + kotlinx.serialization（CHG-08：不引入 Ktor，`:core:network` 模块不拆分） | 全部外部 URL 只允许在 `core:data` 的单一构造器 **`TideSpotUrls`** 拼接（含天气/海洋/地理/RG-A/RG-B/Copernicus auth 与 WMTS），单点可审计 |
 | 存储 | Room（SQLite），DAO 全 suspend | |
 | DI | Hilt | |
@@ -497,12 +497,12 @@ spot_reverse_cache(latKey, lonKey, waterBodyName, localityName, adminJson, plusC
 
 ```
 MapScreen(首页)
- ├─ 顶部浮层：定位按钮 / 搜索框(§5.9 正地理) / 收藏入口 / 设置
+ ├─ 右上/右下浮动按钮组（无底部 dock，CHG-21）：我的位置 / 收藏 / Top10 / 设置（+ 顶部搜索框，§5.9 正地理）
  ├─ 长按或拖动 → 准星 → 底部信息条（经纬度·地名·水体类型·[确定]·[收藏]）
- ├─ 右侧抽屉：收藏列表 → DetailScreen(spot)
- └─ 底部：Top10 入口（本点 / 全部收藏）
+ ├─ 收藏入口 → 收藏列表 → DetailScreen(spot)（列表项点击进详情）
+ └─ Top10 入口：进收藏页并自动展开跨点 Top10 Sheet（CHG-28 口径；地图本点 Top10 需详情上下文，本期不做）
 DetailScreen(spot)
- ├─ Tab: 风浪 | 天气 | 钓鱼指数 | 水质 | 潮流
+ ├─ Tab: 钓鱼指数 | 潮流(水位) | 天气 | 水质 | 风浪(湖面风与水温)；顺序见 CHG-21，**默认选中「钓鱼指数」**（CHG-28）
  ├─ DaySelector（今天 … +9，范围由设置 7/10 决定）
  ├─ HourChart ⇄ 数值表（可切换，默认图表）
  ├─ 点小时 → FactorBreakdown（指数 Tab）/ 字段明细（其他 Tab）
@@ -510,9 +510,11 @@ DetailScreen(spot)
  └─ Sheet：数据源与免责
 ```
 
+> **Tab 顺序实现口径（CHG-28 留证，三处必须成对重排，缺一即错位）**：① `DetailTab` 枚举声明顺序 ② `DetailScreen` 的 `TabRow` 列表顺序 ③ `WaterBodyTabTitles.titlesInTabOrder()` 返回顺序；只改第 ③ 处会重演 CHG-13/D01 的"标题与内容错配"。
+
 ### 8.2 关键组件
 
-1. **DaySelector**：横向 Chip（`今天 11-02`、`+1`…`+9`）；右侧显示"源更新 HH:mm · 本机拉取 HH:mm"。
+1. **DaySelector**：横向 Chip 直接显示日期 + 星期（`今天 周二`、`11/12 周三`…，CHG-21/D7-7，去 `+N` 相对格式；星期与日期按选点当地时区）；右侧显示"源更新 HH:mm · 本机拉取 HH:mm"。
 2. **HourChart**：24 点；**null 断线不连线**（禁止画成 0）；y 轴自适应带单位；点选小时浮层；指数 Tab 用柱 + 5 档色带，≥80 段叠"窗口"横条。
 3. **FactorBreakdown**：子分行（名称/权重/得分/贡献条）+ `ΠV` 明细（触发了哪些、乘子值）+ 原始输入（Tw、DO_p、P、ΔP3、ΔP24、风/阵风、雨、云、WMO、浪、潮位、dh/dt、流速、月龄、照明、中天）。
 4. **ConfidenceBadge**：`实测` `卫星` `模型` `估算` `未校正` `低置信`（六色，且带文字，不靠颜色单独编码）。
@@ -646,7 +648,10 @@ curl -sS -o /dev/null -w '%{http_code}\n' -A 'TideSpot/1.0 (test)' 'https://nomi
 # A8 GIBS 瓦片（陆面温度，仅作叠加层候选）
 curl -o t.png 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_Land_Surface_Temp_Day/default/2026-10-30/GoogleMapsCompatible_Level7/4/12/6.png'   # [已验证 200 png]；.gtx 反解 [M0验证]
 # A9 水体类型判定的 Overpass 查询：与 A5d 同一端点/同一表单写法（GET 实测 406，POST 表单可用但主端点偶发 502）[M0验证]
-# A10 底图样式：curl -I https://basemaps.cartocdn.com/gl/positron-gl-style/style.json   # [已验证 200]
+# A10 底图样式（三种，CHG-21/D8）：Positron [已验证 200] / Voyager（默认，彩色）/ Dark Matter（深色）
+curl -I https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
+curl -I https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json
+curl -I https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json
 ```
 
 ## 附录 B：黄金样例（用于 §10.1 断言；均由本次实测产生）
