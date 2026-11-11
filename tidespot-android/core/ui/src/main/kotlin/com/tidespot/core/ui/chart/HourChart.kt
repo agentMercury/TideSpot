@@ -13,14 +13,17 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import com.tidespot.core.ui.R
 import com.tidespot.core.ui.band.ScoreBand
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.strings.localTideSpotStrings
 
 /** 图表模式：LINE=折线（数值维度）/ BAR=柱（钓鱼指数，5 档色带 + ≥80 窗口横条，§8.2-2）。 */
 enum class HourChartMode { LINE, BAR }
@@ -71,22 +74,28 @@ fun HourChart(
     val axisLabelStyle = axisTextStyle.copy(color = axisColor)
     val tooltipLabelStyle = tooltipTextStyle.copy(color = tooltipFg)
     val textMeasurer = rememberTextMeasurer()
+    val strings = localTideSpotStrings()
+    // OPT-V115-01 #2（ts_window_bar）：「窗口」横条文字标签（段宽足够时绘制，不足则仅保留细条）
+    val windowLabel = stringResource(R.string.ts_window_bar)
+    val windowLabelLayout = remember(windowLabel, axisLabelStyle) {
+        textMeasurer.measure(windowLabel, axisLabelStyle)
+    }
 
-    val semantic = remember(values, mode, unit, selectedHour) {
+    val semantic = remember(values, mode, unit, selectedHour, strings) {
         val validCount = values.count { it != null }
         val missingCount = values.size - validCount
         val sel = selectedHour?.let {
-            "，当前选中第 ${it + 1} 小时：${tooltipFormatter(values.getOrNull(it))}"
+            strings.chartHourTooltipSuffix(it + 1, tooltipFormatter(values.getOrNull(it)))
         } ?: ""
         val base = when (mode) {
             HourChartMode.LINE ->
-                "24 小时逐小时图表，单位 $unit。$validCount 个数据点" +
-                    (if (missingCount > 0) "，$missingCount 个小时缺测（显示为断线，数值表为 —）" else "")
+                strings.chartHourDescription(unit, validCount) +
+                    (if (missingCount > 0) strings.chartMissingSuffix(missingCount) else "")
             HourChartMode.BAR ->
-                "24 小时钓鱼指数柱状图，0 到 100 分，5 档色带" +
-                    (if (windowHours.isNotEmpty()) "，其中 ${windowHours.size} 个小时达到爆护窗口（≥80 分）" else "")
+                strings.chartScoreDescription +
+                    (if (windowHours.isNotEmpty()) strings.chartWindowSuffix(windowHours.size) else "")
         }
-        "$base。点选可查看小时数值，等价数值见下方逐小时表。$sel"
+        strings.chartHint(base, sel)
     }
 
     Canvas(
@@ -167,15 +176,28 @@ fun HourChart(
                         )
                     }
                 }
-                // ≥80 段叠「窗口」横条
+                // ≥80 段叠「窗口」横条（OPT-V115-01 #2：段宽足够时在条内绘制 ts_window_bar 标签）
                 windowSegments.forEach { seg ->
                     val x1 = xOf(seg.startHour) - chartW / n / 2
                     val x2 = xOf(seg.endHourInclusive) + chartW / n / 2
+                    val labelW = windowLabelLayout.size.width
+                    val fits = (x2 - x1) >= labelW + 8f
+                    val stripH = if (fits) 14.dp.toPx() else 4.dp.toPx()
                     drawRect(
                         color = Color(ScoreBand.EXPLOSIVE.argb), // D14/19：色值收敛 ScoreBand token（单源）
                         topLeft = Offset(x1, 2.dp.toPx()),
-                        size = Size(x2 - x1, 4.dp.toPx()),
+                        size = Size(x2 - x1, stripH),
                     )
+                    if (fits) {
+                        drawText(
+                            windowLabelLayout,
+                            color = Color.White,
+                            topLeft = Offset(
+                                x1 + (x2 - x1 - labelW) / 2f,
+                                2.dp.toPx() + (stripH - windowLabelLayout.size.height) / 2f,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -183,7 +205,7 @@ fun HourChart(
         // 点选浮层
         if (selectedHour != null) {
             val v = values.getOrNull(selectedHour)
-            val text = if (v == null) ChartMath.MISSING_TOOLTIP else tooltipFormatter(v)
+            val text = if (v == null) strings.noDataHour else tooltipFormatter(v)
             val measured = textMeasurer.measure(text, tooltipLabelStyle)
             val bx = (xOf(selectedHour) - measured.size.width / 2f)
                 .coerceIn(0f, (size.width - measured.size.width).coerceAtLeast(0f))

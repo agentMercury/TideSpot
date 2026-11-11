@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TideSpot · Map copy (OPT-V11-13; English draft, manual review pending) -->
+<resources>
+    <string name="ts_map_location_ok">Located · accuracy ±%1$d m</string>
+    <string name="ts_map_my_location">My location</string>
+    <string name="ts_map_confirm">Confirm</string>
+    <string name="ts_map_search_clear">Clear</string>
+    <string name="ts_map_search_hint">Search a place (e.g. Wanlu Lake)</string>
+</resources>

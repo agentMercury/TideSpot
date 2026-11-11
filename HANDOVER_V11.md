@@ -1,5 +1,7 @@
 # 交接文档 · 潮点 TideSpot v1.1（HANDOVER_V11）
 
+> ⚠️ **历史交接（2026-11-10）**：v1.1 已收官，**当前施工以 `HANDOVER_V115.md` + `OPT_REQUIREMENTS_V115.md` 为准**。本文档保留 v1.1 全量实现细节与环境雷区，供查阅。
+
 > 交接日期：**2026-11-10** ｜ 交接方：v1.1 P1 批次开发会话（交付负责人） ｜ 接手方：**下一开发会话**
 > 交接起点：**v1.1 P2 批次开工**（P0-1 / P0-2 / **P1 全部完成**；P1 真机冒烟待执行，见 §9）
 > **必读顺序**：本文件 → `OPT_REQUIREMENTS_V11.md`（v1.3 需求规格，含 D1–D15 裁定）→ `REQUIREMENTS_REGISTER.md`（**CHG-17/19/20/21/23/24/25/26/27** 为 v1.1 相关）→ `tidespot-android/CONTRACT.md`（「v1.1 子契约 P0-1」）→ `PROGRESS_TRACKER.md`（§2/§2b）→ `design-handoff/INDEX.md` + `DECISIONS.md`（UI v2 设计包）→ 本仓库根 `HANDOVER.md`（v1 历史交接，环境须知仍有效）

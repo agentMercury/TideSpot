@@ -221,16 +221,37 @@
 | OPT-V11-16 收藏分组 | ✅ | Room **v5→v6** `groupName`（可空无 DEFAULT）；默认组「未分组」置末、折叠、编辑/批量可改组 |
 | OPT-V11-12 批量操作 | ✅ | 长按进多选、全选/反选、批量删除（**单事务 + 级联 6 表**，D19）、批量改标签（追加/替换）、批量改分组；**不做导出**（D3） |
 | OPT-V11-17 缩略图 | ⛔ **已移除（客户裁定 D21）** | 实现期实证：CARTO `rastertiles/*` 已要求 API key，无 key 返回「API KEY REQUIRED」占位图（v1.2.0 真机截图留证）→ 客户裁定删除该功能；`MapThumbnailStore`/`ThumbnailCachePolicy`/`TileMath`/`cartoStaticTile` 全量移除，本轮不做 |
-| OPT-V11-13 i18n 存量全量外移 | ⬜ **未开工（评估完成，需专项批次）** | 见下「i18n 评估」 |
+| OPT-V11-13 i18n 存量全量外移 | ✅ **技术完成（CHG-40/41/42/43/44）**；GAP-05 定稿接线 **10/17**，剩余 7 条转 **V1.15** | 见下「i18n 实施进展」 |
 
 - **验证**：`core:ui` / `core:data` / `feature:favorites` 单测全绿；`assembleRelease` 产出 `潮点TideSpot-v1.2.0.apk`（`versionCode=4`，自动分发 `E:\Trans`）；**真机 AAK-AN00/Android 16：`connectedDebugAndroidTest` 8/8 通过**（含新增 `v4→v5`、`v5→v6` 迁移用例；真实升级路径另由 v1.2.0 覆盖安装验证：5 条收藏全保留、`groupName` 列生效）。
 - **开发期发现并修正的既有缺陷**：① `Format.value(v, digits)` 的 digits 上限 3 → 收藏列表「坐标 6 位小数」实际只有 3 位 → 新增 `Format.coordinate`（6 位专用，`value()` 上限不变以免行为漂移）；② `deleteFavorite` 只删 `spot` + `hourly_score`，遗留 4 张表孤儿行 → 按 D19 一并级联清理。
 - **风险**：① 缩略图在列表滚动时的帧率与磁盘缓存增长（30 d × 每点 1 张 ≈ 数十 KB/点，可接受；真机滚动冒烟验证）；② Room v5→v6 真机迁移锁 **已补齐并真机通过**（`RoomMigrationInstrumentedTest` v4→v5/v5→v6，8/8）；③ 长按/点按手势区分需真机确认（多选态点按 = 选择、非多选态点按 = 进详情）。
-- **下一步**：① 真机冒烟 P2 五项；② 补 `RoomMigrationInstrumentedTest` v5→v6 用例并真机跑；③ **OPT-V11-13 专项批次**（方案见下）。
+- **下一步（2026-11-11 更新）**：① P2 真机冒烟五项**待复测**（批量操作/排序/信息卡/分组/长按手势）；② OPT-V11-13 **已完成技术目标**（扫描 FAIL=0、中英逐键锁、真机英文界面无残留）；③ **GAP-05 剩余 7 条 → V1.15 需求池 `OPT-V115-01`**（见 §10）。
 
-### i18n（OPT-V11-13）评估（未开工，供客户裁定）
+### i18n（OPT-V11-13）实施进展（CHG-40，2026-11-11）
 
-- **现状取证**：main 源码含中文字面量 **468 处 / 47 个文件**（`DetailScreen` 72、`FavoritesScreen` 49、`SettingsScreen` 30、`TideSpotStrings` 28、`BestWindowFinder` 20、`VetoEvaluator` 11、`TideCalibrator` 11、`Derivations` 16、`MainActivity` 16…）。
-- **技术难点**：① `:core:domain` 为纯 Kotlin（无 Android），产出中文文案（档位名/否决 reason/观测类型/预设计算），**不能直接读 res** → 需新增可注入文案接口 + 中文默认实现；② `TideSpotStrings` 现为 `const` 常量对象，全量外移需改为 `object` + `stringResource` 双轨（测试拿不到 res）；③ 30+ 现有测试断言中文字符串，必须按「外移前后渲染文本逐一相等」改写为枚举锁；④ 红线扫描需升级为**注释感知**（KDoc 中文字面量不算）；
-- **预估**：2–3 天（含英文首版机翻 + 人工复核标记 + 全量回归）；风险等级 **中-高**。
-- **建议**：单开专项批次，先做 `:core:ui` + `:feature:*`（用户可见文案 90%），再处理 `:core:domain` 注入层；`spot.groupPreset` 按 D18 改稳定 id（旧中文值读取兼容）。
+- **架构已落地**：`TideSpotStrings`（core:ui 接口 + `ZhStrings`/`EnStrings`/`ResStrings` 三实现 + CompositionLocal 注入）与 `DomainCopy`（domain 接口 + `ZhDomainCopy`/`ResDomainCopy`）；domain 四个计算入口全部以**默认参数**接入，不注入时中文逐字不变（700+ 既有单测零改动通过）。
+- **已全量外移**：`core:ui` 79、`core:domain` 58、`feature:settings` 73、`feature:map` 10（界面文案）。
+- **扫描门禁**：`.tools/i18n_scan.mjs`（注释感知 + 豁免白名单），基线 **538 → 0**（**FAIL=0**，豁免 13→12：`SourceMetaRegistry.granularity` 改用 `DomainCopy.hourlyGranularity` 后移出白名单）。
+- **完成（批次二，CHG-44，2026-11-11）**：`feature:detail` 135、`feature:favorites` 117、`app` 21、`core:data` 3 **全部外移**；新增/补齐 `ts_detail_*`/`ts_fav_*`/`ts_app_*` 中英资源。
+- **验收现状**：八模块 `gradlew test` **EXIT=0**；`assembleRelease` 产出 `潮点TideSpot-v1.2.0.apk`（51,915,708 B，已分发 `E:\Trans`）；真机切英文逐屏核对**无残留中文**（客户报障的详情页 4 类残留已修，见下「英文残留修复」）。
+- **GAP-05 接线现状**：**10/17**（已接线：`ts_resolving`、`ts_location_denied`、`ts_favorite_dialog_title`、`ts_favorite_name_hint`、`ts_top10_this_spot`、`ts_top10_all`、`ts_top10_empty`、`ts_confirm_favorite`、`ts_placeholder_v11`、`ts_cancel`）；**剩余 7 条转 V1.15 `OPT-V115-01`**（需新增 UI 落点，见 §10 与 `OPT_REQUIREMENTS_V115.md`）。
+- **英文残留修复（CHG-44 关键教训）**：根因＝纯函数默认参数回落 `ZhStrings`/`ZhDomainCopy`，而调用点未注入。已修 `WaterBodyTabTitles.titlesFor`、`DaySelectorLogic.chips`、`Derivations.tabStatus/rowsFor`、`SourceMetaRegistry.granularity`，连带 `chipText`/`extremesLine`/`correctionCompare`/`Top10Formatter`/`SourceFooter`。**红线：新增纯逻辑必须用 `strings/copy` 参数，调用点显式注入**。
+- **环境红线**：Gradle 必须走 `subst T:`（`verify.ps1` 同口径）；直接以中文路径运行会导致 test worker `ClassNotFoundException`。
+
+- **批次二执行口径（已定，不需再评估）**：`DetailScreen`/`FavoritesScreen`/`MainActivity` 直接 `stringResource(R.string.*)`（资源已建/按同规范补齐）；纯逻辑（`Derivations`/`Top10Formatter`/`FavoritesSummaryFormatter` 等）加 `strings: TideSpotStrings = ZhStrings` / `copy: DomainCopy = ZhDomainCopy` 参数；测试断言保持中文默认实现（零漂移），英文由 `EnStrings` 独立锁定。
+- **风险—影响—概率—应对**：① detail/favorites 大文件逐条替换遗漏 → 影响：切英文残留中文 → 概率中 → 应对：`.tools/i18n_scan.mjs` 门禁 + 真机切换语言逐屏核对；② 纯逻辑注入参数遗漏 → 影响：英文环境下该处仍中文 → 概率中 → 应对：扫描 FAIL 即拦截；③ 资源键漏翻 → 概率低 → 应对：`EnStringsParityTest` 逐键相等锁。
+
+## 10. V1.15 需求池（2026-11-11 建档，CHG-45）
+
+> 规格：`OPT_REQUIREMENTS_V115.md` ｜ 交接：`HANDOVER_V115.md` ｜ 目标发布：`v1.15.0`（`versionCode=5`）
+> 来源：V1.1 收官遗留（GAP-05 剩余 7 条）+ 客户指令「按 design-handoff UI 设计做 UI 更新」（设计包已评估可用）
+
+| 项 | 状态 | 说明 / 落点 |
+|---|---|---|
+| OPT-V115-01 GAP-05 剩余 7 条接线 | ✅ 已交付（2026-11-11，CHG-46） | 7 条全部接线：`ts_reverse_geo_off`（地图信息条上方 5s 提示）｜`ts_window_bar`（HourChart BAR 段内文字标签，段宽不足降级细条）｜`ts_record_high_tide`（校潮 Sheet 空态引导）｜`ts_offline`（`:core:ui` 新增 `OfflineBanner`，详情/收藏页顶部）｜`ts_stale`（黄条=通用句+数据时间，新增 `ts_stale_with_time` 中英双语）｜`ts_dimension_degraded`（低置信徽标同行说明）｜`ts_chart_table_switch`（图表/数值表→单 Switch）。GAP-05 **17/17** 每 key ≥1 处引用；`i18n_scan` FAIL=0；八模块 `test` 全绿 |
+| OPT-V115-02 UI v2 设计包全量落地 | 🔶 骨架完成（2026-11-11，CHG-46）；视觉逐屏待设备 | **GAP-03 收口**：`WindowCompat.setDecorFitsSystemWindows(window,false)` + `Scaffold(contentWindowInsets=0)`，Map/Detail/Favorites/Settings 各屏 `statusBarsPadding()+navigationBarsPadding()`，Top10/校潮/免责/收藏 Top10 四个 Sheet 内容补 `navigationBarsPadding()`。**token 对齐**：`TideSpotTheme` 新增 `Shapes`（card 16 / small 12 / medium 16 / large 20）与 `Typography`（20/16/14/15/13/12/12/10），色值零改动。**遗留**：22 组件逐项像素校对、9 屏真机中英+深色截图、正文对比度 ≥4.5:1 实测（`adb devices` 为空，待设备接入） |
+
+- **开工顺序建议**：01 内先做 `ts_record_high_tide`/`ts_stale`/`ts_dimension_degraded`/`ts_chart_table_switch`/`ts_reverse_geo_off`（改动小），再做 `ts_window_bar`（Canvas 绘制）与 `ts_offline`（需连通性探测）；随后 02。
+- **完成判据（GAP-05 闭环）**：17/17 每 key ≥1 处 `R.string.` 引用 + `DECISIONS.md §6` 七项复核全绿 + `i18n_scan.mjs` FAIL=0。
+- **V1.1 收官口径（2026-11-11）**：V1.1 池 26 项 = **25 项已交付 + 1 项移除（OPT-V11-17/D21）**；功能目标全部达成，**剩余为验收性收尾**（P2 真机冒烟五项、v1.1.1 两 bug 复测、v1（M0–M6）交付验收 12-04~12-08），及 GAP-05 7 条（已转入 V1.15，不在 V1.1 记未完成）。

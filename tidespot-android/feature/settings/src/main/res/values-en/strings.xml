@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TideSpot · Settings copy (OPT-V11-13; English draft, manual review pending) -->
+<resources>
+    <string name="ts_settings_content_desc">Settings: units, detail days, data &amp; privacy, open-source licenses</string>
+    <string name="ts_settings_title">Settings</string>
+    <string name="ts_settings_display">Display</string>
+    <string name="ts_settings_unit">Units</string>
+    <string name="ts_settings_unit_si">Metric (°C · km/h · m)</string>
+    <string name="ts_settings_unit_si_desc">Units: metric</string>
+    <string name="ts_settings_unit_imperial">Imperial (°F · mph · ft)</string>
+    <string name="ts_settings_unit_imperial_desc">Units: imperial</string>
+    <string name="ts_settings_detail_days">Detail days</string>
+    <string name="ts_settings_days">%1$d days</string>
+    <string name="ts_settings_days_desc">Detail days: %1$d</string>
+    <string name="ts_settings_map_style">Map style</string>
+    <string name="ts_settings_map_style_desc">Map style: %1$s (%2$s)</string>
+    <string name="ts_settings_data_network">Data &amp; network</string>
+    <string name="ts_settings_prefetch">Background prefetch</string>
+    <string name="ts_settings_weather">Weather</string>
+    <string name="ts_settings_prefetch_toggle">Background prefetch toggle</string>
+    <string name="ts_settings_reverse_geo">Reverse geocoding (RG-A BigDataCloud / RG-B Photon)</string>
+    <string name="ts_settings_reverse_geo_note">Off = place names fall back to coordinate text; per-source payloads are listed under Privacy below</string>
+    <string name="ts_settings_reverse_geo_toggle">Reverse geocoding master switch</string>
+    <string name="ts_settings_use_cases">Use cases · Species · Weights</string>
+    <string name="ts_settings_api_key">API Key (optional)</string>
+    <string name="ts_settings_api_key_optional">Optional API Key (no consumer yet; stored only)</string>
+    <string name="ts_settings_api_key_input">Optional API Key field</string>
+    <string name="ts_settings_api_key_empty">Blank = not set</string>
+    <string name="ts_settings_api_key_save">Save API Key</string>
+    <string name="ts_settings_licenses">Open-source licenses &amp; data attribution</string>
+    <string name="ts_settings_privacy">Privacy disclosure (per source)</string>
+    <string name="ts_settings_privacy_sends">Sends: %1$s</string>
+
+    <string name="ts_settings_style_color">Color</string>
+    <string name="ts_settings_style_plain">Plain</string>
+    <string name="ts_settings_style_dark">Dark</string>
+
+    <string name="ts_license_open_meteo_role">Weather / Ocean / Geocoding search</string>
+    <string name="ts_license_open_meteo_license">CC BY 4.0 (data)</string>
+    <string name="ts_license_copernicus_role">Ocean reanalysis / Water level / Water quality</string>
+    <string name="ts_license_copernicus_license">Copernicus Marine license (attribution required)</string>
+    <string name="ts_license_nasa_role">Water mask / Remote-sensing reference</string>
+    <string name="ts_license_nasa_license">NASA open data policy (attribution required)</string>
+    <string name="ts_license_noaa_role">Water level / Ocean reference</string>
+    <string name="ts_license_noaa_license">Public domain (attribution recommended)</string>
+    <string name="ts_license_usgs_role">Terrain / Water reference</string>
+    <string name="ts_license_usgs_license">Public domain (attribution recommended)</string>
+    <string name="ts_license_osm_role">Basemap / Rendering</string>
+    <string name="ts_license_osm_license">ODbL (data) / BSD-2 (MapLibre)</string>
+    <string name="ts_license_bdc_role">Reverse geocoding RG-A</string>
+    <string name="ts_license_bdc_license">CC BY 4.0 (client API free tier)</string>
+    <string name="ts_license_photon_role">Reverse geocoding RG-B</string>
+    <string name="ts_license_photon_license">ODbL (data © OpenStreetMap)</string>
+
+    <string name="ts_privacy_geo_on">Controlled by the reverse-geocoding master switch: on</string>
+    <string name="ts_privacy_geo_off">Controlled by the reverse-geocoding master switch: off (no requests)</string>
+    <string name="ts_privacy_prefetch_on">Prefetch is on: list pages may warm up in the background</string>
+    <string name="ts_privacy_prefetch_off">Prefetch is off: fetched only on the detail page</string>
+    <string name="ts_privacy_rga_source">Reverse geocoding RG-A · BigDataCloud</string>
+    <string name="ts_privacy_rgb_source">Reverse geocoding RG-B · Photon</string>
+    <string name="ts_privacy_rg_coords">Sends coordinates only (lat/lon); no account or device identifiers</string>
+    <string name="ts_privacy_geocode_source">Geocoding · Open-Meteo /v1/search</string>
+    <string name="ts_privacy_geocode_sends">Sends search keywords only</string>
+    <string name="ts_privacy_geocode_only">Sent only when you search</string>
+    <string name="ts_privacy_weather_source">Weather · Open-Meteo</string>
+    <string name="ts_privacy_coords_period">Sends coordinates and request period</string>
+    <string name="ts_privacy_marine_source">Ocean · Copernicus / ocean model</string>
+    <string name="ts_privacy_wq_source">Water quality · On-device derivation</string>
+    <string name="ts_privacy_wq_sends">Sends nothing (derived on device from the weather series)</string>
+    <string name="ts_privacy_no_network">No network requests</string>
+<!-- Copernicus credential section (TalkBack) -->
+    <string name="ts_settings_copernicus_username_input">Copernicus username field</string>
+    <string name="ts_settings_copernicus_password_input">Copernicus password field</string>
+    <string name="ts_settings_copernicus_check_save_desc">Verify and save Copernicus credentials</string>
+    <string name="ts_settings_copernicus_clear_desc">Clear saved Copernicus credentials</string>
+    <string name="ts_settings_copernicus_password_hide">Hide password</string>
+    <string name="ts_settings_copernicus_password_show">Show password</string>
+</resources>

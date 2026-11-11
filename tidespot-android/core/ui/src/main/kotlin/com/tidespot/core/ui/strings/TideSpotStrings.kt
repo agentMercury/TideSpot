@@ -1,107 +1,199 @@
 package com.tidespot.core.ui.strings
 
 /**
- * 用户可见文案唯一入口（FO-01，M6 批次 2 部分落地；CHG-16⑳）：
- * 本期只迁「Tab 标题 / 免责 / 徽标」核心串并保证零行为漂移
- * （[com.tidespot.core.ui.titles.WaterBodyTabTitles] 与 [com.tidespot.core.ui.badge.Kind]
- * 的既有常量/标签改为引用本对象，值一字不改，既有测试断言保持通过）。
+ * 用户可见文案唯一入口（FO-01 / OPT-V11-13 全量外移）。
  *
- * - 全量文案外移登记 v1.1；
- * - 否决 reason 文案由 :core:domain VetoEvaluator 产出（冻结模块不可改）；消费侧禁 parse 文案，
- *   结构化兜底走 [com.tidespot.core.domain.model.VetoCode]（Models.kt 冻结契约）。
+ * 三层结构：
+ * - **本接口**：跨 Compose / 纯 Kotlin 逻辑共用的取词契约（[com.tidespot.core.ui.titles.WaterBodyTabTitles]、
+ *   [com.tidespot.core.ui.format.RelativeTimeFormatter] 等纯函数依赖它）；
+ * - **[ResStrings]**：Android 运行期实现，全部值来自 `values/strings.xml` / `values-en/strings.xml`
+ *   （切系统语言即切文案，N-8；单测/纯函数用 [ZhStrings] / [EnStrings]）；
+ * - **[ComposeTideSpotStrings]**：Composable 侧便捷取词（`LocalContext.current.resources` + 配置变更感知）。
+ *
+ * 红线：`src/main` 下除 `strings/`（文案提供者，资源镜像）与 `*DomainCopy*`（:core:domain 纯 Kotlin 文案提供者）
+ * 外，**禁止出现中文字符串字面量**；KDoc/行注释除外。
  */
-object TideSpotStrings {
+interface TideSpotStrings {
 
-    // ────────────── Tab 标题（WaterBodyTabTitles 串源；顺序 §8.1：风浪|天气|钓鱼指数|水质|潮流） ──────────────
+    // ────────────── Tab 标题（SRS §8.1；内陆/陆地降级 F-1.6 / F-1.7） ──────────────
+    val tabWave: String
+    val tabWeather: String
+    val tabScore: String
+    val tabWaterQuality: String
+    val tabTide: String
+    val tabWaveInland: String
+    val tabTideInland: String
+    val tabWaveLand: String
+    val tabWaterQualityLand: String
+    val tabTideLand: String
+    val noticeLand: String
+    val noticeUnknown: String
 
-    const val TAB_WAVE = "风浪"
-    const val TAB_WEATHER = "天气"
-    const val TAB_SCORE = "钓鱼指数"
-    const val TAB_WATER_QUALITY = "水质"
-    const val TAB_TIDE = "潮流"
-
-    // F-1.6 内陆降级 / F-1.7 陆地点标注（与 WaterBodyTabTitles 逐字一致）
-    const val TAB_WAVE_INLAND = "湖面风与水温"
-    const val TAB_TIDE_INLAND = "水位（无潮汐）"
-    const val TAB_WAVE_LAND = "风浪（估算）"
-    const val TAB_WATER_QUALITY_LAND = "水质（估算）"
-    const val TAB_TIDE_LAND = "潮流（不可用）"
-
-    const val NOTICE_LAND = "陆地点：水质与潮流为估算或不可用，仅供参考"
-    const val NOTICE_UNKNOWN = "水体类型待判定：数据源恢复后自动更新"
-
-    // ────────────── 免责声明（§9.6 / D11：共 5 条，第 5 条为 M6 新增「潮汐校正」） ──────────────
-
-    const val DISCLAIMER_SHEET_TITLE = "免责声明"
-
-    /** 1/5 潮位与潮流（原 WAVE/TIDE Tab 免责原文）。 */
-    const val DISCLAIMER_WAVE_TIDE =
-        "潮位与潮流来自 ~8 km 全球模型，官方声明不适用于近岸航行；本 App 不替代航路指南与官方潮汐表。"
-
-    /** 2/5 天气（原 WEATHER Tab 免责原文）。 */
-    const val DISCLAIMER_WEATHER =
-        "雷暴、大风、大浪判定仅供参考。水上安全以当地预警为准，切勿在雷电、台风、大潮汛期间出钓。"
-
-    /** 3/5 钓鱼指数（原 SCORE Tab 免责原文）。 */
-    const val DISCLAIMER_SCORE =
-        "指数基于气象与天文因子的经验加权估算，不构成渔获保证。"
-
-    /** 4/5 水质（原 WATER_QUALITY Tab 免责原文）。 */
-    const val DISCLAIMER_WATER_QUALITY =
-        "中国境内多数点位水质为模型估算值，非实测，不作为用水、饮用或接触安全依据。"
-
-    /** 5/5 潮汐校正（D11 新增）：现场校潮属用户自记经验修正，非官方数据。 */
-    const val DISCLAIMER_TIDE_CORRECTION =
-        "「现场校潮」为用户自记高潮观测对模型滞后的经验修正（lag 平移），仅用于相对时刻参考；" +
-            "校正不改变数据来源与精度，仍非官方潮汐表。"
+    // ────────────── 免责声明（SRS §9.6 / D11：恒 5 条） ──────────────
+    val disclaimerTitle: String
+    val disclaimerEntry: String
+    val disclaimerWaveTide: String
+    val disclaimerWeather: String
+    val disclaimerScore: String
+    val disclaimerWaterQuality: String
+    val disclaimerTideCorrection: String
 
     /** 免责全文（Sheet 渲染顺序 1..5；D11 锁：恒 5 条）。 */
-    val DISCLAIMER_ITEMS: List<String> = listOf(
-        DISCLAIMER_WAVE_TIDE,
-        DISCLAIMER_WEATHER,
-        DISCLAIMER_SCORE,
-        DISCLAIMER_WATER_QUALITY,
-        DISCLAIMER_TIDE_CORRECTION,
+    fun disclaimerItems(): List<String> = listOf(
+        disclaimerWaveTide,
+        disclaimerWeather,
+        disclaimerScore,
+        disclaimerWaterQuality,
+        disclaimerTideCorrection,
     )
 
-    /** 常驻免责入口按钮文案（D11）。 */
-    const val DISCLAIMER_ENTRY = "免责声明"
-
-    // ────────────── 置信徽标（§8.2-4；ConfidenceBadge.Kind 标签串源） ──────────────
-
-    const val BADGE_MEASURED = "实测"
-    const val BADGE_SATELLITE = "卫星"
-    const val BADGE_MODEL = "模型"
-    const val BADGE_ESTIMATED = "估算"
-    const val BADGE_UNCALIBRATED = "未校正"
-    const val BADGE_LOW_CONFIDENCE = "低置信"
+    // ────────────── 置信徽标（SRS §8.2-4） ──────────────
+    val badgeMeasured: String
+    val badgeSatellite: String
+    val badgeModel: String
+    val badgeEstimated: String
+    val badgeUncalibrated: String
+    val badgeLowConfidence: String
 
     /** TalkBack 读法模板（N-7）。 */
-    fun confidenceDescription(label: String): String = "数据置信：$label"
+    fun confidenceDescription(label: String): String
 
-    // ────────────── F-3.7 数据来源署名（M6 批次 3 部分口径；:app 详情容器透出） ──────────────
+    // ────────────── 数据来源署名（F-3.7） ──────────────
+    val modelAttribution: String
 
-    /** 天气/海洋模型静态署名（Open-Meteo 底层模型；DTO 级模型名/网格分辨率透出登记 v1.1）。 */
-    const val MODEL_ATTRIBUTION =
-        "天气 · Open-Meteo（ICON / ECMWF 模型） · 海洋 · Open-Meteo Marine / Copernicus Marine"
+    // ────────────── 水体类型徽标（OPT-V11-15） ──────────────
+    val waterBodyOcean: String
+    val waterBodyNearshore: String
+    val waterBodyInland: String
+    val waterBodyLand: String
+    val waterBodyUnknown: String
 
-    // ────────────── 水体类型徽标与收藏信息卡片（OPT-V11-15 / P2 CHG-37） ──────────────
+    // ────────────── 收藏信息卡片（OPT-V11-15；缺值 —） ──────────────
+    val infoCoordinatePrefix: String
+    val infoElevationPrefix: String
+    val infoLastFetchedPrefix: String
+    val infoGroupPrefix: String
+    val infoWaterBodyPrefix: String
+    val infoAccuracyNote: String
 
-    /** 水体类型徽标文案（[com.tidespot.core.domain.model.WaterBodyType] 展示名）。 */
-    const val WATER_BODY_OCEAN = "海域"
-    const val WATER_BODY_NEARSHORE = "近岸"
-    const val WATER_BODY_INLAND = "内陆水域"
-    const val WATER_BODY_LAND = "陆地"
-    const val WATER_BODY_UNKNOWN = "待判定"
+    // ────────────── 因子名（SRS §6.4） ──────────────
+    val factorOxygen: String
+    val factorPressure: String
+    val factorSolunar: String
+    val factorTide: String
+    val factorWind: String
+    val factorWeather: String
+    val factorDaypart: String
+    val factorTempMatch: String
+    val factorComfort: String
+    val factorWaterQuality: String
 
-    /** 收藏信息卡片（OPT-V11-15）：仅读库，字段缺值一律 `—`（禁 0 填充，§5.0）。 */
-    const val INFO_CARD_COORDINATE_PREFIX = "坐标"
-    const val INFO_CARD_ELEVATION_PREFIX = "海拔"
-    const val INFO_CARD_LAST_FETCHED_PREFIX = "最近拉取"
-    const val INFO_CARD_GROUP_PREFIX = "分组"
-    const val INFO_CARD_WATER_BODY_PREFIX = "水体"
+    // ────────────── 因子分解视图（F-3.4） ──────────────
+    val factorBreakdownTitle: String
+    val factorDecay: String
+    val factorRawInput: String
+    fun factorRow(name: String, subText: String, weightText: String): String
+    fun factorMultiplier(multiplierText: String, reason: String): String
 
-    /** 坐标精度来源说明（口径：选点坐标即 WGS84 原始值，存 6 位小数；不做偏移纠偏）。 */
-    const val INFO_CARD_ACCURACY_NOTE =
-        "坐标为选点原始 WGS84 值，保留 6 位小数（≈0.11 m），未做偏移纠偏"
+    // ────────────── 日期 / 相对时间（N-8） ──────────────
+    val timePattern: String
+    val weekdayMon: String
+    val weekdayTue: String
+    val weekdayWed: String
+    val weekdayThu: String
+    val weekdayFri: String
+    val weekdaySat: String
+    val weekdaySun: String
+    fun today(clock: String): String
+    fun tomorrow(clock: String): String
+
+    // ────────────── 逐小时图表 / 日选择器 TalkBack ──────────────
+    fun chartHourTooltipSuffix(hour: Int, tooltip: String): String
+    fun chartHourDescription(unit: String, points: Int): String
+    fun chartMissingSuffix(missing: Int): String
+    val chartScoreDescription: String
+    fun chartWindowSuffix(hours: Int): String
+    fun chartHint(base: String, selected: String): String
+    fun dayToday(weekday: String, date: String): String
+    fun dayFuture(offsetDays: Int, weekday: String, date: String): String
+    fun dayShortToday(weekday: String): String
+    val noDataHour: String
+    val deviceZoneNote: String
+
+    /** 地图信息条：无名称兜底（F-1.3 永不空白）与拖动预览提示。 */
+    val unnamedWater: String
+    val previewHint: String
+
+    /** 水质实测指标名（OPT-V11-02 Sheet / 校验提示）。 */
+    val waterTemp: String
+    val dissolvedOxygen: String
+    val turbidity: String
+
+    /** 批次二：明细 / 无障碍 / 时间格式化（纯逻辑层取词）。 */
+    fun durationHours(hours: Int): String
+    fun windowLine(start: String, peak: String, duration: String): String
+    fun peakScoreLine(score: Int, tier: String): String
+    val burstBadge: String
+    fun sustainedUntil(time: String): String
+    fun calibrationEnabled(lagHours: Int): String
+    val calibrationDisabled: String
+    val rawWind: String
+    val rawGust: String
+    val rawRain: String
+    val rawCloud: String
+    val rawWave: String
+    val rawTideLevel: String
+    val rawCurrent: String
+    val rawTurbidity: String
+    val rawChlorophyll: String
+    fun hourWave(hour: Int, wave: String, period: String, direction: String): String
+    fun hourWeather(hour: Int, temp: String, wind: String, pressure: String): String
+    fun hourScore(hour: Int, score: Int): String
+    fun hourScoreMissing(hour: Int): String
+    fun hourWater(hour: Int, temp: String, doPotential: String): String
+    fun hourTide(hour: Int, level: String, rate: String, current: String): String
+    val hourMissing: String
+    val sourceUnavailable: String
+    fun dataUnusable(ageHours: Int): String
+    val manualSame: String
+    fun manualLater(delta: String): String
+    fun manualEarlier(delta: String): String
+    fun manualCompare(type: String, model: String, delta: String): String
+    val manualAnyType: String
+    fun manualLine(type: String, time: String): String
+    val manualTimeFormatError: String
+    fun manualOutOfRange(maxHours: Int): String
+
+    /** 潮汐图派生（高低潮 + 校正对照）。 */
+    fun tideBefore(before: String): String
+    fun tideAfter(lagHours: Int, after: String): String
+    fun tideHigh(times: String): String
+    fun tideLow(times: String): String
+
+    /** 明细缺省：本点无来源 / 评分单位。 */
+    val noSourceData: String
+    val unitScore: String
+
+    /** 收藏页纯逻辑文案（批次二）。 */
+    val ungrouped: String
+    val summaryNotLoaded: String
+    val staleLabel: String
+    val expiredLabel: String
+    fun dataPrefix(date: String, time: String): String
+    val presetFreshLure: String
+    val presetSeaShore: String
+    val presetFreshBait: String
+    val errBatchDelete: String
+    val errBatchTag: String
+    val errBatchGroup: String
+    val errNoCoordinate: String
+    fun summaryLine(time: String, score: Int, tier: String): String
+    fun batchDeleteConfirm(count: Int): String
+
+    // ────────────── 钓鱼指数 5 档色带文字（SRS §6.3；色值为冻结规格） ──────────────
+    val bandExplosive: String
+    val bandGreat: String
+    val bandOk: String
+    val bandPoor: String
+    val bandBad: String
 }

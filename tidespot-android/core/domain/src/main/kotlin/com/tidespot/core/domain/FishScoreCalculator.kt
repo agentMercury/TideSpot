@@ -11,6 +11,8 @@ import com.tidespot.core.domain.model.FactorScore
 import com.tidespot.core.domain.model.FishScoreResult
 import com.tidespot.core.domain.model.HourlyMarine
 import com.tidespot.core.domain.model.HourlyWeather
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import com.tidespot.core.domain.water.DoPhysics
 import com.tidespot.core.domain.water.WaterTempFusion
 import java.time.Instant
@@ -56,7 +58,13 @@ class FishScoreCalculator {
      * 主入口。[inputs] 必须按时间升序（可在 START 之前多带前置小时，供 Tw 滞后窗口与 dP24 用）。
      * [lonDeg] 用于月上中天换算（与参照实现一致，tz 默认 +8）。
      */
-    fun calculate(inputs: List<HourlyScoreInput>, preset: ScenePreset, lonDeg: Double): List<FishScoreResult> {
+    fun calculate(
+        inputs: List<HourlyScoreInput>,
+        preset: ScenePreset,
+        lonDeg: Double,
+        // OPT-V11-13：文案源（默认中文，零行为漂移；Android 侧注入 ResDomainCopy）
+        copy: DomainCopy = ZhDomainCopy,
+    ): List<FishScoreResult> {
         // N-4/BLK-06（CHG-07 修复 1）：空序列返回空结果 + 合法空综合，不得抛异常
         if (inputs.isEmpty()) return emptyList()
         val sorted = inputs.sortedBy { it.timeEpochSec }
@@ -79,7 +87,7 @@ class FishScoreCalculator {
         val pressures = sorted.map { it.weather.pressureMslHpa }
 
         return sorted.mapIndexed { i, input ->
-            scoreOne(input, i, preset, lonDeg, amp, dhByIndex[i] ?: 0.0, airTemps, pressures, sorted)
+            scoreOne(input, i, preset, lonDeg, amp, dhByIndex[i] ?: 0.0, airTemps, pressures, sorted, copy)
         }
     }
 
@@ -93,6 +101,7 @@ class FishScoreCalculator {
         airTemps: List<Double?>,
         pressures: List<Double?>,
         all: List<HourlyScoreInput>,
+        copy: DomainCopy,
     ): FishScoreResult {
         val w = input.weather
         val m = input.marine
@@ -128,9 +137,11 @@ class FishScoreCalculator {
         // D09（M6/CHG-16）：月龄/照明/中天三项原始输入进 FactorScore.detail（§6.2d/e/f；
         // 纯增明细文本，sub/weight 不变——黄金对拍 B1–B7 数值路径零触碰）
         val illum = Solunar.illumination(age)
-        val solunarDetail = "月龄" + String.format(java.util.Locale.US, "%.1f", age) + "天" +
-            " 照明" + String.format(java.util.Locale.US, "%.0f%%", illum * 100) +
-            " 中天" + String.format(java.util.Locale.US, "%.2f", transit) + "时"
+        val solunarDetail = copy.solunarDetail(
+            String.format(java.util.Locale.US, "%.1f", age),
+            String.format(java.util.Locale.US, "%.0f%%", illum * 100),
+            String.format(java.util.Locale.US, "%.2f", transit),
+        )
 
         // —— 其余子分（null → 从分母剔除，§6.4/§6.7）——
         // rain（CHG-07 修复 1）：各雨量分量全缺测 → 未知(null)，不得当 0（会误加小雨 bonus、漏安全衰减）；
@@ -187,13 +198,14 @@ class FishScoreCalculator {
             rainMmPerH = rain,
             waveHeightM = wave,
             doPotentialMgL = doP,
+            copy = copy,
         )
         val total = (baseScore * veto.value * 100.0).roundToInt()
 
         // 缺 past 小时的 pressure 明细：权重 0.08 + 「趋势数据不足」标注（中文，M6 i18n 时再机器码化）
         val effectivePressureWeight =
             if (trendMissing) MISSING_TREND_PRESSURE_WEIGHT else preset.weights[FactorId.PRESSURE] ?: 0.0
-        val detailForPressure = if (trendMissing) "趋势数据不足" else null
+        val detailForPressure = if (trendMissing) copy.trendInsufficient else null
 
         // —— 因子明细（F-3.4 分解视图；只收录有效因子，缺失 = 不出现 → UI 显示"本点无该来源数据"§6.7；
         //     水质代理仅入水质 Tab、不计入指数（§6.2j），故 weight=0）——
@@ -215,7 +227,7 @@ class FishScoreCalculator {
                     it, w.cloudCoverPct, rain24hSum(index, all), null, tw,
                 )
             }
-            sWaterQ?.let { add(FactorScore("waterQuality", it, 0.0, "水质 Tab 专用")) }
+            sWaterQ?.let { add(FactorScore("waterQuality", it, 0.0, copy.waterQualityProxyNote)) }
         }
 
         // 低置信：有效权重 < 0.6（§6.7）

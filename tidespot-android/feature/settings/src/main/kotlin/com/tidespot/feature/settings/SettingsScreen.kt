@@ -1,11 +1,13 @@
-﻿package com.tidespot.feature.settings
+package com.tidespot.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
@@ -21,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.tidespot.core.ui.R as UiR
 
 /**
  * SettingsScreen（CHG-16⑱ 薄组装）：所有状态经 [SettingsState] 注入、交互回调上抛，
@@ -31,6 +35,8 @@ import androidx.compose.ui.unit.dp
  *
  * 版块：显示（单位制/详情天数）｜数据与网络（预取/逆地理）｜物种与权重（占位 v1.1）｜
  * 可选 API Key（占位）｜开源许可｜隐私逐源披露。
+ *
+ * OPT-V11-13：全部用户可见文案走资源（`stringResource`），本文件名零中文字面量。
  */
 @Composable
 fun SettingsScreen(
@@ -46,116 +52,140 @@ fun SettingsScreen(
     /** CHG-25（P0-1）：Copernicus 凭据版块槽位（:app 注入 [CopernicusCredentialSection]；null = 不渲染，零行为漂移）。 */
     credentialSection: (@Composable () -> Unit)? = null,
 ) {
+    val screenDesc = stringResource(R.string.ts_settings_content_desc)
     Column(
         modifier = modifier.fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
-            .semantics { contentDescription = "设置页：单位制、详情天数、数据与隐私、开源许可" }
+            .semantics { contentDescription = screenDesc }
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text("设置", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.ts_settings_title), style = MaterialTheme.typography.titleLarge)
 
         // ── 显示 ──
-        SectionTitle("显示")
-        Text("单位制", style = MaterialTheme.typography.titleSmall)
+        SectionTitle(stringResource(R.string.ts_settings_display))
+        Text(stringResource(R.string.ts_settings_unit), style = MaterialTheme.typography.titleSmall)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            val siDesc = stringResource(R.string.ts_settings_unit_si_desc)
+            val imperialDesc = stringResource(R.string.ts_settings_unit_imperial_desc)
             FilterChip(
                 selected = state.unitSystem == UnitSystem.SI,
                 onClick = { onUnitSystemChange(UnitSystem.SI) },
-                label = { Text("公制（°C · km/h · m）") },
-                modifier = Modifier.semantics { contentDescription = "单位制：公制" },
+                label = { Text(stringResource(R.string.ts_settings_unit_si)) },
+                modifier = Modifier.semantics { contentDescription = siDesc },
             )
             FilterChip(
                 selected = state.unitSystem == UnitSystem.IMPERIAL,
                 onClick = { onUnitSystemChange(UnitSystem.IMPERIAL) },
-                label = { Text("英制（°F · mph · ft）") },
-                modifier = Modifier.semantics { contentDescription = "单位制：英制" },
+                label = { Text(stringResource(R.string.ts_settings_unit_imperial)) },
+                modifier = Modifier.semantics { contentDescription = imperialDesc },
             )
         }
-        Text("详情页天数", style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.ts_settings_detail_days), style = MaterialTheme.typography.titleSmall)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(7, 10).forEach { d ->
+                val daysLabel = stringResource(R.string.ts_settings_days, d)
+                val daysDesc = stringResource(R.string.ts_settings_days_desc, d)
                 FilterChip(
                     selected = state.detailDays == d,
                     onClick = { onDetailDaysChange(d) },
-                    label = { Text("$d 天") },
-                    modifier = Modifier.semantics { contentDescription = "详情页天数：$d 天" },
+                    label = { Text(daysLabel) },
+                    modifier = Modifier.semantics { contentDescription = daysDesc },
                 )
             }
         }
         // UX-19（OPT-V11-19 / D8）：地图样式三选（默认彩色；深色系统不覆盖用户选择）
-        Text("地图样式", style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.ts_settings_map_style), style = MaterialTheme.typography.titleSmall)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             MapStyle.entries.forEach { style ->
+                val label = stringResource(style.labelRes)
+                val styleDesc = stringResource(
+                    R.string.ts_settings_map_style_desc,
+                    label,
+                    style.description,
+                )
                 FilterChip(
                     selected = state.mapStyle == style,
                     onClick = { onMapStyleChange(style) },
-                    label = { Text(style.label) },
-                    modifier = Modifier.semantics {
-                        contentDescription = "地图样式：${style.label}（${style.description}）"
-                    },
+                    label = { Text(label) },
+                    modifier = Modifier.semantics { contentDescription = styleDesc },
                 )
             }
         }
         SectionDivider()
 
         // ── 数据与网络 ──
-        SectionTitle("数据与网络")
+        SectionTitle(stringResource(R.string.ts_settings_data_network))
+        val privacyLines = SettingsLogic.privacyLines(state.reverseGeoEnabled, state.prefetchEnabled)
+        val prefetchDesc = stringResource(R.string.ts_settings_prefetch_toggle)
+        val reverseGeoDesc = stringResource(R.string.ts_settings_reverse_geo_toggle)
         ToggleRow(
-            title = "后台预取",
-            subtitle = SettingsLogic.privacyLines(state.reverseGeoEnabled, state.prefetchEnabled)
-                .first { it.source.startsWith("天气") }.toggleNote,
+            title = stringResource(R.string.ts_settings_prefetch),
+            subtitle = stringResource(
+                privacyLines.first { it.sourceRes == R.string.ts_privacy_weather_source }.toggleNoteRes,
+            ),
             checked = state.prefetchEnabled,
             onChange = onPrefetchChange,
-            desc = "后台预取开关",
+            desc = prefetchDesc,
         )
         ToggleRow(
-            title = "逆地理名称（RG-A BigDataCloud / RG-B Photon）",
-            subtitle = "关 = 位置名称回退坐标文本；逐源发送内容见下方「隐私披露」",
+            title = stringResource(R.string.ts_settings_reverse_geo),
+            subtitle = stringResource(R.string.ts_settings_reverse_geo_note),
             checked = state.reverseGeoEnabled,
             onChange = onReverseGeoChange,
-            desc = "逆地理总开关",
+            desc = reverseGeoDesc,
         )
         credentialSection?.invoke()
         SectionDivider()
 
         // ── 用例 / 物种 / 权重（占位） ──
-        SectionTitle("用例 · 物种 · 权重")
-        Text("垂钓用例、物种预设与因子权重编辑入口于 v1.1 开放（当前沿收藏点预设生效）。",
-            style = MaterialTheme.typography.bodySmall)
+        SectionTitle(stringResource(R.string.ts_settings_use_cases))
+        Text(
+            stringResource(UiR.string.ts_placeholder_v11),
+            style = MaterialTheme.typography.bodySmall,
+        )
         SectionDivider()
 
         // ── 可选 API Key（占位） ──
-        SectionTitle("API Key（可选）")
+        SectionTitle(stringResource(R.string.ts_settings_api_key))
         var apiKeyDraft by remember(state.apiKey) { mutableStateOf(state.apiKey ?: "") }
+        val apiKeyInputDesc = stringResource(R.string.ts_settings_api_key_input)
         OutlinedTextField(
             value = apiKeyDraft,
             onValueChange = { apiKeyDraft = it },
-            label = { Text("可选 API Key（当前无消费方，仅保存）") },
+            label = { Text(stringResource(R.string.ts_settings_api_key_optional)) },
             modifier = Modifier.fillMaxWidth()
-                .semantics { contentDescription = "可选 API Key 输入框" },
-            supportingText = { Text("留空 = 未设置") },
+                .semantics { contentDescription = apiKeyInputDesc },
+            supportingText = { Text(stringResource(R.string.ts_settings_api_key_empty)) },
         )
         androidx.compose.material3.Button(onClick = { onApiKeyChange(apiKeyDraft) }) {
-            Text("保存 API Key")
+            Text(stringResource(R.string.ts_settings_api_key_save))
         }
         SectionDivider()
 
         // ── 开源许可 ──
-        SectionTitle("开源许可与数据署名")
+        SectionTitle(stringResource(R.string.ts_settings_licenses))
         SettingsLogic.LICENSES.forEach { lic ->
             Text(lic.name, style = MaterialTheme.typography.titleSmall)
-            Text("${lic.role} · ${lic.license}", style = MaterialTheme.typography.bodySmall)
+            Text(
+                "${stringResource(lic.roleRes)} · ${stringResource(lic.licenseRes)}",
+                style = MaterialTheme.typography.bodySmall,
+            )
             Text(lic.attribution, style = MaterialTheme.typography.labelSmall)
         }
         SectionDivider()
 
         // ── 隐私逐源披露 ──
-        SectionTitle("隐私披露（逐源）")
-        SettingsLogic.privacyLines(state.reverseGeoEnabled, state.prefetchEnabled).forEach { line ->
-            Text(line.source, style = MaterialTheme.typography.titleSmall)
-            Text("发送内容：${line.sends}", style = MaterialTheme.typography.bodySmall)
-            Text(line.toggleNote, style = MaterialTheme.typography.labelSmall)
+        SectionTitle(stringResource(R.string.ts_settings_privacy))
+        privacyLines.forEach { line ->
+            Text(stringResource(line.sourceRes), style = MaterialTheme.typography.titleSmall)
+            Text(
+                stringResource(R.string.ts_settings_privacy_sends, stringResource(line.sendsRes)),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Text(stringResource(line.toggleNoteRes), style = MaterialTheme.typography.labelSmall)
         }
     }
 }

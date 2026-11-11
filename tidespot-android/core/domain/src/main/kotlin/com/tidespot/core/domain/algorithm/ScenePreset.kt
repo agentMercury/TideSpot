@@ -1,6 +1,8 @@
 ﻿package com.tidespot.core.domain.algorithm
 
 import com.tidespot.core.domain.model.WaterBodyType
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 
 /**
  * 场景预设权重与参数（SRS §6.4 表；JSON 资源化属 :app 职责，此处为内置缺省）。
@@ -59,6 +61,14 @@ object Presets {
     )
 
     fun byId(id: String): ScenePreset? = listOf(FRESH_LURE, SEA_SHORE, FRESH_BAIT).firstOrNull { it.id == id }
+
+    /**
+     * 展示名（OPT-V11-13）：按稳定 id 取本地化文案。
+     *
+     * [ScenePreset.label] 为**协议值/历史兼容值**（`spot.preset` 与 `HourlyScoreStore.resolvePreset`
+     * 的中文标签子串解析依赖它），不得翻译；UI 一律走本方法，禁止直接显示 `label`。
+     */
+    fun displayLabel(presetId: String, copy: DomainCopy = ZhDomainCopy): String = copy.presetLabel(presetId)
 }
 
 // ───────────────────────── OPT-19/M6（CHG-16）：8 物种预设库 ─────────────────────────

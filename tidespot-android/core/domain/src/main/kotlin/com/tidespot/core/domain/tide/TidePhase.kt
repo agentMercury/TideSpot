@@ -1,6 +1,8 @@
 package com.tidespot.core.domain.tide
 
 import com.tidespot.core.domain.algorithm.Solunar
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import kotlin.math.abs
 
 /**
@@ -13,6 +15,9 @@ import kotlin.math.abs
  * - D13 覆盖：大潮期恒活汛、小潮期恒死汛；过渡带（1.5 天带外）按潮差增减判定
  *
  * 数据区隔：仅展示层使用，**不得进入 FishScoreCalculator**（与水体判定隔离同等语义）。
+ *
+ * OPT-V11-13：枚举不再携带中文 label（本文件名零字面量）；展示名走 [DomainCopy]
+ * （默认 [ZhDomainCopy]，零行为漂移）。
  */
 object TidePhase {
 
@@ -25,22 +30,15 @@ object TidePhase {
     const val BAND_DAYS: Double = 1.5
 
     /** 大潮/小潮（NONE = 过渡带，非大非小）。 */
-    enum class TideSize(val label: String?) {
-        SPRING("大潮"),
-        NEAP("小潮"),
-        NONE(null),
-    }
+    enum class TideSize { SPRING, NEAP, NONE }
 
     /** 活汛/死汛。 */
-    enum class TideCurrent(val label: String) {
-        ACTIVE("活汛"),
-        DEAD("死汛"),
-    }
+    enum class TideCurrent { ACTIVE, DEAD }
 
     data class Phase(val size: TideSize, val current: TideCurrent) {
         /** UI chip 文案：大潮/小潮存在时「大潮 · 活汛」，过渡带仅「活汛」。 */
-        val label: String
-            get() = listOfNotNull(size.label, current.label).joinToString(" · ")
+        fun label(copy: DomainCopy = ZhDomainCopy): String =
+            listOfNotNull(copy.tideSizeLabel(size), copy.tideCurrentLabel(current)).joinToString(" · ")
     }
 
     /** 月龄归一化到 [0, 朔望月) —— 负数/超月龄（>29.53）一律折回。 */
@@ -77,5 +75,5 @@ object TidePhase {
     }
 
     /** 便捷：月龄 → chip 文案（UI 唯一入口，禁 Screen 内拼串）。 */
-    fun labelFor(ageDays: Double): String = of(ageDays).label
+    fun labelFor(ageDays: Double, copy: DomainCopy = ZhDomainCopy): String = of(ageDays).label(copy)
 }

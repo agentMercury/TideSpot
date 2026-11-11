@@ -86,7 +86,7 @@ class AppGraph(context: Context) {
     private val waterBodyClassifier: WaterBodyClassifier = run {
         val stored = runBlocking { credentialStore.load() }
         if (stored == null) {
-            Log.i(TAG, "Copernicus 凭据未配置：OSTIA 探针禁用 → 水体判定 UNKNOWN 降级（设置页可配置）")
+            Log.i(TAG, "Copernicus 凭据未配置：OSTIA 探针禁用 → 水体判定 UNKNOWN 降级（设置页可配置）") // i18n-exempt: 技术日志
         }
         WaterBodyClassifier(
             waterBodyCacheDao = db.waterBodyCacheDao(),
@@ -112,7 +112,7 @@ class AppGraph(context: Context) {
             waterBodyClassifier.setProbe(
                 OstiaLakeProbe(CopernicusAuthClient(credential.username, credential.password)),
             )
-            Log.i(TAG, "Copernicus 凭据已生效（运行期切换探针，无需重启）")
+            Log.i(TAG, "Copernicus 凭据已生效（运行期切换探针，无需重启）") // i18n-exempt: 技术日志
         }
         return result
     }

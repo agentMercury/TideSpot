@@ -50,6 +50,14 @@ fun CopernicusCredentialSection(
     var checking by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<SectionMessage?>(null) }
     val scope = rememberCoroutineScope()
+    val usernameInputDesc = stringResource(R.string.ts_settings_copernicus_username_input)
+    val passwordInputDesc = stringResource(R.string.ts_settings_copernicus_password_input)
+    val checkSaveDesc = stringResource(R.string.ts_settings_copernicus_check_save_desc)
+    val clearDesc = stringResource(R.string.ts_settings_copernicus_clear_desc)
+    val passwordToggleDesc = stringResource(
+        if (showPassword) R.string.ts_settings_copernicus_password_hide
+        else R.string.ts_settings_copernicus_password_show,
+    )
 
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(stringResource(UiR.string.ts_copernicus_section_title), style = MaterialTheme.typography.titleSmall)
@@ -64,7 +72,9 @@ fun CopernicusCredentialSection(
             onValueChange = { username = it },
             label = { Text(stringResource(UiR.string.ts_copernicus_username_label)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Copernicus 用户名输入框" },
+            modifier = Modifier.fillMaxWidth().semantics {
+                contentDescription = usernameInputDesc
+            },
         )
         OutlinedTextField(
             value = password,
@@ -72,7 +82,9 @@ fun CopernicusCredentialSection(
             label = { Text(stringResource(UiR.string.ts_copernicus_password_label)) },
             singleLine = true,
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Copernicus 密码输入框" },
+            modifier = Modifier.fillMaxWidth().semantics {
+                contentDescription = passwordInputDesc
+            },
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
@@ -98,7 +110,7 @@ fun CopernicusCredentialSection(
                         checking = false
                     }
                 },
-                modifier = Modifier.semantics { contentDescription = "校验并保存 Copernicus 凭据" },
+                modifier = Modifier.semantics { contentDescription = checkSaveDesc },
             ) {
                 Text(
                     stringResource(
@@ -115,11 +127,11 @@ fun CopernicusCredentialSection(
                         message = SectionMessage.Cleared
                     }
                 },
-                modifier = Modifier.semantics { contentDescription = "清除已保存的 Copernicus 凭据" },
+                modifier = Modifier.semantics { contentDescription = clearDesc },
             ) { Text(stringResource(UiR.string.ts_copernicus_clear)) }
             OutlinedButton(
                 onClick = { showPassword = !showPassword },
-                modifier = Modifier.semantics { contentDescription = if (showPassword) "隐藏密码" else "显示密码" },
+                modifier = Modifier.semantics { contentDescription = passwordToggleDesc },
             ) {
                 Text(stringResource(if (showPassword) UiR.string.ts_copernicus_hide else UiR.string.ts_copernicus_show))
             }

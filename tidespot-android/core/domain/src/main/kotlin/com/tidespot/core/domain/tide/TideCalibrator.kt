@@ -1,5 +1,7 @@
 ﻿package com.tidespot.core.domain.tide
 
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -283,11 +285,13 @@ object TideCalibrator {
         observationTypes: List<TideObservationType?> = emptyList(),
         // OPT-V11-07：模型分类型标记时刻（高潮/低潮/开始涨/开始退；缺键按极值全集兜底）
         modelMarkersByType: Map<TideObservationType, List<Long>> = emptyMap(),
+        // OPT-V11-13：文案源（默认中文，零行为漂移；Android 侧注入 ResDomainCopy）
+        copy: DomainCopy = ZhDomainCopy,
     ): ManualTideFit {
         if (observationTimesEpochSec.size < 2) {
             return ManualTideFit(
                 lagHours = 0, offsetM = 0.0, gain = 1.0, adopted = false,
-                message = "再记 " + (2 - observationTimesEpochSec.size) + " 条即可校潮",
+                message = copy.manualNeedMore(2 - observationTimesEpochSec.size),
             )
         }
         // OPT-06（M5）：模型极值匹配限 ±6h 窗（abs(it-obs) <= 6*3600 先过滤再取最近）——
@@ -306,13 +310,13 @@ object TideCalibrator {
         if (lags.size < 2) {
             return ManualTideFit(
                 lagHours = 0, offsetM = 0.0, gain = 1.0, adopted = false,
-                message = "有效观测不足 2 条（现有 ${lags.size} 条 ±6h 内有匹配极值）",
+                message = copy.manualNoValidObservations(lags.size),
             )
         }
         val median = if (lags.size % 2 == 1) lags[lags.size / 2] else (lags[lags.size / 2 - 1] + lags[lags.size / 2]) / 2.0
         val lag = Math.round(median).toInt()
         if (abs(lag) > MAX_ABS_LAG) {
-            return ManualTideFit(lag, 0.0, 1.0, false, "现场校潮 lag $lag h 超出 ±$MAX_ABS_LAG h，不启用")
+            return ManualTideFit(lag, 0.0, 1.0, false, copy.manualLagExceeds(lag, MAX_ABS_LAG))
         }
         return ManualTideFit(lag, 0.0, 1.0, true, null)
     }

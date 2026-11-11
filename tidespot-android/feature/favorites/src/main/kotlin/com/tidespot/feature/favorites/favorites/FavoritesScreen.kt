@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -38,7 +40,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.ui.R as UiR
+import com.tidespot.core.ui.banner.OfflineBanner
 import com.tidespot.core.ui.format.Format
+import androidx.compose.ui.res.stringResource
+import com.tidespot.core.ui.strings.localTideSpotStrings
+import com.tidespot.feature.favorites.R
 import com.tidespot.core.ui.zone.SpotZones
 
 /**
@@ -62,6 +69,8 @@ fun FavoritesScreen(
     onTop10Opened: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
+    val strings = localTideSpotStrings()
+    val screenDesc = stringResource(R.string.ts_fav_content_desc)
     // OPT-M5-03（CHG-16⑯）：时刻渲染按 spot.tzOffsetSec → ZoneOffset（SpotZones 单源）；
     // null = 未回写 → 系统默认并在卡片注明「本机时区」。跨点 Top10 逐条目用各点时区（见 Top10Content）。
 
@@ -93,17 +102,22 @@ fun FavoritesScreen(
 
     LazyColumn(
         modifier = modifier.fillMaxSize()
-            .semantics { contentDescription = "收藏列表：收藏点与最佳窗口摘要" },
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .semantics { contentDescription = screenDesc },
     ) {
+        // OPT-V115-01 #4（ts_offline）：离线横幅（不阻断离线数据，仅提示）
+        item { OfflineBanner() }
         item {
             // OPT-V11-10（P1）：搜索框（名称/备注实时过滤）+ 标签/预设 chips（先筛后排）
+            val searchDesc = stringResource(R.string.ts_fav_search_desc)
             OutlinedTextField(
                 value = state.filter.query,
                 onValueChange = { viewModel.setFilter(state.filter.copy(query = it)) },
-                label = { Text("搜索名称或备注") },
+                label = { Text(stringResource(R.string.ts_fav_search_hint)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
-                    .semantics { contentDescription = "搜索收藏点" },
+                    .semantics { contentDescription = searchDesc },
             )
             val tags = FavoritesFilterLogic.availableTags(state.spots)
             val presets = FavoritesFilterLogic.availablePresets(state.spots)
@@ -113,6 +127,7 @@ fun FavoritesScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     items(tags, key = { "tag-$it" }) { tag ->
+                        val tagDesc = stringResource(R.string.ts_fav_tag_filter, tag)
                         FilterChip(
                             selected = state.filter.tag == tag,
                             onClick = {
@@ -121,7 +136,7 @@ fun FavoritesScreen(
                                 )
                             },
                             label = { Text(tag) },
-                            modifier = Modifier.semantics { contentDescription = "标签筛选：$tag" },
+                            modifier = Modifier.semantics { contentDescription = tagDesc },
                         )
                     }
                 }
@@ -132,6 +147,7 @@ fun FavoritesScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     items(presets, key = { "preset-$it" }) { preset ->
+                        val presetDesc = stringResource(R.string.ts_fav_preset_filter, preset)
                         FilterChip(
                             selected = state.filter.preset == preset,
                             onClick = {
@@ -140,7 +156,7 @@ fun FavoritesScreen(
                                 )
                             },
                             label = { Text(preset) },
-                            modifier = Modifier.semantics { contentDescription = "场景筛选：$preset" },
+                            modifier = Modifier.semantics { contentDescription = presetDesc },
                         )
                     }
                 }
@@ -166,30 +182,32 @@ fun FavoritesScreen(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    item { SortChip("按名称", state.sortOrder == SortOrder.NAME) { viewModel.setSortOrder(SortOrder.NAME) } }
-                    item { SortChip("综合推荐", state.sortOrder == SortOrder.RECOMMENDED) { viewModel.setSortOrder(SortOrder.RECOMMENDED) } }
-                    item { SortChip("按最近查看", state.sortOrder == SortOrder.LAST_VIEWED) { viewModel.setSortOrder(SortOrder.LAST_VIEWED) } }
-                    item { SortChip("按分数", state.sortOrder == SortOrder.SCORE) { viewModel.setSortOrder(SortOrder.SCORE) } }
+                    item { SortChip(stringResource(R.string.ts_fav_sort_name), state.sortOrder == SortOrder.NAME) { viewModel.setSortOrder(SortOrder.NAME) } }
+                    item { SortChip(stringResource(R.string.ts_fav_sort_recommended), state.sortOrder == SortOrder.RECOMMENDED) { viewModel.setSortOrder(SortOrder.RECOMMENDED) } }
+                    item { SortChip(stringResource(R.string.ts_fav_sort_recent), state.sortOrder == SortOrder.LAST_VIEWED) { viewModel.setSortOrder(SortOrder.LAST_VIEWED) } }
+                    item { SortChip(stringResource(R.string.ts_fav_sort_score), state.sortOrder == SortOrder.SCORE) { viewModel.setSortOrder(SortOrder.SCORE) } }
                     if (state.filter.isActive) {
                         item {
+                            val clearDesc = stringResource(R.string.ts_fav_clear_desc)
                             TextButton(
                                 onClick = { viewModel.setFilter(FavoritesFilterLogic.Filter()) },
-                                modifier = Modifier.semantics { contentDescription = "清除搜索与筛选条件" },
-                            ) { Text("清除") }
+                                modifier = Modifier.semantics { contentDescription = clearDesc },
+                            ) { Text(stringResource(R.string.ts_fav_clear)) }
                         }
                     }
                 }
             }
             if (!state.isSelecting) {
+                val top10Desc = stringResource(R.string.ts_fav_top10_desc)
                 Button(
                     onClick = { showTop10 = true },
                     modifier = Modifier.padding(horizontal = 12.dp)
-                        .semantics { contentDescription = "打开全收藏点最佳窗口前十名" },
+                        .semantics { contentDescription = top10Desc },
                 ) {
-                    Text("全部收藏 Top10")
+                    Text(stringResource(UiR.string.ts_top10_all))
                 }
             }
-            if (state.loading) Text("加载中…", Modifier.padding(12.dp))
+            if (state.loading) Text(stringResource(R.string.ts_fav_loading), Modifier.padding(12.dp))
             state.lastSaveError?.let {
                 Text(it, Modifier.padding(horizontal = 12.dp),
                     color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
@@ -205,7 +223,7 @@ fun FavoritesScreen(
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                     )
-                    TextButton(onClick = { viewModel.clearBatchMessage() }) { Text("知道了") }
+                    TextButton(onClick = { viewModel.clearBatchMessage() }) { Text(stringResource(R.string.ts_fav_got_it)) }
                 }
             }
         }
@@ -226,6 +244,7 @@ fun FavoritesScreen(
                         fetchedAtMillis = state.summaries[spot.id]?.fetchedAtMillis ?: emptyMap(),
                         nowMillis = state.nowEpochSec * 1000L,
                         zone = SpotZones.zoneForSpot(spot),
+                        strings = strings,
                     )
                     // OPT-V11-15：信息卡片（只读库；不新增网络请求）
                     val info = if (state.infoSpotId == spot.id) {
@@ -233,6 +252,7 @@ fun FavoritesScreen(
                             spot = spot,
                             fetchedAtMillis = state.summaries[spot.id]?.fetchedAtMillis ?: emptyMap(),
                             zone = SpotZones.zoneForSpot(spot),
+                            strings = strings,
                         )
                     } else {
                         null
@@ -246,11 +266,12 @@ fun FavoritesScreen(
                                     SpotZones.zoneForSpot(spot),
                                     // OPT-V11-06：相对时间（今天/明天/周X）；now=0（未加载）回落绝对格式
                                     state.nowEpochSec.takeIf { it > 0 },
+                                    strings,
                                 ),
                             )
                             // OPT-V11-11：副标题附数据时间
                             stale.dataTimeLabel?.let { append(" · ").append(it) }
-                            SpotZones.zoneNote(spot.tzOffsetSec)?.let { append(" · ") }
+                            SpotZones.zoneNote(spot.tzOffsetSec, strings)?.let { append(" · ") }
                         },
                         stale = stale,
                         selecting = state.isSelecting,
@@ -272,14 +293,16 @@ fun FavoritesScreen(
             item {
                 if (state.filter.isActive) {
                     Column(Modifier.padding(12.dp)) {
-                        Text("无匹配收藏", style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.ts_fav_no_match), style = MaterialTheme.typography.bodySmall)
+                        val clearDesc = stringResource(R.string.ts_fav_clear_desc)
                         TextButton(
                             onClick = { viewModel.setFilter(FavoritesFilterLogic.Filter()) },
-                            modifier = Modifier.semantics { contentDescription = "清除搜索与筛选条件" },
-                        ) { Text("清除筛选") }
+                            modifier = Modifier.semantics { contentDescription = clearDesc },
+                        ) { Text(stringResource(R.string.ts_fav_clear_filters)) }
                     }
                 } else {
-                    Text("暂无收藏点", Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.ts_fav_empty), Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -306,38 +329,44 @@ fun FavoritesScreen(
 
     // F-2.4 删除二次确认
     deleteTarget?.let { target ->
+        val confirmDesc = stringResource(R.string.ts_fav_delete_confirm_desc)
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            title = { Text("删除收藏点") },
-            text = { Text("确定删除「${target.name}」吗？该操作不可撤销。") },
+            title = { Text(stringResource(R.string.ts_fav_delete)) },
+            text = { Text(stringResource(R.string.ts_fav_delete_confirm, target.name)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteFavorite(target.id)
                     deleteTarget = null
-                }, modifier = Modifier.semantics { contentDescription = "确认删除收藏点" }) { Text("删除") }
+                }, modifier = Modifier.semantics { contentDescription = confirmDesc }) {
+                    Text(stringResource(R.string.ts_fav_delete_action))
+                }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTarget = null }) { Text("取消") }
+                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(UiR.string.ts_cancel)) }
             },
         )
     }
 
     // OPT-V11-12：批量删除二次确认（条数明示）
     if (showBatchDelete) {
+        val batchConfirmDesc = stringResource(R.string.ts_fav_batch_delete_desc)
         AlertDialog(
             onDismissRequest = { showBatchDelete = false },
-            title = { Text("批量删除") },
-            text = { Text(FavoritesBatchLogic.deleteConfirmMessage(state.selection.size)) },
+            title = { Text(stringResource(R.string.ts_fav_batch_delete)) },
+            text = { Text(FavoritesBatchLogic.deleteConfirmMessage(state.selection.size, strings)) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         viewModel.deleteSelected(sorted)
                         showBatchDelete = false
                     },
-                    modifier = Modifier.semantics { contentDescription = "确认批量删除" },
-                ) { Text("删除") }
+                    modifier = Modifier.semantics { contentDescription = batchConfirmDesc },
+                ) { Text(stringResource(R.string.ts_fav_delete_action)) }
             },
-            dismissButton = { TextButton(onClick = { showBatchDelete = false }) { Text("取消") } },
+            dismissButton = {
+                TextButton(onClick = { showBatchDelete = false }) { Text(stringResource(UiR.string.ts_cancel)) }
+            },
         )
     }
 
@@ -369,18 +398,21 @@ fun FavoritesScreen(
     // F-2.6 跨点 Top10（Sheet 内独立滚动 = 单层 LazyColumn，无嵌套同向 LazyColumn，D02）
     if (showTop10) {
         ModalBottomSheet(onDismissRequest = { showTop10 = false }) {
-            Top10Content(top10 = state.top10)
+            Column(Modifier.navigationBarsPadding()) {
+                Top10Content(top10 = state.top10)
+            }
         }
     }
 }
 
 @Composable
 private fun SortChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    val sortDesc = stringResource(R.string.ts_fav_sort_desc, label)
     FilterChip(
         selected = selected,
         onClick = onClick,
         label = { Text(label) },
-        modifier = Modifier.semantics { contentDescription = "排序方式：$label" },
+        modifier = Modifier.semantics { contentDescription = sortDesc },
     )
 }
 
@@ -391,19 +423,19 @@ private fun GroupHeader(
     collapsed: Boolean,
     onToggle: () -> Unit,
 ) {
+    val groupName = FavoritesGroupLogic.displayName(group.name, localTideSpotStrings())
+    val headerDesc = stringResource(R.string.ts_fav_group_desc, groupName, group.spots.size) +
+        stringResource(if (collapsed) R.string.ts_fav_collapsed else R.string.ts_fav_expand)
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TextButton(
             onClick = onToggle,
-            modifier = Modifier.semantics {
-                contentDescription = "分组 ${group.name}，${group.spots.size} 个收藏点，" +
-                    if (collapsed) "已折叠，点击展开" else "点击折叠"
-            },
+            modifier = Modifier.semantics { contentDescription = headerDesc },
         ) {
             Text(
-                "${if (collapsed) "▸" else "▾"} ${group.name}（${group.spots.size}）",
+                "${if (collapsed) "▸" else "▾"} $groupName (${group.spots.size})",
                 style = MaterialTheme.typography.labelLarge,
             )
         }
@@ -423,31 +455,39 @@ private fun BatchActionBar(
     onGroup: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
+        val selectAllDesc = stringResource(if (allSelected) R.string.ts_fav_all_selected else R.string.ts_fav_select_all_desc)
+        val exitDesc = stringResource(R.string.ts_fav_exit_desc)
+        val deleteDesc = stringResource(R.string.ts_fav_batch_delete_sel_desc)
+        val tagDesc = stringResource(R.string.ts_fav_batch_tag_desc)
+        val groupDesc = stringResource(R.string.ts_fav_batch_group_desc)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("已选 $selectedCount 项", style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(R.string.ts_fav_selected_count, selectedCount),
+                style = MaterialTheme.typography.labelLarge)
             TextButton(
                 onClick = onSelectAll,
-                modifier = Modifier.semantics { contentDescription = if (allSelected) "已全选" else "全选当前列表" },
-            ) { Text(if (allSelected) "已全选" else "全选") }
-            TextButton(onClick = onInvert) { Text("反选") }
+                modifier = Modifier.semantics { contentDescription = selectAllDesc },
+            ) {
+                Text(stringResource(if (allSelected) R.string.ts_fav_all_selected else R.string.ts_fav_select_all))
+            }
+            TextButton(onClick = onInvert) { Text(stringResource(R.string.ts_fav_invert)) }
             TextButton(
                 onClick = onExit,
-                modifier = Modifier.semantics { contentDescription = "退出多选模式" },
-            ) { Text("退出") }
+                modifier = Modifier.semantics { contentDescription = exitDesc },
+            ) { Text(stringResource(R.string.ts_fav_exit)) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             TextButton(
                 onClick = onDelete,
-                modifier = Modifier.semantics { contentDescription = "批量删除已选收藏点" },
-            ) { Text("删除", color = MaterialTheme.colorScheme.error) }
+                modifier = Modifier.semantics { contentDescription = deleteDesc },
+            ) { Text(stringResource(R.string.ts_fav_delete_action), color = MaterialTheme.colorScheme.error) }
             TextButton(
                 onClick = onTags,
-                modifier = Modifier.semantics { contentDescription = "批量修改标签" },
-            ) { Text("改标签") }
+                modifier = Modifier.semantics { contentDescription = tagDesc },
+            ) { Text(stringResource(R.string.ts_fav_batch_tag)) }
             TextButton(
                 onClick = onGroup,
-                modifier = Modifier.semantics { contentDescription = "批量修改分组" },
-            ) { Text("改分组") }
+                modifier = Modifier.semantics { contentDescription = groupDesc },
+            ) { Text(stringResource(R.string.ts_fav_batch_group)) }
         }
     }
 }
@@ -467,7 +507,24 @@ private fun FavoriteCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val staleBadge = FavoritesStaleLogic.badge(stale.level)
+    val strings = localTideSpotStrings()
+    val staleBadge = FavoritesStaleLogic.badge(stale.level, strings)
+    val itemDesc = stringResource(
+        R.string.ts_fav_item_desc,
+        spot.name,
+        spot.lat.toString(),
+        spot.lon.toString(),
+        summaryLine,
+    ) +
+        (staleBadge?.let { stringResource(R.string.ts_fav_status_suffix, it) } ?: "") +
+        if (selected) stringResource(R.string.ts_fav_selected_suffix) else ""
+    val infoDesc = stringResource(
+        if (info == null) R.string.ts_fav_expand_info else R.string.ts_fav_collapse_info,
+        spot.name,
+    )
+    val dataStatusDesc = staleBadge?.let { stringResource(R.string.ts_fav_data_status, it) }
+    val editDesc = stringResource(R.string.ts_fav_edit_desc, spot.name)
+    val deleteDesc = stringResource(R.string.ts_fav_delete_item_desc, spot.name)
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
             // OPT-V11-11：陈旧/已过期整项降透明度
@@ -477,11 +534,7 @@ private fun FavoriteCard(
                 onClick = { if (selecting) onLongPress() else onOpen() },
                 onLongClick = onLongPress,
             )
-            .semantics {
-                contentDescription = "收藏点 ${spot.name}，坐标 ${spot.lat} ${spot.lon}，摘要 $summaryLine" +
-                    (staleBadge?.let { "，状态 $it" } ?: "") +
-                    if (selected) "，已选中" else ""
-            },
+            .semantics { contentDescription = itemDesc },
     ) {
         Column(Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -495,16 +548,16 @@ private fun FavoriteCard(
                         onClick = {},
                         label = { Text(badge) },
                         modifier = Modifier.padding(start = 6.dp)
-                            .semantics { contentDescription = "数据状态：$badge" },
+                            .semantics { contentDescription = dataStatusDesc ?: badge },
                     )
                 }
                 if (!selecting) {
                     TextButton(
                         onClick = onToggleInfo,
-                        modifier = Modifier.semantics {
-                            contentDescription = if (info == null) "展开信息卡片 ${spot.name}" else "收起信息卡片 ${spot.name}"
-                        },
-                    ) { Text(if (info == null) "信息" else "收起") }
+                        modifier = Modifier.semantics { contentDescription = infoDesc },
+                    ) {
+                        Text(stringResource(if (info == null) R.string.ts_fav_info else R.string.ts_fav_collapse))
+                    }
                 }
             }
             Text(
@@ -545,8 +598,14 @@ private fun FavoriteCard(
             }
             if (!selecting) {
                 Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    TextButton(onClick = onEdit, modifier = Modifier.semantics { contentDescription = "编辑收藏点 ${spot.name}" }) { Text("编辑") }
-                    TextButton(onClick = onDelete, modifier = Modifier.semantics { contentDescription = "删除收藏点 ${spot.name}" }) { Text("删除") }
+                    TextButton(onClick = onEdit,
+                        modifier = Modifier.semantics { contentDescription = editDesc }) {
+                        Text(stringResource(R.string.ts_fav_edit))
+                    }
+                    TextButton(onClick = onDelete,
+                        modifier = Modifier.semantics { contentDescription = deleteDesc }) {
+                        Text(stringResource(R.string.ts_fav_delete_action))
+                    }
                 }
             }
         }
@@ -574,55 +633,63 @@ private fun EditSpotDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (existing == null) "新建收藏点" else "编辑收藏点") },
+        title = {
+            Text(stringResource(if (existing == null) R.string.ts_fav_new_title else R.string.ts_fav_edit_title))
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val nameInputDesc = stringResource(R.string.ts_fav_name_input)
+                val memoInputDesc = stringResource(R.string.ts_fav_memo_input)
+                val tagsInputDesc = stringResource(R.string.ts_fav_tags_input)
+                val groupInputDesc = stringResource(R.string.ts_fav_group_input)
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("名称（必填）") },
+                    label = { Text(stringResource(R.string.ts_fav_name_label)) },
                     isError = nameError,
-                    supportingText = { if (nameError) Text("名称不能为空") },
-                    modifier = Modifier.semantics { contentDescription = "收藏点名称输入框" },
+                    supportingText = { if (nameError) Text(stringResource(R.string.ts_fav_name_required)) },
+                    modifier = Modifier.semantics { contentDescription = nameInputDesc },
                 )
                 OutlinedTextField(
                     value = memo,
                     onValueChange = { memo = it },
-                    label = { Text("备注（可选）") },
-                    modifier = Modifier.semantics { contentDescription = "备注输入框" },
+                    label = { Text(stringResource(R.string.ts_fav_memo_label)) },
+                    modifier = Modifier.semantics { contentDescription = memoInputDesc },
                 )
-                Text("场景预设（可选）", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.ts_fav_preset_label), style = MaterialTheme.typography.labelMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     FavoritesSortLogic.PRESET_OPTIONS.forEach { option ->
+                        val presetDesc = stringResource(R.string.ts_fav_preset_option, option)
                         FilterChip(
                             selected = preset == option,
                             onClick = { preset = if (preset == option) "" else option },
                             label = { Text(option) },
-                            modifier = Modifier.semantics { contentDescription = "场景预设 $option" },
+                            modifier = Modifier.semantics { contentDescription = presetDesc },
                         )
                     }
                 }
                 OutlinedTextField(
                     value = tagsRaw,
                     onValueChange = { tagsRaw = it },
-                    label = { Text("标签（可选，顿号或逗号分隔）") },
-                    modifier = Modifier.semantics { contentDescription = "标签输入框" },
+                    label = { Text(stringResource(R.string.ts_fav_tags_label)) },
+                    modifier = Modifier.semantics { contentDescription = tagsInputDesc },
                 )
                 OutlinedTextField(
                     value = group,
                     onValueChange = { group = it },
-                    label = { Text("分组（可选，留空 = 未分组）") },
+                    label = { Text(stringResource(R.string.ts_fav_group_label)) },
                     singleLine = true,
-                    modifier = Modifier.semantics { contentDescription = "分组输入框" },
+                    modifier = Modifier.semantics { contentDescription = groupInputDesc },
                 )
                 if (groupOptions.isNotEmpty()) {
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         groupOptions.forEach { option ->
+                            val existingDesc = stringResource(R.string.ts_fav_existing_group, option)
                             FilterChip(
                                 selected = group.trim() == option,
                                 onClick = { group = option },
                                 label = { Text(option) },
-                                modifier = Modifier.semantics { contentDescription = "已有分组 $option" },
+                                modifier = Modifier.semantics { contentDescription = existingDesc },
                             )
                         }
                     }
@@ -630,6 +697,7 @@ private fun EditSpotDialog(
             }
         },
         confirmButton = {
+            val saveDesc = stringResource(R.string.ts_fav_save_item)
             TextButton(
                 onClick = {
                     onSave(
@@ -641,10 +709,12 @@ private fun EditSpotDialog(
                     )
                 },
                 enabled = !nameError,
-                modifier = Modifier.semantics { contentDescription = "保存收藏点" },
-            ) { Text("保存") }
+                modifier = Modifier.semantics { contentDescription = saveDesc },
+            ) { Text(stringResource(R.string.ts_fav_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.ts_cancel)) }
+        },
     )
 }
 
@@ -659,39 +729,44 @@ private fun BatchTagsDialog(
     var replace by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("批量改标签（$selectedCount 项）") },
+        title = { Text(stringResource(R.string.ts_fav_batch_tag_title, selectedCount)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val batchTagsDesc = stringResource(R.string.ts_fav_batch_tags_input)
+                val appendDesc = stringResource(R.string.ts_fav_append_desc)
+                val replaceDesc = stringResource(R.string.ts_fav_replace_desc)
                 OutlinedTextField(
                     value = raw,
                     onValueChange = { raw = it },
-                    label = { Text("标签（顿号或逗号分隔）") },
-                    modifier = Modifier.semantics { contentDescription = "批量标签输入框" },
+                    label = { Text(stringResource(R.string.ts_fav_batch_tags_label)) },
+                    modifier = Modifier.semantics { contentDescription = batchTagsDesc },
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     FilterChip(
                         selected = !replace,
                         onClick = { replace = false },
-                        label = { Text("追加") },
-                        modifier = Modifier.semantics { contentDescription = "追加标签" },
+                        label = { Text(stringResource(R.string.ts_fav_append)) },
+                        modifier = Modifier.semantics { contentDescription = appendDesc },
                     )
                     FilterChip(
                         selected = replace,
                         onClick = { replace = true },
-                        label = { Text("替换") },
-                        modifier = Modifier.semantics { contentDescription = "替换标签" },
+                        label = { Text(stringResource(R.string.ts_fav_replace)) },
+                        modifier = Modifier.semantics { contentDescription = replaceDesc },
                     )
                 }
                 Text(
-                    if (replace) "将覆盖所选点的全部标签（输入为空即清空）" else "保留原标签并追加新标签",
+                    stringResource(if (replace) R.string.ts_fav_replace_hint else R.string.ts_fav_append_hint),
                     style = MaterialTheme.typography.labelSmall,
                 )
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(raw, replace) }) { Text("应用") }
+            TextButton(onClick = { onConfirm(raw, replace) }) { Text(stringResource(R.string.ts_fav_apply)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.ts_cancel)) }
+        },
     )
 }
 
@@ -706,24 +781,26 @@ private fun BatchGroupDialog(
     var group by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("批量改分组（$selectedCount 项）") },
+        title = { Text(stringResource(R.string.ts_fav_batch_group_title, selectedCount)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                val batchGroupDesc = stringResource(R.string.ts_fav_batch_group_input)
                 OutlinedTextField(
                     value = group,
                     onValueChange = { group = it },
-                    label = { Text("分组名（留空 = 未分组）") },
+                    label = { Text(stringResource(R.string.ts_fav_group_name_label)) },
                     singleLine = true,
-                    modifier = Modifier.semantics { contentDescription = "批量分组输入框" },
+                    modifier = Modifier.semantics { contentDescription = batchGroupDesc },
                 )
                 if (groupOptions.isNotEmpty()) {
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         groupOptions.forEach { option ->
+                            val existingDesc = stringResource(R.string.ts_fav_existing_group, option)
                             FilterChip(
                                 selected = group.trim() == option,
                                 onClick = { group = option },
                                 label = { Text(option) },
-                                modifier = Modifier.semantics { contentDescription = "已有分组 $option" },
+                                modifier = Modifier.semantics { contentDescription = existingDesc },
                             )
                         }
                     }
@@ -733,24 +810,26 @@ private fun BatchGroupDialog(
         confirmButton = {
             TextButton(
                 onClick = { onConfirm(FavoritesGroupLogic.normalizeGroupName(group)) },
-            ) { Text("应用") }
+            ) { Text(stringResource(R.string.ts_fav_apply)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.ts_cancel)) } },
     )
 }
 
 /** F-2.6 Top10 列表内容（OPT-M5-03：逐条目按归属点时区渲染；Sheet 内单层 LazyColumn 独立滚动）。 */
 @Composable
 private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
+    val strings = localTideSpotStrings()
     if (top10.isEmpty()) {
-        Text("未加载", Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.ts_fav_not_loaded), Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyMedium)
         return
     }
     // 口径注明：任一条目时区未回写 → 按本机时区渲染并注明（SpotZones 口径）
     val deviceZoneUsed = top10.any { it.usesDeviceZone }
     Column(Modifier.padding(horizontal = 12.dp)) {
         if (deviceZoneUsed) {
-            Text("注：部分点未回写时区，其时刻按${SpotZones.DEVICE_ZONE_NOTE}显示",
+            Text(stringResource(R.string.ts_fav_zone_note, strings.deviceZoneNote),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(vertical = 4.dp))
         }
@@ -758,32 +837,49 @@ private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
             items(top10.size) { i ->
                 val entry = top10[i]
                 val w = entry.window
+                val startText = FavoritesSummaryFormatter.time(w.startEpochSec, entry.zone, strings)
+                val peakText = FavoritesSummaryFormatter.time(w.peakEpochSec, entry.zone, strings)
+                val rankDesc = stringResource(
+                    R.string.ts_fav_rank_desc,
+                    i + 1,
+                    entry.spotName,
+                    w.peakScore,
+                    w.tier,
+                    startText,
+                )
                 Card(
                     Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                        .semantics {
-                            contentDescription = "第 ${i + 1} 名，${entry.spotName}，" +
-                                "峰值 ${w.peakScore} 分 ${w.tier}，起始 ${FavoritesSummaryFormatter.time(w.startEpochSec, entry.zone)}"
-                        },
+                        .semantics { contentDescription = rankDesc },
                 ) {
                     Column(Modifier.padding(12.dp)) {
                         Text("#${i + 1} ${entry.spotName}", style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "起 ${FavoritesSummaryFormatter.time(w.startEpochSec, entry.zone)} · " +
-                                "峰 ${FavoritesSummaryFormatter.time(w.peakEpochSec, entry.zone)} · ${w.durationHours} 小时",
+                            stringResource(
+                                R.string.ts_fav_window_start,
+                                startText,
+                                peakText,
+                                w.durationHours,
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         Text(
-                            "${w.peakScore} 分 · ${w.tier}",
+                            stringResource(R.string.ts_fav_window_peak, w.peakScore, w.tier),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         // Top2 主因（空 → —，禁 0 填充）
                         Text(
-                            "主因 " + (if (w.topFactors.isEmpty()) Format.MISSING else w.topFactors.take(2).joinToString("、")),
+                            stringResource(R.string.ts_fav_main_factor) + " " +
+                                if (w.topFactors.isEmpty()) Format.MISSING
+                                else w.topFactors.take(2).joinToString("、"),
                             style = MaterialTheme.typography.bodySmall,
                         )
                         // 注意事项逐条（isEmpty() 判定，CHG-08 ④）
                         if (w.warnings.isNotEmpty()) {
-                            w.warnings.forEach { Text("注意：$it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
+                            w.warnings.forEach {
+                                Text(stringResource(R.string.ts_fav_warning, it),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error)
+                            }
                         }
                     }
                 }

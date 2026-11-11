@@ -3,6 +3,8 @@
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.domain.model.FishScoreResult
 import com.tidespot.core.domain.model.VetoCode
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -56,12 +58,14 @@ object BestWindowFinder {
         // OPT-V11-09（P1）：有效现场校潮 lag（小时；null = 无校正）。仅影响「注意事项」追加一句，
         // 不改候选/rank/去重/时间域（校正已由数据层作用于潮位序列）。
         manualTideLagHours: Int? = null,
+        // OPT-V11-13：文案源（默认中文，零行为漂移；Android 侧注入 ResDomainCopy）。
+        copy: DomainCopy = ZhDomainCopy,
     ): Output {
         // 0) 时间域过滤（CHG-15 偏差①）：results 升序，filter 保序；nowEpochSec=0 时零开销直通
         val inHorizon = if (nowEpochSec > 0) results.filter { it.timeEpochSec >= nowEpochSec } else results
         val effectiveHours = if (nowEpochSec > 0) minOf(validHoursPresent, inHorizon.size) else validHoursPresent
         if (effectiveHours < 24) {
-            return Output(emptyList(), "有效数据不足 24 小时，最佳窗口功能暂不可用")
+            return Output(emptyList(), copy.windowNotEnoughData)
         }
 
         // 1) 候选集：Score≥60 且未触发雷暴否决（含否决小时由 warnings 提示）
@@ -81,11 +85,7 @@ object BestWindowFinder {
         if (merged.isEmpty()) {
             // 全部 <60 → 兜底文案（最高分只在未来序列内取，CHG-15 偏差①）
             val best = inHorizon.maxByOrNull { it.total }
-            val msg = if (best != null) {
-                "未来 $horizonDays 天无 ≥$CANDIDATE_MIN 分窗口，最高 ${best.total} 分"
-            } else {
-                "未来 $horizonDays 天无 ≥$CANDIDATE_MIN 分窗口"
-            }
+            val msg = copy.windowNoCandidate(horizonDays, CANDIDATE_MIN, best?.total)
             return Output(emptyList(), msg, best?.timeEpochSec)
         }
 
@@ -133,9 +133,9 @@ object BestWindowFinder {
                 durationHours = w.len,
                 peakScore = w.peak,
                 rank = w.rank,
-                tier = tierOf(w.peak),
+                tier = tierOf(w.peak, copy),
                 topFactors = topFactors(w.peakHour),
-                warnings = warningsOf(w.peakHour, tideRates, manualTideLagHours),
+                warnings = warningsOf(w.peakHour, tideRates, manualTideLagHours, copy),
                 coreStartEpochSec = w.coreStartEpoch,
                 coreEndEpochSec = w.coreEndEpoch,
                 // 利好延续：仅当核心段短于原窗（UI 附注「利好持续至 HH:mm」；null = 核心即原窗）
@@ -152,13 +152,8 @@ object BestWindowFinder {
         }
         val msg = when {
             windowStartEpochSec > 0 && windowEndEpochSec > windowStartEpochSec ->
-                if (best != null) {
-                    "所选时段无 ≥$CANDIDATE_MIN 分窗口，时段内最高 ${best.total} 分"
-                } else {
-                    "所选时段无 ≥$CANDIDATE_MIN 分窗口"
-                }
-            best != null -> "未来 $horizonDays 天无 ≥$CANDIDATE_MIN 分窗口，最高 ${best.total} 分"
-            else -> "未来 $horizonDays 天无 ≥$CANDIDATE_MIN 分窗口"
+                copy.windowNoCandidateInRange(CANDIDATE_MIN, best?.total)
+            else -> copy.windowNoCandidate(horizonDays, CANDIDATE_MIN, best?.total)
         }
         return Output(emptyList(), msg, best?.timeEpochSec)
     }
@@ -226,17 +221,18 @@ object BestWindowFinder {
         peakHour: FishScoreResult,
         tideRates: Map<Long, Double>?,
         manualTideLagHours: Int?,
+        copy: DomainCopy,
     ): List<String> {
         val warnings = mutableListOf<String>()
         peakHour.vetoReasons.firstOrNull()?.let { warnings.add(it) }
         if (tideRates != null) {
             val dh = tideRates[peakHour.timeEpochSec]
-            if (dh != null && abs(dh) < 0.02) warnings.add("临近平潮/停流，潮流交换弱")
+            if (dh != null && abs(dh) < 0.02) warnings.add(copy.warningSlackTide)
         }
         val gust = peakHour.factors.firstOrNull { it.id == "wind" }?.detail
-        if (gust != null && gust.toDoubleOrNull()?.let { it > 40 } == true) warnings.add("阵风超过 40 km/h，注意抛投安全")
+        if (gust != null && gust.toDoubleOrNull()?.let { it > 40 } == true) warnings.add(copy.warningGustOver40)
         // OPT-V11-09（P1）：有效现场校潮 → 注意事项追加校正状态（无校正不出现空串，CHG-08④）
-        manualTideLagHours?.let { warnings.add(manualCalibrationWarning(it)) }
+        manualTideLagHours?.let { warnings.add(manualCalibrationWarning(it, copy)) }
         return warnings
     }
 
@@ -244,20 +240,14 @@ object BestWindowFinder {
      * OPT-V11-09：校潮状态文案（唯一入口，UI/测试共用）。
      * lag>0 = 模型滞后参考 → 校正后时刻**延后** lag 小时；lag<0 = **提前**。
      */
-    fun manualCalibrationWarning(lagHours: Int): String = when {
-        lagHours > 0 -> "已按现场校潮校正：时刻延后 ${lagHours}h"
-        lagHours < 0 -> "已按现场校潮校正：时刻提前 ${-lagHours}h"
-        else -> "已按现场校潮校正：时刻无偏移"
+    fun manualCalibrationWarning(lagHours: Int, copy: DomainCopy = ZhDomainCopy): String = when {
+        lagHours > 0 -> copy.manualCalibrationDelay(lagHours)
+        lagHours < 0 -> copy.manualCalibrationAhead(lagHours)
+        else -> copy.manualCalibrationNoShift
     }
 
     /** 档位文案（SRS §6.3）。 */
-    fun tierOf(score: Int): String = when {
-        score >= 80 -> "爆护窗口"
-        score >= 65 -> "很适合"
-        score >= 50 -> "可以"
-        score >= 35 -> "较差"
-        else -> "别去"
-    }
+    fun tierOf(score: Int, copy: DomainCopy = ZhDomainCopy): String = copy.tier(score)
 
 
 }

@@ -2,10 +2,13 @@
 
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.ui.format.RelativeTimeFormatter
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * F-2.5 列表摘要格式化纯函数（JVM 单测锁：正常/未加载/跨日时刻）。
@@ -17,29 +20,40 @@ import java.time.format.DateTimeFormatter
  */
 object FavoritesSummaryFormatter {
 
-    private val MD_HM = DateTimeFormatter.ofPattern("M月d日 HH:mm")
-
-    /** epoch 秒 → "M月d日 HH:mm"（zone 可传 ZoneOffset.ofTotalSeconds(tzOffsetSec) 或系统默认）。 */
-    fun time(epochSec: Long, zone: ZoneId): String =
-        MD_HM.format(Instant.ofEpochSecond(epochSec).atZone(zone))
+    /** epoch 秒 → 当地「M月d日 HH:mm」（zone 可传 ZoneOffset.ofTotalSeconds(tzOffsetSec) 或系统默认）。 */
+    fun time(epochSec: Long, zone: ZoneId, strings: TideSpotStrings = ZhStrings): String =
+        DateTimeFormatter.ofPattern(strings.timePattern, Locale.getDefault())
+            .format(Instant.ofEpochSecond(epochSec).atZone(zone))
 
     /** 有窗口摘要行：「M月d日 HH:mm · 92 分 · 爆护窗口」（时刻 = 峰值时刻）。 */
-    fun windowLine(window: BestWindow, zone: ZoneId): String =
-        "${time(window.peakEpochSec, zone)} · ${window.peakScore} 分 · ${window.tier}"
+    fun windowLine(
+        window: BestWindow,
+        zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
+    ): String = strings.summaryLine(time(window.peakEpochSec, zone, strings), window.peakScore, window.tier)
 
     /**
      * OPT-V11-06（P1）：相对时间摘要行——时刻改「今天/明天/周X/M月d日 HH:mm」（当地时区语义）。
      * [nowEpochSec] 由调用方注入（纯函数可测，禁 System 时钟渗入）。null = 回落绝对格式（既有行为）。
      */
-    fun windowLine(window: BestWindow, zone: ZoneId, nowEpochSec: Long?): String {
-        val timeText = nowEpochSec?.let { RelativeTimeFormatter.format(window.peakEpochSec, zone, it) }
-            ?: time(window.peakEpochSec, zone)
-        return "$timeText · ${window.peakScore} 分 · ${window.tier}"
+    fun windowLine(
+        window: BestWindow,
+        zone: ZoneId,
+        nowEpochSec: Long?,
+        strings: TideSpotStrings = ZhStrings,
+    ): String {
+        val timeText = nowEpochSec?.let { RelativeTimeFormatter.format(window.peakEpochSec, zone, it, strings) }
+            ?: time(window.peakEpochSec, zone, strings)
+        return strings.summaryLine(timeText, window.peakScore, window.tier)
     }
 
     /** 兜底行：fallbackMessage + 「（M月d日 HH:mm）」（兜底最高分时刻；无时刻则只显示文案）。 */
-    fun fallbackLine(message: String, fallbackBestEpochSec: Long?, zone: ZoneId): String =
-        message + (fallbackBestEpochSec?.let { "（${time(it, zone)}）" } ?: "")
+    fun fallbackLine(
+        message: String,
+        fallbackBestEpochSec: Long?,
+        zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
+    ): String = message + (fallbackBestEpochSec?.let { "（${time(it, zone, strings)}）" } ?: "")
 
     /**
      * F-2.5 完整摘要副标题（唯一入口）：
@@ -47,13 +61,18 @@ object FavoritesSummaryFormatter {
      * - 无窗口但有兜底（含「有效数据不足 24 小时」禁用文案，CHG-15 偏差①后全过期也走此分支）→ [fallbackLine]；
      * - 其余（未算过/无库内行/无兜底）→ 「未加载」。
      */
-    fun line(summary: FavoritesSpotSummary, zone: ZoneId = ZoneId.systemDefault(), nowEpochSec: Long? = null): String {
+    fun line(
+        summary: FavoritesSpotSummary,
+        zone: ZoneId = ZoneId.systemDefault(),
+        nowEpochSec: Long? = null,
+        strings: TideSpotStrings = ZhStrings,
+    ): String {
         val window = summary.window
         return when {
-            window != null -> windowLine(window, zone, nowEpochSec)
+            window != null -> windowLine(window, zone, nowEpochSec, strings)
             summary.fallbackMessage != null ->
-                fallbackLine(summary.fallbackMessage, summary.fallbackBestEpochSec, zone)
-            else -> "未加载"
+                fallbackLine(summary.fallbackMessage, summary.fallbackBestEpochSec, zone, strings)
+            else -> strings.summaryNotLoaded
         }
     }
 }

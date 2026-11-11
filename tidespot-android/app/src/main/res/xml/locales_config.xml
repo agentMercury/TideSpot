@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  OPT-V11-13：应用级语言清单（Android 13+ per-app language）。
+  - zh-CN 为默认（values/），en 为英文（values-en/）；
+  - 声明后系统设置「App 语言」与 `adb shell cmd locale set-app-locales` 才生效；
+  - 语言集 = 中/英（需求：不含日文）。
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="zh-CN" />
+    <locale android:name="en" />
+</locale-config>

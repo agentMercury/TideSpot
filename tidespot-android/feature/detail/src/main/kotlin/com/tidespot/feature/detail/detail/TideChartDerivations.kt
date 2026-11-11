@@ -4,6 +4,8 @@ import com.tidespot.core.data.repo.HourSlice
 import com.tidespot.core.data.repo.TideCorrectionSummary
 import com.tidespot.core.domain.model.HourlyMarine
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -77,15 +79,16 @@ object TideChartDerivations {
         beforeDayExtremes: List<TideExtreme>,
         correction: TideCorrectionSummary,
         zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
     ): CorrectionCompare? {
         if (beforeDayExtremes.isEmpty()) return null
-        val before = extremesLine(beforeDayExtremes, zone) ?: return null
-        val after = extremesLine(shiftByLag(beforeDayExtremes, correction.lagHours), zone) ?: return null
+        val before = extremesLine(beforeDayExtremes, zone, strings) ?: return null
+        val after = extremesLine(shiftByLag(beforeDayExtremes, correction.lagHours), zone, strings) ?: return null
         return CorrectionCompare(
             lagHours = correction.lagHours,
             adopted = correction.adopted,
-            beforeLine = "校正前：$before",
-            afterLine = "校正后（滞后 ${correction.lagHours}h）：$after",
+            beforeLine = strings.tideBefore(before),
+            afterLine = strings.tideAfter(correction.lagHours, after),
         )
     }
 
@@ -93,13 +96,17 @@ object TideChartDerivations {
      * 极值 → 文案行：「高潮 03:00 / 15:00　低潮 09:00 / 21:00」；
      * 无极值 → null（不渲染；时刻用选点当地墙钟，Format.hourLocal 单源）。
      */
-    fun extremesLine(extremes: List<TideExtreme>, zone: ZoneId): String? {
+    fun extremesLine(
+        extremes: List<TideExtreme>,
+        zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
+    ): String? {
         if (extremes.isEmpty()) return null
         val highs = extremes.filter { it.type == ExtremeType.HIGH }.map { Format.hourLocal(it.epochSec, zone) }
         val lows = extremes.filter { it.type == ExtremeType.LOW }.map { Format.hourLocal(it.epochSec, zone) }
         val parts = buildList {
-            if (highs.isNotEmpty()) add("高潮 ${highs.joinToString(" / ")}")
-            if (lows.isNotEmpty()) add("低潮 ${lows.joinToString(" / ")}")
+            if (highs.isNotEmpty()) add(strings.tideHigh(highs.joinToString(" / ")))
+            if (lows.isNotEmpty()) add(strings.tideLow(lows.joinToString(" / ")))
         }
         return if (parts.isEmpty()) null else parts.joinToString("　")
     }

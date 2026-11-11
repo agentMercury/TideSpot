@@ -1,7 +1,8 @@
-﻿package com.tidespot.core.ui.titles
+package com.tidespot.core.ui.titles
 
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 
 /**
  * Tab 标题映射【canonical 实现】（M4 批次 B 自 :feature:map 迁入，CONTRACT「M4 子契约」：
@@ -9,6 +10,9 @@ import com.tidespot.core.ui.strings.TideSpotStrings
  *
  * 顺序对应 §8.1 DetailScreen：风浪 | 天气 | 钓鱼指数 | 水质 | 潮流。
  * M4 详情页（:feature:detail）与地图信息条（:feature:map）共用本实现；内陆点按 §6.9 切标题、不隐藏 Tab（F-3.1/F-1.6）。
+ *
+ * OPT-V11-13：文案改由 [TideSpotStrings] 注入（Composable 传 `localTideSpotStrings()`，
+ * JVM 单测/默认传 [ZhStrings]），本对象内**零字面量**。
  */
 data class WaterTabTitles(
     val waveTab: String,
@@ -22,56 +26,41 @@ data class WaterTabTitles(
 
 object WaterBodyTabTitles {
 
-    // OCEAN / NEARSHORE：默认 5 维标题（全开）
-    const val WAVE_DEFAULT = TideSpotStrings.TAB_WAVE
-    const val WEATHER_DEFAULT = TideSpotStrings.TAB_WEATHER
-    const val SCORE_DEFAULT = TideSpotStrings.TAB_SCORE
-    const val WATER_QUALITY_DEFAULT = TideSpotStrings.TAB_WATER_QUALITY
-    const val TIDE_DEFAULT = TideSpotStrings.TAB_TIDE
-
-    // F-1.6 内陆水体降级：风浪 Tab 标题变「湖面风与水温」、潮流 Tab 标注「无潮汐」
-    const val WAVE_INLAND = TideSpotStrings.TAB_WAVE_INLAND
-    const val TIDE_INLAND = TideSpotStrings.TAB_TIDE_INLAND
-
-    // F-1.7 陆地点：水质/潮流显式标注估算或不可用
-    const val WAVE_LAND = TideSpotStrings.TAB_WAVE_LAND
-    const val WATER_QUALITY_LAND = TideSpotStrings.TAB_WATER_QUALITY_LAND
-    const val TIDE_LAND = TideSpotStrings.TAB_TIDE_LAND
-    const val NOTICE_LAND = TideSpotStrings.NOTICE_LAND
-
-    // CHG-09②（产品口径 C1）：探针失败期水体判 UNKNOWN + 「待判定」徽标（OSTIA 复测通过后自动恢复）
-    const val NOTICE_UNKNOWN = TideSpotStrings.NOTICE_UNKNOWN
-
-    fun titlesFor(type: WaterBodyType): WaterTabTitles = when (type) {
+    /**
+     * 水体类型 → 五维标题（OCEAN/NEARSHORE 全开；INLAND 降级；LAND 标注；UNKNOWN 待判定提示）。
+     *
+     * @param strings 文案来源，默认中文（[ZhStrings]）保持既有行为零漂移。
+     */
+    fun titlesFor(type: WaterBodyType, strings: TideSpotStrings = ZhStrings): WaterTabTitles = when (type) {
         WaterBodyType.INLAND_WATER -> WaterTabTitles(
-            waveTab = WAVE_INLAND,
-            weatherTab = WEATHER_DEFAULT,
-            scoreTab = SCORE_DEFAULT,
-            waterQualityTab = WATER_QUALITY_DEFAULT,
-            tideTab = TIDE_INLAND,
+            waveTab = strings.tabWaveInland,
+            weatherTab = strings.tabWeather,
+            scoreTab = strings.tabScore,
+            waterQualityTab = strings.tabWaterQuality,
+            tideTab = strings.tabTideInland,
         )
         WaterBodyType.OCEAN, WaterBodyType.NEARSHORE -> WaterTabTitles(
-            waveTab = WAVE_DEFAULT,
-            weatherTab = WEATHER_DEFAULT,
-            scoreTab = SCORE_DEFAULT,
-            waterQualityTab = WATER_QUALITY_DEFAULT,
-            tideTab = TIDE_DEFAULT,
+            waveTab = strings.tabWave,
+            weatherTab = strings.tabWeather,
+            scoreTab = strings.tabScore,
+            waterQualityTab = strings.tabWaterQuality,
+            tideTab = strings.tabTide,
         )
         WaterBodyType.UNKNOWN -> WaterTabTitles(
-            waveTab = WAVE_DEFAULT,
-            weatherTab = WEATHER_DEFAULT,
-            scoreTab = SCORE_DEFAULT,
-            waterQualityTab = WATER_QUALITY_DEFAULT,
-            tideTab = TIDE_DEFAULT,
-            notice = NOTICE_UNKNOWN,
+            waveTab = strings.tabWave,
+            weatherTab = strings.tabWeather,
+            scoreTab = strings.tabScore,
+            waterQualityTab = strings.tabWaterQuality,
+            tideTab = strings.tabTide,
+            notice = strings.noticeUnknown,
         )
         WaterBodyType.LAND -> WaterTabTitles(
-            waveTab = WAVE_LAND,
-            weatherTab = WEATHER_DEFAULT,
-            scoreTab = SCORE_DEFAULT,
-            waterQualityTab = WATER_QUALITY_LAND,
-            tideTab = TIDE_LAND,
-            notice = NOTICE_LAND,
+            waveTab = strings.tabWaveLand,
+            weatherTab = strings.tabWeather,
+            scoreTab = strings.tabScore,
+            waterQualityTab = strings.tabWaterQualityLand,
+            tideTab = strings.tabTideLand,
+            notice = strings.noticeLand,
         )
     }
 
@@ -88,4 +77,3 @@ object WaterBodyTabTitles {
         titles.waveTab,
     )
 }
-

@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.data.remote.TideSpotUrls
 import com.tidespot.core.ui.R as UiR
+import com.tidespot.feature.detail.R
 
 /**
  * 内陆水质「Copernicus 凭据」首次引导卡（CHG-25 P0-1 批次 B）。
@@ -30,8 +31,11 @@ fun InlandCredentialGuideCard(
     onSkip: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val cardDesc = stringResource(R.string.ts_detail_guide_desc)
+    val openDesc = stringResource(R.string.ts_detail_guide_open)
+    val skipDesc = stringResource(R.string.ts_detail_guide_skip)
     Card(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
-        .semantics { contentDescription = "内陆水质卫星增强配置引导" }) {
+        .semantics { contentDescription = cardDesc }) {
         Column(Modifier.padding(12.dp)) {
             Text(stringResource(UiR.string.ts_guide_inland_title), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(UiR.string.ts_guide_inland_body), style = MaterialTheme.typography.bodySmall)
@@ -42,11 +46,11 @@ fun InlandCredentialGuideCard(
             Text(stringResource(UiR.string.ts_guide_inland_privacy), style = MaterialTheme.typography.labelSmall)
             Row {
                 TextButton(onClick = onOpenSettings,
-                    modifier = Modifier.semantics { contentDescription = "前往设置页配置 Copernicus 账号" }) {
+                    modifier = Modifier.semantics { contentDescription = openDesc }) {
                     Text(stringResource(UiR.string.ts_guide_inland_open_settings))
                 }
                 TextButton(onClick = onSkip,
-                    modifier = Modifier.semantics { contentDescription = "跳过本次引导，不再显示" }) {
+                    modifier = Modifier.semantics { contentDescription = skipDesc }) {
                     Text(stringResource(UiR.string.ts_guide_inland_skip))
                 }
             }

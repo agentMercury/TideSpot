@@ -1,6 +1,8 @@
 package com.tidespot.feature.favorites.favorites
 
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 
 /**
  * OPT-V11-12（P2/CHG-37）批量操作纯函数层（JVM 单测锁；UI 只做渲染与转发）。
@@ -51,8 +53,8 @@ object FavoritesBatchLogic {
     fun parseTags(raw: String): List<String> = FavoritesSortLogic.parseTags(raw)
 
     /** 批量删除二次确认文案（条数明示，验收 GWT 要求）。 */
-    fun deleteConfirmMessage(count: Int): String =
-        "确定删除选中的 $count 个收藏点吗？该操作不可撤销。"
+    fun deleteConfirmMessage(count: Int, strings: TideSpotStrings = ZhStrings): String =
+        strings.batchDeleteConfirm(count)
 
     /** 批量删除的 id 列表（按可见序输出，保证删除集合与用户所见一致）。 */
     fun selectedIds(visible: List<FavoriteSpot>, selection: Set<Long>): List<Long> =

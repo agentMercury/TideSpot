@@ -17,6 +17,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.format.RelativeTimeFormatter
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -51,35 +53,43 @@ object DaySelectorLogic {
         val chipLabel: String,
         /** chip 副文案：MM-dd（TalkBack 与跨月核对用）。 */
         val dateLabel: String,
-    ) {
-        /** TalkBack 读法（N-7；含星期，与主文案同源）。 */
-        val contentDescription: String
-            get() = if (offsetDays == 0) {
-                "今天 ${RelativeTimeFormatter.weekdayLabel(localDate)}，$dateLabel"
-            } else {
-                "未来第 $offsetDays 天 ${RelativeTimeFormatter.weekdayLabel(localDate)}，$dateLabel"
-            }
-    }
+        /** TalkBack 读法（N-7；含星期，与主文案同源；OPT-V11-13 由 [chips] 按文案源生成）。 */
+        val contentDescription: String,
+    )
 
     /**
      * 生成 chips。[nowEpochSec] 为当前时刻（epoch 秒）；「今天」= 该时刻在 [zone] 内的 LocalDate。
      * 固定输入可复现（JST 当地 23:30 / UTC+8 等跨时区边界用例直接构造 epoch 即可）。
+     *
+     * @param strings 文案来源（默认 [ZhStrings] 零行为漂移；Android 侧传 `ResStrings`）。
      */
-    fun chips(daysRange: Int, zone: ZoneId, nowEpochSec: Long): List<DayChip> {
+    fun chips(
+        daysRange: Int,
+        zone: ZoneId,
+        nowEpochSec: Long,
+        strings: TideSpotStrings = ZhStrings,
+    ): List<DaySelectorLogic.DayChip> {
         val n = coerceDaysRange(daysRange)
         val today = Instant.ofEpochSecond(nowEpochSec).atZone(zone).toLocalDate()
         return (0 until n).map { offset ->
             val d = today.plusDays(offset.toLong())
+            val weekday = RelativeTimeFormatter.weekdayLabel(d, strings)
+            val dateLabel = Format.mmdd(d)
             DayChip(
                 offsetDays = offset,
                 localDate = d,
                 // OPT-V11-24：去 +N 相对格式 → 日期 + 星期（今天为「今天 周二」合并态）
                 chipLabel = if (offset == 0) {
-                    "今天 ${RelativeTimeFormatter.weekdayLabel(d)}"
+                    strings.dayShortToday(weekday)
                 } else {
-                    "${Format.md(d)} ${RelativeTimeFormatter.weekdayLabel(d)}"
+                    "${Format.md(d)} $weekday"
                 },
-                dateLabel = Format.mmdd(d),
+                dateLabel = dateLabel,
+                contentDescription = if (offset == 0) {
+                    strings.dayToday(weekday, dateLabel)
+                } else {
+                    strings.dayFuture(offset, weekday, dateLabel)
+                },
             )
         }
     }

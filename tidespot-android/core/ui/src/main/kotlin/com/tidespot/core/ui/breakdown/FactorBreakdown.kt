@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.breakdown
+package com.tidespot.core.ui.breakdown
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,12 +21,15 @@ import androidx.compose.ui.unit.dp
 import com.tidespot.core.domain.algorithm.FactorId
 import com.tidespot.core.ui.band.ScoreBand
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
+import com.tidespot.core.ui.strings.localTideSpotStrings
 
 /** 因子行（F-3.4：名称/权重/得分/贡献条）。 */
 data class FactorRow(
     /** domain FactorScore.id（字符串，如 "OXYGEN"）。 */
     val id: String,
-    /** 中文名（溶氧/气压/Solunar/…，§6.4）。 */
+    /** 本地化名称（溶氧/气压/Solunar/…，§6.4）。 */
     val name: String,
     /** 0–1 子分（未启用/缺测 → null，从分母剔除的因子不出现假 0 分）。 */
     val sub: Double?,
@@ -38,7 +41,7 @@ data class FactorRow(
 
 /** ΠV 明细行（F-3.4：触发项与乘子值）。 */
 data class VetoRow(
-    /** 触发项描述（vetoReasons 原文）。 */
+    /** 触发项描述（vetoReasons 原文，已按当前语言产出）。 */
     val reason: String,
     /** 乘子值 V（0–1；domain 不透出时由调用侧重算，null → 仅显示触发项）。 */
     val multiplier: Double? = null,
@@ -47,19 +50,22 @@ data class VetoRow(
 /** 原始输入行（§8.2-3：Tw、DO_p、P、ΔP3、ΔP24、风/阵风、雨、云、WMO、浪、潮位、dh/dt、流速…）。 */
 data class RawInputRow(val label: String, val value: String)
 
-/** 因子中文名映射（§6.4 因子表行名；F-3.4 验收文案）。 */
-fun factorLabel(id: String): String = try {
+/**
+ * 因子名映射（§6.4 因子表行名；F-3.4 验收文案）。
+ * OPT-V11-13：唯一入口，文案由 [TideSpotStrings] 注入；未知 id 原样返回。
+ */
+fun factorLabel(id: String, strings: TideSpotStrings = ZhStrings): String = try {
     when (FactorId.valueOf(id)) {
-    FactorId.OXYGEN -> "溶氧"
-    FactorId.PRESSURE -> "气压"
-    FactorId.SOLUNAR -> "Solunar"
-    FactorId.TIDE -> "潮流"
-    FactorId.WIND -> "风"
-    FactorId.WEATHER -> "天气"
-    FactorId.DAYPART -> "时段"
-    FactorId.TEMP_MATCH -> "适温"
-    FactorId.COMFORT -> "舒适"
-    FactorId.WATER_QUALITY -> "水质"
+        FactorId.OXYGEN -> strings.factorOxygen
+        FactorId.PRESSURE -> strings.factorPressure
+        FactorId.SOLUNAR -> strings.factorSolunar
+        FactorId.TIDE -> strings.factorTide
+        FactorId.WIND -> strings.factorWind
+        FactorId.WEATHER -> strings.factorWeather
+        FactorId.DAYPART -> strings.factorDaypart
+        FactorId.TEMP_MATCH -> strings.factorTempMatch
+        FactorId.COMFORT -> strings.factorComfort
+        FactorId.WATER_QUALITY -> strings.factorWaterQuality
     }
 } catch (_: IllegalArgumentException) {
     id
@@ -78,11 +84,13 @@ fun FactorBreakdown(
     rawInputs: List<RawInputRow>,
     modifier: Modifier = Modifier,
 ) {
+    val strings = localTideSpotStrings()
     Column(modifier = modifier.fillMaxWidth().padding(8.dp)) {
-        Text("因子分解", style = MaterialTheme.typography.titleSmall)
+        Text(strings.factorBreakdownTitle, style = MaterialTheme.typography.titleSmall)
         rows.forEach { row ->
             val subText = row.sub?.let { Format.value(it, 2) } ?: Format.MISSING
-            val desc = "${row.name}：子分 $subText，权重 ${Format.value(row.weight, 2)}" +
+            val weightText = Format.value(row.weight, 2)
+            val desc = strings.factorRow(row.name, subText, weightText) +
                 (row.detail?.let { "，$it" } ?: "")
             Row(
                 modifier = Modifier
@@ -93,7 +101,7 @@ fun FactorBreakdown(
             ) {
                 Text(row.name, style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(64.dp))
                 Text(
-                    "$subText ×${Format.value(row.weight, 2)}",
+                    "$subText ×$weightText",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.width(96.dp),
                 )
@@ -122,7 +130,7 @@ fun FactorBreakdown(
 
         if (vetoRows.isNotEmpty()) {
             HorizontalDivider(Modifier.padding(vertical = 6.dp))
-            Text("衰减 ΠV", style = MaterialTheme.typography.titleSmall)
+            Text(strings.factorDecay, style = MaterialTheme.typography.titleSmall)
             vetoRows.forEach { veto ->
                 val multiplierText = veto.multiplier?.let { Format.value(it, 2) } ?: Format.MISSING
                 Text(
@@ -130,14 +138,16 @@ fun FactorBreakdown(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .padding(vertical = 2.dp)
-                        .semantics { contentDescription = "乘子 $multiplierText，触发：${veto.reason}" },
+                        .semantics {
+                            contentDescription = strings.factorMultiplier(multiplierText, veto.reason)
+                        },
                 )
             }
         }
 
         if (rawInputs.isNotEmpty()) {
             HorizontalDivider(Modifier.padding(vertical = 6.dp))
-            Text("原始输入", style = MaterialTheme.typography.titleSmall)
+            Text(strings.factorRawInput, style = MaterialTheme.typography.titleSmall)
             rawInputs.chunked(3).forEach { chunk ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
                     chunk.forEach { input ->
@@ -152,5 +162,3 @@ fun FactorBreakdown(
         }
     }
 }
-
-

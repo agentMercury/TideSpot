@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 潮点 TideSpot · 地图页文案（OPT-V11-13；中文默认） -->
+<resources>
+    <string name="ts_map_location_ok">定位成功 · 精度 ±%1$d m</string>
+    <string name="ts_map_my_location">我的位置</string>
+    <string name="ts_map_confirm">确定</string>
+    <string name="ts_map_search_clear">清空</string>
+    <string name="ts_map_search_hint">搜索地点（如：万绿湖）</string>
+</resources>

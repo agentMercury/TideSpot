@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  潮点 TideSpot · 用户可见文案资源（CHG-25 P0-1 i18n 框架，中文默认）
-  规范（CONTRACT「v1.1 子契约 P0-1」）：
-  - 新增用户可见文案一律进本文件（key 前缀 ts_），禁止 Screen/Formatter 硬编码、禁止新增 object 常量；
-  - 存量 TideSpotStrings object（中文）P2 全量外移，本期不动（零行为漂移）；
-  - 英文初稿见 values-en/strings.xml（语言集=中/英，不含日文）。
+  潮点 TideSpot · 用户可见文案资源（中文默认）
+  规范（CONTRACT「v1.1 子契约 P0-1」/ OPT-V11-13）：
+  - 新增用户可见文案一律进本文件（key 前缀 ts_），禁止 Screen/Formatter 硬编码中文字面量；
+  - 非资源文件（`src/main` 下的 .kt）含中文字面量 = FAIL，KDoc/行注释除外；
+  - 英文见 values-en/strings.xml（语言集=中/英，不含日文；机翻初稿 + 人工复核标记）。
   GAP-05 17 条为设计稿定稿文案（design-handoff/DECISIONS.md §2，已产品确认）。
 -->
 <resources>
@@ -22,6 +22,8 @@
     <string name="ts_placeholder_v11">垂钓用例、物种预设与因子权重编辑入口于 v1.1 开放（当前沿收藏点预设生效）。</string>
     <string name="ts_offline">网络不可用，显示本地缓存数据</string>
     <string name="ts_stale">数据已过期 · 显示上次成功拉取结果</string>
+    <!-- OPT-V115-01 #5：过期黄条 = ts_stale 通用句 + 具体数据时间（%1$s=通用句，%2$s=数据时间） -->
+    <string name="ts_stale_with_time">%1$s · 数据时间 %2$s</string>
     <string name="ts_dimension_degraded">部分维度不可用，已按有效权重重算</string>
     <string name="ts_chart_table_switch">图表 / 数值表</string>
     <string name="ts_confirm_favorite">确认收藏</string>
@@ -61,7 +63,6 @@
     <string name="ts_wq_turb_label">浊度（0~1000 NTU）</string>
     <string name="ts_wq_time_label">录入时刻（yyyy-MM-dd HH:mm，±24h 内）</string>
     <string name="ts_wq_save">保存</string>
-    <string name="ts_wq_cancel">取消</string>
     <string name="ts_wq_saved">已保存（水温将参与融合）</string>
     <string name="ts_wq_err_number">请输入数字</string>
     <string name="ts_wq_err_range">超出允许范围</string>
@@ -79,4 +80,212 @@
     <string name="ts_guide_inland_privacy">账号仅保存在本机，不上传；不配置不影响其他维度且不会崩溃。</string>
     <string name="ts_guide_inland_open_settings">去设置配置</string>
     <string name="ts_guide_inland_skip">暂不配置</string>
+
+    <!-- ── OPT-V11-13：Tab 标题 / 提示（WaterBodyTabTitles 串源；顺序 §8.1） ── -->
+    <string name="ts_tab_wave">风浪</string>
+    <string name="ts_tab_weather">天气</string>
+    <string name="ts_tab_score">钓鱼指数</string>
+    <string name="ts_tab_water_quality">水质</string>
+    <string name="ts_tab_tide">潮流</string>
+    <!-- F-1.6 内陆降级 / F-1.7 陆地点标注 -->
+    <string name="ts_tab_wave_inland">湖面风与水温</string>
+    <string name="ts_tab_tide_inland">水位（无潮汐）</string>
+    <string name="ts_tab_wave_land">风浪（估算）</string>
+    <string name="ts_tab_water_quality_land">水质（估算）</string>
+    <string name="ts_tab_tide_land">潮流（不可用）</string>
+    <string name="ts_notice_land">陆地点：水质与潮流为估算或不可用，仅供参考</string>
+    <string name="ts_notice_unknown">水体类型待判定：数据源恢复后自动更新</string>
+
+    <!-- ── OPT-V11-13：免责声明（§9.6 / D11：共 5 条） ── -->
+    <string name="ts_disclaimer_title">免责声明</string>
+    <string name="ts_disclaimer_entry">免责声明</string>
+    <string name="ts_disclaimer_wave_tide">潮位与潮流来自 ~8 km 全球模型，官方声明不适用于近岸航行；本 App 不替代航路指南与官方潮汐表。</string>
+    <string name="ts_disclaimer_weather">雷暴、大风、大浪判定仅供参考。水上安全以当地预警为准，切勿在雷电、台风、大潮汛期间出钓。</string>
+    <string name="ts_disclaimer_score">指数基于气象与天文因子的经验加权估算，不构成渔获保证。</string>
+    <string name="ts_disclaimer_water_quality">中国境内多数点位水质为模型估算值，非实测，不作为用水、饮用或接触安全依据。</string>
+    <string name="ts_disclaimer_tide_correction">「现场校潮」为用户自记高潮观测对模型滞后的经验修正（lag 平移），仅用于相对时刻参考；校正不改变数据来源与精度，仍非官方潮汐表。</string>
+
+    <!-- ── OPT-V11-13：置信徽标（§8.2-4；六档六色且带文字） ── -->
+    <string name="ts_badge_measured">实测</string>
+    <string name="ts_badge_satellite">卫星</string>
+    <string name="ts_badge_model">模型</string>
+    <string name="ts_badge_estimated">估算</string>
+    <string name="ts_badge_uncalibrated">未校正</string>
+    <string name="ts_badge_low_confidence">低置信</string>
+    <string name="ts_confidence_description">数据置信：%1$s</string>
+
+    <!-- ── F-3.7 数据来源署名 ── -->
+    <string name="ts_model_attribution">天气 · Open-Meteo（ICON / ECMWF 模型） · 海洋 · Open-Meteo Marine / Copernicus Marine</string>
+
+    <!-- ── 水体类型徽标（WaterBodyType 展示名） ── -->
+    <string name="ts_water_body_ocean">海域</string>
+    <string name="ts_water_body_nearshore">近岸</string>
+    <string name="ts_water_body_inland">内陆水域</string>
+    <string name="ts_water_body_land">陆地</string>
+    <string name="ts_water_body_unknown">待判定</string>
+
+    <!-- ── 收藏信息卡片（OPT-V11-15；缺值一律 —） ── -->
+    <string name="ts_info_coordinate_prefix">坐标</string>
+    <string name="ts_info_elevation_prefix">海拔</string>
+    <string name="ts_info_last_fetched_prefix">最近拉取</string>
+    <string name="ts_info_group_prefix">分组</string>
+    <string name="ts_info_water_body_prefix">水体</string>
+    <string name="ts_info_accuracy_note">坐标为选点原始 WGS84 值，保留 6 位小数（≈0.11 m），未做偏移纠偏</string>
+
+    <!-- ── 因子名（§6.4 因子表行名；F-3.4 验收文案） ── -->
+    <string name="ts_factor_oxygen">溶氧</string>
+    <string name="ts_factor_pressure">气压</string>
+    <string name="ts_factor_solunar">Solunar</string>
+    <string name="ts_factor_tide">潮流</string>
+    <string name="ts_factor_wind">风</string>
+    <string name="ts_factor_weather">天气</string>
+    <string name="ts_factor_daypart">时段</string>
+    <string name="ts_factor_temp_match">适温</string>
+    <string name="ts_factor_comfort">舒适</string>
+    <string name="ts_factor_water_quality">水质</string>
+
+    <!-- ── 因子分解视图（F-3.4） ── -->
+    <string name="ts_factor_breakdown_title">因子分解</string>
+    <string name="ts_factor_row">%1$s：子分 %2$s，权重 %3$s</string>
+    <string name="ts_factor_decay">衰减 ΠV</string>
+    <string name="ts_factor_multiplier">乘子 %1$s，触发：%2$s</string>
+    <string name="ts_factor_raw_input">原始输入</string>
+
+    <!-- ── 日期 / 相对时间（N-8 本地化；模式串随语言切换） ── -->
+    <string name="ts_time_pattern">M月d日 HH:mm</string>
+    <string name="ts_weekday_mon">周一</string>
+    <string name="ts_weekday_tue">周二</string>
+    <string name="ts_weekday_wed">周三</string>
+    <string name="ts_weekday_thu">周四</string>
+    <string name="ts_weekday_fri">周五</string>
+    <string name="ts_weekday_sat">周六</string>
+    <string name="ts_weekday_sun">周日</string>
+    <string name="ts_today">今天 %1$s</string>
+    <string name="ts_tomorrow">明天 %1$s</string>
+
+    <!-- ── 逐小时图表 / 日选择器无障碍文案 ── -->
+    <string name="ts_chart_hour_tooltip_suffix">，当前选中第 %1$d 小时：%2$s</string>
+    <string name="ts_chart_hour_desc">24 小时逐小时图表，单位 %1$s。%2$d 个数据点</string>
+    <string name="ts_chart_missing_suffix">，%1$d 个小时缺测（显示为断线，数值表为 —）</string>
+    <string name="ts_chart_score_desc">24 小时钓鱼指数柱状图，0 到 100 分，5 档色带</string>
+    <string name="ts_chart_window_suffix">，其中 %1$d 个小时达到爆护窗口（≥80 分）</string>
+    <string name="ts_chart_hint">%1$s。点选可查看小时数值，等价数值见下方逐小时表。%2$s</string>
+    <string name="ts_day_today">今天 %1$s，%2$s</string>
+    <string name="ts_day_future">未来第 %1$d 天 %2$s，%3$s</string>
+    <string name="ts_day_short_today">今天 %1$s</string>
+    <string name="ts_no_data_hour">该小时无数据</string>
+    <string name="ts_device_zone_note">本机时区</string>
+    <string name="ts_info_unnamed_water">未命名水域</string>
+    <string name="ts_info_preview_hint">移动中，点确定切换</string>
+    <string name="ts_water_temp">水温</string>
+    <string name="ts_dissolved_oxygen">溶解氧</string>
+    <string name="ts_turbidity">浊度</string>
+
+    <!-- ── 钓鱼指数 5 档色带文字（§6.3；色值为冻结规格，禁改） ── -->
+    <string name="ts_band_explosive">爆护窗口</string>
+    <string name="ts_band_great">很适合</string>
+    <string name="ts_band_ok">可以</string>
+    <string name="ts_band_poor">较差</string>
+    <string name="ts_band_bad">别去</string>
+
+    <!-- ── OPT-V11-13：:core:domain 文案（ResDomainCopy；默认中文与 ZhDomainCopy 逐字一致） ── -->
+    <string name="ts_domain_window_not_enough">有效数据不足 24 小时，最佳窗口功能暂不可用</string>
+    <string name="ts_domain_window_no_candidate">未来 %1$d 天无 ≥%2$d 分窗口</string>
+    <string name="ts_domain_window_no_candidate_best">未来 %1$d 天无 ≥%2$d 分窗口，最高 %3$d 分</string>
+    <string name="ts_domain_window_no_candidate_range">所选时段无 ≥%1$d 分窗口</string>
+    <string name="ts_domain_window_no_candidate_range_best">所选时段无 ≥%1$d 分窗口，时段内最高 %2$d 分</string>
+    <string name="ts_domain_warning_slack">临近平潮/停流，潮流交换弱</string>
+    <string name="ts_domain_warning_gust">阵风超过 40 km/h，注意抛投安全</string>
+    <string name="ts_domain_manual_delay">已按现场校潮校正：时刻延后 %1$dh</string>
+    <string name="ts_domain_manual_ahead">已按现场校潮校正：时刻提前 %1$dh</string>
+    <string name="ts_domain_manual_no_shift">已按现场校潮校正：时刻无偏移</string>
+    <string name="ts_domain_manual_need_more">再记 %1$d 条即可校潮</string>
+    <string name="ts_domain_manual_no_valid">有效观测不足 2 条（现有 %1$d 条 ±6h 内有匹配极值）</string>
+    <string name="ts_domain_manual_lag_exceeds">现场校潮 lag %1$d h 超出 ±%2$d h，不启用</string>
+    <string name="ts_domain_tier_explosive">爆护窗口</string>
+    <string name="ts_domain_tier_great">很适合</string>
+    <string name="ts_domain_tier_ok">可以</string>
+    <string name="ts_domain_tier_poor">较差</string>
+    <string name="ts_domain_tier_bad">别去</string>
+    <string name="ts_domain_veto_thunderstorm">雷暴（安全否决）</string>
+    <string name="ts_domain_veto_decay">可作钓性衰减 V=%1$s%2$s</string>
+    <string name="ts_domain_veto_wind"> 风%1$s/%2$skm/h</string>
+    <string name="ts_domain_veto_pressure"> 气压3h降%1$shPa</string>
+    <string name="ts_domain_veto_rain"> 降水%1$smm/h</string>
+    <string name="ts_domain_veto_wave"> 浪%1$sm</string>
+    <string name="ts_domain_veto_low_oxygen"> 低溶氧%1$s</string>
+    <string name="ts_domain_tide_size_spring">大潮</string>
+    <string name="ts_domain_tide_size_neap">小潮</string>
+    <string name="ts_domain_tide_current_active">活汛</string>
+    <string name="ts_domain_tide_current_dead">死汛</string>
+    <string name="ts_domain_obs_high">高潮</string>
+    <string name="ts_domain_obs_low">低潮</string>
+    <string name="ts_domain_obs_rising_start">我开始涨潮</string>
+    <string name="ts_domain_obs_falling_start">我开始退潮</string>
+    <string name="ts_domain_preset_fresh_lure">淡水·路亚</string>
+    <string name="ts_domain_preset_sea_shore">海水·岸边/矶钓</string>
+    <string name="ts_domain_preset_fresh_bait">淡水·台钓</string>
+    <string name="ts_domain_solunar_detail">月龄%1$s天 照明%2$s 中天%3$s时</string>
+    <string name="ts_domain_trend_insufficient">趋势数据不足</string>
+    <string name="ts_domain_water_quality_note">水质 Tab 专用</string>
+    <string name="ts_domain_hourly">逐小时</string>
+    <string name="ts_domain_credential_invalid">凭据无效</string>
+    <string name="ts_domain_network_error">网络异常</string>
+
+    <!-- ── OPT-V11-13 批次二：明细/无障碍/时间格式化（纯逻辑层取词） ── -->
+    <string name="ts_d2_duration_hours">%1$d 小时</string>
+    <string name="ts_d2_window_line">起始 %1$s · 峰值 %2$s · 时长 %3$s</string>
+    <string name="ts_d2_peak_score_line">%1$d 分 · %2$s</string>
+    <string name="ts_d2_burst">爆护</string>
+    <string name="ts_d2_sustained">利好持续至 %1$s</string>
+    <string name="ts_d2_calib_on">已启用：滞后 %1$dh</string>
+    <string name="ts_d2_calib_off">未启用</string>
+    <string name="ts_d2_raw_wind">风</string>
+    <string name="ts_d2_raw_gust">阵风</string>
+    <string name="ts_d2_raw_rain">雨</string>
+    <string name="ts_d2_raw_cloud">云</string>
+    <string name="ts_d2_raw_wave">浪</string>
+    <string name="ts_d2_raw_tide_level">潮位</string>
+    <string name="ts_d2_raw_current">流速</string>
+    <string name="ts_d2_raw_turbidity">浊度</string>
+    <string name="ts_d2_raw_chlorophyll">叶绿素</string>
+    <string name="ts_d2_hour_wave">第 %1$d 小时：浪高 %2$s，周期 %3$s，方向 %4$s</string>
+    <string name="ts_d2_hour_weather">第 %1$d 小时：气温 %2$s，风速 %3$s，海平面气压 %4$s</string>
+    <string name="ts_d2_hour_score">第 %1$d 小时：钓鱼指数 %2$d 分</string>
+    <string name="ts_d2_hour_score_missing">第 %1$d 小时：该小时未评分</string>
+    <string name="ts_d2_hour_water">第 %1$d 小时：水温 %2$s，溶氧潜力 %3$s（估算）</string>
+    <string name="ts_d2_hour_tide">第 %1$d 小时：潮位 %2$s，涨落率 %3$s，流速 %4$s</string>
+    <string name="ts_d2_hour_missing">缺测</string>
+    <string name="ts_d2_source_unavailable">来源不可用</string>
+    <string name="ts_d2_unusable">数据不可用（已过期 %1$d h），不作为评分依据</string>
+    <string name="ts_d2_manual_same">基本一致</string>
+    <string name="ts_d2_manual_later">晚 %1$sh</string>
+    <string name="ts_d2_manual_earlier">早 %1$sh</string>
+    <string name="ts_d2_manual_compare">模型%1$s %2$s · 你记录%3$s</string>
+    <string name="ts_d2_manual_any">高低潮</string>
+    <string name="ts_d2_manual_line">%1$s · %2$s</string>
+    <string name="ts_d2_manual_time_err">时刻格式应为 yyyy-MM-dd HH:mm</string>
+    <string name="ts_d2_manual_range_err">时刻超出可补记范围（当前 ±%1$dh）</string>
+    <string name="ts_d2_tide_before">校正前：%1$s</string>
+    <string name="ts_d2_tide_after">校正后（滞后 %1$dh）：%2$s</string>
+    <string name="ts_d2_tide_high">高潮 %1$s</string>
+    <string name="ts_d2_tide_low">低潮 %1$s</string>
+    <string name="ts_d2_no_source">本点无该来源数据</string>
+    <string name="ts_d2_unit_score">分</string>
+
+    <!-- ── OPT-V11-13 批次二：收藏页纯逻辑文案 ── -->
+    <string name="ts_fx_ungrouped">未分组</string>
+    <string name="ts_fx_not_loaded">未加载</string>
+    <string name="ts_fx_stale">陈旧</string>
+    <string name="ts_fx_expired">已过期</string>
+    <string name="ts_fx_data_prefix">数据 %1$s %2$s</string>
+    <string name="ts_fx_preset_fresh_lure">淡水路亚</string>
+    <string name="ts_fx_preset_sea_shore">海水岸边</string>
+    <string name="ts_fx_preset_fresh_bait">淡水台钓</string>
+    <string name="ts_fx_err_batch_delete">批量删除失败，未做任何改动</string>
+    <string name="ts_fx_err_batch_tag">批量改标签失败，未做任何改动</string>
+    <string name="ts_fx_err_batch_group">批量改分组失败，未做任何改动</string>
+    <string name="ts_fx_err_no_coord">新建收藏点需携带坐标（请在地图上选点后保存）</string>
+    <string name="ts_fx_summary_line">%1$s · %2$d 分 · %3$s</string>
+    <string name="ts_fx_batch_delete_confirm">确定删除选中的 %1$d 个收藏点吗？该操作不可撤销。</string>
 </resources>

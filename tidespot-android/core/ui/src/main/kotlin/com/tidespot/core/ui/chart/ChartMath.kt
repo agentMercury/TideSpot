@@ -125,8 +125,5 @@ object ChartMath {
     object ScoreWindow {
         const val THRESHOLD = 80
     }
-
-    /** 点选浮层数值文本的默认兜底（null 小时不可点选提示）。 */
-    const val MISSING_TOOLTIP = "该小时无数据"
 }
 

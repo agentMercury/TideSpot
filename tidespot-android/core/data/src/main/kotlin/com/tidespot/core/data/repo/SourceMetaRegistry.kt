@@ -1,5 +1,8 @@
 package com.tidespot.core.data.repo
 
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
+
 /**
  * F-3.7 数据来源元数据静态映射表（OPT-V11-04 / CHG-27）。
  *
@@ -17,7 +20,7 @@ object SourceMetaRegistry {
         /** 网格分辨率描述。 */
         val resolution: String,
         /** 更新粒度（如「逐小时」）。 */
-        val granularity: String,
+        /** 粒度文案由 DomainCopy 提供（OPT-V11-13），此处不再存中文。 */
     )
 
     /**
@@ -30,18 +33,18 @@ object SourceMetaRegistry {
         DataSource.WEATHER -> SourceMeta(
             model = "Open-Meteo Best Match（ECMWF IFS / GFS）",
             resolution = "9–25 km",
-            granularity = "逐小时",
+
         )
         DataSource.MARINE -> SourceMeta(
             model = "ECMWF WAM / GFS Wave",
             resolution = "9 / 16 km",
-            granularity = "逐小时",
+
         )
     }
 
     /** 来源行片段（"模型 · 分辨率 · 粒度"）；Screen 层再拼「本机拉取 HH:mm」。 */
-    fun line(source: DataSource): String {
+    fun line(source: DataSource, copy: DomainCopy = ZhDomainCopy): String {
         val m = forSource(source)
-        return "${m.model} · ${m.resolution} · ${m.granularity}"
+        return "${m.model} · ${m.resolution} · ${copy.hourlyGranularity}"
     }
 }

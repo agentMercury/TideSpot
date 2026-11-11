@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.detail.detail
+package com.tidespot.feature.detail.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -16,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Switch
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -42,6 +45,7 @@ import com.tidespot.core.data.repo.Ttl
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.ui.badge.ConfidenceBadge
 import com.tidespot.core.ui.badge.Kind
+import com.tidespot.core.ui.banner.OfflineBanner
 import com.tidespot.core.ui.band.ScoreBand
 import com.tidespot.core.ui.chart.HourChart
 import com.tidespot.core.ui.chart.HourChartMode
@@ -52,6 +56,10 @@ import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.selector.DaySelector
 import com.tidespot.core.ui.selector.DaySelectorLogic
 import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.localDomainCopy
+import com.tidespot.core.ui.strings.localTideSpotStrings
+import com.tidespot.feature.detail.R
+import androidx.compose.ui.res.stringResource
 import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.titles.WaterBodyTabTitles
 import com.tidespot.core.domain.window.BestWindowFinder
@@ -77,7 +85,7 @@ fun DetailScreen(
     val zone: ZoneId = viewModel.zoneId
     // CHG-35：优先用详情自愈结果（历史误判 INLAND/UNKNOWN 的海洋点，首屏即恢复「潮流/NEARSHORE」）
     val effectiveWaterBody = state.result?.effectiveWaterBody ?: spot.waterBody
-    val titles = WaterBodyTabTitles.titlesFor(effectiveWaterBody)
+    val titles = WaterBodyTabTitles.titlesFor(effectiveWaterBody, localTideSpotStrings())
     // M5（F-3.5 / §6.2b）：Top10 与现场校潮 Sheet（模块内接线；:app 导航 M6）
     var showTop10 by remember { mutableStateOf(false) }
     var showCalibration by remember { mutableStateOf(false) }
@@ -100,11 +108,14 @@ fun DetailScreen(
             if (!DaySelectorLogic.isSameLocalDay(nowEpochSec, next, zone)) nowEpochSec = next
         }
     }
-    val chips = remember(nowEpochSec, zone, state.daysRange) {
-        DaySelectorLogic.chips(state.daysRange, zone, nowEpochSec)
+    val dayStrings = localTideSpotStrings()
+    val chips = remember(nowEpochSec, zone, state.daysRange, dayStrings) {
+        DaySelectorLogic.chips(state.daysRange, zone, nowEpochSec, dayStrings)
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize().semantics { contentDescription = "详情页：五维度逐小时数据" }) {
+    val screenDesc = stringResource(R.string.ts_detail_content_desc)
+    val tabsDesc = stringResource(R.string.ts_detail_tabs_desc)
+    LazyColumn(modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().semantics { contentDescription = screenDesc }) {
         item {
             titles.notice?.let {
                 Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error,
@@ -112,15 +123,16 @@ fun DetailScreen(
             }
             TabRow(
                 selectedTabIndex = state.selectedTab.ordinal,
-                modifier = Modifier.semantics { contentDescription = "五维度标签页" },
+                modifier = Modifier.semantics { contentDescription = tabsDesc },
             ) {
                 listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
                     .forEachIndexed { i, tab ->
+                        val tabDesc = stringResource(R.string.ts_detail_tab_desc, tabTitles[i])
                         Tab(
                             selected = state.selectedTab == tab,
                             onClick = { viewModel.selectTab(tab) },
                             text = { Text(tabTitles[i]) },
-                            modifier = Modifier.semantics { contentDescription = "${tabTitles[i]}标签页" },
+                            modifier = Modifier.semantics { contentDescription = tabDesc },
                         )
                     }
             }
@@ -132,6 +144,9 @@ fun DetailScreen(
             )
         }
 
+        // OPT-V115-01 #4（ts_offline）：离线横幅（不阻断离线数据，仅提示）
+        item { OfflineBanner() }
+
         item {
             val result = state.result
             if (result != null) {
@@ -142,23 +157,30 @@ fun DetailScreen(
 
         item {
             val result = state.result
-            val status = result?.let { Derivations.tabStatus(state.selectedTab, it) } ?: DimensionStatus.Available
+            val status = result?.let { Derivations.tabStatus(state.selectedTab, it, strings = localTideSpotStrings()) } ?: DimensionStatus.Available
             if (status is DimensionStatus.Degraded) {
                 // F-3.6：「来源不可用/本点无该来源数据 + 重试 + 最近缓存时间」；其余 Tab 照常
+                val retryDesc = stringResource(R.string.ts_detail_retry_desc)
                 Card(Modifier.fillMaxWidth().padding(8.dp)) {
                     Column(Modifier.padding(8.dp)) {
                         Text(status.reason, style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.error)
-                        Text("最近缓存：${status.lastFetchedMillis?.let { Format.clockMillis(it, zone) } ?: "—"}",
-                            style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(
+                                R.string.ts_detail_last_cache,
+                                status.lastFetchedMillis?.let { Format.clockMillis(it, zone) }
+                                    ?: Format.MISSING,
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
                         Button(onClick = viewModel::retry,
-                            modifier = Modifier.semantics { contentDescription = "重试加载该维度数据" }) {
-                            Text("重试")
+                            modifier = Modifier.semantics { contentDescription = retryDesc }) {
+                            Text(stringResource(R.string.ts_detail_retry))
                         }
                     }
                 }
             }
-            if (state.loading) Text("加载中…", Modifier.padding(12.dp))
+            if (state.loading) Text(stringResource(R.string.ts_detail_loading), Modifier.padding(12.dp))
         }
 
         item {
@@ -166,18 +188,27 @@ fun DetailScreen(
             val today = LocalDate.now(zone)
             val daySlices = Derivations.slicesForDay(result.slices, state.selectedDay, zone, today)
             if (daySlices.isEmpty()) {
-                Text("本点无该来源数据", Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.ts_detail_no_source), Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodySmall)
                 return@item
             }
 
             var showTable by remember(state.selectedTab, state.selectedDay) { mutableStateOf(false) } // 默认图表
-            Row(Modifier.padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                FilterChip(selected = !showTable, onClick = { showTable = false },
-                    label = { Text("图表") },
-                    modifier = Modifier.semantics { contentDescription = "切换为逐小时图表" })
-                FilterChip(selected = showTable, onClick = { showTable = true },
-                    label = { Text("数值表") },
-                    modifier = Modifier.semantics { contentDescription = "切换为逐小时数值表（TalkBack 可读）" })
+            // OPT-V115-01 #7（ts_chart_table_switch）：双 FilterChip → 单开关，标签=设计稿文案，状态说明沿用模块文案
+            val chartTableLabel = stringResource(UiR.string.ts_chart_table_switch)
+            val chartTableState = stringResource(if (showTable) R.string.ts_detail_table else R.string.ts_detail_chart)
+            Row(
+                Modifier.padding(horizontal = 8.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(chartTableLabel, style = MaterialTheme.typography.labelMedium)
+                Switch(
+                    checked = showTable,
+                    onCheckedChange = { showTable = it },
+                    modifier = Modifier.semantics { contentDescription = chartTableState },
+                )
+                Text(chartTableState, style = MaterialTheme.typography.labelMedium)
             }
 
             val scoresByEpoch = state.scores.associateBy { it.timeEpochSec }
@@ -191,7 +222,7 @@ fun DetailScreen(
                 HourChart(
                     values = values,
                     mode = if (state.selectedTab == DetailTab.SCORE) HourChartMode.BAR else HourChartMode.LINE,
-                    unit = chartUnit(state.selectedTab),
+                    unit = chartUnit(state.selectedTab, stringResource(R.string.ts_detail_unit_score)),
                     selectedHour = state.selectedHour,
                     onHourSelected = viewModel::selectHour,
                     windowHours = if (state.selectedTab == DetailTab.SCORE)
@@ -199,7 +230,7 @@ fun DetailScreen(
                     localHours = dayLocalHours,
                 )
             } else {
-                val rows = Derivations.rowsFor(state.selectedTab, daySlices, zone, state)
+                val rows = Derivations.rowsFor(state.selectedTab, daySlices, zone, state, localTideSpotStrings())
                 // CHG-13/D02：外层已是 LazyColumn，此处**禁止**再嵌同向 LazyColumn（无限高约束直接崩溃）；
                 // 24 行普通 Column 渲染，滚动由外层承担。
                 Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
@@ -220,22 +251,23 @@ fun DetailScreen(
                 ) {
                     val chipDay = chips.getOrNull(state.selectedDay)?.localDate
                     if (chipDay != null) {
-                        val phaseText = TidePhaseChipLogic.chipText(chipDay, zone)
-                        Row(
-                            Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                        ) {
-                            AssistChip(
-                                onClick = { },
-                                label = { Text(phaseText) },
-                                modifier = Modifier.semantics { contentDescription = "潮汛：$phaseText" },
-                            )
-                        }
+                        val phaseText = TidePhaseChipLogic.chipText(chipDay, zone, localDomainCopy())
+                        val phaseDesc = stringResource(R.string.ts_detail_tide_phase, phaseText)
+                            Row(
+                                Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            ) {
+                                AssistChip(
+                                    onClick = { },
+                                    label = { Text(phaseText) },
+                                    modifier = Modifier.semantics { contentDescription = phaseDesc },
+                                )
+                            }
                     }
                 }
                 val dayExtremes = TideChartDerivations.dayExtremes(
                     TideChartDerivations.classifiedExtremes(result.marine), state.selectedDay, zone, today)
-                TideChartDerivations.extremesLine(dayExtremes, zone)?.let {
+                TideChartDerivations.extremesLine(dayExtremes, zone, localTideSpotStrings())?.let {
                     Text(it, Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
                         style = MaterialTheme.typography.bodyMedium)
                 }
@@ -248,7 +280,7 @@ fun DetailScreen(
                     localHours = dayLocalHours,
                 )
                 result.tideCorrection?.let { tc ->
-                    TideChartDerivations.correctionCompare(dayExtremes, tc, zone)?.let { cmp ->
+                    TideChartDerivations.correctionCompare(dayExtremes, tc, zone, localTideSpotStrings())?.let { cmp ->
                         Column(Modifier.padding(horizontal = 12.dp, vertical = 2.dp)) {
                             Text(cmp.beforeLine, style = MaterialTheme.typography.bodySmall)
                             Text(cmp.afterLine, style = MaterialTheme.typography.bodySmall,
@@ -265,7 +297,22 @@ fun DetailScreen(
                     daySlices.getOrNull(idx)?.timeEpochSec?.let { scoresByEpoch[it] }
                 } ?: daySlices.firstNotNullOfOrNull { scoresByEpoch[it.timeEpochSec] }
                 ScoreBadgeDerivations.badgeKind(badgeScore, presetWeightSum)?.let { kind ->
-                    Row(Modifier.padding(horizontal = 12.dp, vertical = 2.dp)) { ConfidenceBadge(kind) }
+                    Row(
+                        Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    ) {
+                        ConfidenceBadge(kind)
+                        // OPT-V115-01 #6（ts_dimension_degraded）：有效权重 <0.6 → 低置信徽标同行附降级说明
+                        if (kind == Kind.LOW_CONFIDENCE) {
+                            val degradedNote = stringResource(UiR.string.ts_dimension_degraded)
+                            Text(
+                                degradedNote,
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(start = 6.dp)
+                                    .semantics { contentDescription = degradedNote },
+                            )
+                        }
+                    }
                 }
             }
 
@@ -310,39 +357,43 @@ fun DetailScreen(
                 // CHG-25（P0-1）：内陆点首次配置引导卡（:app 判定：内陆 + 未配置 + 未跳过）
                 credentialGuideSlot?.invoke()
                 // OPT-V11-02（CHG-27）：水质实测录入入口（离线可用；水温参与 §6.1.3 融合）
+                val wqEntryDesc = stringResource(R.string.ts_detail_wq_entry_desc)
                 Button(
                     onClick = { showQualityEntry = true },
                     modifier = Modifier.padding(horizontal = 12.dp)
-                        .semantics { contentDescription = "录入水质实测值" },
+                        .semantics { contentDescription = wqEntryDesc },
                 ) { Text(androidx.compose.ui.res.stringResource(UiR.string.ts_wq_entry_open)) }
             }
 
             // F-3.7 每 Tab 底部：来源与更新时间（由 SpotDetailResult 元数据生成，禁硬编码来源文案）
             SourceFooter(result, zone, state.selectedTab)
             // §9.6 免责（原文照用）
-            Text(disclaimerFor(state.selectedTab), Modifier.padding(12.dp), style = MaterialTheme.typography.labelSmall)
+            Text(disclaimerFor(state.selectedTab, localTideSpotStrings()), Modifier.padding(12.dp), style = MaterialTheme.typography.labelSmall)
         }
 
         item {
             // F-3.5 Top10 入口（窗口数据 = state.top10，onResult 时派生层现算，N-2 同源）
+            val top10Desc = stringResource(R.string.ts_detail_top10_desc)
+            val calibrationDesc = stringResource(R.string.ts_detail_calibration_desc)
+            val disclaimerDesc = stringResource(R.string.ts_detail_disclaimer_desc)
             Button(onClick = { showTop10 = true }, modifier = Modifier.padding(12.dp)
-                .semantics { contentDescription = "打开未来最佳窗口前十名" }) {
-                Text("最佳窗口 Top10")
+                .semantics { contentDescription = top10Desc }) {
+                Text(stringResource(R.string.ts_detail_top10))
             }
             // §6.2b 规则 5 现场校潮入口（潮 Tab 内；CHG-04）
             if (state.selectedTab == DetailTab.TIDE) {
                 Button(onClick = { showCalibration = true }, modifier = Modifier.padding(horizontal = 12.dp)
-                    .semantics { contentDescription = "打开现场校潮面板" }) {
-                    Text("现场校潮")
+                    .semantics { contentDescription = calibrationDesc }) {
+                    Text(stringResource(R.string.ts_detail_calibration))
                 }
             }
             // D11：常驻免责入口（全 Tab 可见；Sheet 复用既有 ModalBottomSheet 模式）
             TextButton(
                 onClick = { showDisclaimer = true },
                 modifier = Modifier.padding(horizontal = 12.dp)
-                    .semantics { contentDescription = "打开免责声明（共 5 条）" },
+                    .semantics { contentDescription = disclaimerDesc },
             ) {
-                Text(TideSpotStrings.DISCLAIMER_ENTRY)
+                Text(localTideSpotStrings().disclaimerEntry)
             }
         }
     }
@@ -371,9 +422,9 @@ fun DetailScreen(
     // D11：免责 Sheet（§9.6 共 5 条，含新增第 5 条「潮汐校正」；TideSpotStrings 单源）
     if (showDisclaimer) {
         ModalBottomSheet(onDismissRequest = { showDisclaimer = false }) {
-            Column(Modifier.padding(12.dp)) {
-                Text(TideSpotStrings.DISCLAIMER_SHEET_TITLE, style = MaterialTheme.typography.titleMedium)
-                TideSpotStrings.DISCLAIMER_ITEMS.forEachIndexed { i, line ->
+            Column(Modifier.padding(12.dp).navigationBarsPadding()) {
+                Text(localTideSpotStrings().disclaimerTitle, style = MaterialTheme.typography.titleMedium)
+                localTideSpotStrings().disclaimerItems().forEachIndexed { i, line ->
                     Text("${i + 1}. $line", Modifier.padding(vertical = 4.dp),
                         style = MaterialTheme.typography.bodySmall)
                 }
@@ -401,26 +452,30 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, vi
         else -> customRange?.let { viewModel.top10Filtered(it.startEpochSec, it.endEpochSec) }
             ?: output
     }
-    Column(Modifier.padding(12.dp)) {
-        Text("未来最佳窗口 Top10", style = MaterialTheme.typography.titleMedium)
+    Column(Modifier.padding(12.dp).navigationBarsPadding()) {
+        Text(stringResource(UiR.string.ts_top10_this_spot), style = MaterialTheme.typography.titleMedium)
+        val allDesc = stringResource(R.string.ts_detail_filter_all_desc)
+        val h24Desc = stringResource(R.string.ts_detail_filter_24h_desc)
+        val weekendDesc = stringResource(R.string.ts_detail_filter_weekend_desc)
+        val customDesc = stringResource(R.string.ts_detail_filter_custom_desc)
         Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.small) {
             Row(Modifier.fillMaxWidth().padding(4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 FilterChip(selected = preset == Top10TimeFilter.Preset.ALL,
                     onClick = { preset = Top10TimeFilter.Preset.ALL },
-                    label = { Text("全部") },
-                    modifier = Modifier.semantics { contentDescription = "时段筛选：全部" })
+                    label = { Text(stringResource(R.string.ts_detail_filter_all)) },
+                    modifier = Modifier.semantics { contentDescription = allDesc })
                 FilterChip(selected = preset == Top10TimeFilter.Preset.NEXT_24H,
                     onClick = { preset = Top10TimeFilter.Preset.NEXT_24H },
-                    label = { Text("接下来 24h") },
-                    modifier = Modifier.semantics { contentDescription = "时段筛选：接下来 24 小时" })
+                    label = { Text(stringResource(R.string.ts_detail_filter_24h)) },
+                    modifier = Modifier.semantics { contentDescription = h24Desc })
                 FilterChip(selected = preset == Top10TimeFilter.Preset.THIS_WEEKEND,
                     onClick = { preset = Top10TimeFilter.Preset.THIS_WEEKEND },
-                    label = { Text("本周末") },
-                    modifier = Modifier.semantics { contentDescription = "时段筛选：本周末" })
+                    label = { Text(stringResource(R.string.ts_detail_filter_weekend)) },
+                    modifier = Modifier.semantics { contentDescription = weekendDesc })
                 FilterChip(selected = customRange != null,
                     onClick = { showCustom = true },
-                    label = { Text("自选") },
-                    modifier = Modifier.semantics { contentDescription = "时段筛选：自选日期与时段" })
+                    label = { Text(stringResource(R.string.ts_detail_filter_custom)) },
+                    modifier = Modifier.semantics { contentDescription = customDesc })
             }
         }
         if (showCustom) {
@@ -436,16 +491,23 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, vi
         }
         when {
             shown == null -> Text(
-                "数据未到达，加载中…",
+                stringResource(R.string.ts_detail_data_pending),
                 Modifier.padding(vertical = 12.dp),
                 style = MaterialTheme.typography.bodyMedium,
             )
-            shown.windows.isEmpty() -> Text(
-                Top10Formatter.fallbackLine(shown.fallbackMessage ?: "暂无 ≥75 分窗口", shown.fallbackBestEpochSec, zone),
-                Modifier.padding(vertical = 12.dp)
-                    .semantics { contentDescription = "未来无达标窗口提示" },
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            shown.windows.isEmpty() -> {
+                val noWindowDesc = stringResource(R.string.ts_detail_no_window_desc)
+                Text(
+                    Top10Formatter.fallbackLine(
+                        shown.fallbackMessage ?: stringResource(UiR.string.ts_top10_empty),
+                        shown.fallbackBestEpochSec,
+                        zone,
+                    ),
+                    Modifier.padding(vertical = 12.dp)
+                        .semantics { contentDescription = noWindowDesc },
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             else -> LazyColumn(Modifier.padding(vertical = 8.dp)) {
                 items(shown.windows.size) { i ->
                     val w = shown.windows[i]
@@ -453,11 +515,11 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, vi
                         Column(Modifier.padding(12.dp)) {
                             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                                 Text(
-                                    "#${i + 1}  ${Top10Formatter.peakScoreLine(w)}",
+                                    "#${i + 1}  ${Top10Formatter.peakScoreLine(w, localTideSpotStrings())}",
                                     style = MaterialTheme.typography.titleSmall,
                                 )
                                 // OPT-V11-26（CHG-27）：≥80 爆护标识（档位色复用 ScoreBands，禁新硬编码色值）
-                                Top10Formatter.burstBadge(w)?.let { badge ->
+                                Top10Formatter.burstBadge(w, localTideSpotStrings())?.let { badge ->
                                     Box(
                                         Modifier.padding(start = 6.dp)
                                             .background(Color(ScoreBand.EXPLOSIVE.argb))
@@ -472,22 +534,22 @@ private fun Top10SheetContent(output: BestWindowFinder.Output?, zone: ZoneId, vi
                                 }
                             }
                             Text(
-                                Top10Formatter.startLine(w, zone, nowEpochSec),
+                                Top10Formatter.startLine(w, zone, nowEpochSec, localTideSpotStrings()),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                             // OPT-V11-25（CHG-27）：核心段短于原窗时标注利好延续时刻（null 不显示）
-                            Top10Formatter.sustainedLine(w, zone)?.let {
+                            Top10Formatter.sustainedLine(w, zone, localTideSpotStrings())?.let {
                                 Text(it, style = MaterialTheme.typography.labelSmall)
                             }
                             Text(
-                                "主因 ${Top10Formatter.topFactorsLine(w.topFactors)}",
+                                stringResource(R.string.ts_detail_top_factor, Top10Formatter.topFactorsLine(w.topFactors)),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                             // 注意事项：非空才显示（isEmpty() 判定，CHG-08④）
                             if (!w.warnings.isEmpty()) {
                                 w.warnings.forEach { reason ->
                                     Text(
-                                        "注意 $reason",
+                                        stringResource(R.string.ts_detail_warning, reason),
                                         color = MaterialTheme.colorScheme.error,
                                         style = MaterialTheme.typography.bodySmall,
                                     )
@@ -518,24 +580,28 @@ private fun CustomTimeRangeDialog(
     var error by remember { mutableStateOf<Top10TimeFilter.CustomError?>(null) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("自选时段") },
+        title = { Text(stringResource(R.string.ts_detail_custom_title)) },
         text = {
             Column {
+                val dateDesc = stringResource(R.string.ts_detail_custom_date_desc)
+                val startDesc = stringResource(R.string.ts_detail_custom_start_desc)
+                val endDesc = stringResource(R.string.ts_detail_custom_end_desc)
                 OutlinedTextField(value = dateText, onValueChange = { dateText = it },
-                    label = { Text("日期（yyyy-MM-dd）") }, singleLine = true,
-                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "自选日期" })
+                    label = { Text(stringResource(R.string.ts_detail_custom_date)) }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = dateDesc })
                 OutlinedTextField(value = startText, onValueChange = { startText = it },
-                    label = { Text("开始（HH:mm）") }, singleLine = true,
-                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "自选开始时间" })
+                    label = { Text(stringResource(R.string.ts_detail_custom_start)) }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = startDesc })
                 OutlinedTextField(value = endText, onValueChange = { endText = it },
-                    label = { Text("结束（HH:mm）") }, singleLine = true,
-                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = "自选结束时间" })
+                    label = { Text(stringResource(R.string.ts_detail_custom_end)) }, singleLine = true,
+                    modifier = Modifier.fillMaxWidth().semantics { contentDescription = endDesc })
                 error?.let {
                     Text(
                         when (it) {
-                            Top10TimeFilter.CustomError.BAD_DATE -> "日期格式应为 yyyy-MM-dd"
-                            Top10TimeFilter.CustomError.BAD_TIME -> "时间格式应为 HH:mm"
-                            Top10TimeFilter.CustomError.END_NOT_AFTER_START -> "结束时间必须晚于开始时间"
+                            Top10TimeFilter.CustomError.BAD_DATE -> stringResource(R.string.ts_detail_err_date_format)
+                            Top10TimeFilter.CustomError.BAD_TIME -> stringResource(R.string.ts_detail_err_time_format)
+                            Top10TimeFilter.CustomError.END_NOT_AFTER_START ->
+                                stringResource(R.string.ts_detail_err_end_before_start)
                         },
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
@@ -547,9 +613,9 @@ private fun CustomTimeRangeDialog(
             Button(onClick = {
                 val parsed = Top10TimeFilter.parseCustom(dateText, startText, endText, zone)
                 if (parsed.range == null) error = parsed.error else onApply(parsed.range)
-            }) { Text("应用") }
+            }) { Text(stringResource(R.string.ts_detail_apply)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.ts_cancel)) } },
     )
 }
 
@@ -579,34 +645,41 @@ private fun CalibrationSheetContent(
     var error by remember { mutableStateOf<TideObservationEntryLogic.ParseError?>(null) }
     val parsed = TideObservationEntryLogic.parse(timeText, zone, nowEpochSec)
 
-    Column(Modifier.padding(12.dp)) {
-        Text("现场校潮", style = MaterialTheme.typography.titleMedium)
+    Column(Modifier.padding(12.dp).navigationBarsPadding()) {
+        Text(stringResource(R.string.ts_detail_calibration), style = MaterialTheme.typography.titleMedium)
         Text(
-            "记录现场观测（≥2 条、与模型标记 ±6h 内才启用；只校正滞后 lag）。时刻可改，支持事后补记。",
+            stringResource(R.string.ts_detail_calib_body),
             Modifier.padding(vertical = 4.dp),
             style = MaterialTheme.typography.bodySmall,
         )
         // ① 操作区置顶：类型 chips
-        Text("观测类型", style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 4.dp))
+        Text(
+            stringResource(R.string.ts_detail_obs_type),
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(top = 4.dp),
+        )
         Row(Modifier.padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             com.tidespot.core.domain.tide.TideObservationType.entries.forEach { type ->
+                val typeLabel = localDomainCopy().observationTypeLabel(type)
+                val typeDesc = stringResource(R.string.ts_detail_obs_type_desc, typeLabel)
                 FilterChip(
                     selected = selectedType == type,
                     onClick = { selectedType = type },
-                    label = { Text(type.label) },
-                    modifier = Modifier.semantics { contentDescription = "观测类型：${type.label}" },
+                    label = { Text(typeLabel) },
+                    modifier = Modifier.semantics { contentDescription = typeDesc },
                 )
             }
         }
         // ② 时刻（默认当前，可补记）
+        val obsTimeDesc = stringResource(R.string.ts_detail_obs_time_input)
         OutlinedTextField(
             value = timeText,
             onValueChange = { timeText = it; error = null },
-            label = { Text("观测时刻（yyyy-MM-dd HH:mm）") },
+            label = { Text(stringResource(R.string.ts_detail_obs_time)) },
             singleLine = true,
             isError = error != null,
             supportingText = { error?.let { Text(TideObservationEntryLogic.errorText(it)) } },
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "观测时刻输入框" },
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = obsTimeDesc },
         )
         // ③ 模型对照（辅助对齐；无 ±6h 匹配 → 不显示，禁编造）
         parsed.epochSec?.let { epoch ->
@@ -614,25 +687,37 @@ private fun CalibrationSheetContent(
                 Text(it, Modifier.padding(vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
             }
         }
+        val obsRecordDesc = stringResource(R.string.ts_detail_obs_record)
         Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = {
                     val value = parsed.epochSec
                     if (value == null) error = parsed.error else viewModel.recordObservation(selectedType, value)
                 },
-                modifier = Modifier.semantics { contentDescription = "记录观测" },
-            ) { Text("记录") }
+                modifier = Modifier.semantics { contentDescription = obsRecordDesc },
+            ) { Text(stringResource(R.string.ts_detail_obs_record_short)) }
             if (!observations.isEmpty()) {
-                Button(onClick = { viewModel.clearObservations() }) { Text("清空本页记录") }
+                Button(onClick = { viewModel.clearObservations() }) { Text(stringResource(R.string.ts_detail_obs_clear)) }
             }
         }
         Text(
-            "已记录 ${observations.size} 条" + observations.lastOrNull()?.let {
-                "，最近 ${Top10Formatter.time(it.epochSec, zone)}"
-            }.orEmpty(),
+            stringResource(R.string.ts_detail_obs_count, observations.size) +
+                observations.lastOrNull()?.let {
+                    stringResource(R.string.ts_detail_obs_latest, Top10Formatter.time(it.epochSec, zone, localTideSpotStrings()))
+                }.orEmpty(),
             Modifier.padding(vertical = 2.dp),
             style = MaterialTheme.typography.bodyMedium,
         )
+        // OPT-V115-01 #3（ts_record_high_tide）：校潮 Sheet 空态引导句（替代空白）
+        if (observations.isEmpty()) {
+            val emptyHint = stringResource(UiR.string.ts_record_high_tide)
+            Text(
+                emptyHint,
+                Modifier.padding(vertical = 2.dp).semantics { contentDescription = emptyHint },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
         // ④ 已记录列表（类型 + 时刻）
         observations.takeLast(5).reversed().forEach { o ->
             Text(
@@ -641,17 +726,18 @@ private fun CalibrationSheetContent(
             )
         }
         Text(
-            "拟合结果：${Top10Formatter.calibrationLine(fit)}",
+            stringResource(R.string.ts_detail_fit_result, Top10Formatter.calibrationLine(fit, localTideSpotStrings())),
             Modifier.padding(top = 4.dp),
             style = MaterialTheme.typography.bodyMedium,
         )
         // M6：拟合启用 → saveTideFit 持久化 + force 刷新（tideCorrection 透出 → 潮 Tab「校正前/后」对照）
         if (fit.adopted) {
+            val saveDesc = stringResource(R.string.ts_detail_calib_save)
             Button(
                 onClick = { viewModel.saveTideFit(fit) },
                 modifier = Modifier.padding(vertical = 8.dp)
-                    .semantics { contentDescription = "保存并应用现场校潮" },
-            ) { Text("保存并应用校潮") }
+                    .semantics { contentDescription = saveDesc },
+            ) { Text(stringResource(R.string.ts_detail_calib_save_short)) }
         }
     }
 }
@@ -659,8 +745,11 @@ private fun CalibrationSheetContent(
 @Composable
 private fun sourceInfo(fetched: Map<DataSource, Long>?, zone: ZoneId) {
     // §8.2-1 右侧槽位：「源更新 HH:mm · 本机拉取 HH:mm」；源端更新时刻数据层未透出（上报项）→ 源更新显示 —
-    val pull = fetched?.values?.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: "—"
-    Text("源更新 ${Format.MISSING} · 本机拉取 $pull", style = MaterialTheme.typography.labelSmall)
+    val pull = fetched?.values?.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: Format.MISSING
+    Text(
+        stringResource(R.string.ts_detail_source_update, Format.MISSING, pull),
+        style = MaterialTheme.typography.labelSmall,
+    )
 }
 
 @Composable
@@ -671,21 +760,36 @@ private fun StaleBanner(result: com.tidespot.core.data.repo.SpotDetailResult, zo
     val marineUnusable = Ttl.unusableAgeMillis(result.fetchedAtMillis[com.tidespot.core.data.repo.DataSource.MARINE] ?: 0L, now)
     if (weatherUnusable != null || marineUnusable != null) {
         val ageH = maxOf(weatherUnusable ?: 0L, marineUnusable ?: 0L).let { (it + 3_599_999) / 3_600_000 }
-        Text("数据不可用（已过期 $ageH h），不作为评分依据；最近数据时间 ${result.fetchedAtMillis.values.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: "—"}",
+        val expiredDesc = stringResource(R.string.ts_detail_expired_48h)
+        Text(
+            stringResource(
+                R.string.ts_detail_unusable,
+                ageH,
+                result.fetchedAtMillis.values.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: Format.MISSING,
+            ),
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(horizontal = 12.dp)
-                .semantics { contentDescription = "缓存已超过48小时，数据不可用，不作为评分依据" })
+                .semantics { contentDescription = expiredDesc },
+        )
     } else {
         val staleWeather = Ttl.staleForMillis(com.tidespot.core.data.repo.DataSource.WEATHER, result.fetchedAtMillis[com.tidespot.core.data.repo.DataSource.WEATHER] ?: 0L, now)
         val staleMarine = Ttl.staleForMillis(com.tidespot.core.data.repo.DataSource.MARINE, result.fetchedAtMillis[com.tidespot.core.data.repo.DataSource.MARINE] ?: 0L, now)
         if (staleWeather != null || staleMarine != null) {
             // 文案「数据时间 X，已过期」由 Ttl 计算，不硬编码
-            Text("数据时间 ${result.fetchedAtMillis.values.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: "—"}，已过期",
+            val staleDesc = stringResource(R.string.ts_detail_expired_desc)
+            Text(
+                // OPT-V115-01 #5（ts_stale）：黄条统一为「数据已过期 · 显示上次成功拉取结果 · 数据时间 X」
+                stringResource(
+                    UiR.string.ts_stale_with_time,
+                    stringResource(UiR.string.ts_stale),
+                    result.fetchedAtMillis.values.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: Format.MISSING,
+                ),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 12.dp)
-                    .semantics { contentDescription = "缓存已过期警告：数据时间显示于正文" })
+                    .semantics { contentDescription = staleDesc },
+            )
         }
     }
 }
@@ -698,37 +802,58 @@ private fun DailySummaryLine(
     zone: ZoneId,
     state: DetailUiState,
 ) {
-    val unit = chartUnit(tab)
+    val unit = chartUnit(tab, stringResource(R.string.ts_detail_unit_score))
     val summary = Derivations.summary(daySlices.map { it.timeEpochSec to values.getOrNull(daySlices.indexOf(it)) })
     if (summary == null) {
-        Text("当日摘要：—（无有效数据）", Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+        Text(stringResource(R.string.ts_detail_summary_empty), Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             style = MaterialTheme.typography.bodySmall)
         return
     }
+    val summaryDesc = stringResource(
+        R.string.ts_detail_summary_plain,
+        Format.value(summary.max),
+        Format.hourLocal(summary.maxEpochSec, zone),
+        Format.value(summary.min),
+        Format.hourLocal(summary.minEpochSec, zone),
+    )
     Text(
-        "当日摘要：最高 ${Format.valueUnit(summary.max, unit)}（${Format.hourLocal(summary.maxEpochSec, zone)}）" +
-            " / 最低 ${Format.valueUnit(summary.min, unit)}（${Format.hourLocal(summary.minEpochSec, zone)}）",
+        stringResource(
+            R.string.ts_detail_summary_unit,
+            Format.valueUnit(summary.max, unit),
+            Format.hourLocal(summary.maxEpochSec, zone),
+            Format.valueUnit(summary.min, unit),
+            Format.hourLocal(summary.minEpochSec, zone),
+        ),
         Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-            .semantics { contentDescription = "当日摘要：最高 ${Format.value(summary.max)} 于 ${Format.hourLocal(summary.maxEpochSec, zone)}，最低 ${Format.value(summary.min)} 于 ${Format.hourLocal(summary.minEpochSec, zone)}" },
+            .semantics { contentDescription = summaryDesc },
         style = MaterialTheme.typography.bodyMedium,
     )
 }
 
 @Composable
 private fun SourceFooter(result: com.tidespot.core.data.repo.SpotDetailResult, zone: ZoneId, tab: DetailTab) {
+    val w = result.fetchedAtMillis[DataSource.WEATHER]?.takeIf { it > 0 }
+    val m = result.fetchedAtMillis[DataSource.MARINE]?.takeIf { it > 0 }
+    // OPT-V11-04（CHG-27）：模型名/分辨率/粒度取契约映射表（禁 Screen 硬编码）；禁编造源更新时间
+    val marineLine = m?.let {
+        stringResource(
+            R.string.ts_detail_marine_source,
+            SourceMetaRegistry.line(DataSource.MARINE, localDomainCopy()),
+            Format.clockMillis(it, zone),
+        )
+    }
+    val weatherLine = w?.let {
+        stringResource(
+            R.string.ts_detail_weather_source,
+            SourceMetaRegistry.line(DataSource.WEATHER, localDomainCopy()),
+            Format.clockMillis(it, zone),
+        )
+    }
+    val cacheLine = if (result.servedFromCache.isNotEmpty()) stringResource(R.string.ts_detail_stale_cache) else null
     val lines = buildList {
-        val w = result.fetchedAtMillis[DataSource.WEATHER]?.takeIf { it > 0 }
-        val m = result.fetchedAtMillis[DataSource.MARINE]?.takeIf { it > 0 }
-        if (tab != DetailTab.SCORE && tab != DetailTab.WATER_QUALITY) {
-            if (m != null) {
-                // OPT-V11-04（CHG-27）：模型名/分辨率/粒度取契约映射表（禁 Screen 硬编码）；禁编造源更新时间
-                add("海洋来源 · ${SourceMetaRegistry.line(DataSource.MARINE)} · 本机拉取 ${Format.clockMillis(m, zone)}")
-            }
-        }
-        if (w != null) {
-            add("天气来源 · ${SourceMetaRegistry.line(DataSource.WEATHER)} · 本机拉取 ${Format.clockMillis(w, zone)}")
-        }
-        if (result.servedFromCache.isNotEmpty()) add("当前显示为最近缓存（重试失败保留旧数据）")
+        if (tab != DetailTab.SCORE && tab != DetailTab.WATER_QUALITY && marineLine != null) add(marineLine)
+        if (weatherLine != null) add(weatherLine)
+        if (cacheLine != null) add(cacheLine)
     }
     Column(Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
         lines.forEach {
@@ -740,19 +865,19 @@ private fun SourceFooter(result: com.tidespot.core.data.repo.SpotDetailResult, z
 private fun holderRawInputs(viewModel: DetailViewModel, epochSec: Long): List<RawInputRow> =
     viewModel.holderInternal().rawInputsFor(epochSec)
 
-private fun chartUnit(tab: DetailTab): String = when (tab) {
+private fun chartUnit(tab: DetailTab, scoreUnit: String): String = when (tab) {
     DetailTab.WAVE -> "m"
     DetailTab.WEATHER -> "°C"
-    DetailTab.SCORE -> "分"
+    DetailTab.SCORE -> scoreUnit
     DetailTab.WATER_QUALITY -> "°C"
     DetailTab.TIDE -> "m"
 }
 
-private fun disclaimerFor(tab: DetailTab): String = when (tab) {
-    DetailTab.WAVE, DetailTab.TIDE -> TideSpotStrings.DISCLAIMER_WAVE_TIDE
-    DetailTab.WEATHER -> TideSpotStrings.DISCLAIMER_WEATHER
-    DetailTab.SCORE -> TideSpotStrings.DISCLAIMER_SCORE
-    DetailTab.WATER_QUALITY -> TideSpotStrings.DISCLAIMER_WATER_QUALITY
+private fun disclaimerFor(tab: DetailTab, strings: TideSpotStrings): String = when (tab) {
+    DetailTab.WAVE, DetailTab.TIDE -> strings.disclaimerWaveTide
+    DetailTab.WEATHER -> strings.disclaimerWeather
+    DetailTab.SCORE -> strings.disclaimerScore
+    DetailTab.WATER_QUALITY -> strings.disclaimerWaterQuality
 }
 
 

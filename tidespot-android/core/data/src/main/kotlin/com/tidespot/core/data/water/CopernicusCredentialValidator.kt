@@ -1,6 +1,8 @@
 package com.tidespot.core.data.water
 
 import com.tidespot.core.data.DataError
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import kotlinx.coroutines.CancellationException
 
 /**
@@ -38,7 +40,7 @@ class CopernicusCredentialValidator(
         { CopernicusAuthClient(it.username, it.password) },
 ) {
 
-    suspend fun check(credential: CopernicusCredential?): CredentialCheck {
+    suspend fun check(credential: CopernicusCredential?, copy: DomainCopy = ZhDomainCopy): CredentialCheck {
         val c = credential ?: return CredentialCheck.Missing
         if (c.isBlank) return CredentialCheck.Missing
         return try {
@@ -49,12 +51,12 @@ class CopernicusCredentialValidator(
         } catch (e: DataError) {
             when (e) {
                 is DataError.BadRequest, is DataError.SourceParamError ->
-                    CredentialCheck.Invalid(e.message ?: "凭据无效")
+                    CredentialCheck.Invalid(e.message ?: copy.credentialInvalid)
                 is DataError.RateLimited, is DataError.ServerError, is DataError.NetworkError ->
-                    CredentialCheck.Unreachable(e.message ?: "网络异常")
+                    CredentialCheck.Unreachable(e.message ?: copy.networkError)
             }
         } catch (e: Exception) {
-            CredentialCheck.Unreachable(e.message ?: "网络异常")
+            CredentialCheck.Unreachable(e.message ?: copy.networkError)
         }
     }
 }

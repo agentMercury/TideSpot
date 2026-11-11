@@ -75,3 +75,51 @@
 7. OPT-V11-13 自有验收：红线扫描扩展（非资源文件含中文字面量=FAIL）生效；切英文后五 Tab/免责/徽标/按钮全英文且无截断。
 
 **结论口径**：1–7 全绿才可把 GAP-05 记为「已闭环」；任一项不满足，登记偏差并回推 OPT-V11-13。
+
+### 6.1 复核结果（2026-11-11，V1.15 / CHG-46）
+
+| # | 项 | 结果 | 证据 |
+|---|---|---|---|
+| 1 | 17 key 每 key ≥1 处引用 | ✅ | 17/17（另新增 `ts_stale_with_time` 中英双语） |
+| 2 | 旧硬编码消失 | ✅ | 「逆地理解析中…」「未来最佳窗口 Top10」「记录一条高潮观测」「确认收藏」全仓 0 命中 |
+| 3 | 中英条目对齐 | ✅ | `values` 241 / `values-en` 241 |
+| 4 | 冻结链未动 | ✅ | `ScoreBands` / `ConfidenceBadge` diff 无 0xFF 变化；`TideSpotTheme` 主色未改（仅新增 Shapes/Typography） |
+| 5 | StaleBanner 两态兼容 | ✅ | 过期黄条=通用句+时间；≥48h 不可用态独立保留，测试未删改 |
+| 6 | 模块测试 | ✅ | 八模块 `gradlew test` BUILD SUCCESSFUL（含 core:ui Robolectric 冒烟 8 用例） |
+| 7 | i18n 红线 + 英文界面 | 🔶 部分 | `i18n_scan` FAIL=0 ✅；真机英文界面未验（`adb devices` 为空），Robolectric `qualifiers=en` 未新增断言 → 随下次真机批次 |
+
+**GAP-05 结论**：文案定稿与接线（1–6）**已闭环**；英文真机验收（7）因设备缺席挂起，不阻塞 v1.15.0 交付。
+
+## 7. OPT-V11-13 i18n 范围裁定（D22，2026-11-11）
+
+**裁定人**：交付负责人（客户任务「接手完成 OPT-V11-13」授权范围内）→ **待客户复核**。
+
+### 7.1 语言切换方式
+
+**系统语言驱动**（`values/` 中文默认 + `values-en/` 英文），App 内**不新增语言选择器**。
+依据：`OPT_REQUIREMENTS_V11.md:133-138` 只要求「中英双语准备 + N-8 日期与单位本地化」，未要求应用内切换；SRS 无语言设置项。
+验证：`TideSpotStringsTest`（中）与 `EnStringsParityTest`（英）逐键锁；真机切换系统语言后重组即生效（`localTideSpotStrings()` 监听 `LocalConfiguration`）。
+
+### 7.2 文案提供者白名单（红线扫描豁免，代码级）
+
+| 位置 | 豁免理由 |
+|---|---|
+| `core/ui/.../strings/{ZhStrings,EnStrings}.kt` | 资源镜像（纯 Kotlin 侧取词），与 `values{-en}` 逐键相等测试锁死 |
+| `core/domain/.../strings/{DomainCopy,ZhDomainCopy}.kt` | 纯 Kotlin domain 取词层 |
+| `core/data/.../geo/T2S.kt` | 繁简归一**数据表**，非文案 |
+| `core/data/.../repo/HourlyScoreStore.kt` | `preset` 中文标签**解析关键字**（协议值） |
+| `core/domain/.../algorithm/ScenePreset.kt` | `label` 为 `spot.preset` 数据协议值；展示改走 `Presets.displayLabel(id, copy)` |
+| `core/data/.../{DataError,CopernicusCredentialStore,OpenMeteoClient}.kt`、`TideSpotRepository.kt` | 技术诊断/开发期断言，**不上屏** |
+| `core/domain/.../tide/TideCalibrator.kt` | `rejectReason` 为存库诊断列（不上屏） |
+| `core/data/.../repo/SourceMetaRegistry.kt` | 数据源技术元数据（非语言敏感） |
+| `feature/map/.../geo/{GeocoderApi,PlaceResolver}.kt` | 测试/搜索桩数据（地名样本） |
+
+### 7.3 数据协议值红线（禁翻译）
+
+- `spot.preset`：仍写中文标签（`淡水路亚/海水岸边/淡水台钓`），`HourlyScoreStore.resolvePreset` 的「id → 中文标签子串 → 水体兜底」链不变（D18 只覆盖 `groupPreset`）。
+- `groupName`：用户数据原样。
+- `vetoReasons` / `FactorScore.detail`：**落库文本**，新写入行跟随当前语言；历史行为迁移前中文（既有行为，不回填）。消费侧判定只认 `vetoCodes`（FO-01 口径不变）。
+
+### 7.4 交付口径
+
+本批（CHG-40）完成**架构 + core:ui / core:domain / feature:settings / feature:map** 全量外移；`feature:detail` / `feature:favorites` / `app` 共 276 处转**批次二**（资源与注入接口已就绪，纯替换）。批次二完成前，**7.2 #7 验收项（切英文全量无残留）不成立**，GAP-05 不得记「已闭环」。

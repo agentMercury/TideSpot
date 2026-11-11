@@ -1,5 +1,6 @@
-﻿package com.tidespot.feature.settings
+package com.tidespot.feature.settings
 
+import androidx.annotation.StringRes
 import com.tidespot.core.ui.selector.DaySelectorLogic
 
 /**
@@ -8,7 +9,7 @@ import com.tidespot.core.ui.selector.DaySelectorLogic
  * - 单位制：SI/英制切换仅是显示层换算语义（内部恒 SI，冻结点 3），换算函数在此单源；
  * - 详情天数：7|10 二选一，收敛单源接 [DaySelectorLogic.coerceDaysRange]（D14 设置项）；
  * - 开关/API Key：翻转与清洗均为纯函数；
- * - 许可清单/隐私披露：静态数据 + 开关联动文案。
+ * - 许可清单/隐私披露：静态数据 + 开关联动；OPT-V11-13 起文案全部外移资源（本类只持有 `@StringRes`）。
  */
 object SettingsLogic {
 
@@ -70,26 +71,30 @@ object SettingsLogic {
 
     data class LicenseEntry(
         val name: String,
-        val role: String,
-        val license: String,
+        @StringRes val roleRes: Int,
+        @StringRes val licenseRes: Int,
         val attribution: String,
     )
 
-    /** 数据源/库许可与署名（渲染顺序即展示顺序；锁测试钉内容）。 */
+    /** 数据源/库许可与署名（渲染顺序即展示顺序；锁测试钉 id 序列，OPT-V11-13 文案外移）。 */
     val LICENSES: List<LicenseEntry> = listOf(
-        LicenseEntry("Open-Meteo", "天气 / 海洋 / 正地理搜索", "CC BY 4.0（数据）", "Weather data by Open-Meteo.com"),
-        LicenseEntry("Copernicus Marine Service", "海洋再分析 / 水位 / 水质", "Copernicus Marine 许可（需署名）", "© Copernicus Marine Environment Monitoring Service"),
-        LicenseEntry("NASA", "水体掩膜 / 遥感参考", "NASA 开放数据协议（需署名）", "Courtesy of NASA Earth Science Division"),
-        LicenseEntry("NOAA", "水位 / 海洋参考", "公有领域（建议署名）", "Source: NOAA"),
-        LicenseEntry("USGS", "地形 / 水体参考", "公有领域（建议署名）", "Source: USGS"),
-        LicenseEntry("OpenStreetMap · MapLibre", "地图底图 / 渲染", "ODbL（数据）/ BSD-2（MapLibre）", "© OpenStreetMap contributors"),
-        LicenseEntry("BigDataCloud", "逆地理 RG-A", "CC BY 4.0（客户端 API 免费层）", "© BigDataCloud"),
-        LicenseEntry("Photon", "逆地理 RG-B", "ODbL（数据 © OpenStreetMap）", "© Photon by komoot"),
+        LicenseEntry("Open-Meteo", R.string.ts_license_open_meteo_role, R.string.ts_license_open_meteo_license, "Weather data by Open-Meteo.com"),
+        LicenseEntry("Copernicus Marine Service", R.string.ts_license_copernicus_role, R.string.ts_license_copernicus_license, "© Copernicus Marine Environment Monitoring Service"),
+        LicenseEntry("NASA", R.string.ts_license_nasa_role, R.string.ts_license_nasa_license, "Courtesy of NASA Earth Science Division"),
+        LicenseEntry("NOAA", R.string.ts_license_noaa_role, R.string.ts_license_noaa_license, "Source: NOAA"),
+        LicenseEntry("USGS", R.string.ts_license_usgs_role, R.string.ts_license_usgs_license, "Source: USGS"),
+        LicenseEntry("OpenStreetMap · MapLibre", R.string.ts_license_osm_role, R.string.ts_license_osm_license, "© OpenStreetMap contributors"),
+        LicenseEntry("BigDataCloud", R.string.ts_license_bdc_role, R.string.ts_license_bdc_license, "© BigDataCloud"),
+        LicenseEntry("Photon", R.string.ts_license_photon_role, R.string.ts_license_photon_license, "© Photon by komoot"),
     )
 
     // ────────────── 隐私逐源披露（发送内容 + 开关联动） ──────────────
 
-    data class PrivacyLine(val source: String, val sends: String, val toggleNote: String)
+    data class PrivacyLine(
+        @StringRes val sourceRes: Int,
+        @StringRes val sendsRes: Int,
+        @StringRes val toggleNoteRes: Int,
+    )
 
     /**
      * 逐源披露行（RG-A BigDataCloud / RG-B Photon / 正地理 Open-Meteo / 天气 / 海洋 / 水质推导）。
@@ -97,17 +102,15 @@ object SettingsLogic {
      * [prefetchEnabled] 关 → 天气行注明「仅进详情页时拉取」。
      */
     fun privacyLines(reverseGeoEnabled: Boolean, prefetchEnabled: Boolean): List<PrivacyLine> {
-        val geoNote = if (reverseGeoEnabled) "受「逆地理名称」总开关控制：已开启"
-        else "受「逆地理名称」总开关控制：已关闭（不发请求）"
-        val weatherNote = if (prefetchEnabled) "「预取」已开启：进入列表页可能后台预热"
-        else "「预取」已关闭：仅进入详情页时拉取"
+        val geoNote = if (reverseGeoEnabled) R.string.ts_privacy_geo_on else R.string.ts_privacy_geo_off
+        val weatherNote = if (prefetchEnabled) R.string.ts_privacy_prefetch_on else R.string.ts_privacy_prefetch_off
         return listOf(
-            PrivacyLine("逆地理 RG-A · BigDataCloud", "仅发送坐标（纬度/经度），不含账号或设备标识", geoNote),
-            PrivacyLine("逆地理 RG-B · Photon", "仅发送坐标（纬度/经度），不含账号或设备标识", geoNote),
-            PrivacyLine("正地理 · Open-Meteo /v1/search", "仅发送搜索关键词", "仅在用户搜索时发送"),
-            PrivacyLine("天气 · Open-Meteo", "发送坐标与请求时段", weatherNote),
-            PrivacyLine("海洋 · Copernicus / 海洋模型", "发送坐标与请求时段", weatherNote),
-            PrivacyLine("水质 · 本地推导", "不发送任何数据（由天气序列在设备内推导）", "无网络请求"),
+            PrivacyLine(R.string.ts_privacy_rga_source, R.string.ts_privacy_rg_coords, geoNote),
+            PrivacyLine(R.string.ts_privacy_rgb_source, R.string.ts_privacy_rg_coords, geoNote),
+            PrivacyLine(R.string.ts_privacy_geocode_source, R.string.ts_privacy_geocode_sends, R.string.ts_privacy_geocode_only),
+            PrivacyLine(R.string.ts_privacy_weather_source, R.string.ts_privacy_coords_period, weatherNote),
+            PrivacyLine(R.string.ts_privacy_marine_source, R.string.ts_privacy_coords_period, weatherNote),
+            PrivacyLine(R.string.ts_privacy_wq_source, R.string.ts_privacy_wq_sends, R.string.ts_privacy_no_network),
         )
     }
 }

@@ -15,7 +15,7 @@ class TidePhaseTest {
         val p = TidePhase.of(0.4)
         assertEquals(TidePhase.TideSize.SPRING, p.size)
         assertEquals(TidePhase.TideCurrent.ACTIVE, p.current)
-        assertEquals("大潮 · 活汛", p.label)
+        assertEquals("大潮 · 活汛", p.label())
     }
 
     @Test
@@ -23,7 +23,7 @@ class TidePhaseTest {
         val p = TidePhase.of(7.4)
         assertEquals(TidePhase.TideSize.NEAP, p.size)
         assertEquals(TidePhase.TideCurrent.DEAD, p.current)
-        assertEquals("小潮 · 死汛", p.label)
+        assertEquals("小潮 · 死汛", p.label())
     }
 
     @Test
@@ -31,7 +31,7 @@ class TidePhaseTest {
         val p = TidePhase.of(11.0)
         assertEquals(TidePhase.TideSize.NONE, p.size)
         assertEquals(TidePhase.TideCurrent.ACTIVE, p.current)
-        assertEquals("活汛", p.label)
+        assertEquals("活汛", p.label())
     }
 
     @Test

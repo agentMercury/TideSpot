@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 潮点 TideSpot · 详情页文案（OPT-V11-13；中文默认） -->
+<resources>
+    <!-- DetailScreen 主界面 -->
+    <string name="ts_detail_content_desc">详情页：五维度逐小时数据</string>
+    <string name="ts_detail_tabs_desc">五维度标签页</string>
+    <string name="ts_detail_tab_desc">%1$s标签页</string>
+    <string name="ts_detail_last_cache">最近缓存：%1$s</string>
+    <string name="ts_detail_retry_desc">重试加载该维度数据</string>
+    <string name="ts_detail_retry">重试</string>
+    <string name="ts_detail_loading">加载中…</string>
+    <string name="ts_detail_no_source">本点无该来源数据</string>
+    <string name="ts_detail_chart">图表</string>
+    <string name="ts_detail_chart_desc">切换为逐小时图表</string>
+    <string name="ts_detail_table">数值表</string>
+    <string name="ts_detail_table_desc">切换为逐小时数值表（TalkBack 可读）</string>
+    <string name="ts_detail_tide_phase">潮汛：%1$s</string>
+    <string name="ts_detail_wq_entry_desc">录入水质实测值</string>
+    <string name="ts_detail_top10_desc">打开未来最佳窗口前十名</string>
+    <string name="ts_detail_top10">最佳窗口 Top10</string>
+    <string name="ts_detail_calibration_desc">打开现场校潮面板</string>
+    <string name="ts_detail_calibration">现场校潮</string>
+    <string name="ts_detail_disclaimer_desc">打开免责声明（共 5 条）</string>
+
+    <!-- Top10 Sheet -->
+    <string name="ts_detail_filter_all">全部</string>
+    <string name="ts_detail_filter_all_desc">时段筛选：全部</string>
+    <string name="ts_detail_filter_24h">接下来 24h</string>
+    <string name="ts_detail_filter_24h_desc">时段筛选：接下来 24 小时</string>
+    <string name="ts_detail_filter_weekend">本周末</string>
+    <string name="ts_detail_filter_weekend_desc">时段筛选：本周末</string>
+    <string name="ts_detail_filter_custom">自选</string>
+    <string name="ts_detail_filter_custom_desc">时段筛选：自选日期与时段</string>
+    <string name="ts_detail_data_pending">数据未到达，加载中…</string>
+    <string name="ts_detail_no_window_desc">未来无达标窗口提示</string>
+    <string name="ts_detail_top_factor">主因 %1$s</string>
+    <string name="ts_detail_warning">注意 %1$s</string>
+
+    <!-- 自选时段 -->
+    <string name="ts_detail_custom_title">自选时段</string>
+    <string name="ts_detail_custom_date">日期（yyyy-MM-dd）</string>
+    <string name="ts_detail_custom_date_desc">自选日期</string>
+    <string name="ts_detail_custom_start">开始（HH:mm）</string>
+    <string name="ts_detail_custom_start_desc">自选开始时间</string>
+    <string name="ts_detail_custom_end">结束（HH:mm）</string>
+    <string name="ts_detail_custom_end_desc">自选结束时间</string>
+    <string name="ts_detail_err_date_format">日期格式应为 yyyy-MM-dd</string>
+    <string name="ts_detail_err_time_format">时间格式应为 HH:mm</string>
+    <string name="ts_detail_err_end_before_start">结束时间必须晚于开始时间</string>
+    <string name="ts_detail_apply">应用</string>
+    <!-- 现场校潮 Sheet -->
+    <string name="ts_detail_calib_body">记录现场观测（≥2 条、与模型标记 ±6h 内才启用；只校正滞后 lag）。时刻可改，支持事后补记。</string>
+    <string name="ts_detail_obs_type">观测类型</string>
+    <string name="ts_detail_obs_type_desc">观测类型：%1$s</string>
+    <string name="ts_detail_obs_time">观测时刻（yyyy-MM-dd HH:mm）</string>
+    <string name="ts_detail_obs_time_input">观测时刻输入框</string>
+    <string name="ts_detail_obs_record">记录观测</string>
+    <string name="ts_detail_obs_record_short">记录</string>
+    <string name="ts_detail_obs_clear">清空本页记录</string>
+    <string name="ts_detail_obs_count">已记录 %1$d 条</string>
+    <string name="ts_detail_obs_latest">，最近 %1$s</string>
+    <string name="ts_detail_fit_result">拟合结果：%1$s</string>
+    <string name="ts_detail_calib_save">保存并应用现场校潮</string>
+    <string name="ts_detail_calib_save_short">保存并应用校潮</string>
+
+    <!-- 来源脚注 / 过期 -->
+    <string name="ts_detail_source_update">源更新 %1$s · 本机拉取 %2$s</string>
+    <string name="ts_detail_unusable">数据不可用（已过期 %1$d h），不作为评分依据；最近数据时间 %2$s</string>
+    <string name="ts_detail_expired_48h">缓存已超过48小时，数据不可用，不作为评分依据</string>
+    <string name="ts_detail_data_time_expired">数据时间 %1$s，已过期</string>
+    <string name="ts_detail_expired_desc">缓存已过期警告：数据时间显示于正文</string>
+    <string name="ts_detail_summary_empty">当日摘要：—（无有效数据）</string>
+    <string name="ts_detail_summary_unit">当日摘要：最高 %1$s（%2$s）/ 最低 %3$s（%4$s）</string>
+    <string name="ts_detail_summary_plain">当日摘要：最高 %1$s 于 %2$s，最低 %3$s 于 %4$s</string>
+    <string name="ts_detail_marine_source">海洋来源 · %1$s · 本机拉取 %2$s</string>
+    <string name="ts_detail_weather_source">天气来源 · %1$s · 本机拉取 %2$s</string>
+    <string name="ts_detail_stale_cache">当前显示为最近缓存（重试失败保留旧数据）</string>
+    <string name="ts_detail_unit_score">分</string>
+
+    <!-- 水质实测 Sheet -->
+    <string name="ts_detail_wq_sheet_title">录入水质实测</string>
+    <string name="ts_detail_wq_save_desc">保存水质实测</string>
+    <string name="ts_detail_wq_cancel_desc">取消录入</string>
+    <string name="ts_detail_wq_temp_input">水温实测输入</string>
+    <string name="ts_detail_wq_do_input">溶解氧实测输入</string>
+    <string name="ts_detail_wq_turb_input">浊度实测输入</string>
+    <string name="ts_detail_wq_time_input">录入时刻输入</string>
+
+    <!-- 内陆引导卡 -->
+    <string name="ts_detail_guide_desc">内陆水质卫星增强配置引导</string>
+    <string name="ts_detail_guide_open">前往设置页配置 Copernicus 账号</string>
+    <string name="ts_detail_guide_skip">跳过本次引导，不再显示</string>
+
+    <!-- 潮汐图派生 / 校潮对照 -->
+    <string name="ts_detail_tide_before">校正前：%1$s</string>
+    <string name="ts_detail_tide_after">校正后（滞后 %1$dh）：%2$s</string>
+    <string name="ts_detail_tide_high">高潮 %1$s</string>
+    <string name="ts_detail_tide_low">低潮 %1$s</string>
+    <string name="ts_detail_manual_same">基本一致</string>
+    <string name="ts_detail_manual_later">晚 %1$sh</string>
+    <string name="ts_detail_manual_earlier">早 %1$sh</string>
+    <string name="ts_detail_manual_compare">模型%1$s %2$s · 你记录%3$s</string>
+    <string name="ts_detail_manual_any">高低潮</string>
+    <string name="ts_detail_manual_line">%1$s · %2$s</string>
+    <string name="ts_detail_manual_time_format">时刻格式应为 yyyy-MM-dd HH:mm</string>
+    <string name="ts_detail_manual_out_of_range">时刻超出可补记范围（当前 ±%1$dh）</string>
+    <string name="ts_detail_wq_label_temp">水温</string>
+    <string name="ts_detail_wq_label_do">溶解氧</string>
+    <string name="ts_detail_wq_label_turb">浊度</string>
+</resources>

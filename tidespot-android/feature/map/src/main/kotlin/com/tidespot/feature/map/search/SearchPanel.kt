@@ -20,6 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.tidespot.feature.map.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tidespot.feature.map.geo.GeocoderApi
@@ -63,11 +65,11 @@ fun SearchPanel(
             trailingIcon = {
                 if (query.isNotEmpty()) {
                     IconButton(onClick = { query = "" }) {
-                        Icon(Icons.Filled.Close, contentDescription = "清空")
+                        Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.ts_map_search_clear))
                     }
                 }
             },
-            placeholder = { Text("搜索地点（如：万绿湖）") },
+            placeholder = { Text(stringResource(R.string.ts_map_search_hint)) },
         )
         if (results.isNotEmpty()) {
             Card(modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {

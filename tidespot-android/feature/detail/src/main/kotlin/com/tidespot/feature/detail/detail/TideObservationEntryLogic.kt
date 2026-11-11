@@ -1,6 +1,10 @@
 package com.tidespot.feature.detail.detail
 
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import com.tidespot.core.domain.tide.TideObservationType
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -64,28 +68,37 @@ object TideObservationEntryLogic {
         type: TideObservationType,
         epochSec: Long,
         zone: ZoneId,
+        copy: DomainCopy = ZhDomainCopy,
+        strings: TideSpotStrings = ZhStrings,
     ): String? {
         val marker = nearestMarker(markers, type, epochSec) ?: return null
         val modelText = HM.format(Instant.ofEpochSecond(marker).atZone(zone))
         val deltaHours = (epochSec - marker) / 3600.0
         val delta = when {
-            abs(deltaHours) < 0.25 -> "基本一致"
-            deltaHours > 0 -> "晚 ${oneDecimal(deltaHours)}h"
-            else -> "早 ${oneDecimal(-deltaHours)}h"
+            abs(deltaHours) < 0.25 -> strings.manualSame
+            deltaHours > 0 -> strings.manualLater(oneDecimal(deltaHours))
+            else -> strings.manualEarlier(oneDecimal(-deltaHours))
         }
-        return "模型${type.label} $modelText · 你记录$delta"
+        return strings.manualCompare(copy.observationTypeLabel(type), modelText, delta)
     }
 
     /** 已记录条目展示行：「高潮 · 11月10日 06:10」。 */
-    fun observationLine(type: TideObservationType?, epochSec: Long, zone: ZoneId): String {
-        val hm = DateTimeFormatter.ofPattern("M月d日 HH:mm")
+    fun observationLine(
+        type: TideObservationType?,
+        epochSec: Long,
+        zone: ZoneId,
+        copy: DomainCopy = ZhDomainCopy,
+        strings: TideSpotStrings = ZhStrings,
+    ): String {
+        val hm = DateTimeFormatter.ofPattern(strings.timePattern)
             .format(Instant.ofEpochSecond(epochSec).atZone(zone))
-        return "${type?.label ?: "高低潮"} · $hm"
+        val typeLabel = type?.let { copy.observationTypeLabel(it) } ?: strings.manualAnyType
+        return strings.manualLine(typeLabel, hm)
     }
 
-    fun errorText(error: ParseError): String = when (error) {
-        ParseError.BAD_FORMAT -> "时刻格式应为 yyyy-MM-dd HH:mm"
-        ParseError.OUT_OF_RANGE -> "时刻超出可补记范围（当前 ±${MAX_OFFSET_HOURS}h）"
+    fun errorText(error: ParseError, strings: TideSpotStrings = ZhStrings): String = when (error) {
+        ParseError.BAD_FORMAT -> strings.manualTimeFormatError
+        ParseError.OUT_OF_RANGE -> strings.manualOutOfRange(MAX_OFFSET_HOURS.toInt())
     }
 
     private fun oneDecimal(v: Double): String = String.format(Locale.ROOT, "%.1f", v)

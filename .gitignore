@@ -27,3 +27,6 @@ archive/
 .idea/
 *.iml
 .vscode/
+
+# Kotlin 构建期临时目录（errors 日志，V1.15）
+.kotlin/

@@ -1,6 +1,8 @@
 package com.tidespot.feature.detail.detail
 
 import com.tidespot.core.data.repo.WaterQualityObservationKind
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 
 /**
  * OPT-V11-02（CHG-27）：水质实测录表单纯逻辑（JVM 锁；UI 只做状态与渲染）。
@@ -35,11 +37,11 @@ object WaterQualityEntryLogic {
         WaterQualityObservationKind.TURBIDITY -> "NTU"
     }
 
-    /** 指标中文名。 */
-    fun label(kind: WaterQualityObservationKind): String = when (kind) {
-        WaterQualityObservationKind.WATER_TEMP -> "水温"
-        WaterQualityObservationKind.DO -> "溶解氧"
-        WaterQualityObservationKind.TURBIDITY -> "浊度"
+    /** 指标名（OPT-V11-13：由 [TideSpotStrings] 注入，默认中文 [ZhStrings] 零漂移）。 */
+    fun label(kind: WaterQualityObservationKind, strings: TideSpotStrings = ZhStrings): String = when (kind) {
+        WaterQualityObservationKind.WATER_TEMP -> strings.waterTemp
+        WaterQualityObservationKind.DO -> strings.dissolvedOxygen
+        WaterQualityObservationKind.TURBIDITY -> strings.turbidity
     }
 
     /**

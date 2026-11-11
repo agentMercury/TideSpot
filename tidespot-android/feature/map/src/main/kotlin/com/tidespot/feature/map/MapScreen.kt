@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map
+package com.tidespot.feature.map
 
 import android.Manifest
 import android.app.Activity
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
@@ -33,6 +34,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +48,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.tidespot.core.domain.model.NamedPlace
+import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.feature.map.crosshair.CrosshairState
 import com.tidespot.feature.map.crosshair.CrosshairStateMachine
@@ -307,6 +312,18 @@ fun MapScreen(
         CrosshairState.Idle -> buildInfoBarState(InfoBarMode.CONFIRMED, null, null, null, reverseGeoEnabled)
     }
 
+    // OPT-V115-01 #1（ts_reverse_geo_off）：逆地理关闭 → 信息条上方一次性提示，5s 自动隐藏
+    var showReverseGeoOffHint by remember(reverseGeoEnabled) { mutableStateOf(!reverseGeoEnabled) }
+    LaunchedEffect(reverseGeoEnabled) {
+        if (reverseGeoEnabled) {
+            showReverseGeoOffHint = false
+        } else {
+            showReverseGeoOffHint = true
+            kotlinx.coroutines.delay(5_000)
+            showReverseGeoOffHint = false
+        }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
 
@@ -316,7 +333,7 @@ fun MapScreen(
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp)) {
                 SearchPanel(
                     geocoder = geocoder,
                     onSelect = { candidate ->
@@ -331,10 +348,10 @@ fun MapScreen(
                 )
                 when (val ps = permissionState) {
                     is PermissionUiState.Denied ->
-                        TopHint("未开启定位，可长按地图选点", isError = ps.permanent)
+                        TopHint(stringResource(UiR.string.ts_location_denied), isError = ps.permanent)
                     PermissionUiState.Granted -> lastFix?.let { fix ->
                         TopHint(
-                            "定位成功 · 精度 ±" + (fix.accuracyMeters?.toInt() ?: 0) + " m",
+                            stringResource(R.string.ts_map_location_ok, fix.accuracyMeters?.toInt() ?: 0),
                             isError = false,
                         )
                     }
@@ -343,6 +360,18 @@ fun MapScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            if (showReverseGeoOffHint) {
+                val geoOffHint = stringResource(UiR.string.ts_reverse_geo_off)
+                Text(
+                    geoOffHint,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .semantics { contentDescription = geoOffHint },
+                )
+            }
 
             InfoBarPanel(
                 state = infoState,
@@ -367,7 +396,7 @@ fun MapScreen(
             floatingActions?.invoke()
             if (permissionState is PermissionUiState.Granted && locationController != null) {
                 FloatingActionButton(onClick = { locateMe() }) {
-                    Text("我的位置")
+                    Text(stringResource(R.string.ts_map_my_location))
                 }
             }
         }
@@ -423,7 +452,7 @@ private fun InfoBarPanel(
             }
             if (resolving) {
                 Text(
-                    "逆地理解析中…",
+                    stringResource(UiR.string.ts_resolving),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -438,8 +467,8 @@ private fun InfoBarPanel(
             if (preview) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = onCancel) { Text("取消") }
-                    Button(onClick = onConfirm) { Text("确定") }
+                    TextButton(onClick = onCancel) { Text(stringResource(UiR.string.ts_cancel)) }
+                    Button(onClick = onConfirm) { Text(stringResource(R.string.ts_map_confirm)) }
                 }
             }
         }

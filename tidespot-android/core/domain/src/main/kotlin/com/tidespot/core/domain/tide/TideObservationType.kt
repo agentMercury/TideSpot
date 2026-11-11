@@ -9,10 +9,14 @@ package com.tidespot.core.domain.tide
  * - [LOW] / [RISING_START] → 与模型**低潮**时刻匹配（落→涨翻转点即开始涨潮）。
  *
  * 历史数据兼容：v1 之前的观测无类型（`TIDE_OBSERVATION`），拟合时按「任意极值最近匹配」处理。
+ *
+ * OPT-V11-13：**枚举不再携带中文 label**（本文件名零字面量）；展示名走
+ * `DomainCopy.observationTypeLabel(type)`（默认中文 [com.tidespot.core.domain.strings.ZhDomainCopy]）。
  */
-enum class TideObservationType(val label: String) {
-    HIGH("高潮"),
-    LOW("低潮"),
-    RISING_START("我开始涨潮"),
-    FALLING_START("我开始退潮"),
+@Suppress("EnumEntryName")
+enum class TideObservationType {
+    HIGH,
+    LOW,
+    RISING_START,
+    FALLING_START,
 }

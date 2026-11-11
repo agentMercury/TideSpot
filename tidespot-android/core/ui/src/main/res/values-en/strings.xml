@@ -2,6 +2,7 @@
 <!--
   潮点 TideSpot · English strings (initial draft, machine-translated with manual review pending).
   Keep semantic parity with values/strings.xml; numbers/units semantics must not change with language (N-8).
+  Manual review status: REVIEWED-1 (GAP-05 + P0-1 + OPT-V11-13 batches).
 -->
 <resources>
     <!-- GAP-05 finalized copy (17) -->
@@ -18,6 +19,8 @@
     <string name="ts_placeholder_v11">Fishing use-cases, species presets and factor weight editing open in v1.1 (currently following the favorite\'s preset).</string>
     <string name="ts_offline">Network unavailable; showing cached data</string>
     <string name="ts_stale">Data expired · showing last successful fetch</string>
+    <!-- OPT-V115-01 #5: stale banner = generic sentence + concrete data time (%1$s=sentence, %2$s=time) -->
+    <string name="ts_stale_with_time">%1$s · Data time %2$s</string>
     <string name="ts_dimension_degraded">Some dimensions unavailable; recalculated with effective weights</string>
     <string name="ts_chart_table_switch">Chart / Table</string>
     <string name="ts_confirm_favorite">Confirm</string>
@@ -57,7 +60,6 @@
     <string name="ts_wq_turb_label">Turbidity (0~1000 NTU)</string>
     <string name="ts_wq_time_label">Time (yyyy-MM-dd HH:mm, within ±24h)</string>
     <string name="ts_wq_save">Save</string>
-    <string name="ts_wq_cancel">Cancel</string>
     <string name="ts_wq_saved">Saved (water temp now fused)</string>
     <string name="ts_wq_err_number">Enter a number</string>
     <string name="ts_wq_err_range">Out of allowed range</string>
@@ -75,4 +77,211 @@
     <string name="ts_guide_inland_privacy">Credentials stay on this device and are never uploaded. Skipping does not affect other tabs or cause crashes.</string>
     <string name="ts_guide_inland_open_settings">Open Settings</string>
     <string name="ts_guide_inland_skip">Not now</string>
+
+    <!-- OPT-V11-13: tab titles / notices (WaterBodyTabTitles source; SRS §8.1 order) -->
+    <string name="ts_tab_wave">Wind &amp; Waves</string>
+    <string name="ts_tab_weather">Weather</string>
+    <string name="ts_tab_score">Fishing Score</string>
+    <string name="ts_tab_water_quality">Water Quality</string>
+    <string name="ts_tab_tide">Tide</string>
+    <string name="ts_tab_wave_inland">Lake Wind &amp; Water Temp</string>
+    <string name="ts_tab_tide_inland">Water Level (no tide)</string>
+    <string name="ts_tab_wave_land">Wind &amp; Waves (est.)</string>
+    <string name="ts_tab_water_quality_land">Water Quality (est.)</string>
+    <string name="ts_tab_tide_land">Tide (unavailable)</string>
+    <string name="ts_notice_land">Land spot: water quality and tide are estimated or unavailable. Reference only.</string>
+    <string name="ts_notice_unknown">Water body undetermined; it updates automatically when the data source recovers.</string>
+
+    <!-- OPT-V11-13: disclaimers (SRS §9.6 / D11: exactly 5) -->
+    <string name="ts_disclaimer_title">Disclaimer</string>
+    <string name="ts_disclaimer_entry">Disclaimer</string>
+    <string name="ts_disclaimer_wave_tide">Tide levels and currents come from a ~8 km global model and are officially not suitable for coastal navigation. This app does not replace nautical guides or official tide tables.</string>
+    <string name="ts_disclaimer_weather">Thunderstorm, gale and high-wave judgments are for reference only. Water safety follows local warnings; never fish during lightning, typhoons or spring tides.</string>
+    <string name="ts_disclaimer_score">The score is an empirical weighting of weather and astronomical factors and does not guarantee catch.</string>
+    <string name="ts_disclaimer_water_quality">Most water-quality values in China are model estimates, not measurements; do not use them as a basis for drinking, potable water or safe contact.</string>
+    <string name="ts_disclaimer_tide_correction">\"On-site tide calibration\" is your own recorded high-tide observations used as an empirical correction of model lag (time shift); it is for relative timing reference only. Calibration does not change the data source or accuracy and is still not an official tide table.</string>
+
+    <!-- OPT-V11-13: confidence badges (SRS §8.2-4) -->
+    <string name="ts_badge_measured">Measured</string>
+    <string name="ts_badge_satellite">Satellite</string>
+    <string name="ts_badge_model">Model</string>
+    <string name="ts_badge_estimated">Estimated</string>
+    <string name="ts_badge_uncalibrated">Uncalibrated</string>
+    <string name="ts_badge_low_confidence">Low conf.</string>
+    <string name="ts_confidence_description">Data confidence: %1$s</string>
+
+    <!-- F-3.7 data attribution -->
+    <string name="ts_model_attribution">Weather · Open-Meteo (ICON / ECMWF models) · Ocean · Open-Meteo Marine / Copernicus Marine</string>
+
+    <!-- Water body type badges -->
+    <string name="ts_water_body_ocean">Sea</string>
+    <string name="ts_water_body_nearshore">Nearshore</string>
+    <string name="ts_water_body_inland">Inland water</string>
+    <string name="ts_water_body_land">Land</string>
+    <string name="ts_water_body_unknown">Undetermined</string>
+
+    <!-- Favorite info card (OPT-V11-15; missing values show —) -->
+    <string name="ts_info_coordinate_prefix">Coordinates</string>
+    <string name="ts_info_elevation_prefix">Elevation</string>
+    <string name="ts_info_last_fetched_prefix">Last fetched</string>
+    <string name="ts_info_group_prefix">Group</string>
+    <string name="ts_info_water_body_prefix">Water body</string>
+    <string name="ts_info_accuracy_note">Coordinates are the raw WGS84 pick values kept to 6 decimals (~0.11 m) with no offset correction</string>
+
+    <!-- Factor names (SRS §6.4) -->
+    <string name="ts_factor_oxygen">Dissolved O₂</string>
+    <string name="ts_factor_pressure">Pressure</string>
+    <string name="ts_factor_solunar">Solunar</string>
+    <string name="ts_factor_tide">Tide</string>
+    <string name="ts_factor_wind">Wind</string>
+    <string name="ts_factor_weather">Weather</string>
+    <string name="ts_factor_daypart">Time of day</string>
+    <string name="ts_factor_temp_match">Temp match</string>
+    <string name="ts_factor_comfort">Comfort</string>
+    <string name="ts_factor_water_quality">Water quality</string>
+
+    <!-- Factor breakdown (F-3.4) -->
+    <string name="ts_factor_breakdown_title">Factor breakdown</string>
+    <string name="ts_factor_row">%1$s: sub-score %2$s, weight %3$s</string>
+    <string name="ts_factor_decay">Decay ΠV</string>
+    <string name="ts_factor_multiplier">Multiplier %1$s, triggered by: %2$s</string>
+    <string name="ts_factor_raw_input">Raw input</string>
+
+    <!-- Date / relative time (N-8; pattern changes with language) -->
+    <string name="ts_time_pattern">MMM d, HH:mm</string>
+    <string name="ts_weekday_mon">Mon</string>
+    <string name="ts_weekday_tue">Tue</string>
+    <string name="ts_weekday_wed">Wed</string>
+    <string name="ts_weekday_thu">Thu</string>
+    <string name="ts_weekday_fri">Fri</string>
+    <string name="ts_weekday_sat">Sat</string>
+    <string name="ts_weekday_sun">Sun</string>
+    <string name="ts_today">Today %1$s</string>
+    <string name="ts_tomorrow">Tomorrow %1$s</string>
+
+    <!-- Hourly chart / day selector accessibility -->
+    <string name="ts_chart_hour_tooltip_suffix">, selected hour %1$d: %2$s</string>
+    <string name="ts_chart_hour_desc">24-hour chart in %1$s. %2$d data points</string>
+    <string name="ts_chart_missing_suffix">, %1$d hours missing (shown as gaps; table shows —)</string>
+    <string name="ts_chart_score_desc">24-hour fishing score bars, 0 to 100, 5 color bands</string>
+    <string name="ts_chart_window_suffix">, %1$d hours reach the prime window (≥80)</string>
+    <string name="ts_chart_hint">%1$s. Tap to inspect hourly values; see the hourly table below. %2$s</string>
+    <string name="ts_day_today">Today %1$s, %2$s</string>
+    <string name="ts_day_future">Day %1$d %2$s, %3$s</string>
+    <string name="ts_day_short_today">Today %1$s</string>
+    <string name="ts_no_data_hour">No data for this hour</string>
+    <string name="ts_device_zone_note">device time zone</string>
+    <string name="ts_info_unnamed_water">Unnamed water</string>
+    <string name="ts_info_preview_hint">Moving; tap Confirm to switch</string>
+    <string name="ts_water_temp">Water temp</string>
+    <string name="ts_dissolved_oxygen">Dissolved oxygen</string>
+    <string name="ts_turbidity">Turbidity</string>
+
+    <!-- Score bands (SRS §6.3; colors are frozen) -->
+    <string name="ts_band_explosive">Prime window</string>
+    <string name="ts_band_great">Very good</string>
+    <string name="ts_band_ok">Fair</string>
+    <string name="ts_band_poor">Poor</string>
+    <string name="ts_band_bad">Avoid</string>
+
+    <!-- ── OPT-V11-13: :core:domain copy (ResDomainCopy) ── -->
+    <string name="ts_domain_window_not_enough">Not enough valid data (under 24 hours); best windows are unavailable for now</string>
+    <string name="ts_domain_window_no_candidate">No window ≥%2$d in the next %1$d days</string>
+    <string name="ts_domain_window_no_candidate_best">No window ≥%2$d in the next %1$d days; best is %3$d</string>
+    <string name="ts_domain_window_no_candidate_range">No window ≥%1$d in the selected range</string>
+    <string name="ts_domain_window_no_candidate_range_best">No window ≥%1$d in the selected range; best in range is %2$d</string>
+    <string name="ts_domain_warning_slack">Near slack water / weak current exchange</string>
+    <string name="ts_domain_warning_gust">Gusts over 40 km/h; mind casting safety</string>
+    <string name="ts_domain_manual_delay">Adjusted by on-site calibration: times shifted later by %1$dh</string>
+    <string name="ts_domain_manual_ahead">Adjusted by on-site calibration: times shifted earlier by %1$dh</string>
+    <string name="ts_domain_manual_no_shift">Adjusted by on-site calibration: no time shift</string>
+    <string name="ts_domain_manual_need_more">Record %1$d more to enable calibration</string>
+    <string name="ts_domain_manual_no_valid">Fewer than 2 valid observations (%1$d matched a model extreme within ±6h)</string>
+    <string name="ts_domain_manual_lag_exceeds">On-site calibration lag %1$d h exceeds ±%2$d h; not applied</string>
+    <string name="ts_domain_tier_explosive">Prime window</string>
+    <string name="ts_domain_tier_great">Very good</string>
+    <string name="ts_domain_tier_ok">Fair</string>
+    <string name="ts_domain_tier_poor">Poor</string>
+    <string name="ts_domain_tier_bad">Avoid</string>
+    <string name="ts_domain_veto_thunderstorm">Thunderstorm (safety veto)</string>
+    <string name="ts_domain_veto_decay">Fishability decay V=%1$s%2$s</string>
+    <string name="ts_domain_veto_wind"> wind %1$s/%2$s km/h</string>
+    <string name="ts_domain_veto_pressure"> ΔP3h %1$s hPa</string>
+    <string name="ts_domain_veto_rain"> rain %1$s mm/h</string>
+    <string name="ts_domain_veto_wave"> waves %1$s m</string>
+    <string name="ts_domain_veto_low_oxygen"> low DO %1$s</string>
+    <string name="ts_domain_tide_size_spring">Spring tide</string>
+    <string name="ts_domain_tide_size_neap">Neap tide</string>
+    <string name="ts_domain_tide_current_active">Active flow</string>
+    <string name="ts_domain_tide_current_dead">Slack flow</string>
+    <string name="ts_domain_obs_high">High tide</string>
+    <string name="ts_domain_obs_low">Low tide</string>
+    <string name="ts_domain_obs_rising_start">I see it start rising</string>
+    <string name="ts_domain_obs_falling_start">I see it start falling</string>
+    <string name="ts_domain_preset_fresh_lure">Freshwater · Lure</string>
+    <string name="ts_domain_preset_sea_shore">Saltwater · Shore/Rock</string>
+    <string name="ts_domain_preset_fresh_bait">Freshwater · Bait</string>
+    <string name="ts_domain_solunar_detail">Moon age %1$s d, illumination %2$s, transit %3$s h</string>
+    <string name="ts_domain_trend_insufficient">Trend data insufficient</string>
+    <string name="ts_domain_water_quality_note">Water-quality tab only</string>
+    <string name="ts_domain_hourly">hourly</string>
+    <string name="ts_domain_credential_invalid">Invalid credentials</string>
+    <string name="ts_domain_network_error">Network error</string>
+
+    <!-- OPT-V11-13 batch 2: detail/a11y formatting copy -->
+    <string name="ts_d2_duration_hours">%1$d h</string>
+    <string name="ts_d2_window_line">Start %1$s · Peak %2$s · Duration %3$s</string>
+    <string name="ts_d2_peak_score_line">%1$d pts · %2$s</string>
+    <string name="ts_d2_burst">Burst</string>
+    <string name="ts_d2_sustained">Favorable until %1$s</string>
+    <string name="ts_d2_calib_on">Enabled: lag %1$dh</string>
+    <string name="ts_d2_calib_off">Not enabled</string>
+    <string name="ts_d2_raw_wind">Wind</string>
+    <string name="ts_d2_raw_gust">Gust</string>
+    <string name="ts_d2_raw_rain">Rain</string>
+    <string name="ts_d2_raw_cloud">Cloud</string>
+    <string name="ts_d2_raw_wave">Wave</string>
+    <string name="ts_d2_raw_tide_level">Tide level</string>
+    <string name="ts_d2_raw_current">Current</string>
+    <string name="ts_d2_raw_turbidity">Turbidity</string>
+    <string name="ts_d2_raw_chlorophyll">Chlorophyll</string>
+    <string name="ts_d2_hour_wave">Hour %1$d: wave %2$s, period %3$s, direction %4$s</string>
+    <string name="ts_d2_hour_weather">Hour %1$d: temp %2$s, wind %3$s, MSL pressure %4$s</string>
+    <string name="ts_d2_hour_score">Hour %1$d: fishing score %2$d</string>
+    <string name="ts_d2_hour_score_missing">Hour %1$d: not scored</string>
+    <string name="ts_d2_hour_water">Hour %1$d: water temp %2$s, DO potential %3$s (estimated)</string>
+    <string name="ts_d2_hour_tide">Hour %1$d: tide level %2$s, rate %3$s, current %4$s</string>
+    <string name="ts_d2_hour_missing">missing</string>
+    <string name="ts_d2_source_unavailable">Source unavailable</string>
+    <string name="ts_d2_unusable">Data unavailable (expired %1$d h); not used for scoring</string>
+    <string name="ts_d2_manual_same">Matches</string>
+    <string name="ts_d2_manual_later">%1$sh later</string>
+    <string name="ts_d2_manual_earlier">%1$sh earlier</string>
+    <string name="ts_d2_manual_compare">Model %1$s %2$s · you recorded %3$s</string>
+    <string name="ts_d2_manual_any">high/low tide</string>
+    <string name="ts_d2_manual_line">%1$s · %2$s</string>
+    <string name="ts_d2_manual_time_err">Time must be yyyy-MM-dd HH:mm</string>
+    <string name="ts_d2_manual_range_err">Time outside the back-fill range (±%1$dh)</string>
+    <string name="ts_d2_tide_before">Before correction: %1$s</string>
+    <string name="ts_d2_tide_after">After correction (lag %1$dh): %2$s</string>
+    <string name="ts_d2_tide_high">High tide %1$s</string>
+    <string name="ts_d2_tide_low">Low tide %1$s</string>
+    <string name="ts_d2_no_source">No data from this source for this spot</string>
+    <string name="ts_d2_unit_score">pts</string>
+
+    <!-- OPT-V11-13 batch 2: favorites pure-logic copy -->
+    <string name="ts_fx_ungrouped">Ungrouped</string>
+    <string name="ts_fx_not_loaded">Not loaded</string>
+    <string name="ts_fx_stale">Stale</string>
+    <string name="ts_fx_expired">Expired</string>
+    <string name="ts_fx_data_prefix">Data %1$s %2$s</string>
+    <string name="ts_fx_preset_fresh_lure">Freshwater lure</string>
+    <string name="ts_fx_preset_sea_shore">Saltwater shore</string>
+    <string name="ts_fx_preset_fresh_bait">Freshwater bait</string>
+    <string name="ts_fx_err_batch_delete">Batch delete failed; no changes were made</string>
+    <string name="ts_fx_err_batch_tag">Batch tag edit failed; no changes were made</string>
+    <string name="ts_fx_err_batch_group">Batch group edit failed; no changes were made</string>
+    <string name="ts_fx_err_no_coord">A new favorite needs coordinates (pick a spot on the map first)</string>
+    <string name="ts_fx_summary_line">%1$s · %2$d pts · %3$s</string>
+    <string name="ts_fx_batch_delete_confirm">Delete the %1$d selected favorites? This cannot be undone.</string>
 </resources>

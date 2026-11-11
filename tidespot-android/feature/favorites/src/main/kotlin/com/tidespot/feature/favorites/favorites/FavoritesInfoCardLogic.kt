@@ -5,6 +5,7 @@ import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -41,36 +42,40 @@ object FavoritesInfoCardLogic {
         spot: FavoriteSpot,
         fetchedAtMillis: Map<DataSource, Long> = emptyMap(),
         zone: ZoneId = ZoneId.systemDefault(),
+        strings: TideSpotStrings = ZhStrings,
     ): InfoCard {
         val latest = fetchedAtMillis.values.filter { it > 0 }.maxOrNull()
         return InfoCard(
-            coordinateLine = "${TideSpotStrings.INFO_CARD_COORDINATE_PREFIX} " +
+            coordinateLine = "${strings.infoCoordinatePrefix} " +
                 "${Format.coordinate(spot.lat)}, ${Format.coordinate(spot.lon)}",
-            accuracyNote = TideSpotStrings.INFO_CARD_ACCURACY_NOTE,
-            elevationLine = "${TideSpotStrings.INFO_CARD_ELEVATION_PREFIX} " +
+            accuracyNote = strings.infoAccuracyNote,
+            elevationLine = "${strings.infoElevationPrefix} " +
                 if (spot.elevation == null) {
                     Format.MISSING
                 } else {
                     Format.valueUnit(spot.elevation, "m", 1)
                 },
-            waterBodyBadge = waterBodyLabel(spot.waterBody),
-            lastFetchedLine = "${TideSpotStrings.INFO_CARD_LAST_FETCHED_PREFIX} " +
+            waterBodyBadge = waterBodyLabel(spot.waterBody, strings),
+            lastFetchedLine = "${strings.infoLastFetchedPrefix} " +
                 if (latest == null) {
                     Format.MISSING    // 无记录 → 禁编造（CONFLICT-03）
                 } else {
                     MM_DD_HH_MM.format(Instant.ofEpochMilli(latest).atZone(zone))
                 },
-            groupLine = "${TideSpotStrings.INFO_CARD_GROUP_PREFIX} " +
-                (spot.groupName?.trim()?.ifEmpty { null } ?: FavoritesGroupLogic.UNGROUPED),
+            groupLine = "${strings.infoGroupPrefix} " +
+                FavoritesGroupLogic.displayName(
+                    spot.groupName?.trim()?.ifEmpty { null } ?: FavoritesGroupLogic.UNGROUPED_KEY,
+                    strings,
+                ),
         )
     }
 
     /** 水体类型徽标文案（设计包六枚置信徽标之外，属水体类型标注，不改 `ConfidenceBadge` 冻结取值）。 */
-    fun waterBodyLabel(type: WaterBodyType): String = when (type) {
-        WaterBodyType.OCEAN -> TideSpotStrings.WATER_BODY_OCEAN
-        WaterBodyType.NEARSHORE -> TideSpotStrings.WATER_BODY_NEARSHORE
-        WaterBodyType.INLAND_WATER -> TideSpotStrings.WATER_BODY_INLAND
-        WaterBodyType.LAND -> TideSpotStrings.WATER_BODY_LAND
-        WaterBodyType.UNKNOWN -> TideSpotStrings.WATER_BODY_UNKNOWN
+    fun waterBodyLabel(type: WaterBodyType, strings: TideSpotStrings = ZhStrings): String = when (type) {
+        WaterBodyType.OCEAN -> strings.waterBodyOcean
+        WaterBodyType.NEARSHORE -> strings.waterBodyNearshore
+        WaterBodyType.INLAND_WATER -> strings.waterBodyInland
+        WaterBodyType.LAND -> strings.waterBodyLand
+        WaterBodyType.UNKNOWN -> strings.waterBodyUnknown
     }
 }

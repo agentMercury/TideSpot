@@ -1,4 +1,4 @@
-﻿package com.tidespot.app
+package com.tidespot.app
 
 import android.os.Bundle
 import android.widget.Toast
@@ -26,14 +26,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.data.repo.TideSpotRepository
+import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.data.water.CopernicusCredential
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.model.WaterBodyType
+import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.theme.TideSpotTheme
 import com.tidespot.feature.detail.detail.DetailScreen
@@ -59,6 +62,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // OPT-V115-02 / GAP-03：edge-to-edge（Android 15+ 强制；统一显式关闭 decor fits，insets 由各屏自管）
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         val graph = AppGraph(this)
         setContent {
             TideSpotTheme {
@@ -137,11 +142,15 @@ private fun AppRoot(graph: AppGraph) {
             (context as? android.app.Activity)?.finish()
         } else {
             lastBackAt = now
-            Toast.makeText(context, "再按一次退出", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.ts_app_exit_hint), Toast.LENGTH_SHORT).show()
         }
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        // OPT-V115-02 / GAP-03：edge-to-edge 收口——insets 下沉到各屏自管（地图全屏、控件单独 pad）
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -162,26 +171,29 @@ private fun AppRoot(graph: AppGraph) {
                     initialCameraTarget = pendingMapTarget,
                     // UX-20：右下浮动三按钮（收藏 / Top10 / 设置）
                     floatingActions = {
+                        val favDesc = stringResource(R.string.ts_app_favorites)
+                        val top10Desc = stringResource(UiR.string.ts_top10_all)
+                        val settingsDesc = stringResource(R.string.ts_app_settings)
                         FloatingActionButton(
                             onClick = {
                                 openFavoritesTop10 = false
                                 navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
                             },
-                            modifier = Modifier.semantics { contentDescription = "收藏" },
-                        ) { Text("收藏") }
+                            modifier = Modifier.semantics { contentDescription = favDesc },
+                        ) { Text(stringResource(R.string.ts_app_favorites)) }
                         FloatingActionButton(
                             onClick = {
                                 openFavoritesTop10 = true
                                 navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
                             },
-                            modifier = Modifier.semantics { contentDescription = "全部收藏 Top10" },
+                            modifier = Modifier.semantics { contentDescription = top10Desc },
                         ) { Text("Top10") }
                         FloatingActionButton(
                             onClick = {
                                 navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.SETTINGS))
                             },
-                            modifier = Modifier.semantics { contentDescription = "设置" },
-                        ) { Text("设置") }
+                            modifier = Modifier.semantics { contentDescription = settingsDesc },
+                        ) { Text(stringResource(R.string.ts_app_settings)) }
                     },
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -211,7 +223,7 @@ private fun AppRoot(graph: AppGraph) {
                             viewModel = vm,
                             onBack = { navState = AppNav.reduce(navState, AppNavEvent.BackFromDetail) },
                             // UX-21：详情返回按来源页呈现（从地图进 → 回地图）
-                            backLabel = if (navState.sourcePage == AppPage.MAP) "← 返回地图" else "← 返回收藏",
+                            backLabel = if (navState.sourcePage == AppPage.MAP) stringResource(R.string.ts_app_back_map) else stringResource(R.string.ts_app_back_favorites),
                             showCredentialGuide = spot.waterBody == WaterBodyType.INLAND_WATER &&
                                 !copernicusConfigured && !credentialGuideSkipped,
                             onOpenCredentialSettings = {
@@ -279,9 +291,10 @@ private fun DetailPage(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxWidth()) {
+            val backDesc = stringResource(R.string.ts_app_back)
             TextButton(
                 onClick = onBack,
-                modifier = Modifier.semantics { contentDescription = "返回上一页" },
+                modifier = Modifier.semantics { contentDescription = backDesc },
             ) {
                 Text(backLabel)
             }
@@ -302,7 +315,7 @@ private fun DetailPage(
             },
         )
         Text(
-            TideSpotStrings.MODEL_ATTRIBUTION,
+            localTideSpotStrings().modelAttribution,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
@@ -367,28 +380,35 @@ private fun ConfirmFavoriteDialog(
     }
     var saving by remember(confirmed) { mutableStateOf(false) }
     var error by remember(confirmed) { mutableStateOf<String?>(null) }
+    val spotNameDesc = stringResource(R.string.ts_app_spot_name)
+    val saveFailed = stringResource(R.string.ts_app_save_failed)
+    val coord1 = String.format(java.util.Locale.US, "%.5f", point.lat)
+    val coord2 = String.format(java.util.Locale.US, "%.5f", point.lon)
 
     AlertDialog(
         onDismissRequest = { if (!saving) onDismiss() },
-        title = { Text("确认收藏") },
+        title = { Text(stringResource(UiR.string.ts_favorite_dialog_title)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("名称") },
+                    label = { Text(stringResource(R.string.ts_app_name)) },
                     singleLine = true,
+                    supportingText = {
+                        Text(stringResource(UiR.string.ts_favorite_name_hint))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .semantics { contentDescription = "收藏点名称" },
+                        .semantics { contentDescription = spotNameDesc },
                 )
                 Text(
-                    String.format(java.util.Locale.US, "坐标 %.5f, %.5f", point.lat, point.lon),
+                    stringResource(R.string.ts_app_coordinate, coord1, coord2),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 6.dp),
                 )
                 Text(
-                    "水体：" + confirmed.waterBody.name,
+                    stringResource(R.string.ts_app_water_body, confirmed.waterBody.name),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 error?.let {
@@ -402,11 +422,12 @@ private fun ConfirmFavoriteDialog(
             }
         },
         confirmButton = {
+            val rejectMessage = FavoritesSaveRules.rejectMessage(localTideSpotStrings())
             TextButton(
                 enabled = !saving,
                 onClick = {
                     if (!FavoritesSaveRules.canCreate(point.lat, point.lon)) {
-                        error = FavoritesSaveRules.REJECT_MESSAGE
+                        error = rejectMessage
                         return@TextButton
                     }
                     saving = true
@@ -427,18 +448,18 @@ private fun ConfirmFavoriteDialog(
                             favoritesVm.load()
                             onSaved(draft.copy(id = id, waterBody = confirmed.waterBody))
                         } catch (e: Exception) {
-                            error = e.message ?: "保存失败，请重试"
+                            error = e.message ?: saveFailed
                         } finally {
                             saving = false
                         }
                     }
                 },
             ) {
-                Text(if (saving) "保存中…" else "收藏")
+                Text(if (saving) stringResource(R.string.ts_app_saving) else stringResource(UiR.string.ts_confirm_favorite))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("取消") }
+            TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.ts_cancel)) }
         },
     )
 }

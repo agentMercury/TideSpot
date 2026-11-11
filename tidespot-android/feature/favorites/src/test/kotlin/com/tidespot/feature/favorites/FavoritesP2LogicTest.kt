@@ -141,7 +141,7 @@ class FavoritesP2LogicTest {
             spot(3, "C", groupName = "常去"),
         )
         val groups = FavoritesGroupLogic.groups(spots)
-        assertEquals(listOf("常去", "计划去", FavoritesGroupLogic.UNGROUPED), groups.map { it.name })
+        assertEquals(listOf("常去", "计划去", FavoritesGroupLogic.UNGROUPED_KEY), groups.map { it.name })
         assertTrue(groups.last().isDefault)
     }
 
@@ -154,7 +154,7 @@ class FavoritesP2LogicTest {
 
     @Test
     fun `分组_空白串归一为未分组`() {
-        assertEquals(FavoritesGroupLogic.UNGROUPED, FavoritesGroupLogic.groupNameOf(spot(1, "A", groupName = "  ")))
+        assertEquals(FavoritesGroupLogic.UNGROUPED_KEY, FavoritesGroupLogic.groupNameOf(spot(1, "A", groupName = "  ")))
         assertNull(FavoritesGroupLogic.normalizeGroupName("   "))
         assertEquals("常去", FavoritesGroupLogic.normalizeGroupName(" 常去 "))
     }
@@ -185,7 +185,7 @@ class FavoritesP2LogicTest {
         assertTrue(card.coordinateLine.contains("118.950000"))
         assertTrue(card.elevationLine.endsWith("—"), "null 海拔禁 0 填充")
         assertTrue(card.lastFetchedLine.endsWith("—"), "无拉取记录禁编造时间")
-        assertTrue(card.groupLine.endsWith(FavoritesGroupLogic.UNGROUPED))
+        assertTrue(card.groupLine.endsWith("未分组"))
         assertTrue(card.accuracyNote.isNotEmpty())
     }
 

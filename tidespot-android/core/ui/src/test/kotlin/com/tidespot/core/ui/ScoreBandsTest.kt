@@ -1,5 +1,6 @@
 ﻿package com.tidespot.core.ui
 
+import com.tidespot.core.ui.band.BandTitles
 import com.tidespot.core.ui.band.ScoreBand
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,10 +35,10 @@ class ScoreBandsTest {
     @Test
     fun bandLabels_provideTextNotColorOnly() {
         // N-7：档位同时有文字
-        assertEquals("爆护窗口", ScoreBand.labelOf(90))
-        assertEquals("很适合", ScoreBand.labelOf(70))
-        assertEquals("可以", ScoreBand.labelOf(55))
-        assertEquals("较差", ScoreBand.labelOf(40))
-        assertEquals("别去", ScoreBand.labelOf(10))
+        assertEquals("爆护窗口", BandTitles.fromDomainTier(90))
+        assertEquals("很适合", BandTitles.fromDomainTier(70))
+        assertEquals("可以", BandTitles.fromDomainTier(55))
+        assertEquals("较差", BandTitles.fromDomainTier(40))
+        assertEquals("别去", BandTitles.fromDomainTier(10))
     }
 }

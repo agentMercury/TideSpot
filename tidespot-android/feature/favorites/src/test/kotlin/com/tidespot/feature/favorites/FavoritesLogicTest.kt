@@ -271,7 +271,7 @@ class FavoritesSaveRulesTest {
 
     @Test
     fun `拒绝提示_非空文案`() {
-        assertTrue(FavoritesSaveRules.REJECT_MESSAGE.isNotBlank())
+        assertTrue(FavoritesSaveRules.rejectMessage().isNotBlank())
     }
 }
 

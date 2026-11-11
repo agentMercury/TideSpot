@@ -1,4 +1,4 @@
-﻿package com.tidespot.app
+package com.tidespot.app
 
 import com.tidespot.feature.settings.MapStyle
 import com.tidespot.feature.settings.SettingsKeys
@@ -80,5 +80,5 @@ object AppSettings {
      * 坐标合法性（0.0/0.0 占位拒绝）由 FavoritesSaveRules.canCreate 单源防御。
      */
     fun fallbackSpotName(lat: Double, lon: Double): String =
-        String.format(Locale.US, "点位 %.5f, %.5f", lat, lon)
+        String.format(Locale.US, "点位 %.5f, %.5f", lat, lon) // i18n-exempt: 默认点位名落库（历史数据兼容）
 }

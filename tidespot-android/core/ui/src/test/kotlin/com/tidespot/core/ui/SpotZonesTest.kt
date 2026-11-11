@@ -30,7 +30,7 @@ class SpotZonesTest {
 
     @Test
     fun zoneNote_nullExplainsDeviceConvention_writtenTzNeedsNoNote() {
-        assertEquals(SpotZones.DEVICE_ZONE_NOTE, SpotZones.zoneNote(null))
+        assertEquals(SpotZones.deviceZoneNote(), SpotZones.zoneNote(null))
         assertNull(SpotZones.zoneNote(32400))
     }
 

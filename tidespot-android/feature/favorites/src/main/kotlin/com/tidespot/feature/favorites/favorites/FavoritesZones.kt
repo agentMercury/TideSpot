@@ -2,6 +2,8 @@
 
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import com.tidespot.core.ui.zone.SpotZones
 import java.time.ZoneId
 
@@ -12,8 +14,8 @@ import java.time.ZoneId
  */
 object FavoritesSaveRules {
 
-    /** 拒绝落库的提示（UI 显示；TalkBack 同读）。 */
-    const val REJECT_MESSAGE = "新建收藏点需携带坐标（请在地图上选点后保存）"
+    /** 拒绝落库的提示（UI 显示；TalkBack 同读；OPT-V11-13 走文案层）。 */
+    fun rejectMessage(strings: TideSpotStrings = ZhStrings): String = strings.errNoCoordinate
 
     /** 新建路径坐标防御：非 null 且不是 (0.0, 0.0) 才允许（单维为 0 是合法经/纬，放行）。 */
     fun canCreate(lat: Double?, lon: Double?): Boolean =

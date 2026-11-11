@@ -64,8 +64,8 @@ object FavoritesSortLogic {
         )
     }
 
-    /** 场景预设可选项（F-2.1；中文字符串写 spot.preset，与 HourlyScoreStore.resolvePreset 标签解析兼容）。 */
-    val PRESET_OPTIONS: List<String> = listOf("淡水路亚", "海水岸边", "淡水台钓")
+    /** 场景预设可选项（F-2.1；**写入 DB 的协议值**，与 HourlyScoreStore.resolvePreset 中文标签解析兼容，禁翻译）。 */
+    val PRESET_OPTIONS: List<String> = listOf("淡水路亚", "海水岸边", "淡水台钓") // i18n-exempt: spot.preset 数据协议值
 
     /**
      * 标签输入解析：按 `,` `，` `、` 空格切分 → trim → 去空 → 去重（保持首次出现序）。

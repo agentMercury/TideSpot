@@ -8,6 +8,8 @@ import com.tidespot.core.domain.model.FishScoreResult
 import com.tidespot.core.domain.window.BestWindowFinder
 import com.tidespot.core.ui.breakdown.RawInputRow
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import com.tidespot.core.ui.selector.DaySelectorLogic
 import java.time.ZoneId
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -130,31 +132,31 @@ class DetailStateHolder(
         _state.value.quality.associate { it.timeEpochSec to it.doMgL }
 
     /** 原始输入区（§8.2-3 清单；缺测显示 —，不补 0）。 */
-    fun rawInputsFor(epochSec: Long): List<RawInputRow> {
+    fun rawInputsFor(epochSec: Long, strings: TideSpotStrings = ZhStrings): List<RawInputRow> {
         val result = _state.value.result ?: return emptyList()
         val w = result.weather.firstOrNull { it.timeEpochSec == epochSec } ?: return emptyList()
         val m = result.marine.firstOrNull { it.timeEpochSec == epochSec }
         val q = _state.value.quality.firstOrNull { it.timeEpochSec == epochSec }
         val byEpoch = result.weather.associateBy { it.timeEpochSec }
         fun row(label: String, v: Double?, digits: Int = 1) =
-            RawInputRow(label, if (v == null) "—" else Format.value(v, digits))
+            RawInputRow(label, if (v == null) Format.MISSING else Format.value(v, digits))
         return listOf(
             row("Tw", q?.waterTempC),
             row("DO_p", q?.doMgL, 2),
             row("P", w.pressureMslHpa),
             row("ΔP3", Derivations.deltaPressure(byEpoch, epochSec, 3), 2),
             row("ΔP24", Derivations.deltaPressure(byEpoch, epochSec, 24), 2),
-            row("风", w.windSpeedKmh),
-            row("阵风", w.windGustKmh),
-            row("雨", w.precipMm, 2),
-            row("云", w.cloudCoverPct, 0),
+            row(strings.rawWind, w.windSpeedKmh),
+            row(strings.rawGust, w.windGustKmh),
+            row(strings.rawRain, w.precipMm, 2),
+            row(strings.rawCloud, w.cloudCoverPct, 0),
             row("WMO", w.weatherCode?.toDouble(), 0),
-            row("浪", m?.waveHeightM),
-            row("潮位", m?.seaLevelHeightMslM),
+            row(strings.rawWave, m?.waveHeightM),
+            row(strings.rawTideLevel, m?.seaLevelHeightMslM),
             row("dh/dt", _state.value.tideRates[epochSec]),
-            row("流速", m?.oceanCurrentVelocityKmh),
-            row("浊度", q?.turbidityProxy, 2),
-            row("叶绿素", q?.chlorophyllProxy, 2),
+            row(strings.rawCurrent, m?.oceanCurrentVelocityKmh),
+            row(strings.rawTurbidity, q?.turbidityProxy, 2),
+            row(strings.rawChlorophyll, q?.chlorophyllProxy, 2),
         )
     }
 }

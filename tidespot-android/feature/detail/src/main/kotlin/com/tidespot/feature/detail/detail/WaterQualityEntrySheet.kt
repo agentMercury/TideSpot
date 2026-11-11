@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.tidespot.core.data.repo.WaterQualityObservation
 import com.tidespot.core.data.repo.WaterQualityObservationKind
 import com.tidespot.core.ui.R as UiR
+import com.tidespot.core.ui.strings.localTideSpotStrings
+import com.tidespot.feature.detail.R
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -69,6 +71,13 @@ fun WaterQualityEntrySheet(
     val errSavePrefix = stringResource(UiR.string.ts_wq_err_save, "")
     val savedListTitle = stringResource(UiR.string.ts_wq_saved_list)
     val emptyListText = stringResource(UiR.string.ts_wq_empty_list)
+    val strings = localTideSpotStrings()
+    val saveDesc = stringResource(R.string.ts_detail_wq_save_desc)
+    val cancelDesc = stringResource(R.string.ts_detail_wq_cancel_desc)
+    val tempInputDesc = stringResource(R.string.ts_detail_wq_temp_input)
+    val doInputDesc = stringResource(R.string.ts_detail_wq_do_input)
+    val turbInputDesc = stringResource(R.string.ts_detail_wq_turb_input)
+    val timeInputDesc = stringResource(R.string.ts_detail_wq_time_input)
 
     LaunchedEffect(Unit) {
         savedList = runCatching { viewModel.waterQualityObservations() }.getOrDefault(emptyList())
@@ -85,9 +94,9 @@ fun WaterQualityEntrySheet(
                 is WaterQualityEntryLogic.ValueResult.Err -> if (error == null) {
                     error = when (r.error) {
                         WaterQualityEntryLogic.Error.NOT_A_NUMBER ->
-                            "${WaterQualityEntryLogic.label(kind)}：$errNumber"
+                            "${WaterQualityEntryLogic.label(kind, strings)}：$errNumber"
                         WaterQualityEntryLogic.Error.OUT_OF_RANGE ->
-                            "${WaterQualityEntryLogic.label(kind)}：$errRange"
+                            "${WaterQualityEntryLogic.label(kind, strings)}：$errRange"
                     }
                 }
             }
@@ -124,12 +133,12 @@ fun WaterQualityEntrySheet(
         Text(stringResource(UiR.string.ts_wq_title), style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = doSave,
-                modifier = Modifier.semantics { contentDescription = "保存水质实测" }) {
+                modifier = Modifier.semantics { contentDescription = saveDesc }) {
                 Text(stringResource(UiR.string.ts_wq_save))
             }
             TextButton(onClick = onDismiss,
-                modifier = Modifier.semantics { contentDescription = "取消录入" }) {
-                Text(stringResource(UiR.string.ts_wq_cancel))
+                modifier = Modifier.semantics { contentDescription = cancelDesc }) {
+                Text(stringResource(UiR.string.ts_cancel))
             }
         }
         message?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error) }
@@ -137,25 +146,25 @@ fun WaterQualityEntrySheet(
             value = tempText, onValueChange = { tempText = it },
             label = { Text(stringResource(UiR.string.ts_wq_temp_label)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "水温实测输入" },
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = tempInputDesc },
         )
         OutlinedTextField(
             value = doText, onValueChange = { doText = it },
             label = { Text(stringResource(UiR.string.ts_wq_do_label)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "溶解氧实测输入" },
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = doInputDesc },
         )
         OutlinedTextField(
             value = turbText, onValueChange = { turbText = it },
             label = { Text(stringResource(UiR.string.ts_wq_turb_label)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "浊度实测输入" },
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = turbInputDesc },
         )
         OutlinedTextField(
             value = timeText, onValueChange = { timeText = it },
             label = { Text(stringResource(UiR.string.ts_wq_time_label)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().semantics { contentDescription = "录入时刻输入" },
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = timeInputDesc },
         )
         Text(savedListTitle, style = MaterialTheme.typography.titleSmall)
         if (savedList.isEmpty()) {

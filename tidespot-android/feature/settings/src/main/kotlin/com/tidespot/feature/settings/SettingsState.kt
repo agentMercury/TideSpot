@@ -1,5 +1,6 @@
 ﻿package com.tidespot.feature.settings
 
+import androidx.annotation.StringRes
 import com.tidespot.core.data.remote.TideSpotUrls
 
 /** 单位制（CHG-16⑱）：内部恒 SI（CONTRACT 冻结点 3），换算仅在 UI/设置层展示语义。 */
@@ -9,11 +10,13 @@ enum class UnitSystem { SI, IMPERIAL }
  * 地图底图样式（UX-19 / OPT-V11-19；D8 三选）。
  * URL 全部收敛在 [TideSpotUrls]（不得回退点 3）；默认 [VOYAGER]；
  * **深色系统模式不覆盖用户选择**（用户显式选择优先，无自动切样式逻辑）。
+ *
+ * OPT-V11-13：展示名走资源（[labelRes]），[description] 为产品名（跨语言不变）。
  */
-enum class MapStyle(val label: String, val description: String, val url: String) {
-    VOYAGER("彩色", "CARTO Voyager", TideSpotUrls.CARTO_VOYAGER_STYLE_URL),
-    POSITRON("素色", "CARTO Positron", TideSpotUrls.CARTO_POSITRON_STYLE_URL),
-    DARK_MATTER("深色", "CARTO Dark Matter", TideSpotUrls.CARTO_DARK_MATTER_STYLE_URL),
+enum class MapStyle(@StringRes val labelRes: Int, val description: String, val url: String) {
+    VOYAGER(R.string.ts_settings_style_color, "CARTO Voyager", TideSpotUrls.CARTO_VOYAGER_STYLE_URL),
+    POSITRON(R.string.ts_settings_style_plain, "CARTO Positron", TideSpotUrls.CARTO_POSITRON_STYLE_URL),
+    DARK_MATTER(R.string.ts_settings_style_dark, "CARTO Dark Matter", TideSpotUrls.CARTO_DARK_MATTER_STYLE_URL),
 }
 
 /**

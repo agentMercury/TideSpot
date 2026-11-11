@@ -1,33 +1,41 @@
 package com.tidespot.feature.favorites.favorites
 
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 
 /**
  * OPT-V11-16（P2/CHG-37）收藏分组纯函数层（JVM 单测锁）。
  *
  * 口径（OPT-V11-16 原文）：**默认组 = 「未分组」，不强制**；列表按分组折叠显示。
- * - `spot.groupName` 为 null/空白 → 归入「未分组」；
- * - 组间顺序：自定义组按名称升序，「未分组」恒排最后（默认组不抢注意力）；
+ * - `spot.groupName` 为 null/空白 → 归入默认组（内部稳定键 [UNGROUPED_KEY]，**不落地、不翻译**）；
+ * - 组间顺序：自定义组按名称升序，默认组恒排最后（默认组不抢注意力）；
  * - 组内顺序：沿用调用方传入的排序结果（排序与分组正交，先筛/排后分组）；
  * - 折叠仅影响渲染，不影响批量选择与数据。
+ *
+ * OPT-V11-13：默认组展示名走 [displayName]（[TideSpotStrings.ungrouped]），内部键保持稳定。
  */
 object FavoritesGroupLogic {
 
-    /** 默认组名（未设置 `groupName` 的点归入此组；禁空串表达）。 */
-    const val UNGROUPED = "未分组"
+    /** 默认组内部键（不落库、不参与国际化；展示统一走 [displayName]）。 */
+    const val UNGROUPED_KEY = "__ungrouped__"
 
-    /** 一个渲染分组。 */
+    /** 一个渲染分组（[name] 为内部键；展示用 [displayName]）。 */
     data class Group(
         val name: String,
         val spots: List<FavoriteSpot>,
     ) {
-        /** true = 默认组（「未分组」）；UI 用其决定是否显示「改名/移组」提示。 */
-        val isDefault: Boolean get() = name == UNGROUPED
+        /** true = 默认组；UI 用其决定是否显示「改名/移组」提示。 */
+        val isDefault: Boolean get() = name == UNGROUPED_KEY
     }
 
-    /** 单点的归属组名（null/空白 → 默认组）。 */
+    /** 单点的归属组名（null/空白 → 默认组内部键）。 */
     fun groupNameOf(spot: FavoriteSpot): String =
-        spot.groupName?.trim()?.ifEmpty { null } ?: UNGROUPED
+        spot.groupName?.trim()?.ifEmpty { null } ?: UNGROUPED_KEY
+
+    /** 组名 → 展示名（默认组按当前语言；自定义组原样）。 */
+    fun displayName(groupName: String, strings: TideSpotStrings = ZhStrings): String =
+        if (groupName == UNGROUPED_KEY) strings.ungrouped else groupName
 
     /**
      * 分组：给定已排序/已筛选的点列表，输出组列表（**组内保持输入序**）。
@@ -36,8 +44,8 @@ object FavoritesGroupLogic {
     fun groups(sortedSpots: List<FavoriteSpot>): List<Group> {
         if (sortedSpots.isEmpty()) return emptyList()
         val buckets = sortedSpots.groupBy { groupNameOf(it) }
-        val custom = buckets.keys.filter { it != UNGROUPED }.sorted()
-        val ordered = custom + (if (buckets.containsKey(UNGROUPED)) listOf(UNGROUPED) else emptyList())
+        val custom = buckets.keys.filter { it != UNGROUPED_KEY }.sorted()
+        val ordered = custom + (if (buckets.containsKey(UNGROUPED_KEY)) listOf(UNGROUPED_KEY) else emptyList())
         return ordered.map { name -> Group(name, buckets.getValue(name)) }
     }
 

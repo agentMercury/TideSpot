@@ -8,6 +8,8 @@ import com.tidespot.core.data.repo.TopWindowsResult
 import com.tidespot.core.domain.FishScoreCalculator
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.window.BestWindowFinder
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,7 @@ import kotlinx.coroutines.launch
 class FavoritesViewModel(
     private val repository: TideSpotRepository,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val strings: TideSpotStrings = ZhStrings,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FavoritesUiState())
@@ -160,7 +163,7 @@ class FavoritesViewModel(
     ) {
         if (name.isBlank()) return
         if (existing == null && !FavoritesSaveRules.canCreate(lat, lon)) {
-            _state.update { it.copy(lastSaveError = FavoritesSaveRules.REJECT_MESSAGE) }
+            _state.update { it.copy(lastSaveError = FavoritesSaveRules.rejectMessage(strings)) }
             return
         }
         viewModelScope.launch(ioDispatcher) {
@@ -258,7 +261,7 @@ class FavoritesViewModel(
             _state.update {
                 it.copy(
                     selection = emptySet(),
-                    batchMessage = result.exceptionOrNull()?.let { "批量删除失败，未做任何改动" },
+                    batchMessage = result.exceptionOrNull()?.let { strings.errBatchDelete },
                 )
             }
             load()
@@ -283,7 +286,7 @@ class FavoritesViewModel(
             _state.update {
                 it.copy(
                     selection = emptySet(),
-                    batchMessage = result.exceptionOrNull()?.let { "批量改标签失败，未做任何改动" },
+                    batchMessage = result.exceptionOrNull()?.let { strings.errBatchTag },
                 )
             }
             load()
@@ -301,7 +304,7 @@ class FavoritesViewModel(
             _state.update {
                 it.copy(
                     selection = emptySet(),
-                    batchMessage = result.exceptionOrNull()?.let { "批量改分组失败，未做任何改动" },
+                    batchMessage = result.exceptionOrNull()?.let { strings.errBatchGroup },
                 )
             }
             load()

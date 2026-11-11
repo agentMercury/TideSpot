@@ -2,6 +2,8 @@
 
 import com.tidespot.core.domain.model.NamedPlace
 import com.tidespot.core.domain.util.OpenLocationCode
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.util.Locale
 
 /** 信息条模式：已确认展示 / 预览（拖动中，不切换已确认数据，F-1.4）。 */
@@ -16,11 +18,6 @@ data class InfoBarState(
     val isNotBlank: Boolean get() = mainText.isNotBlank()
 }
 
-object InfoBarText {
-    const val UNNAMED_FALLBACK = "未命名水域"
-    const val PREVIEW_HINT = "移动中，点确定切换"
-}
-
 /** 坐标 6 位小数（Locale.ROOT，避免区域分隔符污染）：29.600000, 119.038000。 */
 fun formatCoordinate(lat: Double, lon: Double): String =
     String.format(Locale.ROOT, "%.6f, %.6f", lat, lon)
@@ -31,6 +28,8 @@ fun formatCoordinate(lat: Double, lon: Double): String =
  * - 逆地理关闭（布尔位，N-5）：坐标 + plusCode（CHG-09⑤：本地编码统一走
  *   `com.tidespot.core.domain.util.OpenLocationCode` 单一实现，本模块浮点递除版已删除）；
  * - Preview 追加「移动中，点确定切换」。
+ *
+ * OPT-V11-13：兜底名与预览提示由 [TideSpotStrings] 注入（默认 [ZhStrings] 零行为漂移）。
  */
 fun buildInfoBarState(
     mode: InfoBarMode,
@@ -38,13 +37,14 @@ fun buildInfoBarState(
     lon: Double?,
     place: NamedPlace?,
     reverseGeoEnabled: Boolean,
+    strings: TideSpotStrings = ZhStrings,
 ): InfoBarState {
     val coord = if (lat != null && lon != null) formatCoordinate(lat, lon) else null
     val main: String
     val sub: String?
     when {
         !reverseGeoEnabled -> {
-            main = coord ?: InfoBarText.UNNAMED_FALLBACK
+            main = coord ?: strings.unnamedWater
             sub = place?.plusCode
                 ?: if (lat != null && lon != null) OpenLocationCode.encode(lat, lon) else null
         }
@@ -55,13 +55,13 @@ fun buildInfoBarState(
             sub = coord
         }
         else -> {
-            main = coord ?: InfoBarText.UNNAMED_FALLBACK
+            main = coord ?: strings.unnamedWater
             sub = null
         }
     }
     return InfoBarState(
         mainText = main,
         subText = sub,
-        hint = if (mode == InfoBarMode.PREVIEW) InfoBarText.PREVIEW_HINT else null,
+        hint = if (mode == InfoBarMode.PREVIEW) strings.previewHint else null,
     )
 }

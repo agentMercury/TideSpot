@@ -118,34 +118,46 @@ class SettingsLogicTest {
     fun `隐私披露_覆盖六源_逆地理与天气海洋水质`() {
         val lines = SettingsLogic.privacyLines(reverseGeoEnabled = true, prefetchEnabled = true)
         assertEquals(6, lines.size)
-        assertTrue(lines.any { it.source.contains("BigDataCloud") })
-        assertTrue(lines.any { it.source.contains("Photon") })
-        assertTrue(lines.any { it.source.contains("正地理") })
-        assertTrue(lines.any { it.source.startsWith("天气") })
-        assertTrue(lines.any { it.source.contains("Copernicus") })
-        assertTrue(lines.any { it.source.contains("本地推导") && it.sends.contains("不发送") })
+        // OPT-V11-13：文案已外移资源，锁「资源 id 序列」（顺序即渲染顺序）
+        assertEquals(
+            listOf(
+                R.string.ts_privacy_rga_source,
+                R.string.ts_privacy_rgb_source,
+                R.string.ts_privacy_geocode_source,
+                R.string.ts_privacy_weather_source,
+                R.string.ts_privacy_marine_source,
+                R.string.ts_privacy_wq_source,
+            ),
+            lines.map { it.sourceRes },
+        )
+        assertTrue(lines.all { it.sendsRes != 0 && it.toggleNoteRes != 0 })
     }
 
     @Test
     fun `隐私披露_逆地理关_两行注明不发请求`() {
         val lines = SettingsLogic.privacyLines(reverseGeoEnabled = false, prefetchEnabled = true)
-        val geoLines = lines.filter { it.source.startsWith("逆地理") }
+        val geoLines = lines.filter {
+            it.sourceRes == R.string.ts_privacy_rga_source || it.sourceRes == R.string.ts_privacy_rgb_source
+        }
         assertEquals(2, geoLines.size)
-        geoLines.forEach { assertTrue(it.toggleNote.contains("已关闭"), "逆地理关闭须注明不发请求") }
-        // 开启时注明已开启
+        geoLines.forEach {
+            assertEquals(R.string.ts_privacy_geo_off, it.toggleNoteRes, "逆地理关闭须注明不发请求")
+        }
         SettingsLogic.privacyLines(reverseGeoEnabled = true, prefetchEnabled = true)
-            .filter { it.source.startsWith("逆地理") }
-            .forEach { assertTrue(it.toggleNote.contains("已开启")) }
+            .filter {
+                it.sourceRes == R.string.ts_privacy_rga_source || it.sourceRes == R.string.ts_privacy_rgb_source
+            }
+            .forEach { assertEquals(R.string.ts_privacy_geo_on, it.toggleNoteRes) }
     }
 
     @Test
     fun `隐私披露_预取关_天气行注明仅详情拉取`() {
         val off = SettingsLogic.privacyLines(true, prefetchEnabled = false)
-            .first { it.source.startsWith("天气") }
-        assertTrue(off.toggleNote.contains("仅进入详情页"))
+            .first { it.sourceRes == R.string.ts_privacy_weather_source }
+        assertEquals(R.string.ts_privacy_prefetch_off, off.toggleNoteRes)
         val on = SettingsLogic.privacyLines(true, prefetchEnabled = true)
-            .first { it.source.startsWith("天气") }
-        assertTrue(on.toggleNote.contains("已开启"))
+            .first { it.sourceRes == R.string.ts_privacy_weather_source }
+        assertEquals(R.string.ts_privacy_prefetch_on, on.toggleNoteRes)
     }
 
     // ── SettingsStore 接口（JVM 假实现往返） ──

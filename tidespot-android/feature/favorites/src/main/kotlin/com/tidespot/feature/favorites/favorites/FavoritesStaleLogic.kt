@@ -3,6 +3,8 @@ package com.tidespot.feature.favorites.favorites
 import com.tidespot.core.data.repo.DataSource
 import com.tidespot.core.data.repo.Ttl
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.ZoneId
 
@@ -29,9 +31,9 @@ object FavoritesStaleLogic {
     const val ALPHA_STALE: Float = 0.6f
 
     /** 徽标文案（level = NONE → null，禁空串）。 */
-    fun badge(level: StaleLevel): String? = when (level) {
-        StaleLevel.STALE -> "陈旧"
-        StaleLevel.EXPIRED -> "已过期"
+    fun badge(level: StaleLevel, strings: TideSpotStrings = ZhStrings): String? = when (level) {
+        StaleLevel.STALE -> strings.staleLabel
+        StaleLevel.EXPIRED -> strings.expiredLabel
         StaleLevel.NONE -> null
     }
 
@@ -43,11 +45,12 @@ object FavoritesStaleLogic {
         fetchedAtMillis: Map<DataSource, Long>,
         nowMillis: Long,
         zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
     ): StaleMark {
         val latest = fetchedAtMillis.values.maxOrNull() ?: 0L
         if (latest <= 0L) return StaleMark(StaleLevel.NONE, dataTimeLabel = null)
         val local = Instant.ofEpochMilli(latest).atZone(zone)
-        val label = "数据 ${Format.mmdd(local.toLocalDate())} ${Format.hourLocal(latest / 1000, zone)}"
+        val label = strings.dataPrefix(Format.mmdd(local.toLocalDate()), Format.hourLocal(latest / 1000, zone))
         val expired = Ttl.unusableAgeMillis(latest, nowMillis) != null
         val stale = fetchedAtMillis.any { (src, millis) -> Ttl.staleForMillis(src, millis, nowMillis) != null }
         val level = when {

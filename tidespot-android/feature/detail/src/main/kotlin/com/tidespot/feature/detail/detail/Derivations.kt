@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.detail.detail
+package com.tidespot.feature.detail.detail
 
 import com.tidespot.core.data.dto.WeatherDailyDto
 import com.tidespot.core.data.repo.DataSource
@@ -17,6 +17,8 @@ import com.tidespot.core.domain.water.DoPhysics
 import com.tidespot.core.domain.water.WaterTempFusion
 import com.tidespot.core.ui.breakdown.VetoRow
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -274,6 +276,7 @@ object Derivations {
         tab: DetailTab,
         result: SpotDetailResult,
         nowMillis: Long = System.currentTimeMillis(),
+        strings: TideSpotStrings = ZhStrings,
     ): DimensionStatus {
         // CHG-13/N15（§6.7 第 4 行）：缓存年龄 ≥48h → 「数据不可用（不再据此评分）」
         val weatherUnusable = Ttl.unusableAgeMillis(result.fetchedAtMillis[DataSource.WEATHER] ?: 0L, nowMillis)
@@ -282,13 +285,13 @@ object Derivations {
         val marineOk = result.marine.isNotEmpty() && !result.marineAllNullInland && marineUnusable == null
         return when (tab) {
             DetailTab.WEATHER ->
-                if (!weatherOk) degraded(result, DataSource.WEATHER, result.weatherDegraded, weatherUnusable)
+                if (!weatherOk) degraded(result, DataSource.WEATHER, result.weatherDegraded, weatherUnusable, strings)
                 else DimensionStatus.Available
             DetailTab.WAVE, DetailTab.TIDE ->
-                if (!marineOk) degraded(result, DataSource.MARINE, !result.marineAllNullInland || result.marineDegraded, marineUnusable)
+                if (!marineOk) degraded(result, DataSource.MARINE, !result.marineAllNullInland || result.marineDegraded, marineUnusable, strings)
                 else DimensionStatus.Available
             DetailTab.SCORE, DetailTab.WATER_QUALITY ->
-                if (!weatherOk) degraded(result, DataSource.WEATHER, result.weatherDegraded, weatherUnusable)
+                if (!weatherOk) degraded(result, DataSource.WEATHER, result.weatherDegraded, weatherUnusable, strings)
                 else DimensionStatus.Available
         }
     }
@@ -298,15 +301,15 @@ object Derivations {
         source: DataSource,
         sourceFailed: Boolean,
         unusableAgeMillis: Long? = null,
+        strings: TideSpotStrings = ZhStrings,
     ): DimensionStatus.Degraded {
         val reason = when {
             // 内陆全 null 属「本点无该来源数据」（数据集本身不存在，与缓存年龄无关，优先于不可用判定）
-            source == DataSource.MARINE && result.marineAllNullInland -> "本点无该来源数据"
+            source == DataSource.MARINE && result.marineAllNullInland -> strings.noSourceData
             // §6.7 第 4 行：>48h 不可用
-            unusableAgeMillis != null ->
-                "数据不可用（已过期 ${(unusableAgeMillis + 3_599_999) / 3_600_000} h），不作为评分依据"
-            sourceFailed -> "来源不可用"
-            else -> "本点无该来源数据"
+            unusableAgeMillis != null -> strings.dataUnusable(((unusableAgeMillis + 3_599_999) / 3_600_000).toInt())
+            sourceFailed -> strings.sourceUnavailable
+            else -> strings.noSourceData
         }
         return DimensionStatus.Degraded(
             reason = reason,
@@ -337,7 +340,7 @@ object Derivations {
     /** 逐小时表行（F-3.2：24 行可滚；风浪行 = `时:00 浪高 m / 周期 s / 方向 °`）。 */
     data class HourRow(val hourLabel: String, val valueText: String, val description: String)
 
-    fun waveRows(daySlices: List<HourSlice>, zone: ZoneId): List<HourRow> = daySlices.map { s ->
+    fun waveRows(daySlices: List<HourSlice>, zone: ZoneId, strings: TideSpotStrings = ZhStrings): List<HourRow> = daySlices.map { s ->
         val h = hourLocal(s.timeEpochSec, zone)
         val m = s.marine
         val text = "${Format.hourLocal(s.timeEpochSec, zone)}  ${Format.valueUnit(m?.waveHeightM, "m")} / " +
@@ -345,12 +348,16 @@ object Derivations {
         HourRow(
             hourLabel = "$h:00",
             valueText = text,
-            description = "第 $h 小时：浪高 ${Format.valueUnit(m?.waveHeightM, "m")}，" +
-                "周期 ${Format.valueUnit(m?.wavePeriodS, "s")}，方向 ${Format.deg(m?.waveDirectionDeg)}",
+            description = strings.hourWave(
+                h,
+                Format.valueUnit(m?.waveHeightM, "m"),
+                Format.valueUnit(m?.wavePeriodS, "s"),
+                Format.deg(m?.waveDirectionDeg),
+            ),
         )
     }
 
-    fun weatherRows(daySlices: List<HourSlice>, zone: ZoneId): List<HourRow> = daySlices.map { s ->
+    fun weatherRows(daySlices: List<HourSlice>, zone: ZoneId, strings: TideSpotStrings = ZhStrings): List<HourRow> = daySlices.map { s ->
         val h = hourLocal(s.timeEpochSec, zone)
         val w = s.weather
         val text = "${Format.hourLocal(s.timeEpochSec, zone)}  ${Format.valueUnit(w?.temperatureC, "°C")} / " +
@@ -358,8 +365,12 @@ object Derivations {
         HourRow(
             hourLabel = "$h:00",
             valueText = text,
-            description = "第 $h 小时：气温 ${Format.valueUnit(w?.temperatureC, "°C")}，" +
-                "风速 ${Format.valueUnit(w?.windSpeedKmh, "km/h")}，海平面气压 ${Format.valueUnit(w?.pressureMslHpa, "hPa")}",
+            description = strings.hourWeather(
+                h,
+                Format.valueUnit(w?.temperatureC, "°C"),
+                Format.valueUnit(w?.windSpeedKmh, "km/h"),
+                Format.valueUnit(w?.pressureMslHpa, "hPa"),
+            ),
         )
     }
 
@@ -367,15 +378,16 @@ object Derivations {
         daySlices: List<HourSlice>,
         scoresByEpoch: Map<Long, FishScoreResult>,
         zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
     ): List<HourRow> = daySlices.map { s ->
         val h = hourLocal(s.timeEpochSec, zone)
         val score = scoresByEpoch[s.timeEpochSec]
         val text = "${Format.hourLocal(s.timeEpochSec, zone)}  " +
-            (score?.let { "${it.total} 分" } ?: Format.MISSING)
+            (score?.let { "${it.total} ${strings.unitScore}" } ?: Format.MISSING)
         HourRow(
             hourLabel = "$h:00",
             valueText = text,
-            description = "第 $h 小时：" + (score?.let { "钓鱼指数 ${it.total} 分" } ?: "该小时未评分"),
+            description = score?.let { strings.hourScore(h, it.total) } ?: strings.hourScoreMissing(h),
         )
     }
 
@@ -383,6 +395,7 @@ object Derivations {
         daySlices: List<HourSlice>,
         qualityByEpoch: Map<Long, WaterQualitySample>,
         zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
     ): List<HourRow> = daySlices.map { s ->
         val h = hourLocal(s.timeEpochSec, zone)
         val q = qualityByEpoch[s.timeEpochSec]
@@ -392,8 +405,11 @@ object Derivations {
         HourRow(
             hourLabel = "$h:00",
             valueText = text,
-            description = "第 $h 小时：水温 ${Format.valueUnit(q?.waterTempC, "°C")}，" +
-                "溶氧潜力 ${Format.valueUnit(q?.doMgL, "mg/L")}（估算）",
+            description = strings.hourWater(
+                h,
+                Format.valueUnit(q?.waterTempC, "°C"),
+                Format.valueUnit(q?.doMgL, "mg/L"),
+            ),
         )
     }
 
@@ -401,6 +417,7 @@ object Derivations {
         daySlices: List<HourSlice>,
         rates: Map<Long, Double?>,
         zone: ZoneId,
+        strings: TideSpotStrings = ZhStrings,
     ): List<HourRow> = daySlices.map { s ->
         val h = hourLocal(s.timeEpochSec, zone)
         val m = s.marine
@@ -408,24 +425,28 @@ object Derivations {
         val text = "${Format.hourLocal(s.timeEpochSec, zone)}  ${Format.valueUnit(m?.seaLevelHeightMslM, "m")} / " +
             (rate?.let { "${Format.value(it)} m/h" } ?: Format.MISSING) + " / " +
             Format.valueUnit(m?.oceanCurrentVelocityKmh, "km/h")
+        val rateText = rate?.let { "${Format.value(it)} m/h" } ?: strings.hourMissing
         HourRow(
             hourLabel = "$h:00",
             valueText = text,
-            description = "第 $h 小时：潮位 ${Format.valueUnit(m?.seaLevelHeightMslM, "m")}，" +
-                "涨落率 " + (rate?.let { "${Format.value(it)} m/h" } ?: "缺测") +
-                "，流速 ${Format.valueUnit(m?.oceanCurrentVelocityKmh, "km/h")}",
+            description = strings.hourTide(
+                h,
+                Format.valueUnit(m?.seaLevelHeightMslM, "m"),
+                rateText,
+                Format.valueUnit(m?.oceanCurrentVelocityKmh, "km/h"),
+            ),
         )
     }
 
-    fun rowsFor(tab: DetailTab, daySlices: List<HourSlice>, zone: ZoneId, state: DetailUiState): List<HourRow> {
+    fun rowsFor(tab: DetailTab, daySlices: List<HourSlice>, zone: ZoneId, state: DetailUiState, strings: TideSpotStrings = ZhStrings): List<HourRow> {
         val scoresByEpoch = state.scores.associateBy { it.timeEpochSec }
         val qualityByEpoch = state.quality.associateBy { it.timeEpochSec }
         return when (tab) {
-            DetailTab.WAVE -> waveRows(daySlices, zone)
-            DetailTab.WEATHER -> weatherRows(daySlices, zone)
-            DetailTab.SCORE -> scoreRows(daySlices, scoresByEpoch, zone)
-            DetailTab.WATER_QUALITY -> qualityRows(daySlices, qualityByEpoch, zone)
-            DetailTab.TIDE -> tideRows(daySlices, state.tideRates, zone)
+            DetailTab.WAVE -> waveRows(daySlices, zone, strings)
+            DetailTab.WEATHER -> weatherRows(daySlices, zone, strings)
+            DetailTab.SCORE -> scoreRows(daySlices, scoresByEpoch, zone, strings)
+            DetailTab.WATER_QUALITY -> qualityRows(daySlices, qualityByEpoch, zone, strings)
+            DetailTab.TIDE -> tideRows(daySlices, state.tideRates, zone, strings)
         }
     }
 }

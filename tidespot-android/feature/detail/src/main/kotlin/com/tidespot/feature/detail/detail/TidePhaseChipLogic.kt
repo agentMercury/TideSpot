@@ -1,6 +1,8 @@
 package com.tidespot.feature.detail.detail
 
 import com.tidespot.core.domain.algorithm.Solunar
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 import com.tidespot.core.domain.tide.TidePhase
 import java.time.LocalDate
 import java.time.ZoneId
@@ -15,8 +17,8 @@ import java.time.ZoneId
 object TidePhaseChipLogic {
 
     /** 选中日 → chip 文案（「大潮 · 活汛」/「小潮 · 死汛」/ 过渡带仅「活汛」或「死汛」）。 */
-    fun chipText(localDate: LocalDate, zone: ZoneId): String {
+    fun chipText(localDate: LocalDate, zone: ZoneId, copy: DomainCopy = ZhDomainCopy): String {
         val noonMillis = localDate.atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
-        return TidePhase.labelFor(Solunar.lunarAge(noonMillis))
+        return TidePhase.labelFor(Solunar.lunarAge(noonMillis), copy)
     }
 }

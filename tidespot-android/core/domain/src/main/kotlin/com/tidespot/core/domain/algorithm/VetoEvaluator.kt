@@ -1,6 +1,8 @@
 ﻿package com.tidespot.core.domain.algorithm
 
 import com.tidespot.core.domain.model.VetoCode
+import com.tidespot.core.domain.strings.DomainCopy
+import com.tidespot.core.domain.strings.ZhDomainCopy
 
 /**
  * 安全/可作钓性衰减 ΠV（SRS §6.5）——连续 sigmoid，**禁止硬阈值**。
@@ -39,8 +41,6 @@ object VetoEvaluator {
         val codes: List<VetoCode> = emptyList(),
     )
 
-    private const val THUNDERSTORM_REASON = "雷暴（安全否决）"
-
     // —— 缺测输入的保守档位（取值理由见类 KDoc；CHG-07 P1 修复 1）——
     /** wind 缺测代入值：持续风衰减 sigmoid 拐点（V 项 ×0.50，中性偏保守）。 */
     private const val MISSING_WIND_KMH = 34.0
@@ -64,6 +64,7 @@ object VetoEvaluator {
      * @param rainMmPerH 雨强；缺测 → [MISSING_RAIN_MM]，不得假设无雨
      * @param waveHeightM 浪高；null = 内陆点跳过浪项（非缺测语义，§6.5 原文）
      * @param doPotentialMgL 溶氧潜力；null 跳过该项（§6.5 原文）
+     * @param copy 文案源（OPT-V11-13；默认中文 [ZhDomainCopy]，零行为漂移）
      */
     fun evaluate(
         wmoCode: Int?,
@@ -73,6 +74,7 @@ object VetoEvaluator {
         rainMmPerH: Double?,
         waveHeightM: Double?,
         doPotentialMgL: Double?,
+        copy: DomainCopy = ZhDomainCopy,
     ): Outcome {
         var veto = 1.0
         val reasons = mutableListOf<String>()
@@ -85,7 +87,7 @@ object VetoEvaluator {
 
         if (wmoCode != null && wmoCode >= 95) {
             veto *= 0.05                                   // 雷暴：唯一硬否决（安全）
-            reasons.add(THUNDERSTORM_REASON)
+            reasons.add(copy.vetoThunderstorm)
             codes.add(VetoCode.THUNDERSTORM)               // CHG-16①：机器码与文案同步产生
         }
         veto *= maxOf(0.12, MathKit.sig(wind, 34.0, 0.30))             // 持续风 34 km/h 起快速衰减
@@ -100,17 +102,17 @@ object VetoEvaluator {
         }
 
         if (veto < 0.75) {
-            // 原因拼接触发项（SRS §6.5：存库并显示）
-            val detail = buildString {
-                append("可作钓性衰减 V=").append(String.format(java.util.Locale.US, "%.2f", veto))
-                if (wind > 30 || gust > 45) append(" 风").append(wind).append("/").append(gust).append("km/h")
-                if (d3 < -2.5) append(" 气压3h降").append(String.format(java.util.Locale.US, "%.1f", d3)).append("hPa")
-                if (rain > 2) append(" 降水").append(String.format(java.util.Locale.US, "%.1f", rain)).append("mm/h")
-                if (waveHeightM != null && waveHeightM > 1.6) append(" 浪").append(waveHeightM).append("m")
+            // 原因拼接触发项（SRS §6.5：存库并显示）；OPT-V11-13：标签由 DomainCopy 提供，数值格式不变
+            val details = buildString {
+                if (wind > 30 || gust > 45) append(copy.vetoWind(wind.toString(), gust.toString()))
+                if (d3 < -2.5) append(copy.vetoPressure(String.format(java.util.Locale.US, "%.1f", d3)))
+                if (rain > 2) append(copy.vetoRain(String.format(java.util.Locale.US, "%.1f", rain)))
+                if (waveHeightM != null && waveHeightM > 1.6) append(copy.vetoWave(waveHeightM.toString()))
                 if (doPotentialMgL != null && doPotentialMgL < 4.6) {
-                    append(" 低溶氧").append(String.format(java.util.Locale.US, "%.1f", doPotentialMgL))
+                    append(copy.vetoLowOxygen(String.format(java.util.Locale.US, "%.1f", doPotentialMgL)))
                 }
             }
+            val detail = copy.vetoDecay(String.format(java.util.Locale.US, "%.2f", veto), details)
             reasons.add(detail)
             codes.add(VetoCode.FISHABILITY_DECAY)          // CHG-16①：衰减明细项同样入机器码
         }

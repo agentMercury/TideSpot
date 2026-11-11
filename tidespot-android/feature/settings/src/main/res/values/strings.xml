@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 潮点 TideSpot · 设置页文案（OPT-V11-13；中文默认） -->
+<resources>
+    <string name="ts_settings_content_desc">设置页：单位制、详情天数、数据与隐私、开源许可</string>
+    <string name="ts_settings_title">设置</string>
+    <string name="ts_settings_display">显示</string>
+    <string name="ts_settings_unit">单位制</string>
+    <string name="ts_settings_unit_si">公制（°C · km/h · m）</string>
+    <string name="ts_settings_unit_si_desc">单位制：公制</string>
+    <string name="ts_settings_unit_imperial">英制（°F · mph · ft）</string>
+    <string name="ts_settings_unit_imperial_desc">单位制：英制</string>
+    <string name="ts_settings_detail_days">详情页天数</string>
+    <string name="ts_settings_days">%1$d 天</string>
+    <string name="ts_settings_days_desc">详情页天数：%1$d 天</string>
+    <string name="ts_settings_map_style">地图样式</string>
+    <string name="ts_settings_map_style_desc">地图样式：%1$s（%2$s）</string>
+    <string name="ts_settings_data_network">数据与网络</string>
+    <string name="ts_settings_prefetch">后台预取</string>
+    <string name="ts_settings_weather">天气</string>
+    <string name="ts_settings_prefetch_toggle">后台预取开关</string>
+    <string name="ts_settings_reverse_geo">逆地理名称（RG-A BigDataCloud / RG-B Photon）</string>
+    <string name="ts_settings_reverse_geo_note">关 = 位置名称回退坐标文本；逐源发送内容见下方「隐私披露」</string>
+    <string name="ts_settings_reverse_geo_toggle">逆地理总开关</string>
+    <string name="ts_settings_use_cases">用例 · 物种 · 权重</string>
+    <string name="ts_settings_api_key">API Key（可选）</string>
+    <string name="ts_settings_api_key_optional">可选 API Key（当前无消费方，仅保存）</string>
+    <string name="ts_settings_api_key_input">可选 API Key 输入框</string>
+    <string name="ts_settings_api_key_empty">留空 = 未设置</string>
+    <string name="ts_settings_api_key_save">保存 API Key</string>
+    <string name="ts_settings_licenses">开源许可与数据署名</string>
+    <string name="ts_settings_privacy">隐私披露（逐源）</string>
+    <string name="ts_settings_privacy_sends">发送内容：%1$s</string>
+
+    <!-- MapStyle 展示名 -->
+    <string name="ts_settings_style_color">彩色</string>
+    <string name="ts_settings_style_plain">素色</string>
+    <string name="ts_settings_style_dark">深色</string>
+
+    <!-- 开源许可清单（名称 / 用途 / 许可） -->
+    <string name="ts_license_open_meteo_role">天气 / 海洋 / 正地理搜索</string>
+    <string name="ts_license_open_meteo_license">CC BY 4.0（数据）</string>
+    <string name="ts_license_copernicus_role">海洋再分析 / 水位 / 水质</string>
+    <string name="ts_license_copernicus_license">Copernicus Marine 许可（需署名）</string>
+    <string name="ts_license_nasa_role">水体掩膜 / 遥感参考</string>
+    <string name="ts_license_nasa_license">NASA 开放数据协议（需署名）</string>
+    <string name="ts_license_noaa_role">水位 / 海洋参考</string>
+    <string name="ts_license_noaa_license">公有领域（建议署名）</string>
+    <string name="ts_license_usgs_role">地形 / 水体参考</string>
+    <string name="ts_license_usgs_license">公有领域（建议署名）</string>
+    <string name="ts_license_osm_role">地图底图 / 渲染</string>
+    <string name="ts_license_osm_license">ODbL（数据）/ BSD-2（MapLibre）</string>
+    <string name="ts_license_bdc_role">逆地理 RG-A</string>
+    <string name="ts_license_bdc_license">CC BY 4.0（客户端 API 免费层）</string>
+    <string name="ts_license_photon_role">逆地理 RG-B</string>
+    <string name="ts_license_photon_license">ODbL（数据 © OpenStreetMap）</string>
+
+    <!-- 隐私逐源披露 -->
+    <string name="ts_privacy_geo_on">受「逆地理名称」总开关控制：已开启</string>
+    <string name="ts_privacy_geo_off">受「逆地理名称」总开关控制：已关闭（不发请求）</string>
+    <string name="ts_privacy_prefetch_on">「预取」已开启：进入列表页可能后台预热</string>
+    <string name="ts_privacy_prefetch_off">「预取」已关闭：仅进入详情页时拉取</string>
+    <string name="ts_privacy_rga_source">逆地理 RG-A · BigDataCloud</string>
+    <string name="ts_privacy_rgb_source">逆地理 RG-B · Photon</string>
+    <string name="ts_privacy_rg_coords">仅发送坐标（纬度/经度），不含账号或设备标识</string>
+    <string name="ts_privacy_geocode_source">正地理 · Open-Meteo /v1/search</string>
+    <string name="ts_privacy_geocode_sends">仅发送搜索关键词</string>
+    <string name="ts_privacy_geocode_only">仅在用户搜索时发送</string>
+    <string name="ts_privacy_weather_source">天气 · Open-Meteo</string>
+    <string name="ts_privacy_coords_period">发送坐标与请求时段</string>
+    <string name="ts_privacy_marine_source">海洋 · Copernicus / 海洋模型</string>
+    <string name="ts_privacy_wq_source">水质 · 本地推导</string>
+    <string name="ts_privacy_wq_sends">不发送任何数据（由天气序列在设备内推导）</string>
+    <string name="ts_privacy_no_network">无网络请求</string>
+
+    <!-- Copernicus 凭据版块（TalkBack） -->
+    <string name="ts_settings_copernicus_username_input">Copernicus 用户名输入框</string>
+    <string name="ts_settings_copernicus_password_input">Copernicus 密码输入框</string>
+    <string name="ts_settings_copernicus_check_save_desc">校验并保存 Copernicus 凭据</string>
+    <string name="ts_settings_copernicus_clear_desc">清除已保存的 Copernicus 凭据</string>
+    <string name="ts_settings_copernicus_password_hide">隐藏密码</string>
+    <string name="ts_settings_copernicus_password_show">显示密码</string>
+</resources>
