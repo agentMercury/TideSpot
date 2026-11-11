@@ -173,8 +173,11 @@ fun DetailScreen(
                 chips = chips,
                 selectedDay = state.selectedDay,
                 onDaySelected = viewModel::selectDay,
-                infoSlot = { sourceInfo(state.result?.fetchedAtMillis, zone) },
+                // S02 C22：来源行独立一行（设计 y=152），不再挤在日期行右侧
+                infoSlot = {},
             )
+            androidx.compose.foundation.layout.Spacer(Modifier.height(4.dp))
+            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) { sourceInfo(state.result?.fetchedAtMillis, zone) }
         }
 
         item {
@@ -276,21 +279,35 @@ fun DetailScreen(
 
             var showTable by remember(state.selectedTab, state.selectedDay) { mutableStateOf(false) } // 默认图表
             // OPT-V115-01 #7（ts_chart_table_switch）：双 FilterChip → 单开关，标签=设计稿文案，状态说明沿用模块文案
-            val chartTableLabel = stringResource(UiR.string.ts_chart_table_switch)
-            val chartTableState = stringResource(if (showTable) R.string.ts_detail_table else R.string.ts_detail_chart)
-            Row(
-                Modifier.padding(horizontal = 8.dp),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            // OPT-V115-02 / S02 C09：设计稿分段胶囊切换（容器 #DCE5EE rx12，选中白胶囊 rx10）
+            Surface(
+                color = Color(0xFFDCE5EE),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).height(36.dp),
             ) {
-                Text(chartTableLabel, style = MaterialTheme.typography.labelMedium)
-                Switch(
-                    checked = showTable,
-                    onCheckedChange = { showTable = it },
-                    modifier = Modifier.semantics { contentDescription = chartTableState },
-                )
+                Row(Modifier.fillMaxHeight().padding(3.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    listOf(false to R.string.ts_detail_chart, true to R.string.ts_detail_table)
+                        .forEach { (isTable, labelRes) ->
+                            val selected = showTable == isTable
+                            val label = stringResource(labelRes)
+                            Surface(
+                                onClick = { showTable = isTable },
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (selected) MaterialTheme.colorScheme.surface else Color.Transparent,
+                                border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
+                                modifier = Modifier.fillMaxHeight().semantics { contentDescription = label },
+                            ) {
+                                Box(Modifier.padding(horizontal = 16.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                                    Text(
+                                        label,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = if (selected) Color(0xFF1565C0) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                }
             }
-
             val scoresByEpoch = state.scores.associateBy { it.timeEpochSec }
             val qualityByEpoch = state.quality.associateBy { it.timeEpochSec }
             val values = Derivations.chartValues(state.selectedTab, daySlices, scoresByEpoch, qualityByEpoch, state.tideRates)

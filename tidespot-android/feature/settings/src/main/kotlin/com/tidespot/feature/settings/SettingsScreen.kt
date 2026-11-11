@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -74,6 +75,9 @@ fun SettingsScreen(
             modifier = Modifier.padding(vertical = 14.dp),
         )
 
+        // OPT-V115-02 / S09 C16：六版块收进一张卡片（设计 366×700 rx16）
+        Card(Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // ── 显示 ──
         SectionTitle(stringResource(R.string.ts_settings_display))
         Text(stringResource(R.string.ts_settings_unit), style = MaterialTheme.typography.titleSmall)
@@ -198,6 +202,8 @@ fun SettingsScreen(
             Text(stringResource(line.toggleNoteRes), style = MaterialTheme.typography.labelSmall)
         }
 
+            }
+        }
         // OPT-V115-02 / S09 C06：底部常驻免责入口条（设计 366×56，与详情页同形态）
         SectionDivider()
         var showDisclaimer by remember { mutableStateOf(false) }
