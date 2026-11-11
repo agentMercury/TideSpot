@@ -165,3 +165,65 @@
 **唯一有意偏离**：浅色次要文字 `#8A9DB0`（2.19–2.79:1）→ `#556579`（4.68–5.96:1），见 CHG-56。
 
 **交付物**：`E:\Trans\潮点TideSpot-v1.15.14.apk`（versionCode 19）；台账 CHG-46~56；交接见 `HANDOVER_V115.md`。
+
+---
+
+## 10. V1.16.0 + v3 美化 · 落地件全量刷新（2026-11-11）
+
+### 10.1 本轮触发与用户裁定
+- 触发：用户「当前工作区的工程文件是最新版本的，你根据这一版看一下 UI 图是否需要更新」，要求以工程实际情况为准。
+- 用户三项决策原文：「1.正式启用 2.按你的来 3.以实际工程为准。实际上大多数跟功能有关的部分都要以现在的实际情况为准，你的任务是美化 UI」：
+  - **决策① API Key / Copernicus 凭据** → 正式启用，不做占位；实现方可真实保存到 SharedPreferences。
+  - **决策② 准星形态** → 由设计侧定稿：四向刻度 + 细环 + 薄荷中心点，idle / active / locked 三态。
+  - **决策③ GMS 口径** → 以实际工程为准：双通道定位，`play-services-location 21.3.0`，不再声明「无 GMS 单机口径」。
+- 边界再确认：**功能 / 结构 / 文案 / Tab 序 / 导航流全部以工程 v1.16.0 为准，设计侧只负责视觉美化。**
+- 用户「四项都确认」：v3 四项美化方向全部采用，进入完整设计侧落地件刷新。
+
+### 10.2 基线锁定（工程 v1.16.0 / versionCode 20）
+
+| 事实 | 值 | 工程权威源 |
+|---|---|---|
+| Tab 渲染序 | 钓鱼指数 → 潮流/水位 → 天气 → 水质 → 风浪 | `WaterBodyTabTitles.titlesInTabOrder` |
+| DaySelector | 52dp 高 · 两行 · 圆角 18 · min 宽 56 · 间距 6 | `DaySelector.kt` |
+| 水质卡 | 1 行 × 3 卡（水温 / 溶解氧 / 浊度，pH 已删）· 卡高 112dp | `DetailScreen.kt` |
+| 信息条 | 236dp 浮条 + 独立操作面板 | `DetailScreen.kt` |
+| 地图底图 | CARTO Voyager | 工程配置 |
+| APP 图标 | `@mipmap/ic_launcher`，adaptive 五件已落地 | `AndroidManifest.xml` + mipmap |
+| edge-to-edge | `contentWindowInsets = WindowInsets(0,0,0,0)`，各屏自行 padding | `MainActivity.kt` |
+| 定位 | 双通道，不再声明无 GMS 单机口径 | `app/build.gradle.kts` |
+| 主题 | Light / Dark + Shapes(8/12/16/20/20) + Typography 工程既有 | `TideSpotTheme.kt` |
+
+### 10.3 DECISION-V3-BEAUTY（四项美化，用户全采纳）
+
+| 编号 | 美化项 | v3 结论 |
+|---|---|---|
+| V3-1 | 准星形态 | 细环 + 四向刻度 + 薄荷中心点；三态；与图标前景层同源母题 |
+| V3-2 | 视觉点缀 | 薄荷色 `#80CBC4` 作唯一强调点缀，不新增主题色、不派生深色副本 |
+| V3-3 | 收藏卡 | 白卡 + 左侧五档色带，替代 v2 深色卡 |
+| V3-4 | 主卡 | 深蓝 `#0D47A1` 轻微渐变 + 48sp 分数 + 档位胶囊 + 五段色带 |
+| 另 | 卡片层级 | 三级 surface 层级 + 柔和阴影；深色为独立设计（非浅色反色） |
+
+- **冻结红线**：五档色（`ScoreBands.kt`）、六徽标色（`ConfidenceBadge.kt`）、4 主色（`TideSpotTheme.kt`）一格未动，未进 `MaterialTheme`、未派生深色副本。
+- 免责恒 5 条、第 5 条为工程 D11「现场校潮」长文；文案唯一入口 `TideSpotStrings.kt`；浅色次要文字对比度 ≥ 4.5:1（CHG-56）。
+
+### 10.4 v2 阻塞项关闭状态
+
+- **关闭** CONFLICT-01（底部 `NavigationBar` 已删，地图优先导航）、CONFLICT-02（免责第 5 条以工程 D11 为准）、CONFLICT-03（源更新时间显示「—」，不硬编码）。
+- **关闭** GAP-01~07（图标已落地 / insets 归零 / Shapes+Typography 集中 / 文案接线 / 深色与结构稿已补）。
+- **关闭** DECISION-API-KEY / DECISION-CROSSHAIR / DECISION-GMS / DECISION-V3-BEAUTY。
+- **当前无待决冲突**；`mapping/design-to-code.json → resolved_decisions` 为权威记录。
+
+### 10.5 非阻塞遗留（open_items）
+
+| 编号 | 项 | 说明 |
+|---|---|---|
+| P2-01 | 地图铺满系统栏区 | edge-to-edge 下地图延伸至状态栏 / 导航栏，需真机微调 padding |
+| P2-02 | 英文真机验收 | i18n 文案已接线，待英文 locale 真机走查 |
+| FO-03 | v3 美化 token 集中化 | 薄荷点缀 / 阴影 / 渐变建议收进 `TideSpotTheme` 或独立 token 文件，避免散落硬编码 |
+
+### 10.6 交付边界
+
+- 本轮只刷新 `design-handoff/` 离线包至 **v3.0.0**；未修改 `tidespot-android/` 任何源码，未产出 APK / 构建产物。
+- 图标 SVG 为视觉升级替换源稿，转 vector drawable 由实现方完成。
+- 验收口径见 `acceptance/acceptance.md`；包完整性（bytes + SHA-256）见 `manifest.json`。
+- v2 视觉资产已归档至工作区外 `weatherfishcheck-trash-20261110/.m4tmp/v3/v2-assets-archive/`，不在交付包内。

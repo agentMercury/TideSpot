@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 手绘鱼种图鉴 · 设置</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;font-family:KaiTi, 楷体, cursive;color:#1A1A1A;
+  background:#DCEAF4;}
+.bgfill{position:absolute;inset:0;background:linear-gradient(160deg,#DCEAF4 0%,#CBDEEE 100%);z-index:0}
+.grain{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:0.9}
+.screen{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:Impact, sans-serif;font-size:14px;font-weight:700;color:#1A1A1A;position:relative;z-index:5}
+.statusbar .r{display:flex;gap:5px;align-items:center;font-size:12px}
+.notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:74px;height:20px;border-radius:12px;background:#1A1A1A;opacity:0.85}
+.disp{font-family:Impact, KaiTi, 楷体, sans-serif;font-weight:400;letter-spacing:0.08em}
+.bodyf{font-family:KaiTi, 楷体, cursive}
+.card{background:#FFFFFF;border:2.2px solid #1A1A1A;border-radius:6px 9px 5px 8px / 8px 5px 9px 6px;
+  box-shadow:2px 3px 0 #1A1A1A33;position:relative;overflow:hidden}
+.tape{position:absolute;background:#F2B33D;opacity:0.85;transform:rotate(-3deg);z-index:3}
+.tag{display:inline-flex;align-items:center;gap:4px;border:2px solid #1A1A1A;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;background:#FFFFFF;position:relative;z-index:4}
+.hl{color:#E5503E}
+.mut{color:#566A7C}
+.row{display:flex;align-items:center}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="19" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.1" xChannelSelector="G" yChannelSelector="B"/>
+  </filter>
+  <filter id="watercolor" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="2.7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.6"/>
+  </filter>
+  <filter id="papergrain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="ng"/>
+    <feComponentTransfer in="ng" result="na"><feFuncA type="linear" slope="0.12"/></feComponentTransfer>
+  </filter>
+  <filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="1A1A1A" flood-opacity="0.18"/>
+  </filter>
+ </defs>
+</svg><div class="screen" style="overflow:hidden"><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div><div style="padding:6px 16px 10px;position:relative;z-index:3"><div class="disp" style="font-size:24px;color:#1A1A1A">设置</div>
+      <div class="bodyf mut" style="font-size:11px;margin-top:2px">潮点 TideSpot · v1.16.0</div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px">
+          <div class="row" style="gap:7px;margin-bottom:2px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+            <span class="disp" style="font-size:12.5px;color:#1A4E86">显示</span>
+            </div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">深色模式</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">跟随系统</span></div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">地图样式</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">彩色 Voyager ▾</span></div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px">
+          <div class="row" style="gap:7px;margin-bottom:2px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+            <span class="disp" style="font-size:12.5px;color:#1A4E86">数据与网络</span>
+            </div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">离线缓存</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">已开启</span></div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">源更新提示</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">3h / 6h TTL</span></div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">双通道定位</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">已启用</span></div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px">
+          <div class="row" style="gap:7px;margin-bottom:2px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+            <span class="disp" style="font-size:12.5px;color:#1A4E86">用例 · 物种 · 权重</span>
+            </div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">垂钓用例</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">海水 · 岸钓</span></div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">物种预设</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">已解锁 6 种</span></div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px">
+          <div class="row" style="gap:7px;margin-bottom:2px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+            <span class="disp" style="font-size:12.5px;color:#1A4E86">API Key（可选）</span>
+            <span class="tag" style="margin-left:auto;font-size:8px;background:#F2B33D;color:#1A1A1A">正式启用</span></div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">凭据状态</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">已保存 ✓</span></div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px">
+          <div class="row" style="gap:7px;margin-bottom:2px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+            <span class="disp" style="font-size:12.5px;color:#1A4E86">开源许可与数据署名</span>
+            </div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">底图</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">OpenStreetMap · CARTO</span></div><div class="row" style="justify-content:space-between;padding:5px 0;border-bottom:1.2px dashed #1A1A1A40">
+          <span class="bodyf" style="font-size:11.5px;color:#1A1A1A">模型</span>
+          <span class="bodyf" style="font-size:10.5px;color:#566A7C">Open-Meteo / Copernicus</span></div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px;border-color:#3E9E5A">
+      <div class="row" style="gap:7px;margin-bottom:5px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##3E9E5A" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+        <span class="disp" style="font-size:12.5px;color:#1A4E86">数据源凭据 · Copernicus</span>
+        <span class="tag" style="margin-left:auto;font-size:8px;background:#3E9E5A;color:#FFFFFF;border-color:#3E9E5A">本地保存</span></div>
+      <div class="row" style="gap:7px"><div style="flex:1;border:1.5px solid #1A1A1A;border-radius:8px;padding:5px 8px"><div class="bodyf mut" style="font-size:8.5px">用户名 / 邮箱</div><div class="bodyf" style="font-size:10.5px;color:#1A1A1A">··@··.··</div></div>
+        <div style="flex:1;border:1.5px solid #1A1A1A;border-radius:8px;padding:5px 8px"><div class="bodyf mut" style="font-size:8.5px">密码</div><div class="bodyf" style="font-size:10.5px;color:#1A1A1A">••••••••　👁</div></div></div>
+      <div class="row" style="gap:7px;margin-top:6px"><div style="flex:1;border:1.8px solid #1A1A1A;border-radius:8px;text-align:center;padding:5px;background:#E5503E;color:#FFFFFF"><b class="bodyf" style="font-size:10.5px">校验并保存</b></div>
+        <div style="border:1.5px solid #1A1A1A;border-radius:8px;padding:5px 11px" class="bodyf" style="font-size:10.5px">清除</div></div>
+      <div class="bodyf mut" style="font-size:8.5px;line-height:1.45;margin-top:5px">凭据仅本地存储、用于拉取卫星数据；不上传、不共享。</div></div><div class="card" style="margin:0 14px 8px;padding:8px 12px">
+      <div class="row" style="gap:7px;margin-bottom:3px"><span style="width:22px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span>
+        <span class="disp" style="font-size:12.5px;color:#1A4E86">隐私披露 · 逐源</span></div>
+      <div class="bodyf mut" style="font-size:9px;line-height:1.5">天气 / 海洋 / 潮汐 / 水质等请求会发送点位经纬度至对应数据源；逆地理与凭据可分别关闭。不声明零数据传输。</div>
+      <div class="bodyf" style="font-size:9.5px;color:#E5503E;margin-top:4px">关于 · 版本 v1.16.0　|　免责声明 ›</div></div></div><svg class="grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <rect width="100%" height="100%" filter="url(#papergrain)" opacity="1"/>
+</svg></body></html>

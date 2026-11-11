@@ -37,6 +37,8 @@ class DetailViewModel(
     daysRange: Int = 7,
     preset: ScenePreset? = null,
     private val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO,
+    /** OPT-V12-03（CHG-57）：联网判定（:app 注入；默认 true = 既有行为零漂移）。 */
+    private val networkAvailable: () -> Boolean = { true },
 ) : ViewModel() {
 
     private val holder = DetailStateHolder(
@@ -50,6 +52,9 @@ class DetailViewModel(
     val state: kotlinx.coroutines.flow.StateFlow<DetailUiState> = holder.state
     val zoneId: ZoneId = zone
     val spotRef: FavoriteSpot = spot
+
+    /** OPT-V12-03：手动刷新单任务门（同点去重；进行中再次下拉复用任务）。 */
+    private val refreshGate = UserRefreshGate()
 
     init {
         refresh(initial = true)
@@ -73,15 +78,46 @@ class DetailViewModel(
         }
     }
 
-    /** F-3.6 重试（用户显式触发，绕过 15 min gate 由 :core:data force 语义处理）。 */
-    fun retry() {
-        viewModelScope.launch(ioDispatcher) {
+    /**
+     * F-3.6 重试 / OPT-V12-03（CHG-57）下拉刷新：用户显式触发 → `force=true`
+     * （**绕过 15 min 最小刷新门**，用户操作必产生请求），但**不绕过 6 req/min 令牌桶**。
+     *
+     * 同点去重由 [UserRefreshGate] 保证：进行中再次下拉复用任务（令牌只扣 1）；
+     * 离线直接回执 [RefreshFeedback.OFFLINE]，不发请求。
+     */
+    fun userRefresh() {
+        // 初始加载或已有刷新进行中：复用（不重复发请求、不叠加令牌消耗）
+        if (refreshGate.isRunning || holder.state.value.refreshing) {
+            holder.setRefreshing(true)
+            return
+        }
+        if (!networkAvailable()) {
+            holder.onUserRefresh(RefreshFeedback.OFFLINE)
+            return
+        }
+        val started = refreshGate.start(viewModelScope) {
             holder.setRefreshing(true)
             runCatching { repository.refreshSpotDetail(spot, force = true) }
-                .onSuccess { holder.onResult(it) }
-                .onFailure { holder.setRefreshing(false) }
+                .onSuccess {
+                    holder.onResult(it)
+                    holder.onUserRefresh(RefreshFeedback.UPDATED)
+                }
+                .onFailure {
+                    holder.setRefreshing(false)
+                    holder.onUserRefresh(RefreshFeedback.FAILED)
+                }
+            loadWaterQualityObservations()
+            loadTideObservations()
         }
+        // 复用进行中任务：仅保持进度态，不重复发请求/不叠加令牌
+        if (!started) holder.setRefreshing(true)
     }
+
+    /** F-3.6 重试按钮：与下拉刷新同一语义（force + 去重 + 令牌桶不可绕过）。 */
+    fun retry() = userRefresh()
+
+    /** OPT-V12-03：提示读罢清除。 */
+    fun clearRefreshFeedback() = holder.clearRefreshFeedback()
 
     // ────────────────── OPT-V11-02 水质实测录入（CHG-27） ──────────────────
 

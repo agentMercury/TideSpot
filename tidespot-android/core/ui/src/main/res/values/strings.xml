@@ -173,6 +173,8 @@
     <string name="ts_day_today">今天 %1$s，%2$s</string>
     <string name="ts_day_future">未来第 %1$d 天 %2$s，%3$s</string>
     <string name="ts_day_short_today">今天 %1$s</string>
+    <!-- OPT-V12-04：DaySelector 两行 chip 上行标签（非今天用 M/d） -->
+    <string name="ts_day_today_label">今天</string>
     <string name="ts_no_data_hour">该小时无数据</string>
     <string name="ts_device_zone_note">本机时区</string>
     <string name="ts_info_unnamed_water">未命名水域</string>

@@ -368,3 +368,40 @@ interface CopernicusCredentialActions {
    `FavoritesViewModel` 构造器尾增可选 `thumbnailSource: ThumbnailSource? = null`，并新增多选/批量/分组/信息卡方法。
 8. `core:ui` `Format.coordinate(v)` 新增（6 位小数；`value()` 的 digits 上限 3 不变，避免既有行为漂移）。
 9. 版本：`versionCode=4 / versionName=1.2.0`（APK `潮点TideSpot-v1.2.0.apk`）。
+
+## V1.2 需求池子契约（2026-11-11，CHG-57，v1.16.0）
+
+> 口径：**既有公共签名零改动**，新增一律为「尾增可选参数 / 新增方法 / 新增只读字段」；
+> 唯一需同步改动的类型是 `TideSpotStrings`（接口新增成员，3 个实现同加）与 `DayChip`（新增两字段，
+> 仅 `DaySelectorLogic.chips` 一个构造点）。
+> 需求依据：`OPT_REQUIREMENTS_V11.md` §7 OPT-V12-01/02/03/04/07。
+
+1. `:core:data` `TokenBucket`：
+   - 新增 `enum class Priority { USER, BACKGROUND }`；
+   - 尾增可选参数 `acquire(priority: Priority = Priority.BACKGROUND)`（默认 = 旧行为，零漂移）；
+   - `tryAcquire()` 语义扩展：存在 `USER` 等待者时返回 false（后台预取主动让出，**不排队**）；
+   - **总速率不变**（capacity/period），仅改变分配顺序。
+2. `:feature:detail`：
+   - `DetailViewModel` 构造器尾增可选 `networkAvailable: () -> Boolean = { true }`；
+   - 新增 `userRefresh()`（`force=true` + 去重）、`clearRefreshFeedback()`；`retry()` 收口到同一语义；
+   - `DetailUiState` 尾增 `refreshFeedback: RefreshFeedback? = null`、`lastRefreshAtMillis: Long? = null`；
+   - 新增 `enum class RefreshFeedback { UPDATED, FAILED, OFFLINE }`（纯层不带文案）；
+   - 新增 `internal class UserRefreshGate`（同点去重整任务门）。
+3. `:feature:favorites`：
+   - `FavoritesViewModel` 构造器尾增可选 `networkAvailable: () -> Boolean = { true }`；
+   - 新增 `refreshAll(spots: List<FavoriteSpot>)`（非 force、并发 ≤2）、`cancelRefresh()`、`clearRefreshMessage()`；
+   - `FavoritesUiState` 尾增 `refreshing / refreshDone / refreshTotal / refreshSummary / refreshOffline`；
+   - 新增纯函数 `FavoritesRefreshLogic`（`Outcome` / `Summary` / `classify` / `summarize` / `targets`）
+     与 `TagPresets`（`DEFAULT` / `isSelected` / `toggleRaw` / `selectedInRaw`）。
+4. `:core:ui`：
+   - `TideSpotStrings` 新增 `val dayTodayLabel: String`（`ZhStrings`/`EnStrings`/`ResStrings` 同步；资源键 `ts_day_today_label`）；
+   - `DaySelectorLogic.DayChip` 新增 `topLabel: String` / `weekdayLabel: String`（`chipLabel` 保留为单行合并态）；
+   - `DaySelector` 组件：chip 改两行（52dp/56dp），`infoSlot` 渲染在 chip 行**下方**（不再占同一行）。
+5. `:feature:map`：
+   - `MapScreen` 尾增可选参数：`favoriteStars: List<FavoriteStar> = emptyList()`、
+     `onOpenFavorite: ((Long) -> Unit)? = null`、`onCameraTargetChanged: (GeoPoint) -> Unit = {}`；
+   - 新增 `FavoriteStar(id, name, lat, lon, summary?)` 与 `FavoriteStarLayer`（`geoJson` / `starIdOf` /
+     `coordinate` / `escape`，纯函数）；图层 id：`tidespot-favorite-stars` / `tidespot-favorite-stars-layer`；
+   - **不改**既有手势契约：点击星标只消费命中（命中时返回 true），**不移动准星、不发起选点请求**；
+     长按（F-1.4）与拖动 idle 逻辑零改动。
+6. 版本：`versionCode=20 / versionName=1.16.0`（APK `潮点TideSpot-v1.16.0.apk`）。

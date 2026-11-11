@@ -61,6 +61,16 @@ data class FavoritesUiState(
     val infoSpotId: Long? = null,
     /** OPT-V11-12：最近一次批量操作失败/拒绝提示（null = 无）。 */
     val batchMessage: String? = null,
+    /** OPT-V12-02（CHG-57）：列表刷新进行中（进度 = [refreshDone] / [refreshTotal]）。 */
+    val refreshing: Boolean = false,
+    /** OPT-V12-02：已处理条目数（分类完成即 +1）。 */
+    val refreshDone: Int = 0,
+    /** OPT-V12-02：本轮刷新条目总数。 */
+    val refreshTotal: Int = 0,
+    /** OPT-V12-02：最近一次刷新汇总（null = 未刷新过；UI 按资源格式化）。 */
+    val refreshSummary: FavoritesRefreshLogic.Summary? = null,
+    /** OPT-V12-02：离线时下拉 → 直接提示（不发请求、不改标记）。 */
+    val refreshOffline: Boolean = false,
 )
 
 /** OPT-V11-12：多选模式判定（UI 顶部操作栏是否渲染）。 */

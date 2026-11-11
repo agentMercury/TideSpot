@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 手绘鱼种图鉴 · 海洋详情页</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;font-family:KaiTi, 楷体, cursive;color:#1A1A1A;
+  background:#DCEAF4;}
+.bgfill{position:absolute;inset:0;background:linear-gradient(160deg,#DCEAF4 0%,#CBDEEE 100%);z-index:0}
+.grain{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:0.9}
+.screen{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:Impact, sans-serif;font-size:14px;font-weight:700;color:#1A1A1A;position:relative;z-index:5}
+.statusbar .r{display:flex;gap:5px;align-items:center;font-size:12px}
+.notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:74px;height:20px;border-radius:12px;background:#1A1A1A;opacity:0.85}
+.disp{font-family:Impact, KaiTi, 楷体, sans-serif;font-weight:400;letter-spacing:0.08em}
+.bodyf{font-family:KaiTi, 楷体, cursive}
+.card{background:#FFFFFF;border:2.2px solid #1A1A1A;border-radius:6px 9px 5px 8px / 8px 5px 9px 6px;
+  box-shadow:2px 3px 0 #1A1A1A33;position:relative;overflow:hidden}
+.tape{position:absolute;background:#F2B33D;opacity:0.85;transform:rotate(-3deg);z-index:3}
+.tag{display:inline-flex;align-items:center;gap:4px;border:2px solid #1A1A1A;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;background:#FFFFFF;position:relative;z-index:4}
+.hl{color:#E5503E}
+.mut{color:#566A7C}
+.row{display:flex;align-items:center}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="19" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.1" xChannelSelector="G" yChannelSelector="B"/>
+  </filter>
+  <filter id="watercolor" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="2.7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.6"/>
+  </filter>
+  <filter id="papergrain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="ng"/>
+    <feComponentTransfer in="ng" result="na"><feFuncA type="linear" slope="0.12"/></feComponentTransfer>
+  </filter>
+  <filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="1A1A1A" flood-opacity="0.18"/>
+  </filter>
+ </defs>
+</svg>
+<div class="bgfill"></div>
+<div class="screen"><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div>
+    <div class="row" style="padding:6px 18px 10px;justify-content:space-between;position:relative;z-index:5">
+      <div>
+        <div class="disp" style="font-size:21px;color:#1A1A1A;line-height:1.15">青岛 · 小麦岛外海</div>
+        <div class="bodyf" style="font-size:11px;color:#566A7C;margin-top:3px">⌖ 36.05°N 120.44°E · 准星落点</div>
+      </div>
+      <div style="width:34px;height:34px;border:2.2px solid #1A1A1A;border-radius:50%;background:#FFFFFF;display:flex;align-items:center;justify-content:center;box-shadow:1.5px 2px 0 #1A1A1A33"><svg viewBox="0 0 120 64" width="26"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+    </div>
+    <div style="padding:0 18px 8px;position:relative;z-index:5">
+      <span class="tag" style="background:#FFFFFF;color:#1A1A1A;border-color:#1A1A1A;box-shadow:2px 2px 0 #1A1A1A55"><svg viewBox="0 0 80 48" width="58" aria-hidden="true"><g filter="url(#rough2)" fill="none" stroke="#1A4E86" stroke-width="2.8" stroke-linecap="round">
+          <path d="M2 30 Q12 21 22 30 Q32 39 42 30 Q52 21 62 30 Q70 37 78 30"/>
+          <path d="M2 41 Q12 32 22 41 Q32 50 42 41 Q52 32 62 41 Q70 48 78 41" opacity="0.85"/>
+          </g>
+          <path d="M50 24 Q56 9 62 24 Z" fill="#F2B33D" stroke="#1A4E86" stroke-width="1.8" filter="url(#rough2)"/>
+          <path d="M68 20 q5 -4 10 0 q-5 4 -10 0 M78 20 q4 -3 8 0" fill="none" stroke="#1A4E86" stroke-width="1.8" stroke-linecap="round" filter="url(#rough2)"/></svg> <b style="font-size:12px;letter-spacing:0.04em">海洋 / 近海</b> <i class="disp" style="font-style:normal;font-size:8px;opacity:.6;letter-spacing:.1em">COASTAL</i></span>
+    </div>
+    <div style="margin:0 14px;position:relative;z-index:4">
+      <div class="card" style="height:150px;background:#F5E9C8;border-radius:6px 9px 5px 8px / 8px 5px 9px 6px">
+        <!-- 手绘地图底 -->
+        <svg width="100%" height="150" viewBox="0 0 362 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="362" height="150" fill="#F5E9C8"/>
+          <path d="M0 96 Q60 78 120 100 Q200 128 268 92 Q320 66 362 84 L362 150 L0 150 Z" fill="#A6D2EE" stroke="#1A1A1A" stroke-width="1.6" filter="url(#rough2)"/>
+          <path d="M-10 40 Q90 60 180 30 Q270 4 380 36" fill="none" stroke="#FFFFFF" stroke-width="7" filter="url(#rough2)"/>
+          <path d="M60 -10 Q80 70 40 160" fill="none" stroke="#FFFFFF" stroke-width="6" filter="url(#rough2)"/>
+          <path d="M250 -10 Q230 70 280 160" fill="none" stroke="#FFFFFF" stroke-width="5" filter="url(#rough2)"/>
+          <g stroke="#1A1A1A" stroke-width="1" opacity="0.5" fill="none" filter="url(#rough2)">
+            <rect x="120" y="42" width="34" height="24"/><rect x="196" y="56" width="42" height="18"/><rect x="300" y="40" width="30" height="30"/>
+          </g>
+        </svg>
+        <!-- 准星：四向刻度 + 中心鱼（替换原点）-->
+        <div style="position:absolute;left:50%;top:44%;transform:translate(-50%,-50%)">
+          <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true"><g stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" filter="url(#rough2)">
+            <path d="M30 4 L30 15 M30 45 L30 56 M4 30 L15 30 M45 30 L56 30"/></g>
+            <circle cx="30" cy="30" r="17" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.9" filter="url(#rough2)"/>
+          </svg>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"><svg viewBox="0 0 120 64" width="30"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+        </div>
+        <div class="tag" style="position:absolute;left:8px;top:8px;font-size:10px;padding:2px 8px">⌖ 拖动地图选点</div>
+        <div style="position:absolute;right:8px;bottom:6px;font-size:8.5px;color:#566A7C">Map data · OpenStreetMap · CARTO</div>
+      </div>
+      <!-- 236dp 信息条：分数摘要 + 徽标 + 窗口 -->
+      <div class="card" style="margin-top:-14px;height:78px;z-index:6;display:flex;align-items:center;padding:0 14px;gap:12px">
+        <div style="text-align:center;min-width:62px">
+          <div class="disp" style="font-size:38px;color:#E5503E;line-height:1">78</div>
+          <div class="bodyf" style="font-size:10px;color:#566A7C">/ 100</div>
+        </div>
+        <div style="width:1.6px;height:42px;background:#1A1A1A;opacity:0.35"></div>
+        <div style="flex:1">
+          <div class="disp" style="font-size:16px;color:#1A4E86">很适合 <span class="hl">●</span></div>
+          <div class="row" style="gap:5px;margin-top:5px">
+            <span class="tag" style="font-size:9px;padding:1px 6px;border-width:1.6px">实测</span>
+            <span class="tag" style="font-size:9px;padding:1px 6px;border-width:1.6px">模型</span>
+            <span class="bodyf mut" style="font-size:10px">近海潮汐模型 · 8 km 网格</span>
+          </div>
+        </div>
+        <div style="width:40px;height:40px;border:2px dashed #3E9E5A;border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)"><svg viewBox="0 0 120 64" width="28"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+      </div>
+    </div>
+    <div style="padding:10px 14px 0;position:relative;z-index:4">
+      <div class="row" style="gap:6px"><div style="width:56px;height:52px;border:2px solid #1A1A1A;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#FFFFFF;color:#1A1A1A;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:17px;line-height:1">12</b><span class="bodyf" style="font-size:10px;margin-top:3px;opacity:0.9">周四</span></div><div style="width:56px;height:52px;border:2px solid #1A1A1A;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#E5503E;color:#FFFFFF;box-shadow:2px 2px 0 #1A1A1A55;flex-shrink:0">
+          <b class="disp" style="font-size:17px;line-height:1">13</b><span class="bodyf" style="font-size:10px;margin-top:3px;opacity:0.9">周五</span></div><div style="width:56px;height:52px;border:2px solid #1A1A1A;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#FFFFFF;color:#1A1A1A;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:17px;line-height:1">14</b><span class="bodyf" style="font-size:10px;margin-top:3px;opacity:0.9">周六</span></div><div style="width:56px;height:52px;border:2px solid #1A1A1A;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#FFFFFF;color:#1A1A1A;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:17px;line-height:1">15</b><span class="bodyf" style="font-size:10px;margin-top:3px;opacity:0.9">周日</span></div><div style="width:56px;height:52px;border:2px solid #1A1A1A;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#FFFFFF;color:#1A1A1A;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:17px;line-height:1">16</b><span class="bodyf" style="font-size:10px;margin-top:3px;opacity:0.9">周一</span></div></div>
+      <div class="row" style="gap:4px;margin-top:10px"><div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:34px;background:#2E7D52;
+          border:1.6px solid #1A1A1A;border-radius:9px;opacity:0.72;
+          box-shadow:none;gap:1px'>
+          <span style='line-height:0;height:13px;white-space:nowrap;overflow:hidden'><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span></span>
+          <span style='font-size:8.5px;color:#FFFFFF;font-weight:600;white-space:nowrap'>爆护窗口</span></div><div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:34px;background:#6BA83E;
+          border:2.6px solid #F2B33D;border-radius:9px;opacity:1;
+          box-shadow:2px 2px 0 #1A1A1A;gap:1px'>
+          <span style='line-height:0;height:13px;white-space:nowrap;overflow:hidden'><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span></span>
+          <span style='font-size:8.5px;color:#FFFFFF;font-weight:700;white-space:nowrap'>很适合</span></div><div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:34px;background:#F2B33D;
+          border:1.6px solid #1A1A1A;border-radius:9px;opacity:0.72;
+          box-shadow:none;gap:1px'>
+          <span style='line-height:0;height:13px;white-space:nowrap;overflow:hidden'><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##FFFFFF" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span></span>
+          <span style='font-size:8.5px;color:#FFFFFF;font-weight:600;white-space:nowrap'>可以</span></div><div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:34px;background:#ED8B3C;
+          border:1.6px solid #1A1A1A;border-radius:9px;opacity:0.72;
+          box-shadow:none;gap:1px'>
+          <span style='line-height:0;height:13px;white-space:nowrap;overflow:hidden'><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##1A1A1A" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##1A1A1A" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span></span>
+          <span style='font-size:8.5px;color:#1A1A1A;font-weight:600;white-space:nowrap'>较差</span></div><div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:34px;background:#E5503E;
+          border:1.6px solid #1A1A1A;border-radius:9px;opacity:0.72;
+          box-shadow:none;gap:1px'>
+          <span style='line-height:0;height:13px;white-space:nowrap;overflow:hidden'><span style='display:inline-block;width:13px;height:13px;vertical-align:middle'><svg viewBox="0 0 120 64" width="13"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##1A1A1A" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></span></span>
+          <span style='font-size:8.5px;color:#1A1A1A;font-weight:600;white-space:nowrap'>别去</span></div></div>
+      <div class="bodyf mut" style="font-size:9.5px;margin-top:4px;text-align:center">五档 · 档位恒带文字 · 鱼多者优</div>
+    </div><div style="margin:10px 14px 0;border:2px solid #1A1A1A;border-radius:14px;background:#FFFFFF;display:flex;position:relative;z-index:4"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 4px;border-bottom:3px solid #E5503E;opacity:1">
+          <div style="height:22px"><svg viewBox="0 0 120 64" width="22"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##E5503E" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+          <span class="bodyf" style="font-size:10px;font-weight:700;color:#E5503E">钓鱼指数</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:22px"><svg viewBox="0 0 120 64" width="22"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#566A7C" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+          <span class="bodyf" style="font-size:10px;font-weight:400;color:#566A7C">潮流</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:22px"><svg viewBox="0 0 120 64" width="22"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#566A7C" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+          <span class="bodyf" style="font-size:10px;font-weight:400;color:#566A7C">天气</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:22px"><svg viewBox="0 0 120 64" width="22"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#566A7C" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+          <span class="bodyf" style="font-size:10px;font-weight:400;color:#566A7C">水质</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:22px"><svg viewBox="0 0 120 64" width="22"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="#566A7C" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+          <span class="bodyf" style="font-size:10px;font-weight:400;color:#566A7C">风浪</span>
+        </div></div>
+    <div class="card" style="margin:10px 14px 0;padding:8px 12px 6px;position:relative;z-index:4">
+      <div class="row" style="justify-content:space-between">
+        <span class="disp" style="font-size:13px;color:#1A4E86">潮高 · 潮流 <span class="bodyf mut" style="font-size:10px">今天</span></span>
+        <span class="tag" style="font-size:9px;padding:1px 7px">高潮 14:20 · 低潮 08:10</span>
+      </div>
+      <svg width="100%" height="100" viewBox="0 0 420 100" aria-hidden="true">
+        <path d="M10 70 L410 70" stroke="#1A1A1A" stroke-width="1.4" opacity="0.35" filter="url(#rough2)"/>
+        <polyline points="18,60 64,46 110,28 156,44 202,34 248,18 294,30 340,48 386,40" fill="none" stroke="#E5503E" stroke-width="2.8" stroke-linecap="round" filter="url(#rough2)"/>
+        <rect x="18" y="52" width="26" height="18" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="31" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">6</text><rect x="64" y="42" width="26" height="28" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="77" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">7</text><rect x="110" y="28" width="26" height="42" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="123" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">8</text><rect x="156" y="46" width="26" height="24" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="169" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">9</text><rect x="202" y="36" width="26" height="34" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="215" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">10</text><rect x="248" y="19" width="26" height="51" rx="5" fill="#E5503E" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="261" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">11</text><rect x="294" y="32" width="26" height="38" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="307" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">12</text><rect x="340" y="49" width="26" height="21" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="353" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">13</text><rect x="386" y="39" width="26" height="31" rx="5" fill="#3E9E5A" stroke="#1A1A1A" stroke-width="1.8" filter="url(#rough2)"/><text x="399" y="96" font-size="8" fill="#566A7C" text-anchor="middle" font-family="KaiTi">14</text>
+      </svg>
+      <div class="bodyf mut" style="font-size:9px;text-align:center">潮高 m · 流速 kn · 源更新 — · 本机拉取 09:41</div>
+    </div><div class="row" style="gap:8px;margin:9px 14px 0;position:relative;z-index:4"><div class="card" style="flex:1;height:66px;padding:7px 8px;background:#F0F6FB">
+          <div class="bodyf mut" style="font-size:10px">水温</div>
+          <div class="disp" style="font-size:20px;color:#1A4E86;margin-top:3px">19.6<span style="font-size:10px;color:#566A7C"> ℃</span></div>
+        </div><div class="card" style="flex:1;height:66px;padding:7px 8px;background:#F0F6FB">
+          <div class="bodyf mut" style="font-size:10px">溶解氧</div>
+          <div class="disp" style="font-size:20px;color:#1A4E86;margin-top:3px">7.2<span style="font-size:10px;color:#566A7C"> mg/L</span></div>
+        </div><div class="card" style="flex:1;height:66px;padding:7px 8px;background:#F0F6FB">
+          <div class="bodyf mut" style="font-size:10px">浊度</div>
+          <div class="disp" style="font-size:20px;color:#1A4E86;margin-top:3px">3.1<span style="font-size:10px;color:#566A7C"> NTU</span></div>
+        </div></div>
+    <div style="margin:9px 14px 0;position:relative;z-index:4;border:2.2px solid #1A1A1A;border-radius:14px;background:#1A4E86;padding:8px 12px;display:flex;align-items:center;gap:10px;box-shadow:2px 3px 0 #1A1A1A44">
+      <div class="row" style="gap:-2px"><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg><svg viewBox="0 0 120 64" width="24"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg><svg viewBox="0 0 120 64" width="20"><g><path d="M24 32 Q42 12 86 24 Q98 27 86 36 Q42 52 24 32 Z" fill="##F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/>
+               <path d="M24 32 L8 18 L12 32 L8 46 Z" fill="#F2B33D" stroke="#1A1A1A" stroke-width="3" stroke-linejoin="round" filter="url(#rough2)"/><path d="M44 19 L48 10 L54 18 M58 18 L63 9 L68 18 M72 20 L77 12 L81 21" fill="#F2B33D" stroke="#1A1A1A" stroke-width="2.2" stroke-linejoin="round" filter="url(#rough2)"/><circle cx="62" cy="30" r="2.6" fill="#1A1A1A" opacity="0.65"/><circle cx="72" cy="34" r="2.2" fill="#1A1A1A" opacity="0.65"/><circle cx="80" cy="28" r="2" fill="#1A1A1A" opacity="0.65"/><circle cx="38" cy="27" r="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="2.8"/><circle cx="38" cy="27" r="2.4" fill="#1A1A1A"/>
+               <path d="M28 33 Q33 38 39 33" fill="none" stroke="#1A1A1A" stroke-width="2.4" stroke-linecap="round"/></g></svg></div>
+      <div style="flex:1"><div class="disp" style="font-size:13px;color:#FFFFFF">全部收藏 Top10</div><div class="bodyf" style="font-size:9.5px;color:#FFFFFFAA">时段筛选 · 本周末窗口</div></div>
+      <span style="color:#F2B33D;font-size:18px">›</span>
+    </div>
+    <div class="bodyf" style="margin:8px 16px 0;font-size:9px;color:#566A7C;position:relative;z-index:4;text-align:center">ⓘ 免责声明 · 共 5 条 · 数据仅供参考，不构成渔获保证</div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:16px;background:linear-gradient(0deg,#CBDEEE,transparent);z-index:5"></div></div>
+<svg class="grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <rect width="100%" height="100%" filter="url(#papergrain)" opacity="1"/>
+</svg>
+</body></html>

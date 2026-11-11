@@ -1,0 +1,308 @@
+{
+  "schema": "tidespot.handdrawn.version/1.0",
+  "id": "A-vintage-outdoor",
+  "no": "A",
+  "name": "复古户外",
+  "name_en": "VINTAGE OUTDOOR",
+  "based_on": "工程 v1.16.0（versionCode 20）· 手绘视觉概念稿",
+  "source_images": [
+    "图5 微信图片_20261112105649_5_163.jpg（MOUNTAIN ADVENTURE）",
+    "图6 微信图片_20261112105650_6_163.jpg（ADVENTURE IS CALLING）"
+  ],
+  "visual_language": "墨绿做旧纸底 + 丝网颗粒噪点 + 藏蓝线描山峦/松林/日轮/星芒 + 芥末黄衬线大标题 + 套印错位阴影 + 双线边框",
+  "fish_motif": "版画套印鱼：限色块 + 错位描边 + 网点鳍条",
+  "best_for": "户外硬朗、品牌调性最鲜明；复古质感最强",
+  "tone": "做旧暖纸 · 藏蓝/墨绿双水体",
+  "offline": true,
+  "selfcontained": true,
+  "screens": [
+    {
+      "key": "detail-sea",
+      "label": "详情页 · 海洋/近海",
+      "png": "screens/detail-sea.png",
+      "html": "sources/detail-sea.html",
+      "sha256": "15740799473977599e2c057055b5b7793b1cd9837b09771bff2d76a995df4277"
+    },
+    {
+      "key": "detail-inland",
+      "label": "详情页 · 内陆/湖泊",
+      "png": "screens/detail-inland.png",
+      "html": "sources/detail-inland.html",
+      "sha256": "8cf7f7d8f0b3646ff256f5f44f0588b0b69c7db5a5007046f80aec51329c1e4d"
+    },
+    {
+      "key": "map-sea",
+      "label": "地图选点 · 海洋",
+      "png": "screens/map-sea.png",
+      "html": "sources/map-sea.html",
+      "sha256": "57e5bae8174d3578add911b5895356841ffc0fb9492df281e768f1bb80fe2d05"
+    },
+    {
+      "key": "map-inland",
+      "label": "地图选点 · 内陆",
+      "png": "screens/map-inland.png",
+      "html": "sources/map-inland.html",
+      "sha256": "8e15d5895d6028a3386fff5c2d7fb3eb21911f170a833071480debd5a58be985"
+    },
+    {
+      "key": "favorites",
+      "label": "收藏页",
+      "png": "screens/favorites.png",
+      "html": "sources/favorites.html",
+      "sha256": "9840ba944969daa0fb44e97a84bbbc6ddb5e48fe776f1e964af9dc958aa99949"
+    },
+    {
+      "key": "settings",
+      "label": "设置页（含外观·皮肤入口，OPT-A-01/02/09 改版）",
+      "png": "screens/settings.png",
+      "html": "sources/settings.html",
+      "sha256": "16046ead5381d779fd355456fd24a199faee30ae3b849838c7b2e68ca0d271b1",
+      "revised": "2026-11-12：删「用例·物种·权重」「API Key」两版块，新增「外观·皮肤」入口（外观选择页本轮未做）",
+      "html_sha256": "641edc9f8980d819d7526b266a9a74cd4a68df42288d75455115612c8100606f"
+    },
+    {
+      "key": "dark-detail",
+      "label": "详情页 · 深色",
+      "png": "screens/dark-detail.png",
+      "html": "sources/dark-detail.html",
+      "sha256": "da004e249fcd75e1d07f7686438904ed3b5e9f54f7918ffacac84a2f732e21d7"
+    }
+  ],
+  "frozen_contract": {
+    "tab_order_sea": [
+      "钓鱼指数",
+      "潮流",
+      "天气",
+      "水质",
+      "风浪"
+    ],
+    "tab_order_inland": [
+      "钓鱼指数",
+      "水位（无潮汐）",
+      "天气",
+      "水质",
+      "湖面风与水温"
+    ],
+    "disclaimer_items": 5,
+    "band_labels": [
+      "爆护窗口",
+      "很适合",
+      "可以",
+      "较差",
+      "别去"
+    ],
+    "badges": [
+      "实测",
+      "卫星",
+      "模型",
+      "估算",
+      "未校正",
+      "低置信"
+    ],
+    "day_selector": "52dp 两行",
+    "water_quality": "1 行 × 3 卡",
+    "note": "以上工程事实四版完全一致；手绘稿为视觉探索，落地时冻结语义色须回归 ScoreBands.kt / ConfidenceBadge.kt，档位恒带文字（N-7）"
+  },
+  "water_differentiators": [
+    "顶部鱼形徽标（浪+贝+海鸟 ↔ 山+日+芦苇）",
+    "主色冷暖/蓝绿",
+    "鱼种（海鱼↔淡水鱼）",
+    "第二 Tab（潮流↔水位）",
+    "图表（潮高·潮流↔水位·无潮汐）",
+    "地点/坐标"
+  ],
+  "example_data_notice": "分数/时刻/点位为版式示意，非业务数据；源更新时间显示 —，未硬编码",
+  "full_ui": {
+    "screen_count": 28,
+    "added_count": 21,
+    "base_count": 7,
+    "added_screens": [
+      {
+        "key": "detail-tab-tide-sea",
+        "label": "详情·潮流 Tab（海洋）",
+        "png": "screens_full/detail-tab-tide-sea.png",
+        "html": "sources_full/detail-tab-tide-sea.html",
+        "sha256_png": "6c8f71c1327fa151a89c609f08ea0b91436d1b1ff0632b34591667ac5ae826ad"
+      },
+      {
+        "key": "detail-tab-tide-inland",
+        "label": "详情·水位 Tab（内陆无潮汐）",
+        "png": "screens_full/detail-tab-tide-inland.png",
+        "html": "sources_full/detail-tab-tide-inland.html",
+        "sha256_png": "2ba0668a5d6e08663163132d851431bec2ecf9ad672b3c4b3b4b7a5b30fd2f93"
+      },
+      {
+        "key": "detail-tab-weather",
+        "label": "详情·天气 Tab",
+        "png": "screens_full/detail-tab-weather.png",
+        "html": "sources_full/detail-tab-weather.html",
+        "sha256_png": "9d6007fdd0a62d28d79df296f5fad4e4dc03e8d3e964ed51dec65a13bbec851e"
+      },
+      {
+        "key": "detail-tab-water",
+        "label": "详情·水质 Tab（1×3）",
+        "png": "screens_full/detail-tab-water.png",
+        "html": "sources_full/detail-tab-water.html",
+        "sha256_png": "a53ee04902b188891fdfa83a45adcae82650293fbcbd5ae113f6544be249c7ca"
+      },
+      {
+        "key": "detail-tab-wave-sea",
+        "label": "详情·风浪 Tab（海洋）",
+        "png": "screens_full/detail-tab-wave-sea.png",
+        "html": "sources_full/detail-tab-wave-sea.html",
+        "sha256_png": "f0329b6da5af0f9bc895958e83bed6ecc8c716eed9ce148b6096cfb48eb024e5"
+      },
+      {
+        "key": "detail-tab-wave-inland",
+        "label": "详情·湖面风与水温 Tab（内陆）",
+        "png": "screens_full/detail-tab-wave-inland.png",
+        "html": "sources_full/detail-tab-wave-inland.html",
+        "sha256_png": "e6ac18a22829f479f1b501bb17eb133e82a72a3f3f2cdfa455c833ea5432c7fe"
+      },
+      {
+        "key": "detail-breakdown",
+        "label": "因子分解展开态",
+        "png": "screens_full/detail-breakdown.png",
+        "html": "sources_full/detail-breakdown.html",
+        "sha256_png": "786a2b0994721d4610b8e03e438d61a8df1a51004537f6f6d68a1d4cdfc62a05"
+      },
+      {
+        "key": "ov01-top10",
+        "label": "OV01 Top10 时段筛选",
+        "png": "screens_full/ov01-top10.png",
+        "html": "sources_full/ov01-top10.html",
+        "sha256_png": "48a38f740d4356377a6f4941440b7a037f1fabc1a37f7ae6017f21287d3df1eb"
+      },
+      {
+        "key": "ov02-disclaimer",
+        "label": "OV02 免责声明 5 条",
+        "png": "screens_full/ov02-disclaimer.png",
+        "html": "sources_full/ov02-disclaimer.html",
+        "sha256_png": "49b6c814cdfd479d66d79b6940b90825c2245039f9fc3b1a8a1e025f6ea57952"
+      },
+      {
+        "key": "ov03-confirm-favorite",
+        "label": "OV03 确认收藏对话框",
+        "png": "screens_full/ov03-confirm-favorite.png",
+        "html": "sources_full/ov03-confirm-favorite.html",
+        "sha256_png": "c5341d0a72669777f1ab10c142d399ce0a1ec2f69d6cb561fd15421203995a0e"
+      },
+      {
+        "key": "ov04-water-entry",
+        "label": "OV04 水质实测录入",
+        "png": "screens_full/ov04-water-entry.png",
+        "html": "sources_full/ov04-water-entry.html",
+        "sha256_png": "580e5f655cb7bbb90419d658967cb2afe5dd5f666bda40857641fedf1e3b5ab1"
+      },
+      {
+        "key": "ov05-star-bubble",
+        "label": "OV05 星标气泡卡",
+        "png": "screens_full/ov05-star-bubble.png",
+        "html": "sources_full/ov05-star-bubble.html",
+        "sha256_png": "832a1054ae74b60adbc28fec41b17cf61b68756f32d7ad6b6edb9dfa8db94148"
+      },
+      {
+        "key": "ov06-delete-confirm",
+        "label": "OV06 删除二次确认",
+        "png": "screens_full/ov06-delete-confirm.png",
+        "html": "sources_full/ov06-delete-confirm.html",
+        "sha256_png": "5b57dcffa1e7d4f0017a996d2aee80e800915f44081661d7fc543d7c98338e8d"
+      },
+      {
+        "key": "state-offline",
+        "label": "状态·离线",
+        "png": "screens_full/state-offline.png",
+        "html": "sources_full/state-offline.html",
+        "sha256_png": "8069e7ff6bfda3a019683620b1d3e99e271261fd3e8dfc189c3fddf931d2c79a"
+      },
+      {
+        "key": "state-stale",
+        "label": "状态·陈旧",
+        "png": "screens_full/state-stale.png",
+        "html": "sources_full/state-stale.html",
+        "sha256_png": "14bbfbb0b3316db4b22d01b852e7c2fece17bfc388552eae251f4330772f3a12"
+      },
+      {
+        "key": "state-unusable-48h",
+        "label": "状态·48h 不可用",
+        "png": "screens_full/state-unusable-48h.png",
+        "html": "sources_full/state-unusable-48h.html",
+        "sha256_png": "0e2d4c8f4434280d0eca0429d227598dae13acbab9cc110c2cf655aeb5d6c4e2"
+      },
+      {
+        "key": "state-degraded",
+        "label": "状态·分维降级",
+        "png": "screens_full/state-degraded.png",
+        "html": "sources_full/state-degraded.html",
+        "sha256_png": "e7801aed4dcf0c8968c5f2988f81a23bbff8d3f571740548e9607abc73c3ea9e"
+      },
+      {
+        "key": "favorites-empty",
+        "label": "收藏空态",
+        "png": "screens_full/favorites-empty.png",
+        "html": "sources_full/favorites-empty.html",
+        "sha256_png": "501620d8bc82cfc99b23cdb0402dade2cf0b50efc20aa97f65146e05dad960f9"
+      },
+      {
+        "key": "favorites-multiselect",
+        "label": "收藏多选批量",
+        "png": "screens_full/favorites-multiselect.png",
+        "html": "sources_full/favorites-multiselect.html",
+        "sha256_png": "02222f3948a131cbdec957502f5181426bccaecca47c29f531dc81c23a3a8169"
+      },
+      {
+        "key": "dark-map",
+        "label": "深色·地图选点",
+        "png": "screens_full/dark-map.png",
+        "html": "sources_full/dark-map.html",
+        "sha256_png": "ac01f388f45e1e1a78e1abdc536b87bb72d328be75ff5ed9ad05fcaa62ace59c"
+      },
+      {
+        "key": "dark-favorites",
+        "label": "深色·收藏列表",
+        "png": "screens_full/dark-favorites.png",
+        "html": "sources_full/dark-favorites.html",
+        "sha256_png": "befe92fd8f5bb530fc7d904cb08d29bf8f777a12772e0921f1a56253962ee613"
+      }
+    ],
+    "index": "index-full.html",
+    "feature_gaps": "feature-gaps.json",
+    "requirements": "APP功能优化需求.md",
+    "generator": [
+      "generator/engine_full.py",
+      "generator/gen_full_index.py"
+    ],
+    "baseline": "工程 v1.16.0（versionCode 20）",
+    "note": "完整 UI = 原 7 屏 + 21 张补齐屏；冻结契约与 base 7 屏定义不变。新增屏均为手绘 A 同一视觉语言的自包含离线稿。设置页已按 OPT-A-01/02/09 改版（属既有屏内容更新，屏数仍 28）。"
+  },
+  "skin_system": {
+    "requirement_ref": "OPT-A-09（换皮肤），明暗独立轴见 OPT-A-03",
+    "spec": "SKIN-DESIGN-SPEC.md",
+    "definition": "皮肤 = 一组可替换的视觉 token（色板/字体/形状/纸张质感/鱼形装饰），结构/文案/交互/冻结契约全部共用",
+    "three_orthogonal_axes": ["皮肤 Skin（用户偏好）", "水体 Water（点位数据决定，不可切）", "明暗 Mode（跟随系统/浅/深）"],
+    "built_in_skins": [
+      {
+        "id": "a-vintage",
+        "name": "手绘 A · 复古户外",
+        "name_en": "VINTAGE OUTDOOR",
+        "status": "使用中 / 首版唯一内置",
+        "source_images": ["图5 MOUNTAIN ADVENTURE", "图6 ADVENTURE IS CALLING"],
+        "palettes": ["sea", "inland"],
+        "screens": 28
+      }
+    ],
+    "skins_total": 1,
+    "placeholder_slots": "设置页「外观·皮肤」入口内「更多皮肤 · 敬请期待」虚线占位；不可点击、不计为可选皮肤",
+    "excluded": "B 拟人鱼绅士 / C 水彩几何鱼 / D 手绘鱼种图鉴是独立风格探索稿，不作为皮肤、不并入、本轮不并入",
+    "entry_screen": "screens/settings.png（外观·皮肤入口卡，含五色色板 + 当前皮肤 + 敬请期待占位）",
+    "selection_page": "本轮未做（用户选「只做需求 + 入口」，对应 OPT-A-09 验收第 3 条）",
+    "mutable_tokens": ["色板(sea/inland 两套)", "字体", "形状/圆角", "纸张质感", "鱼形装饰", "深色 token"],
+    "frozen_not_in_skin": [
+      "Tab 渲染序", "免责 5 条", "五档/六徽标色(ScoreBands.kt / ConfidenceBadge.kt)",
+      "DaySelector 52dp", "水质 1×3", "无底部 NavigationBar", "地图优先", "准星唯一真源",
+      "双水体六重区分", "全部文案(TideSpotStrings.kt 单源)"
+    ],
+    "new_skin_checklist": "SKIN-DESIGN-SPEC.md §5（A1–A10，业务 Composable 零改动）",
+    "ui_scope_this_round": "仅设置页加「外观·皮肤」入口；不新增屏、不做换肤演示、不并入 B/C/D"
+  }
+}

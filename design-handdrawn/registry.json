@@ -1,0 +1,96 @@
+{
+  "schema": "tidespot.handdrawn.registry/1.0",
+  "generated": "2026-11-12",
+  "baseline": "工程 v1.16.0（versionCode 20）",
+  "status": "UNDECIDED",
+  "active": null,
+  "selection": "用户尚未择优；四版并存、互不干扰",
+  "note": "手绘风格概念稿，4 版各自独立目录、自包含、无交叉引用。择优后改 active 指针即可，落选版不删。",
+  "versions": [
+    {
+      "id": "A-vintage-outdoor",
+      "style_key": "a-vintage",
+      "no": "A",
+      "name": "复古户外",
+      "name_en": "VINTAGE OUTDOOR",
+      "status": "candidate",
+      "dir": "A-vintage-outdoor",
+      "preview": "A-vintage-outdoor/preview.html",
+      "spec": "A-vintage-outdoor/spec.json",
+      "board_detail_sea": "A-vintage-outdoor/screens/detail-sea.png",
+      "board_detail_inland": "A-vintage-outdoor/screens/detail-inland.png",
+      "source_images": [
+        "图5 微信图片_20261112105649_5_163.jpg（MOUNTAIN ADVENTURE）",
+        "图6 微信图片_20261112105650_6_163.jpg（ADVENTURE IS CALLING）"
+      ],
+      "tone": "做旧暖纸 · 藏蓝/墨绿双水体",
+      "best_for": "户外硬朗、品牌调性最鲜明；复古质感最强",
+      "screens": 7,
+      "sha256_detail_sea": "15740799473977599e2c057055b5b7793b1cd9837b09771bff2d76a995df4277",
+      "sha256_detail_inland": "8cf7f7d8f0b3646ff256f5f44f0588b0b69c7db5a5007046f80aec51329c1e4d"
+    },
+    {
+      "id": "B-gentleman-fish",
+      "style_key": "b-gentleman",
+      "no": "B",
+      "name": "拟人鱼绅士",
+      "name_en": "GENTLEMAN FISH",
+      "status": "candidate",
+      "dir": "B-gentleman-fish",
+      "preview": "B-gentleman-fish/preview.html",
+      "spec": "B-gentleman-fish/spec.json",
+      "board_detail_sea": "B-gentleman-fish/screens/detail-sea.png",
+      "board_detail_inland": "B-gentleman-fish/screens/detail-inland.png",
+      "source_images": [
+        "图4 微信图片_20261112105648_4_163.jpg（三条穿西装的鱼）"
+      ],
+      "tone": "明快纯色 · 亮蓝/湖绿双水体",
+      "best_for": "亲和可爱、记忆点最强；拟人鱼有 IP 延展潜力",
+      "screens": 7,
+      "sha256_detail_sea": "086114b058d8bf2505c609fffe45f9759ad37302d32b0cf66198596c16c52513",
+      "sha256_detail_inland": "087ded051fe98ad37beeb3f749c11ae8f4893b102cb4f6be7ad070a177c3e017"
+    },
+    {
+      "id": "C-watercolor-geometry",
+      "style_key": "c-watercolor",
+      "no": "C",
+      "name": "水彩几何鱼",
+      "name_en": "WATERCOLOR GEOMETRY",
+      "status": "candidate",
+      "dir": "C-watercolor-geometry",
+      "preview": "C-watercolor-geometry/preview.html",
+      "spec": "C-watercolor-geometry/spec.json",
+      "board_detail_sea": "C-watercolor-geometry/screens/detail-sea.png",
+      "board_detail_inland": "C-watercolor-geometry/screens/detail-inland.png",
+      "source_images": [
+        "图8 微信图片_20261112105652_8_163.jpg（三条抽象撞色鱼）"
+      ],
+      "tone": "水彩通透 · 亮蓝/米白双水体",
+      "best_for": "清爽高级、装饰克制；最像现代插画 App，留白呼吸感最好",
+      "screens": 7,
+      "sha256_detail_sea": "67d923ac5e25c3d38dd5e523428ac4395ee9055685e9c594077f53cc8fe9621b",
+      "sha256_detail_inland": "cb2f07c334dbe3838c7d7cc668e40af191b4624c344be6e45c59f86310068aea"
+    },
+    {
+      "id": "D-field-guide",
+      "style_key": "d-guidebook",
+      "no": "D",
+      "name": "手绘鱼种图鉴",
+      "name_en": "FIELD GUIDE",
+      "status": "candidate",
+      "dir": "D-field-guide",
+      "preview": "D-field-guide/preview.html",
+      "spec": "D-field-guide/spec.json",
+      "board_detail_sea": "D-field-guide/screens/detail-sea.png",
+      "board_detail_inland": "D-field-guide/screens/detail-inland.png",
+      "source_images": [
+        "图7 微信图片_20261112105651_7_163.jpg（路亚鱼种图鉴长图）"
+      ],
+      "tone": "手账拼贴 · 淡蓝/淡绿双水体",
+      "best_for": "信息感强、趣味足；鱼种图鉴与「钓什么鱼」场景天然契合",
+      "screens": 7,
+      "sha256_detail_sea": "af1366d52f19291e0afbab43e4cd297b33f65da9fe21e5a6af31cb08f59cc4bf",
+      "sha256_detail_inland": "ebb14686dee4bb486c067c0b2d6372bfcf9ca33c866bba4a42258bda5d244b18"
+    }
+  ]
+}

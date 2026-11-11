@@ -124,9 +124,11 @@ class ComposeSmokeRobolectricTest {
         compose.setContent {
             DaySelector(chips = chips, selectedDay = 0, onDaySelected = { clicked = it })
         }
-        compose.onNodeWithText(chips[0].chipLabel).assertIsDisplayed()
-        compose.onNodeWithText(chips[1].chipLabel).assertExists()
-        compose.onNodeWithText(chips[1].chipLabel).performClick()
+        // OPT-V12-04：chip 改两行（上行日期/今天、下行星期）→ 断言两行文本，点击走合并语义节点
+        compose.onNodeWithText(chips[0].topLabel).assertIsDisplayed()
+        compose.onNodeWithText(chips[0].weekdayLabel).assertExists()
+        compose.onNodeWithText(chips[1].topLabel).assertExists()
+        compose.onNodeWithContentDescription(chips[1].contentDescription).performClick()
         compose.runOnIdle { check(clicked == 1) { "点击 +1 后回调应为 1，实际 $clicked" } }
         compose.onNodeWithContentDescription(chips[0].contentDescription).assertExists()
         // 口径说明：LazyRow 视口裁剪下 Robolectric 触摸注入不驱动滚动，远端 chip（+6 等）

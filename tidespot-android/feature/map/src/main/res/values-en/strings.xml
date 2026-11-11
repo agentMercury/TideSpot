@@ -8,4 +8,8 @@
     <string name="ts_map_search_hint">Search a place (e.g. Wanlu Lake)</string>
     <string name="ts_map_attribution">Map data: OpenStreetMap contributors · CARTO</string>
     <string name="ts_map_source_line">Source update %1$s · Device fetch %2$s</string>
+    <!-- OPT-V12-01: favorite star bubble -->
+    <string name="ts_map_star_detail">View details</string>
+    <string name="ts_map_star_close">Close</string>
+    <string name="ts_map_star_no_summary">No window summary yet</string>
 </resources>

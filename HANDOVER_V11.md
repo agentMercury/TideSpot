@@ -107,12 +107,12 @@
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot'
 $env:GRADLE_OPTS='-Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=31181 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=31181 -Djavax.net.ssl.trustStoreType=WINDOWS-ROOT'
-subst T: "D:\workspace\天气鱼情\tidespot-android"   # 重启后失效，先查 subst
-D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease --console=plain -p 'T:\'
+subst T: "D:\workspace\weatherfishcheck\tidespot-android"   # 重启后失效，先查 subst
+D:\workspace\weatherfishcheck\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease --console=plain -p 'T:\'
 ```
 - **必须用 `-p T:\`**（物理中文路径 D:\ 下 test worker 类加载不可靠，R-09）
 - **代理**：系统代理 `127.0.0.1:31181`（user 注册表）；Gradle 不继承 → `GRADLE_OPTS` 注入；MITM 证书靠 `trustStoreType=WINDOWS-ROOT`
-- 一键验证：`powershell -ExecutionPolicy Bypass -File "D:\workspace\天气鱼情\tidespot-android\verify.ps1"`（自动注入代理 + subst 自愈 + 红线扫描 + 八模块 + assembleRelease）
+- 一键验证：`powershell -ExecutionPolicy Bypass -File "D:\workspace\weatherfishcheck\tidespot-android\verify.ps1"`（自动注入代理 + subst 自愈 + 红线扫描 + 八模块 + assembleRelease）
 - 新依赖：**先确认 maven 可达**（本机经代理可用）；Robolectric 运行期自下载 android-all 走独立 JVM → `core/ui/build.gradle.kts` 已透传代理属性
 
 ### 4.2 APK 产物

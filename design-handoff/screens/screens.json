@@ -1,174 +1,180 @@
 {
   "schema": "tidespot.screens/1.0",
   "meta": {
-    "version": "2.0.0",
-    "status": "用户已确认（2026-11-09）",
+    "version": "3.0.0",
+    "baseline": "工程 v1.16.0（versionCode 20）",
+    "status": "用户已确认 v3 美化方向（2026-11-11）",
     "offline": true,
     "viewport": { "width_dp": 390, "height_dp": 844, "density": "1x" },
     "box_format": "layers[].box = \"x,y,width,height\"，单位 dp，原点为屏幕左上角（0,0）",
-    "how_to_use": "按 screens[].layers 顺序自底向上组装；c 字段指向 components/components.json 的组件 id；copy_keys 指向 copy/copy.json 的 keys。",
+    "how_to_use": "按 screens[].layers 顺序自底向上组装；c 字段指向 components/components.json 的组件 id；copy_keys 指向 copy/copy.json 的键。v3 视觉以 assets/v3/ 的 2x PNG 为准。",
     "visual_coverage": {
-      "pixel_ready": [
-        "S01 → assets/screen-01-map.svg / .png",
-        "S02 → assets/screen-02-score.svg / .png",
-        "S08 → assets/screen-03-settings.svg / .png",
-        "DV01 → assets/screen-04-dark-score.svg / .png"
+      "pixel_ready_2x": [
+        "S01 → assets/v3/screen-01-map.png（780×1688）",
+        "S02 → assets/v3/screen-02-score.png（780×1688）",
+        "S06 → assets/v3/screen-06-water.png（780×1688）",
+        "S08 → assets/v3/screen-08-favorites.png（780×1688）",
+        "S09 → assets/v3/screen-09-settings.png（780×1688）",
+        "DV01 → assets/v3/screen-dv01-dark-score.png（780×1688）"
       ],
-      "spec_derived": "S03–S08 复用 S02 的详情屏骨架（状态栏 / 标题 / DaySelector / 五维 Tab / 图表卡 / 来源与免责入口），仅替换 layers 中标注的内容区。按本文件 + components.json + tokens 即可无歧义还原，不需要联网查画布。",
+      "spec_derived": "S03 / S04 / S05 / S07 无独立像素精稿，复用 S02 详情屏骨架（状态栏 / 标题 / 两行 DaySelector 52dp / 五维 Tab / 图表卡 / 来源与免责入口），仅替换内容区；另有 assets/derived/ 下 4 张 v3 风格 SVG 结构稿表达层级与占位。按本文件 + components.json + tokens 即可无歧义还原，不需要联网查画布。",
       "derived": [
         "S03 → assets/derived/S03-factor-breakdown.svg",
         "S04 → assets/derived/S04-inland-wave.svg",
         "S05 → assets/derived/S05-weather.svg",
-        "S06 → assets/derived/S06-water-quality.svg",
-        "S07 → assets/derived/S07-tide.svg",
-        "S08 → assets/derived/S08-favorites.svg"
+        "S07 → assets/derived/S07-tide.svg"
       ],
-      "derived_note": "derived/ 下 6 张是按规格推导的离线 SVG 结构稿，表达层级与占位，不是逐屏确认过的像素精稿；配色、圆角、字阶与组件细节一律以 S02 基准屏 + tokens 为准，冲突时以 token / 组件规范为准。",
-      "board": "assets/board-v2.png 为 v2 整板效果图（1700 × 3025）",
-      "baseline": "assets/visual-baseline.svg（主题/五档/六徽标/字阶规范）、assets/dark-adaptation.svg（深色与边缘适配）、assets/icon-system.svg（图标系统）"
+      "derived_note": "derived/ 下 4 张按 v3 视觉语言（白卡 + 薄荷点缀 + 字阶）重画，表达层级与占位，非逐屏确认的像素精稿；配色/圆角/字阶以 tokens + 上面 6 张基准屏为准。S06/S08 已有 v3 像素基准，故不再出 derived。",
+      "board": "assets/board-v3.png 为 v3 整板效果图（1400×5240，用户已确认）；assets/board-v3.html 为内嵌底图的自包含离线整板（双击可看，无需联网）"
     },
     "navigation": {
-      "model": "地图优先，无通用底部 Tab Bar",
-      "flow": "S01 地图选点 → 准星落点 → [确定] → S02 详情（五 Tab 内切 S04/S05/S06/S07）→ 点小时 → S03 因子分解；S01 收藏入口 → S08 收藏列表；S01 设置入口 → S09 设置；S02 Top10 入口 → OV01；S02 免责入口 → OV02；S01 [收藏] → OV03",
-      "source_of_truth": "F-1.3：准星是唯一选点真源，所有下游屏的坐标都来自 S01 的准星落点"
+      "model": "地图优先，无通用底部 Tab Bar（工程 v1.16.0 已移除 MainActivity NavigationBar；CONFLICT-01 已关闭）",
+      "host": "MainActivity.AppRoot = Scaffold(contentWindowInsets=WindowInsets(0,0,0,0)) + when(page)；顶层页 MAP / FAVORITES / DETAIL / SETTINGS，UX-21 返回手势在位",
+      "flow": "S01 地图选点 → 准星落点 → [确定] → S02 详情（五 Tab 内切 S04/S05/S06/S07）→ 点小时 → S03 因子分解；S01 星标 → 气泡卡 → [查看详情]（先收藏再进详情）；S01 顶部收藏入口 → S08 收藏列表 → 点行进详情；S01 顶部设置入口 → S09 设置；S02 / S08 Top10 入口 → OV01；任意屏免责入口 → OV02；S01 [收藏] → OV03；S06 [录入实测] → OV04",
+      "source_of_truth": "F-1.3：准星是唯一选点真源；点星标 / 搜索结果 / 地图中心点击均不绕过 C01"
     }
   },
 
   "screens": [
     {
-      "id": "S01", "name": "地图选点 MapScreen", "route": "home", "scene": "sea|inland|land", "theme": "light",
-      "visual_ref": "assets/screen-01-map.svg",
+      "id": "S01", "name": "地图选点 MapScreen", "route": "MAP", "scene": "sea|inland|land", "theme": "light",
+      "visual_ref": "assets/v3/screen-01-map.png",
       "layers": [
-        { "c": "C21", "box": "16,818,358,12", "note": "底图署名置于最底，不遮挡信息条", "copy_keys": ["attribution.map"] },
-        { "c": "MAP_BASE", "box": "0,0,390,844", "note": "矢量水域底图（无文字、无 UI 控件）；深色下换暗色底图" },
-        { "c": "C02", "box": "12,68,366,46", "note": "顶部工具浮层：定位 / 搜索 / 收藏 / 设置；起点 y ≥ 68" },
-        { "c": "C01", "box": "163,390,64,64", "note": "准星居中；唯一选点真源" },
-        { "c": "C03", "box": "12,600,366,200", "note": "准星信息条 236×48 浮于其上方；底部预留 ≥24 dp" },
-        { "c": "C19", "box": "12,544,366,48", "note": "Top10 入口（本点 / 全部收藏）" },
-        { "c": "C22", "box": "16,812,358,13", "note": "来源时间行（与署名不重叠，按实际可用高度择一）" }
+        { "c": "MAP_BASE", "box": "0,0,390,844", "note": "CARTO Voyager 彩色底图（v1.16.0 默认），MapLibre；深色屏底图压暗" },
+        { "c": "C23", "box": "0,0,390,844", "note": "星标层叠加：收藏点星标 + 星名；点星标弹气泡卡，不动准星" },
+        { "c": "C02", "box": "16,68,358,46", "note": "顶部浮层：搜索 250 + 定位实心 + 收藏 + 设置；起点 y ≥ 68" },
+        { "c": "C01", "box": "137,364,116,116", "note": "准星居中；四向刻度 + 细环 + 薄荷点；唯一选点真源" },
+        { "c": "C03", "box": "77,560,236,48", "note": "236 dp 浮条（v1.16.0 实测）+ 独立操作面板；底部预留 ≥24 dp" },
+        { "c": "C19", "box": "16,636,358,52", "note": "全部收藏 Top10 深蓝横幅 #0D47A1，浮于信息条上方" },
+        { "c": "C21", "box": "16,818,358,12", "note": "底部署名，不遮挡信息条", "copy_keys": ["attribution.map"] }
       ],
-      "states": ["idle", "dragging", "settled", "reverse_geo_off", "land_point", "offline"],
-      "overlays": ["OV03 确认收藏对话框"],
-      "annotations": ["状态栏占位 58 dp（表现值）", "手势条预留 ≥24 dp", "浮层卡片 16 dp 圆角", "信息条 366 dp 宽 = 屏宽 − 2×12"],
-      "acceptance": ["准星落点后信息条非空", "对话框不遮挡信息条", "陆地点提示可见", "地图 60 fps / 拖动不掉帧"]
+      "states": ["idle", "dragging", "preview", "settled", "reverse_geo_off", "land_point", "offline", "star_bubble"],
+      "overlays": ["OV03 确认收藏对话框", "OV05 星标气泡卡"],
+      "annotations": ["状态栏占位 58 dp（表现值，实现走 WindowInsets）", "手势条预留 ≥24 dp", "浮层/信息条 16 dp 圆角", "地图 intent 全屏铺入系统栏区（P2 视觉遗留随下次 UI 批次）"],
+      "acceptance": ["准星落点后信息条非空", "点星标不动准星", "对话框不遮挡信息条", "陆地点提示可见", "地图拖动 60 fps"]
     },
     {
-      "id": "S02", "name": "详情 · 钓鱼指数 Tab", "route": "detail/score", "scene": "inland", "theme": "light",
-      "visual_ref": "assets/screen-02-score.svg",
+      "id": "S02", "name": "详情 · 钓鱼指数 Tab", "route": "DETAIL/score", "scene": "inland|sea|land", "theme": "light",
+      "visual_ref": "assets/v3/screen-02-score.png",
       "layers": [
-        { "c": "TOPBAR", "box": "12,58,366,52", "note": "返回 22×22 / 点位名称 / 副标题 / 收藏状态", "copy_keys": ["design_proposed.favorite_dialog_title"] },
-        { "c": "C07", "box": "16,116,358,36", "note": "DaySelector：今天 11-02 … +5（7 天档）" },
-        { "c": "C22", "box": "16,152,358,13", "note": "源更新 06:00 UTC · 本机拉取 09:38 · 模型 ICON / ECMWF", "copy_keys": ["attribution.model"] },
-        { "c": "C08", "box": "16,172,358,40", "note": "五维 Tab，内陆文案；钓鱼指数选中", "copy_keys": ["tab.inland"] },
-        { "c": "C10", "box": "12,220,366,152", "note": "今日指数主卡：分数 + 档位色块 + 最佳窗口 + 置信徽标" },
-        { "c": "C09", "box": "12,384,366,210", "note": "逐小时图表卡；≥80 段叠窗口横条" },
-        { "c": "C06", "box": "12,784,366,56", "note": "来源与免责常驻入口条；底部预留 ≥24 dp", "copy_keys": ["TideSpotStrings.DISCLAIMER_ENTRY"] },
-        { "c": "C17", "box": "12,58,366,38", "note": "离线/陈旧时插入在 DaySelector 上方， pushes 内容下移" }
+        { "c": "TOPBAR", "box": "12,58,366,52", "note": "返回‹ + 点位名称 + 6 位坐标 + 收藏态" },
+        { "c": "C07", "box": "16,112,358,52", "note": "DaySelector 两行 52dp（今天/11-12 + 周三），圆角 18，间距 6" },
+        { "c": "C22", "box": "16,170,358,13", "note": "源更新 — · 本机拉取 15:48（未透出显示「—」）", "copy_keys": ["attribution.model"] },
+        { "c": "C08", "box": "16,198,358,40", "note": "五维 Tab 渲染序：钓鱼指数 | 潮流(水位) | 天气 | 水质 | 风浪；钓鱼指数选中", "copy_keys": ["tab.inland"] },
+        { "c": "C10", "box": "12,252,366,152", "note": "v3 深蓝渐变主卡 + 柔光 + 56sp 分数 + 档位胶囊 + 五段色带选中高亮" },
+        { "c": "C09", "box": "16,418,358,214", "note": "逐小时图表卡；≥80 段薄荷窗格标记；可切等价数值表" },
+        { "c": "C17", "box": "12,58,366,38", "note": "离线/陈旧/48h 不可用时插入在 DaySelector 上方，pushes 内容下移" },
+        { "c": "C06", "box": "16,784,358,40", "note": "免责常驻入口条（surfaceVariant 底 + ›）", "copy_keys": ["TideSpotStrings.DISCLAIMER_ENTRY"] }
       ],
-      "states": ["normal", "vetoed", "degraded", "offline", "stale", "table_mode"],
+      "states": ["normal", "vetoed", "degraded", "offline", "stale", "unusable_48h", "table_mode"],
       "overlays": ["OV01 Top10 BottomSheet", "OV02 免责 BottomSheet"],
       "annotations": ["内容区 358 dp（左右各 16）", "主卡 366 dp（左右各 12）", "卡片间距 12 dp"],
-      "acceptance": ["五档色为冻结值", "档位有文字", "图表可切等价数值表", "免责入口常驻可达"]
+      "acceptance": ["五档色为冻结值", "档位有文字", "Tab 序 = titlesInTabOrder 恒 5 项", "图表可切等价数值表", "免责入口常驻可达"]
     },
     {
-      "id": "S03", "name": "详情 · 因子分解展开", "route": "detail/score/breakdown", "scene": "inland", "theme": "light",
-      "visual_ref": "assets/derived/S03-factor-breakdown.svg（按规格推导的结构稿，视觉细节以 S02 基准屏为准）",
+      "id": "S03", "name": "详情 · 因子分解展开", "route": "DETAIL/score/breakdown", "scene": "inland|sea", "theme": "light",
+      "visual_ref": "assets/derived/S03-factor-breakdown.svg（v3 结构稿，视觉细节以 S02 基准屏为准）",
       "layers": [
         { "c": "S02_BASE", "box": "0,0,390,844", "note": "保留 S02 全部层，图表卡内点选某小时" },
-        { "c": "C11", "box": "12,384,366,210", "note": "展开面板覆盖/替换图表卡内容：子分 / 权重 / 得分 / 贡献条 → ΠV 明细 → 原始输入；多行行高 15 dp" },
-        { "c": "C12", "box": "12,360,366,20", "note": "所选小时的置信徽标" }
+        { "c": "C11", "box": "16,414,358,352", "note": "展开面板：子分 / 权重 / 得分 / 贡献条 → ΠV 明细 → 原始输入；多行行高 15 dp" },
+        { "c": "C12", "box": "16,384,358,20", "note": "所选小时的置信徽标" }
       ],
       "states": ["collapsed", "expanded", "veto_triggered"],
       "annotations": ["标签列左对齐", "数值列等宽右对齐", "tooltip 宽度 ≥140 dp 避免换行挤压"],
-      "acceptance": ["原始输入 16 项齐全", "禁止 parse 否决文案", "ΠV 触发行可辨识"]
+      "acceptance": ["原始输入项齐全", "禁止 parse 否决文案", "ΠV 触发行可辨识"]
     },
     {
-      "id": "S04", "name": "详情 · 湖面风与水温 Tab（内陆降级）", "route": "detail/wave", "scene": "inland", "theme": "light",
-      "visual_ref": "assets/derived/S04-inland-wave.svg（按规格推导的结构稿，视觉细节以 S02 基准屏为准）",
+      "id": "S04", "name": "详情 · 风浪 / 湖面风与水温 Tab（内陆降级）", "route": "DETAIL/wave", "scene": "inland|sea|land", "theme": "light",
+      "visual_ref": "assets/derived/S04-inland-wave.svg（v3 结构稿，视觉细节以 S02 基准屏为准）",
       "layers": [
-        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 1 项" },
-        { "c": "C08", "box": "16,172,358,40", "note": "标题「湖面风与水温」", "copy_keys": ["tab.inland", "TideSpotStrings.TAB_WAVE_INLAND"] },
-        { "c": "C09", "box": "12,220,366,210", "note": "风速 / 阵风 / 水温折线；海洋 null 维度断线不连线，不画 0" },
-        { "c": "C18", "box": "12,442,366,80", "note": "分维降级卡（海洋维度缺失时）", "copy_keys": ["design_proposed.dimension_degraded"] },
-        { "c": "C22", "box": "16,784,358,13", "note": "来源与更新时间", "copy_keys": ["attribution.model"] },
-        { "c": "C06", "box": "12,800,366,40", "note": "免责入口（第 1 条潮位潮流 + 第 2 条安全）" }
+        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 5 项（风浪 / 湖面风与水温）" },
+        { "c": "C08", "box": "16,198,358,40", "note": "内陆标题「湖面风与水温」", "copy_keys": ["tab.inland", "TideSpotStrings.TAB_WAVE_INLAND"] },
+        { "c": "C09", "box": "12,252,366,210", "note": "风速 / 阵风 / 水温折线；海洋 null 维度断线不连线，不画 0" },
+        { "c": "C18", "box": "12,474,366,80", "note": "分维降级卡（海洋维度缺失时）", "copy_keys": ["design_proposed.dimension_degraded"] },
+        { "c": "C25", "box": "12,566,366,96", "note": "内陆首次引导卡（条件满足才注入）", "copy_keys": ["design_proposed.inland_guide_title"] },
+        { "c": "C06", "box": "16,784,358,40", "note": "免责入口（第 1/2 条）" }
       ],
-      "states": ["inland", "sea", "land_estimated", "partial_degraded"],
-      "acceptance": ["不出现 wave=0", "内陆不显示潮汐专属指标", "免责第 1/2 条可达"]
+      "states": ["inland", "sea", "land_estimated", "partial_degraded", "guide_shown"],
+      "acceptance": ["不出现 wave=0", "内陆不显示潮汐专属指标", "免责 1/2 条可达", "客户裁定以现有实现为准，不复刻旧结构稿细节"]
     },
     {
-      "id": "S05", "name": "详情 · 天气 Tab", "route": "detail/weather", "scene": "inland", "theme": "light",
-      "visual_ref": "assets/derived/S05-weather.svg（按规格推导的结构稿，视觉细节以 S02 基准屏为准）",
+      "id": "S05", "name": "详情 · 天气 Tab", "route": "DETAIL/weather", "scene": "inland|sea|land", "theme": "light",
+      "visual_ref": "assets/derived/S05-weather.svg（v3 结构稿，视觉细节以 S02 基准屏为准）",
       "layers": [
-        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 2 项" },
-        { "c": "C09", "box": "12,220,366,210", "note": "气温 / 降水 / 云量 / WMO 天气码 / 雷暴风险；null 断线" },
-        { "c": "C10", "box": "12,442,366,120", "note": "安全摘要卡：雷暴、大风、大浪判定（仅供参考）" },
-        { "c": "C12", "box": "12,574,366,20", "note": "各指标置信徽标" },
-        { "c": "C06", "box": "12,784,366,56", "note": "免责入口（第 2 条安全）" }
+        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 3 项（天气）" },
+        { "c": "C09", "box": "12,252,366,210", "note": "气温 / 降水 / 云量 / WMO 天气码 / 雷暴风险；null 断线" },
+        { "c": "C10", "box": "12,474,366,120", "note": "安全摘要卡：雷暴、大风、大浪判定（仅供参考）" },
+        { "c": "C12", "box": "12,606,366,20", "note": "各指标置信徽标" },
+        { "c": "C06", "box": "16,784,358,40", "note": "免责入口（第 2 条安全）" }
       ],
       "states": ["normal", "thunderstorm_warning", "partial_degraded"],
       "acceptance": ["免责第 2 条原文完整", "安全判定不表述为官方预警"]
     },
     {
-      "id": "S06", "name": "详情 · 水质 Tab", "route": "detail/water_quality", "scene": "inland", "theme": "light",
-      "visual_ref": "assets/derived/S06-water-quality.svg（按规格推导的结构稿，视觉细节以 S02 基准屏为准）",
+      "id": "S06", "name": "详情 · 水质 Tab（1×3）", "route": "DETAIL/water_quality", "scene": "inland|sea|land", "theme": "light",
+      "visual_ref": "assets/v3/screen-06-water.png",
       "layers": [
-        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 4 项" },
-        { "c": "C15", "box": "12,220,366,240", "note": "2×2 指标卡，单卡高 ≥112 dp，clipsContent=false" },
-        { "c": "C12", "box": "12,468,366,20", "note": "估算 / 实测徽标，按数据源" },
-        { "c": "C09", "box": "12,500,366,210", "note": "逐小时水质曲线（可切数值表）" },
-        { "c": "C06", "box": "12,784,366,56", "note": "免责入口（第 4 条水质）", "copy_keys": ["TideSpotStrings.DISCLAIMER_WATER_QUALITY"] }
+        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 4 项（水质）" },
+        { "c": "C09", "box": "12,252,366,206", "note": "逐小时水温曲线（模型估算 · Copernicus 卫星数据未接入）" },
+        { "c": "C17", "box": "16,470,358,28", "note": "估算说明条：模型估算 · 卫星水质数据未接入（仅供水体判定）" },
+        { "c": "C15", "box": "16,536,358,118", "note": "1 行 × 3 卡（水温/溶解氧/浊度），单卡高 112 dp，clipsContent=false；pH 已删" },
+        { "c": "C24", "box": "16,668,120,40", "note": "[录入实测] 按钮 → OV04 录入 Sheet（离线可录入）" },
+        { "c": "C06", "box": "16,784,358,40", "note": "免责入口（第 4 条水质）", "copy_keys": ["TideSpotStrings.DISCLAIMER_WATER_QUALITY"] }
       ],
-      "states": ["measured", "estimated", "unavailable", "land_estimated"],
-      "acceptance": ["不可用显示「—」而非 0", "首行徽标不被裁切", "免责第 4 条原文完整"]
+      "states": ["measured", "estimated", "unavailable", "land_estimated", "entry_sheet"],
+      "overlays": ["OV04 水质实测录入 Sheet", "OV02 免责 BottomSheet"],
+      "acceptance": ["不可用显示「—」而非 0", "卡片徽标不被裁切", "免责第 4 条原文完整", "实测录入后水温参与融合"]
     },
     {
-      "id": "S07", "name": "详情 · 潮流 Tab（海洋 + 校正对照）", "route": "detail/tide", "scene": "sea", "theme": "light",
-      "visual_ref": "assets/derived/S07-tide.svg（按规格推导的结构稿，视觉细节以 S02 基准屏为准）",
+      "id": "S07", "name": "详情 · 潮流 Tab（海洋 + 校正对照）", "route": "DETAIL/tide", "scene": "sea|inland|land", "theme": "light",
+      "visual_ref": "assets/derived/S07-tide.svg（v3 结构稿，视觉细节以 S02 基准屏为准）",
       "layers": [
-        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 5 项；海洋文案「潮流」" },
-        { "c": "C13", "box": "12,220,366,240", "note": "潮高曲线 + dh/dt 副轴 + 高低潮标记 + 涨/退箭头 + 校正前后对照图例" },
-        { "c": "C12", "box": "12,468,366,20", "note": "未校正时显示「未校正」", "copy_keys": ["TideSpotStrings.BADGE_UNCALIBRATED"] },
-        { "c": "C14", "box": "12,500,366,180", "note": "[校准] 入口 → 现场校潮流程" },
-        { "c": "C06", "box": "12,784,366,56", "note": "免责入口（第 1 条潮位潮流 + 第 5 条潮汐校正）" }
+        { "c": "S02_BASE", "box": "0,0,390,844", "note": "骨架不变，Tab 选中位改为第 2 项；海洋文案「潮流」/ 内陆「水位（无潮汐）」" },
+        { "c": "C13", "box": "12,252,366,240", "note": "潮高曲线 + dh/dt 副轴 + 高低潮标记 + 涨/退箭头 + 校正前后对照图例" },
+        { "c": "C12", "box": "12,504,366,20", "note": "未校正时显示「未校正」", "copy_keys": ["TideSpotStrings.BADGE_UNCALIBRATED"] },
+        { "c": "C14", "box": "12,534,366,180", "note": "[校准] 入口 → 现场校潮流程" },
+        { "c": "C06", "box": "16,784,358,40", "note": "免责入口（第 1/5 条）" }
       ],
       "states": ["sea", "inland_no_tide", "calibrated", "uncalibrated", "land_unavailable"],
       "acceptance": ["内陆不画潮汐曲线", "校正前后可区分", "未校正不假装已校正", "免责第 5 条可达"]
     },
     {
-      "id": "S08", "name": "收藏列表 FavoritesScreen", "route": "favorites", "scene": "any", "theme": "light",
-      "visual_ref": "assets/derived/S08-favorites.svg（按规格推导的结构稿，视觉细节以 S02 基准屏为准）",
+      "id": "S08", "name": "收藏列表 FavoritesScreen", "route": "FAVORITES", "scene": "any", "theme": "light",
+      "visual_ref": "assets/v3/screen-08-favorites.png",
       "layers": [
-        { "c": "TOPBAR", "box": "12,58,366,52", "note": "返回 + 标题「收藏」" },
-        { "c": "C19", "box": "12,120,366,640", "note": "列表：点位名 / 水体类型 / 最佳窗口摘要 / 置信徽标；可滚动" },
-        { "c": "C06", "box": "12,784,366,56", "note": "免责入口" }
+        { "c": "TOPBAR", "box": "12,58,366,52", "note": "标题「收藏点」+ 搜索 / 排序图标" },
+        { "c": "C19", "box": "16,98,358,42", "note": "搜索框（名称或备注）" },
+        { "c": "C19", "box": "16,152,358,30", "note": "排序 FilterChip 行：按名称 / 综合推荐 / 按最近查看 / 按分数" },
+        { "c": "C19", "box": "16,196,358,42", "note": "全部收藏 Top10 + 刷新全部" },
+        { "c": "C19", "box": "16,254,358,500", "note": "分组折叠（默认「未分组」恒最后）+ 卡片列表，可滚动；长按进入多选批量栏" },
+        { "c": "C06", "box": "16,784,358,40", "note": "免责入口" }
       ],
-      "states": ["empty", "list", "offline"],
-      "acceptance": ["空态引导回地图选点", "点击行进入该点详情且携带原坐标"]
+      "states": ["empty", "list", "multi_select", "batch_action", "offline"],
+      "overlays": ["OV01 跨点 Top10", "OV02 免责", "OV06 删除二次确认"],
+      "acceptance": ["空态引导回地图", "点击行携带原坐标进详情", "批量多选/改标签/改分组/删除可用", "排序四选生效", "≥48h 卡片 alpha 0.6"]
     },
     {
-      "id": "S09", "name": "设置与隐私 SettingsScreen", "route": "settings", "scene": "any", "theme": "light",
-      "visual_ref": "assets/screen-03-settings.svg",
+      "id": "S09", "name": "设置与隐私 SettingsScreen", "route": "SETTINGS", "scene": "any", "theme": "light",
+      "visual_ref": "assets/v3/screen-09-settings.png",
       "layers": [
         { "c": "TOPBAR", "box": "12,58,366,52", "note": "标题「设置」" },
-        { "c": "C16", "box": "12,116,366,700", "note": "六版块顺序：显示 / 数据与网络 / 用例·物种·权重（占位）/ API Key（可选，占位）/ 开源许可与数据署名 / 隐私披露（逐源）；整体可滚动" },
-        { "c": "C06", "box": "12,784,366,56", "note": "免责入口" }
+        { "c": "C16", "box": "16,98,358,704", "note": "六版块收进单卡（显示 / 数据与网络 / 用例·物种·权重占位 / API Key 正式启用 / 开源许可 / 隐私逐源），含 Copernicus 凭据区；整体可滚动" },
+        { "c": "C06", "box": "16,796,358,36", "note": "底部「关于 · 版本 v1.16.0 | 免责声明」条", "copy_keys": ["design_proposed.about_version"] }
       ],
-      "states": ["default", "si", "imperial", "days_7", "days_10", "prefetch_on", "reverse_geo_off", "api_key_set"],
-      "annotations": ["页面 padding 12 dp", "版块间距 8 dp / HorizontalDivider 上下 4 dp", "FilterChip 行间距 6 dp"],
-      "acceptance": ["六版块齐全", "逆地理总开关存在", "逐源披露列出发送经纬度", "隐私政策不声明零数据传输", "占位版块不做可点假入口"]
+      "states": ["default", "si", "imperial", "days_7", "days_10", "map_voyager", "map_positron", "map_dark", "prefetch_on", "reverse_geo_off", "credential_saved", "credential_invalid", "api_key_set"],
+      "annotations": ["页面 padding 16 dp", "版块间距 8 dp / HorizontalDivider 上下 4 dp", "FilterChip 行间距 6 dp", "凭据区与 API Key 为真实可交互（决策①）"],
+      "acceptance": ["六版块齐全", "地图样式三选", "Copernicus 凭据可校验保存/清除", "API Key 可真实保存", "逆地理总开关存在", "逐源披露列出发送经纬度", "隐私政策不声明零数据传输"]
     }
   ],
 
   "overlays": [
     {
-      "id": "OV01", "name": "Top10 BottomSheet", "over": ["S02"], "theme": "light|dark",
-      "visual_ref": "assets/screen-02-score.svg（Sheet 展开态）",
-      "box": "0,604,390,240",
-      "c": "C05",
-      "states": ["this_spot", "all_favorites", "empty", "expanded"],
+      "id": "OV01", "name": "Top10 BottomSheet", "over": ["S02", "S08", "S01"], "theme": "light|dark",
+      "visual_ref": "assets/v3/screen-02-score.png（Sheet 展开态见 assets/board-v3.png 组件区）",
+      "box": "0,604,390,240", "c": "C05",
+      "states": ["filter_all", "filter_window", "custom_range", "empty", "expanded"],
       "rank_formula": "rank(W) = 0.62 × 峰值 + 0.23 × 均值 + 1.4 × min(时长, 4)",
-      "acceptance": ["无 ≥60 分窗口时显示空态，禁止兜底造假", "底部预留 ≥24 dp", "可滚动到 24 行数值表"]
+      "acceptance": ["时段筛选四 Chip", "自选时段范围弹层", "无 ≥60 分窗口时显示空态禁止兜底造假", "底部 ≥24 dp", "可滚动到 24 行数值表"]
     },
     {
       "id": "OV02", "name": "免责声明 BottomSheet", "over": ["S02", "S04", "S05", "S06", "S07", "S08", "S09"],
@@ -177,18 +183,32 @@
       "acceptance": ["恒 5 条、顺序 1..5", "原文完整无 ellipsis", "末条下方 ≥24 dp", "可滚动"]
     },
     {
-      "id": "OV03", "name": "确认收藏对话框 ConfirmFavoriteDialog", "over": ["S01"], "theme": "light|dark",
-      "visual_ref": "assets/screen-01-map.svg",
+      "id": "OV03", "name": "确认收藏对话框 ConfirmFavoriteDialog", "over": ["S01", "S08"], "theme": "light|dark",
+      "visual_ref": "assets/board-v3.png（S01 组件区）",
       "box": "26,386,338,自适应", "c": "C04",
-      "acceptance": ["预填逆地理名", "不遮挡准星信息条 C03", "取消/确认均可达", "底部按钮距手势条 ≥24 dp"]
+      "acceptance": ["预填逆地理名", "不遮挡准星信息条 C03", "取消/确认/保存中均可达", "底部按钮距手势条 ≥24 dp"]
+    },
+    {
+      "id": "OV04", "name": "水质实测录入 Sheet", "over": ["S06"], "c": "C24",
+      "content_order": ["水温 ℃", "溶解氧 mg/L", "浊度 NTU", "测量时刻", "[保存实测]"],
+      "acceptance": ["全展开按钮常驻可点", "离线可录入", "保存后指标卡刷新为实测徽标"]
+    },
+    {
+      "id": "OV05", "name": "星标气泡卡 StarBubbleCard", "over": ["S01"], "c": "C23",
+      "content_order": ["点位名", "最佳窗口摘要", "[关闭]", "[查看详情]"],
+      "acceptance": ["点星标弹卡但不动准星", "查看详情先收藏再进详情", "关闭仅收气泡"]
+    },
+    {
+      "id": "OV06", "name": "删除二次确认对话框", "over": ["S08"], "c": "C19",
+      "acceptance": ["批量删除与单条删除均二次确认", "取消不产生副作用"]
     }
   ],
 
   "dark_variants": [
-    { "id": "DV01", "of": "S02", "name": "深色 · 钓鱼指数", "visual_ref": "assets/screen-04-dark-score.svg", "token_set": "tokens/design-tokens.json → theme.dark + surface.dark" },
-    { "id": "DV02", "of": "S02", "name": "深色 · 离线陈旧条", "visual_ref": "assets/dark-adaptation.svg", "components": ["C17"], "copy_keys": ["design_proposed.offline", "design_proposed.stale"] },
-    { "id": "DV03", "of": "S02", "name": "深色 · 分维降级卡", "visual_ref": "assets/dark-adaptation.svg", "components": ["C18"], "copy_keys": ["design_proposed.dimension_degraded"] },
-    { "id": "DV04", "of": "ALL", "name": "全套深色规则", "note": "所有 9 屏按 theme.dark / surface.dark / text.dark / border.dark 换色；冻结语义色不改值；边缘适配见 tokens.safe_area" }
+    { "id": "DV01", "of": "S02", "name": "深色 · 钓鱼指数", "visual_ref": "assets/v3/screen-dv01-dark-score.png", "token_set": "tokens/design-tokens.json → theme.dark + surface.dark + elevation_v3.dark" },
+    { "id": "DV02", "of": "S02", "name": "深色 · 离线/陈旧/48h 条", "components": ["C17"], "copy_keys": ["design_proposed.offline", "TideSpotStrings.STALE_WITH_TIME", "TideSpotStrings.DETAIL_UNUSABLE"] },
+    { "id": "DV03", "of": "S02", "name": "深色 · 分维降级卡", "components": ["C18"], "copy_keys": ["design_proposed.dimension_degraded"] },
+    { "id": "DV04", "of": "ALL", "name": "全套深色规则", "note": "所有 9 屏按 theme.dark / surface.dark / text.dark / border.dark 换色；底图压暗（brightness .42 / saturate .6）；冻结语义色不改值；L2 抬升用 surfaceVariant #1E2C3A；边缘适配见 tokens.safe_area" }
   ],
 
   "numeric_table": {
@@ -200,7 +220,7 @@
       { "key": "value", "label": "数值", "type": "number|null", "align": "right", "font": "等宽", "note": "带单位；null 必须显示「—」，禁止显示 0" },
       { "key": "band", "label": "档位", "type": "string|null", "align": "center", "note": "指数 Tab 必填，取 band.labels；其他 Tab 可空" },
       { "key": "confidence", "label": "置信", "type": "string", "align": "center", "note": "C12 徽标，色块 + 文字" },
-      { "key": "window", "label": "窗口", "type": "boolean", "align": "center", "note": "≥80 分行标记，与图上横条一致" }
+      { "key": "window", "label": "窗口", "type": "boolean", "align": "center", "note": "≥80 分行标记，与图上薄荷窗格一致" }
     ],
     "example_rows": [
       { "hour": "06:00", "value": 82, "band": "爆护窗口", "confidence": "实测", "window": true },
@@ -215,10 +235,11 @@
     "global": [
       "所有尺寸单位 dp，设计稿 1x",
       "状态栏占位 58 dp / 浮层起点 y ≥ 68 dp 为稿件表现值，实现走 WindowInsets",
-      "底部手势条预留 ≥24 dp，五个组件必须 padding（见 tokens.safe_area.must_pad_components）",
+      "底部手势条预留 ≥24 dp，六个组件必须 padding（见 tokens.safe_area.must_pad_components）",
       "主卡片 366 dp（左右 12）／次级内容 358 dp（左右 16）",
-      "卡片内边距 12 dp、分区间距 16 dp、组件间距 8 dp"
+      "卡片内边距 12 dp、分区间距 16 dp、组件间距 8 dp",
+      "v3 美化只动视觉：三级层级 / 薄荷点缀 / 字阶 / 准星三态 / 主卡渐变 / 收藏白卡色带 / 深色独立设计"
     ],
-    "do_not_hardcode": ["58 dp 状态栏", "24 dp 手势条", "色值（取 Kotlin 单源）", "文案（取 TideSpotStrings）", "否决 reason（走 VetoCode）"]
+    "do_not_hardcode": ["58 dp 状态栏", "24 dp 手势条", "色值（取 Kotlin 单源）", "文案（取 TideSpotStrings）", "否决 reason（走 VetoCode）", "源更新时间（未透出显示「—」）", "示例分数/时间/点位"]
   }
 }

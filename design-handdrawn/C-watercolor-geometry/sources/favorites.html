@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 水彩几何鱼 · 海洋收藏</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;font-family:KaiTi, 楷体, cursive;color:#0E346F;
+  background:#1E6FD9;}
+.bgfill{position:absolute;inset:0;background:linear-gradient(160deg,#1E6FD9 0%,#175CC0 100%);z-index:0}
+.grain{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:0.9}
+.screen{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:Gabriola, Georgia, serif;font-size:14px;font-weight:700;color:#0E346F;position:relative;z-index:5}
+.statusbar .r{display:flex;gap:5px;align-items:center;font-size:12px}
+.notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:74px;height:20px;border-radius:12px;background:#0E346F;opacity:0.85}
+.disp{font-family:Gabriola, KaiTi, 楷体, cursive;font-weight:400;letter-spacing:0.10em}
+.bodyf{font-family:KaiTi, 楷体, cursive}
+.card{background:#FFFFFF;border:2.2px solid #0E346F;border-radius:26px 30px 24px 28px / 28px 24px 30px 26px;
+  box-shadow:2px 3px 0 #0E346F33;position:relative;overflow:hidden}
+.tape{position:absolute;background:#F4C430;opacity:0.85;transform:rotate(-3deg);z-index:3}
+.tag{display:inline-flex;align-items:center;gap:4px;border:2px solid #0E346F;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;background:#FFFFFF;position:relative;z-index:4}
+.hl{color:#ED8B3C}
+.mut{color:#3E628F}
+.row{display:flex;align-items:center}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="3.0" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="19" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.8" xChannelSelector="G" yChannelSelector="B"/>
+  </filter>
+  <filter id="watercolor" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="4.2" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.6"/>
+  </filter>
+  <filter id="papergrain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="ng"/>
+    <feComponentTransfer in="ng" result="na"><feFuncA type="linear" slope="0.07"/></feComponentTransfer>
+  </filter>
+  <filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="0E346F" flood-opacity="0.18"/>
+  </filter>
+ </defs>
+</svg><div class="screen"><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div><div style="padding:6px 16px 8px;position:relative;z-index:3">
+      <div class="disp" style="font-size:24px;color:#0E346F">我的收藏</div>
+      <div class="bodyf mut" style="font-size:11px;margin-top:2px">12 个点位 · 3 个分组</div></div>
+    <div style="padding:0 14px;position:relative;z-index:3"><div class="card" style="height:40px;display:flex;align-items:center;gap:8px;padding:0 12px">
+      <span style="font-size:16px;color:#ED8B3C">⌕</span><span class="bodyf" style="font-size:12px;color:#3E628F">搜索收藏点位</span>
+      <span style="margin-left:auto;font-size:13px;color:#123E7C">☷</span></div></div>
+    <div class="row" style="padding:9px 14px 0;gap:6px;position:relative;z-index:3">
+      <span class="tag" style="background:#123E7C;color:#FFFFFF;border-color:#0E346F;font-size:10px">综合推荐 ▾</span>
+      <span class="tag" style="font-size:10px">全部分组 ▾</span>
+      <span class="tag" style="font-size:10px;margin-left:auto">⠿ 批量</span>
+    </div><div class="card" style="margin:10px 14px 0;padding:11px 12px;display:flex;align-items:center;gap:11px;border-left:6px solid #1B7A5E">
+          <div style="width:46px;height:46px;border:2px solid #0E346F;border-radius:12px;background:#EEF4FC;display:flex;align-items:center;justify-content:center;transform:rotate(-4deg)"><svg viewBox="0 0 120 64" width="34"><g><path d="M18 32 L44 16 L44 48 Z" fill="#ED8B3C" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="#ED8B3C" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+          <div style="flex:1"><div class="disp" style="font-size:14px;color:#0E346F">小麦岛外海</div>
+            <div class="bodyf mut" style="font-size:10px;margin-top:2px">青岛 · 海域</div>
+            <div class="row" style="gap:5px;margin-top:5px;background:#1B7A5E;border-radius:7px;padding:2px 7px;display:inline-flex"><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style="font-size:9px;color:#FFFFFF;font-weight:700;margin-left:3px">爆护窗口</span></div>
+          </div>
+          <div style="text-align:center"><div class="disp" style="font-size:26px;color:#ED8B3C;line-height:1">86</div><div class="bodyf mut" style="font-size:9px">分</div></div>
+          <div style="width:26px;height:26px;border:2px solid #0E346F;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F4C430"><svg viewBox="0 0 120 64" width="16"><g><path d="M18 32 L44 16 L44 48 Z" fill="#17A398" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="#17A398" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+        </div><div class="card" style="margin:10px 14px 0;padding:11px 12px;display:flex;align-items:center;gap:11px;border-left:6px solid #5CB23C">
+          <div style="width:46px;height:46px;border:2px solid #0E346F;border-radius:12px;background:#EEF4FC;display:flex;align-items:center;justify-content:center;transform:rotate(-4deg)"><svg viewBox="0 0 120 64" width="34"><g><path d="M18 32 L44 16 L44 48 Z" fill="#ED8B3C" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="#ED8B3C" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+          <div style="flex:1"><div class="disp" style="font-size:14px;color:#0E346F">鲤鱼湾</div>
+            <div class="bodyf mut" style="font-size:10px;margin-top:2px">千岛湖 · 湖湾</div>
+            <div class="row" style="gap:5px;margin-top:5px;background:#5CB23C;border-radius:7px;padding:2px 7px;display:inline-flex"><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style="font-size:9px;color:#FFFFFF;font-weight:700;margin-left:3px">很适合</span></div>
+          </div>
+          <div style="text-align:center"><div class="disp" style="font-size:26px;color:#ED8B3C;line-height:1">78</div><div class="bodyf mut" style="font-size:9px">分</div></div>
+          <div style="width:26px;height:26px;border:2px solid #0E346F;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F4C430"><svg viewBox="0 0 120 64" width="16"><g><path d="M18 32 L44 16 L44 48 Z" fill="#17A398" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="#17A398" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+        </div><div class="card" style="margin:10px 14px 0;padding:11px 12px;display:flex;align-items:center;gap:11px;border-left:6px solid #F4C430">
+          <div style="width:46px;height:46px;border:2px solid #0E346F;border-radius:12px;background:#EEF4FC;display:flex;align-items:center;justify-content:center;transform:rotate(-4deg)"><svg viewBox="0 0 120 64" width="34"><g><path d="M18 32 L44 16 L44 48 Z" fill="#ED8B3C" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="#ED8B3C" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+          <div style="flex:1"><div class="disp" style="font-size:14px;color:#0E346F">东澳礁</div>
+            <div class="bodyf mut" style="font-size:10px;margin-top:2px">珠海 · 近海</div>
+            <div class="row" style="gap:5px;margin-top:5px;background:#F4C430;border-radius:7px;padding:2px 7px;display:inline-flex"><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style='display:inline-block;width:12px'><svg viewBox="0 0 120 64" width="12"><g><path d="M18 32 L44 16 L44 48 Z" fill="##FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##FFFFFF" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></span><span style="font-size:9px;color:#FFFFFF;font-weight:700;margin-left:3px">可以</span></div>
+          </div>
+          <div style="text-align:center"><div class="disp" style="font-size:26px;color:#ED8B3C;line-height:1">64</div><div class="bodyf mut" style="font-size:9px">分</div></div>
+          <div style="width:26px;height:26px;border:2px solid #0E346F;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F4C430"><svg viewBox="0 0 120 64" width="16"><g><path d="M18 32 L44 16 L44 48 Z" fill="#17A398" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="#17A398" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+        </div><div style="margin:11px 14px 0;border:2.2px solid #0E346F;border-radius:14px;background:#123E7C;padding:10px 13px;display:flex;align-items:center;gap:9px;box-shadow:2px 3px 0 #0E346F44">
+      <div class="row"><svg viewBox="0 0 120 64" width="18"><g><path d="M18 32 L44 16 L44 48 Z" fill="##F4C430" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##F4C430" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg><svg viewBox="0 0 120 64" width="22"><g><path d="M18 32 L44 16 L44 48 Z" fill="##F4C430" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##F4C430" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg><svg viewBox="0 0 120 64" width="18"><g><path d="M18 32 L44 16 L44 48 Z" fill="##F4C430" filter="url(#watercolor)"/>
+                   <path d="M44 16 Q92 12 92 32 Q92 52 44 48 Z" fill="#FFFFFF" filter="url(#watercolor)"/>
+                   <path d="M56 16 L78 16 L78 48 L56 48 Z" fill="#F4C430" filter="url(#watercolor)"/>
+                   <path d="M92 32 L112 14 L110 32 L112 50 Z" fill="##F4C430" filter="url(#watercolor)"/><circle cx="34" cy="29" r="3.4" fill="#0E346F"/><circle cx="34" cy="29" r="1.2" fill="#FFFFFF"/></g></svg></div>
+      <div style="flex:1"><div class="disp" style="font-size:13px;color:#FFFFFF">全部收藏 Top10</div><div class="bodyf" style="font-size:9.5px;color:#FFFFFFAA">本周末 · 时段筛选</div></div><span style="color:#F4C430;font-size:17px">›</span></div>
+    <div style="margin:10px 14px 0;border:1.8px dashed #0E346F66;border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:9px;opacity:.8">
+      <div style="width:52px"><svg viewBox="0 0 120 64" width="52"><g filter="url(#watercolor)">
+              <path d="M20 32 L100 32" stroke="#0E346F" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M32 25 L32 39 M48 25 L48 39 M64 25 L64 39 M80 25 L80 39" stroke="#0E346F" stroke-width="2"/>
+              <path d="M18 32 L8 24 M18 32 L8 40 M102 32 L112 24 M102 32 L112 40" stroke="#0E346F" stroke-width="2.6"/></g></svg></div>
+      <div class="bodyf mut" style="font-size:10px;line-height:1.5">当前范围内暂无符合条件的最佳窗口<br>试试切换「全部」或自选时段</div></div></div><svg class="grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <rect width="100%" height="100%" filter="url(#papergrain)" opacity="1"/>
+</svg></body></html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 复古户外 · 天气 Tab</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;font-family:KaiTi, 楷体, STKaiti, serif;color:#16324F;
+  background:#E4D9BC;}
+.bgfill{position:absolute;inset:0;background:linear-gradient(160deg,#E4D9BC 0%,#D8C9A5 100%);z-index:0}
+.grain{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:0.9}
+.screen{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:Georgia, serif;font-size:14px;font-weight:700;color:#16324F;position:relative;z-index:5}
+.statusbar .r{display:flex;gap:5px;align-items:center;font-size:12px}
+.notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:74px;height:20px;border-radius:12px;background:#16324F;opacity:0.85}
+.disp{font-family:Georgia, Times New Roman, serif;font-weight:700;letter-spacing:0.14em}
+.bodyf{font-family:KaiTi, 楷体, STKaiti, serif}
+.card{background:#F2EAD4;border:2.2px solid #16324F;border-radius:16px 20px 15px 19px / 19px 15px 20px 16px;
+  box-shadow:2px 3px 0 #16324F33;position:relative;overflow:hidden}
+.tape{position:absolute;background:#D9A734;opacity:0.85;transform:rotate(-3deg);z-index:3}
+.tag{display:inline-flex;align-items:center;gap:4px;border:2px solid #16324F;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;background:#F2EAD4;position:relative;z-index:4}
+.hl{color:#C15A3A}
+.mut{color:#5C5540}
+.row{display:flex;align-items:center}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="19" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.3" xChannelSelector="G" yChannelSelector="B"/>
+  </filter>
+  <filter id="watercolor" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="3.1" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.6"/>
+  </filter>
+  <filter id="papergrain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="ng"/>
+    <feComponentTransfer in="ng" result="na"><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+  </filter>
+  <filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="16324F" flood-opacity="0.18"/>
+  </filter>
+ </defs>
+</svg>
+<div class="bgfill"></div>
+<div class="screen"><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div><div class="row" style="padding:6px 16px 8px;position:relative;z-index:5;border-bottom:1.6px dashed #16324F55">
+      <span style="font-size:22px;color:#16324F;width:26px">‹</span>
+      <div style="flex:1"><div class="disp" style="font-size:18px;color:#16324F;line-height:1.15">青岛 · 小麦岛外海</div>
+        <div class="bodyf" style="font-size:10px;color:#5C5540;margin-top:2px">⌖ 36.05°N 120.44°E · 准星落点</div></div>
+      <div class="row" style="gap:8px"><span style="width:30px;height:30px;border:2px solid #16324F;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F2EAD4"><svg viewBox="0 0 120 64" width="20"><g><path d="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/>
+                   <path d="M22 32 L4 16 L10 32 L4 48 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/><path d="M50 20 L44 44 M62 19 L56 45 M74 20 L68 42" stroke="#16324F" stroke-width="2" opacity="0.7" filter="url(#rough2)"/><path d="M60 15 Q66 6 76 14 Z" fill="#D9A734" stroke="#16324F" stroke-width="2" filter="url(#rough2)"/><circle cx="36" cy="29" r="4.6" fill="#F2EAD4" stroke="#16324F" stroke-width="2.4"/><circle cx="36" cy="29" r="1.9" fill="#16324F"/></g></svg></span></div>
+    </div><div style="padding:6px 16px 0;position:relative;z-index:5">
+      <span class="tag" style="background:#F2EAD4;color:#16324F;border-color:#16324F;box-shadow:2px 2px 0 #16324F55"><svg viewBox="0 0 80 48" width="52" aria-hidden="true"><g filter="url(#rough2)" fill="none" stroke="#1B3A5C" stroke-width="2.8" stroke-linecap="round">
+          <path d="M2 30 Q12 21 22 30 Q32 39 42 30 Q52 21 62 30 Q70 37 78 30"/>
+          <path d="M2 41 Q12 32 22 41 Q32 50 42 41 Q52 32 62 41 Q70 48 78 41" opacity="0.85"/>
+          </g>
+          <path d="M50 24 Q56 9 62 24 Z" fill="#D9A734" stroke="#1B3A5C" stroke-width="1.8" filter="url(#rough2)"/>
+          <path d="M68 20 q5 -4 10 0 q-5 4 -10 0 M78 20 q4 -3 8 0" fill="none" stroke="#1B3A5C" stroke-width="1.8" stroke-linecap="round" filter="url(#rough2)"/></svg><b style="font-size:11px">海洋 / 近海</b><i class="disp" style="font-style:normal;font-size:8px;opacity:.6;letter-spacing:.1em;margin-left:4px">COASTAL</i></span></div><div class="row" style="gap:6px;padding:8px 14px 0;position:relative;z-index:4"><div style="width:60px;height:52px;border:2px solid #16324F;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#C15A3A;color:#F7F1DE;box-shadow:2px 2px 0 #16324F55;flex-shrink:0">
+          <b class="disp" style="font-size:14px;line-height:1">今天</b><span class="bodyf" style="font-size:9.5px;margin-top:3px;opacity:0.9">周四</span></div><div style="width:60px;height:52px;border:2px solid #16324F;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#F2EAD4;color:#16324F;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:16px;line-height:1">13</b><span class="bodyf" style="font-size:9.5px;margin-top:3px;opacity:0.9">周五</span></div><div style="width:60px;height:52px;border:2px solid #16324F;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#F2EAD4;color:#16324F;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:16px;line-height:1">14</b><span class="bodyf" style="font-size:9.5px;margin-top:3px;opacity:0.9">周六</span></div><div style="width:60px;height:52px;border:2px solid #16324F;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#F2EAD4;color:#16324F;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:16px;line-height:1">15</b><span class="bodyf" style="font-size:9.5px;margin-top:3px;opacity:0.9">周日</span></div><div style="width:60px;height:52px;border:2px solid #16324F;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:#F2EAD4;color:#16324F;box-shadow:none;flex-shrink:0">
+          <b class="disp" style="font-size:16px;line-height:1">16</b><span class="bodyf" style="font-size:9.5px;margin-top:3px;opacity:0.9">周一</span></div></div>
+    <div class="bodyf mut" style="font-size:9px;margin:3px 16px 0;position:relative;z-index:4;text-align:right">源更新 — · 本机拉取 09:41</div><div style="margin:8px 14px 0;border:2px solid #16324F;border-radius:14px;background:#F2EAD4;display:flex;position:relative;z-index:4"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:20px"><svg viewBox="0 0 120 64" width="20"><g><path d="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" fill="#5C5540" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/>
+                   <path d="M22 32 L4 16 L10 32 L4 48 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/><path d="M50 20 L44 44 M62 19 L56 45 M74 20 L68 42" stroke="#16324F" stroke-width="2" opacity="0.7" filter="url(#rough2)"/><path d="M60 15 Q66 6 76 14 Z" fill="#D9A734" stroke="#16324F" stroke-width="2" filter="url(#rough2)"/><circle cx="36" cy="29" r="4.6" fill="#F2EAD4" stroke="#16324F" stroke-width="2.4"/><circle cx="36" cy="29" r="1.9" fill="#16324F"/></g></svg></div>
+          <span class="bodyf" style="font-size:9.5px;font-weight:400;color:#5C5540;white-space:nowrap">钓鱼指数</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:20px"><svg viewBox="0 0 120 64" width="20"><g><path d="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" fill="#5C5540" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/>
+                   <path d="M22 32 L4 16 L10 32 L4 48 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/><path d="M50 20 L44 44 M62 19 L56 45 M74 20 L68 42" stroke="#16324F" stroke-width="2" opacity="0.7" filter="url(#rough2)"/><path d="M60 15 Q66 6 76 14 Z" fill="#D9A734" stroke="#16324F" stroke-width="2" filter="url(#rough2)"/><circle cx="36" cy="29" r="4.6" fill="#F2EAD4" stroke="#16324F" stroke-width="2.4"/><circle cx="36" cy="29" r="1.9" fill="#16324F"/></g></svg></div>
+          <span class="bodyf" style="font-size:9.5px;font-weight:400;color:#5C5540;white-space:nowrap">潮流</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;border-bottom:3px solid #C15A3A;opacity:1">
+          <div style="height:20px"><svg viewBox="0 0 120 64" width="20"><g><path d="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" fill="##C15A3A" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/>
+                   <path d="M22 32 L4 16 L10 32 L4 48 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/><path d="M50 20 L44 44 M62 19 L56 45 M74 20 L68 42" stroke="#16324F" stroke-width="2" opacity="0.7" filter="url(#rough2)"/><path d="M60 15 Q66 6 76 14 Z" fill="#D9A734" stroke="#16324F" stroke-width="2" filter="url(#rough2)"/><circle cx="36" cy="29" r="4.6" fill="#F2EAD4" stroke="#16324F" stroke-width="2.4"/><circle cx="36" cy="29" r="1.9" fill="#16324F"/></g></svg></div>
+          <span class="bodyf" style="font-size:9.5px;font-weight:700;color:#C15A3A;white-space:nowrap">天气</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:20px"><svg viewBox="0 0 120 64" width="20"><g><path d="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" fill="#5C5540" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/>
+                   <path d="M22 32 L4 16 L10 32 L4 48 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/><path d="M50 20 L44 44 M62 19 L56 45 M74 20 L68 42" stroke="#16324F" stroke-width="2" opacity="0.7" filter="url(#rough2)"/><path d="M60 15 Q66 6 76 14 Z" fill="#D9A734" stroke="#16324F" stroke-width="2" filter="url(#rough2)"/><circle cx="36" cy="29" r="4.6" fill="#F2EAD4" stroke="#16324F" stroke-width="2.4"/><circle cx="36" cy="29" r="1.9" fill="#16324F"/></g></svg></div>
+          <span class="bodyf" style="font-size:9.5px;font-weight:400;color:#5C5540;white-space:nowrap">水质</span>
+        </div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 4px;border-bottom:0;opacity:0.72">
+          <div style="height:20px"><svg viewBox="0 0 120 64" width="20"><g><path d="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" fill="#5C5540" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/>
+                   <path d="M22 32 L4 16 L10 32 L4 48 Z" fill="#D9A734" stroke="#16324F" stroke-width="2.6" filter="url(#rough2)"/><path d="M50 20 L44 44 M62 19 L56 45 M74 20 L68 42" stroke="#16324F" stroke-width="2" opacity="0.7" filter="url(#rough2)"/><path d="M60 15 Q66 6 76 14 Z" fill="#D9A734" stroke="#16324F" stroke-width="2" filter="url(#rough2)"/><circle cx="36" cy="29" r="4.6" fill="#F2EAD4" stroke="#16324F" stroke-width="2.4"/><circle cx="36" cy="29" r="1.9" fill="#16324F"/></g></svg></div>
+          <span class="bodyf" style="font-size:9.5px;font-weight:400;color:#5C5540;white-space:nowrap">风浪</span>
+        </div></div><div class="row" style="justify-content:space-between;margin:1px 16px 0;position:relative;z-index:4">
+      <span class="disp" style="font-size:14px;color:#16324F">❦ 逐小时天气</span>
+      <span class="bodyf" style="font-size:9.5px;color:#5C5540">气温 · 降水 · 云量</span></div><div class="card" style="margin:8px 14px 0;padding:10px 12px;position:relative;z-index:4;">
+      <div class="row" style="justify-content:space-between"><span class="disp" style="font-size:12px;color:#1B3A5C">气温 ℃</span><span class="tag" style="font-size:9px;padding:1px 7px;border-width:1.6px;border-color:#16324F;background:#16324F;color:#F7F1DE">模型</span></div>
+      <svg width="100%" height="90" viewBox="0 0 420 90" aria-hidden="true"><path d="M10 72 L410 72" stroke="#16324F" stroke-width="1.3" opacity="0.35" filter="url(#rough2)"/>
+          <polyline points="20,53 66,51 112,49 158,48 204,48 250,50 296,53 342,54 388,55" fill="none" stroke="#C15A3A" stroke-width="2.8" stroke-linecap="round" filter="url(#rough2)"/><text x="20" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">6</text><text x="66" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">7</text><text x="112" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">8</text><text x="158" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">9</text><text x="204" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">10</text><text x="250" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">11</text><text x="296" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">12</text><text x="342" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">13</text><text x="388" y="84" font-size="8" fill="#5C5540" text-anchor="middle" font-family="KaiTi">14</text></svg>
+      <div class="row" style="gap:6px;margin-top:4px"><span class="tag" style="font-size:9px;padding:1px 7px;border-width:1.6px;border-color:#16324F;background:#2E6E7E;color:#F7F1DE">降水 2.1 mm</span><span class="tag" style="font-size:9px;padding:1px 7px;border-width:1.6px;border-color:#16324F;background:#2E6E7E;color:#F7F1DE">云量 68%</span><span class="tag" style="font-size:9px">WMO 803 · 多云</span></div></div><div class="card" style="margin:8px 14px 0;padding:10px 12px;position:relative;z-index:4;border-color:#C15A3A99;background:#E8DDBE">
+      <div class="row" style="gap:8px"><span style="font-size:17px;color:#C15A3A">⚠</span><span class="disp" style="font-size:12.5px;color:#1B3A5C">安全摘要</span><span class="tag" style="font-size:9px;padding:1px 7px;border-width:1.6px;border-color:#16324F;background:#8A6D2E;color:#F7F1DE">低置信</span></div>
+      <div class="bodyf" style="font-size:10.5px;line-height:1.6;margin-top:6px;color:#16324F">雷暴风险 <b class="hl">中</b> · 阵风 &gt; 40 km/h · 午后有短时强降水。<br>水上安全以当地预警为准，切勿在雷电、台风、大潮汛期间出钓。</div></div><div class="row" style="margin:12px 14px 0;gap:8px;position:relative;z-index:4">
+      <span class="tag" style="font-size:9.5px;background:#1B3A5C;color:#F7F1DE;border-color:#16324F">▮ 逐小时曲线</span>
+      <span class="tag" style="font-size:9.5px">☷ 等价数值表</span>
+      <span class="bodyf" style="font-size:8.5px;color:#5C5540;margin-left:auto">24 行 · TalkBack 可读</span></div><div class="bodyf" style="margin:9px 16px 0;font-size:9px;color:#5C5540;text-align:center;line-height:1.6;position:relative;z-index:4">
+      来源 Open-Meteo · 网格 8 km · UTC 更新 — · 本机拉取 09:41<br>null 断线不画 0 · 缺维按有效权重重算（F-3.6）</div><div class="row" style="margin:0 14px;position:absolute;left:0;right:0;bottom:14px;padding:8px 12px;border:1.8px dashed #16324F88;border-radius:11px;background:#F2EAD4EE;z-index:6;gap:8px;box-shadow:0 -2px 8px #D8C9A5AA">
+      <span style="font-size:14px;color:#C15A3A">ⓘ</span>
+      <span class="bodyf" style="font-size:10.5px;color:#5C5540;flex:1">免责声明 · 共 5 条 · 数据仅供参考</span>
+      <span style="color:#1B3A5C;font-size:13px">›</span></div></div>
+<svg class="grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <rect width="100%" height="100%" filter="url(#papergrain)" opacity="1"/>
+</svg>
+</body></html>

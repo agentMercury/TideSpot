@@ -9,6 +9,10 @@
     <string name="ts_detail_retry_desc">重试加载该维度数据</string>
     <string name="ts_detail_retry">重试</string>
     <string name="ts_detail_loading">加载中…</string>
+    <!-- OPT-V12-03：下拉刷新反馈（用户操作优先；失败保留旧数据与陈旧标记） -->
+    <string name="ts_detail_refresh_updated">已更新 %1$s</string>
+    <string name="ts_detail_refresh_failed">刷新失败，显示缓存数据</string>
+    <string name="ts_detail_refresh_offline">无网络，仅可查看缓存</string>
     <string name="ts_detail_no_source">本点无该来源数据</string>
     <string name="ts_detail_chart">图表</string>
     <string name="ts_detail_chart_desc">切换为逐小时图表</string>

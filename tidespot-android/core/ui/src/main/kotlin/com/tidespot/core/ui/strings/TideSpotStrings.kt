@@ -117,6 +117,9 @@ interface TideSpotStrings {
     fun dayToday(weekday: String, date: String): String
     fun dayFuture(offsetDays: Int, weekday: String, date: String): String
     fun dayShortToday(weekday: String): String
+
+    /** OPT-V12-04（CHG-57）：两行 chip 上行「今天」标签（非今天用 `M/d`，由 Format.md 生成）。 */
+    val dayTodayLabel: String
     val noDataHour: String
     val deviceZoneNote: String
 

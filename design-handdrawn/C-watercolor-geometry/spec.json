@@ -1,0 +1,112 @@
+{
+  "schema": "tidespot.handdrawn.version/1.0",
+  "id": "C-watercolor-geometry",
+  "no": "C",
+  "name": "水彩几何鱼",
+  "name_en": "WATERCOLOR GEOMETRY",
+  "based_on": "工程 v1.16.0（versionCode 20）· 手绘视觉概念稿",
+  "source_images": [
+    "图8 微信图片_20261112105652_8_163.jpg（三条抽象撞色鱼）"
+  ],
+  "visual_language": "亮蓝/湖水底 + 蓝白黄橙红色块拼接 + 水彩毛边晕染 + 大留白 + Gabriola 极简标题",
+  "fish_motif": "几何色块鱼：三角头 + 撞色矩形 + 水彩晕染毛边",
+  "best_for": "清爽高级、装饰克制；最像现代插画 App，留白呼吸感最好",
+  "tone": "水彩通透 · 亮蓝/米白双水体",
+  "offline": true,
+  "selfcontained": true,
+  "screens": [
+    {
+      "key": "detail-sea",
+      "label": "详情页 · 海洋/近海",
+      "png": "screens/detail-sea.png",
+      "html": "sources/detail-sea.html",
+      "sha256": "67d923ac5e25c3d38dd5e523428ac4395ee9055685e9c594077f53cc8fe9621b"
+    },
+    {
+      "key": "detail-inland",
+      "label": "详情页 · 内陆/湖泊",
+      "png": "screens/detail-inland.png",
+      "html": "sources/detail-inland.html",
+      "sha256": "cb2f07c334dbe3838c7d7cc668e40af191b4624c344be6e45c59f86310068aea"
+    },
+    {
+      "key": "map-sea",
+      "label": "地图选点 · 海洋",
+      "png": "screens/map-sea.png",
+      "html": "sources/map-sea.html",
+      "sha256": "25705a0b40a05b74fb1f603c8641a8c85fae4005633a1e37e1cedeb044e8aa52"
+    },
+    {
+      "key": "map-inland",
+      "label": "地图选点 · 内陆",
+      "png": "screens/map-inland.png",
+      "html": "sources/map-inland.html",
+      "sha256": "565aec9d12045696e1e829b24c64f2674d473fca38479278089202f83bbde879"
+    },
+    {
+      "key": "favorites",
+      "label": "收藏页",
+      "png": "screens/favorites.png",
+      "html": "sources/favorites.html",
+      "sha256": "c6a3def9e370ce765dcff7910a3260cb8fb60e41a9d24b87e5e7b5f8cc50950a"
+    },
+    {
+      "key": "settings",
+      "label": "设置页",
+      "png": "screens/settings.png",
+      "html": "sources/settings.html",
+      "sha256": "c8ce6ba64e2747b944ed511dac8fafb09542c601f8eac7ed8ed3a7dcf2ad98aa"
+    },
+    {
+      "key": "dark-detail",
+      "label": "详情页 · 深色",
+      "png": "screens/dark-detail.png",
+      "html": "sources/dark-detail.html",
+      "sha256": "435030fce524db7a55515d4bf287420775bbd59e83afa31c39015633a3b2dde1"
+    }
+  ],
+  "frozen_contract": {
+    "tab_order_sea": [
+      "钓鱼指数",
+      "潮流",
+      "天气",
+      "水质",
+      "风浪"
+    ],
+    "tab_order_inland": [
+      "钓鱼指数",
+      "水位（无潮汐）",
+      "天气",
+      "水质",
+      "湖面风与水温"
+    ],
+    "disclaimer_items": 5,
+    "band_labels": [
+      "爆护窗口",
+      "很适合",
+      "可以",
+      "较差",
+      "别去"
+    ],
+    "badges": [
+      "实测",
+      "卫星",
+      "模型",
+      "估算",
+      "未校正",
+      "低置信"
+    ],
+    "day_selector": "52dp 两行",
+    "water_quality": "1 行 × 3 卡",
+    "note": "以上工程事实四版完全一致；手绘稿为视觉探索，落地时冻结语义色须回归 ScoreBands.kt / ConfidenceBadge.kt，档位恒带文字（N-7）"
+  },
+  "water_differentiators": [
+    "顶部鱼形徽标（浪+贝+海鸟 ↔ 山+日+芦苇）",
+    "主色冷暖/蓝绿",
+    "鱼种（海鱼↔淡水鱼）",
+    "第二 Tab（潮流↔水位）",
+    "图表（潮高·潮流↔水位·无潮汐）",
+    "地点/坐标"
+  ],
+  "example_data_notice": "分数/时刻/点位为版式示意，非业务数据；源更新时间显示 —，未硬编码"
+}

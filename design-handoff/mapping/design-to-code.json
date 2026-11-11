@@ -1,65 +1,86 @@
 {
   "schema": "tidespot.design-to-code/1.0",
   "meta": {
-    "version": "2.0.0",
-    "status": "用户已确认（2026-11-09）",
+    "version": "3.0.0",
+    "baseline": "工程 v1.16.0（versionCode 20 / versionName 1.16.0，V1.2 需求池）",
+    "status": "用户已确认 v3 美化方向（2026-11-11）；v2 的 3 项 CONFLICT + 7 项 GAP 已全部关闭",
     "offline": true,
     "path_base": "仓库根目录（design-handoff/ 的上一级）；所有 code_file 均为仓库相对路径",
-    "inspection_basis": "实际读取 TideSpotTheme.kt / ScoreBands.kt / ConfidenceBadge.kt / TideSpotStrings.kt / SettingsScreen.kt / MainActivity.kt / DetailScreen.kt / MapScreen.kt / AndroidManifest.xml，并 grep 全仓 main 源码。",
+    "inspection_basis": "2026-11-11 实际核对：TideSpotTheme.kt（LightColors/DarkColors/TideSpotShapes/TideSpotTypography）、ScoreBands.kt、ConfidenceBadge.kt、TideSpotStrings.kt、WaterBodyTabTitles.kt（titlesInTabOrder）、DaySelector.kt（52dp）、DetailScreen.kt（水质 1×3/免责/Sheet）、SettingsScreen.kt（六版块/凭据/API Key）、MainActivity.kt（导航/insets）、AndroidManifest.xml、app/build.gradle.kts；并对照 .shots/ 的 v16_* 真机实拍。",
     "status_values": {
       "existing": "工程已有实现，设计稿只需对齐视觉值",
-      "partial": "工程已有骨架，但设计稿规定的部分状态/文案/尺寸未覆盖",
-      "missing": "工程当前没有，需要新增",
-      "conflict": "设计稿与工程现状不一致，必须先决策再动手"
+      "partial": "工程已有骨架，但设计稿规定的部分视觉/状态未覆盖",
+      "visual_tune": "功能已就位，v3 只调视觉（渐变/阴影/点缀/字阶/圆角/深色）",
+      "design_only": "设计侧规定，工程尚未实现，实现方按需落地",
+      "conflict": "设计稿与工程方向性不一致，需先决策（本版已全部关闭，见 resolved_decisions）"
     },
-    "critical_warning": "先读 conflicts 再动手。CONFLICT-01（底部 NavigationBar）会直接改变导航结构，未决策前不要按设计稿移除底栏。"
+    "critical_warning": "v2 的 CONFLICT-01（底部 NavigationBar）已由工程移除底栏解决，GAP-01 图标已落地，GAP-05 文案已 17/17 接线。v3 无阻塞性冲突；剩余 P2 视觉遗留（地图 edge-to-edge 铺满系统栏区）随下次 UI 批次处理，不阻塞本次美化。"
   },
 
+  "resolved_decisions": [
+    { "id": "CONFLICT-01", "title": "底部 NavigationBar vs 地图优先导航", "resolution": "方案①已落地：MainActivity 无 NavigationBar，AppRoot 用 Scaffold + when(page)，顶层 MAP/FAVORITES/DETAIL/SETTINGS，UX-21 返回手势在位。设计稿地图优先口径成立。", "status": "closed", "evidence": "MainActivity.kt grep NavigationBar = 0 命中" },
+    { "id": "CONFLICT-02", "title": "免责第 5 条文案差异", "resolution": "以工程 D11「现场校潮」长文为准，恒 5 条；§9.6 的『未校正』由 ConfidenceBadge.UNCALIBRATED 承载。", "status": "closed" },
+    { "id": "CONFLICT-03", "title": "源更新时间为示意值", "resolution": "数据层未透出时显示「—」；C22 由 :app 透传 fetchedAt，禁止硬编码 06:00 UTC。", "status": "closed" },
+    { "id": "GAP-01", "title": "APP 图标系统默认", "resolution": "已落地：AndroidManifest android:icon=@mipmap/ic_launcher；mipmap-anydpi-v26/ic_launcher.xml + round.xml + drawable 三层（background/foreground/monochrome）齐全。v3 图标 SVG 源稿升级为准星三态母题，供后续视觉替换。", "status": "closed", "evidence": "find app/src/main/res -iname 'ic_launcher*' = 5 文件" },
+    { "id": "GAP-03", "title": "edge-to-edge insets", "resolution": "MainActivity contentWindowInsets = WindowInsets(0,0,0,0) 全屏铺入；各屏自行 statusBarsPadding/navigationBarsPadding，遮挡已消除。P2 视觉遗留：地图未全屏铺入系统栏区（纯色条与底图同色不可见），随下次 UI 批次做。", "status": "closed_with_p2", "p2": "MainActivity Scaffold insets + MapScreen 地图全屏，预算 1–2h，改后跑 map/app 测试" },
+    { "id": "GAP-04", "title": "集中化 token", "resolution": "已落地：TideSpotShapes（8/12/16/20/20）+ TideSpotTypography（20/16/14/15/13/12/12/12/10）均定义在 TideSpotTheme.kt 并注入 MaterialTheme。v2 列为『设计建议』现已升为既有 token。", "status": "closed" },
+    { "id": "GAP-05", "title": "17 条 design_proposed 文案", "resolution": "已闭环：17/17 入资源并接线（另新增 ts_stale_with_time 中英双语），values/ 与 values-en/ 各 241 条对齐，旧硬编码 0 命中，i18n_scan FAIL=0。英文真机验收随设备批次。", "status": "closed" },
+    { "id": "DECISION-API-KEY", "title": "API Key / Copernicus 凭据", "resolution": "用户裁定①『正式启用』：API Key OutlinedTextField + 保存（写 SharedPreferences，无消费方备用）；Copernicus 凭据真实校验保存/清除（App 私有目录）。v2『占位不可点』红线作废。", "status": "closed", "decision_owner": "用户" },
+    { "id": "DECISION-CROSSHAIR", "title": "准星形态", "resolution": "用户裁定②『按你的来』：保留工程四向刻度内核（F-1.3），叠加细定位环 + 薄荷中心点，三态 idle/preview/locked，与 APP 图标同源。落地需改 Compose Canvas。", "status": "closed", "decision_owner": "用户" },
+    { "id": "DECISION-GMS", "title": "GMS 口径", "resolution": "用户裁定③『以实际工程为准』：删除『无 GMS 单机口径』，改双通道定位（play-services-location 21.3.0，有 GMS 走 Fused、无 GMS 降级）；验收机型 AAK-AN00 / Android 16。", "status": "closed", "decision_owner": "用户" },
+    { "id": "DECISION-V3-BEAUTY", "title": "v3 四项美化", "resolution": "用户确认全部采用：①准星细环+薄荷点 ②薄荷点缀 #80CBC4/#26A69A ③收藏白卡+左档位色带 ④深蓝主卡轻微渐变。冻结色（五档/六徽标/4 主色）一格未动。", "status": "closed", "decision_owner": "用户" }
+  ],
+
   "tokens": [
-    { "design_key": "theme.light / theme.dark", "code_symbol": "LightColors / DarkColors / TideSpotTheme", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/theme/TideSpotTheme.kt", "status": "existing", "action": "已由 MainActivity.setContent { TideSpotTheme { ... } } 接入；色值禁改" },
-    { "design_key": "semantic_frozen.score_bands", "code_symbol": "ScoreBand 枚举", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/band/ScoreBands.kt", "status": "existing", "action": "冻结单源；HourChart / FactorBreakdown 已引用，禁止在 UI 层另写色值" },
-    { "design_key": "semantic_frozen.confidence_badges", "code_symbol": "ConfidenceBadge.Kind", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/badge/ConfidenceBadge.kt", "status": "existing", "action": "冻结单源；M6 已动态接线，禁硬编码 ESTIMATED" },
-    { "design_key": "copy.keys (frozen)", "code_symbol": "TideSpotStrings / WaterBodyTabTitles", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/strings/TideSpotStrings.kt", "status": "existing", "action": "逐字引用；FO-01 文案唯一入口。feature/map 的 WaterBodyTabTitles 是 typealias 委托" },
-    { "design_key": "tab 标题集合", "code_symbol": "WaterBodyTabTitles.titlesFor(WaterBodyType)", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/titles/WaterBodyTabTitles.kt", "status": "existing", "action": "海洋 / 内陆 / 陆地三套标题已实现，与 screens.json 的 tab.* 一致" },
-    { "design_key": "typography / spacing / radius / safe_area", "code_symbol": "（无集中 token 对象）", "code_file": null, "status": "partial", "action": "工程用 MaterialTheme.typography.* + 散落 dp 值。设计侧在本包规定值；实现时按值落地即可，不要为了「对齐设计」去改 TideSpotTheme 的色值。若要做集中化，另起 Dimensions.kt 并同步本包。" }
+    { "design_key": "theme.light / theme.dark", "code_symbol": "LightColors / DarkColors / TideSpotTheme", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/theme/TideSpotTheme.kt", "status": "existing", "action": "色值禁改；设计侧已按工程现值刷新（含 onSurfaceVariant #556579/#9FB0C0、surfaceVariant #EEF3F8/#1E2C3A）" },
+    { "design_key": "shapes / typography", "code_symbol": "TideSpotShapes / TideSpotTypography", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/theme/TideSpotTheme.kt", "status": "existing", "action": "工程已集中定义并注入 MaterialTheme；v3 scoreHero 56sp 为设计侧建议，不改 token 本体" },
+    { "design_key": "semantic_frozen.score_bands", "code_symbol": "ScoreBand 枚举", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/band/ScoreBands.kt", "status": "existing", "action": "冻结单源；禁在 UI 层另写色值" },
+    { "design_key": "semantic_frozen.confidence_badges", "code_symbol": "ConfidenceBadge.Kind", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/badge/ConfidenceBadge.kt", "status": "existing", "action": "冻结单源；M6 已动态接线" },
+    { "design_key": "copy.keys (frozen)", "code_symbol": "TideSpotStrings / WaterBodyTabTitles", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/strings/TideSpotStrings.kt", "status": "existing", "action": "FO-01 文案唯一入口；中英 241/241 对齐" },
+    { "design_key": "tab 渲染序 / 标题矩阵", "code_symbol": "WaterBodyTabTitles.titlesInTabOrder", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/titles/WaterBodyTabTitles.kt", "status": "existing", "action": "恒 5 项 = [score, tide, weather, waterQuality, wave]；v2 稿的字段顺序口径已作废" },
+    { "design_key": "layout.detail.day_selector", "code_symbol": "DaySelector + DaySelectorLogic", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/selector/DaySelector.kt", "status": "existing", "action": "52dp 两行（topLabel/weekdayLabel）/ 圆角 18 / min 56 / 间距 6（OPT-V12-04 CHG-57）；v2 的 36dp 单行已作废" },
+    { "design_key": "v3 美化 token（elevation/accent/crosshair/主卡渐变）", "code_symbol": "（无工程 token，设计侧新增）", "code_file": null, "status": "visual_tune", "action": "三级层级阴影、薄荷点缀 #80CBC4/#26A69A、准星三态、主卡渐变、收藏白卡色带、深色独立设计——只改视觉，不动工程 colorScheme 冻结角色。若要做集中化，另起设计扩展 token 并同步本包。" }
   ],
 
   "components": [
-    { "id": "C01", "name": "准星", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "CrosshairOverlay + crosshair/CrosshairStateMachine.kt", "status": "existing", "action": "视觉对齐 64×64 / 四向刻度；F-1.3 真源契约不变" },
-    { "id": "C02", "name": "顶部工具浮层", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "MapScreen 顶部 Row", "status": "partial", "action": "核对 y ≥ 68 dp 浮层起点与 44/206 dp 尺寸" },
-    { "id": "C03", "name": "底部选点信息条", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "InfoBarPanel + infobar/InfoBarState.kt", "status": "existing", "action": "状态已覆盖；核对 366×200 dp 与底部安全区" },
-    { "id": "C04", "name": "确认收藏对话框", "code_file": "tidespot-android/app/src/main/kotlin/com/tidespot/app/MainActivity.kt", "symbol": "ConfirmFavoriteDialog (line 234)", "status": "existing", "action": "M6 OPT-M5-07 已实现并预填逆地理名；核对不遮挡信息条" },
-    { "id": "C05", "name": "Top10 BottomSheet", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "ModalBottomSheet + Top10SheetContent (line 317)", "status": "existing", "action": "另有 FavoritesScreen.kt 的 Top10Content；两处口径需一致" },
-    { "id": "C06", "name": "免责 BottomSheet", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "ModalBottomSheet (line 304) + TideSpotStrings.DISCLAIMER_ITEMS", "status": "existing", "action": "常驻入口 line 279 / 285 已接线；核对恒 5 条与可滚动" },
-    { "id": "C07", "name": "DaySelector", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/selector/DaySelector.kt", "symbol": "DaySelector + DaySelectorLogic", "status": "existing", "action": "核对 7/10 天档与 Chip 圆角 18" },
-    { "id": "C08", "name": "五维 TabBar", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/titles/WaterBodyTabTitles.kt", "symbol": "WaterBodyTabTitles.titlesFor", "status": "existing", "action": "标题三套已实现；核对选中下划线与不可用 Tab 不隐藏" },
-    { "id": "C09", "name": "HourChart / 数值表", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/chart/HourChart.kt", "symbol": "HourChart + ChartMath", "status": "existing", "action": "已用 ScoreBand.colorOf / EXPLOSIVE.argb；核对 null 断线与 ≥80 窗口横条" },
-    { "id": "C10", "name": "今日指数主卡", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DailySummaryLine + ScoreBadgeDerivations.kt", "status": "existing", "action": "核对分数 + 档位文字 + 徽标同屏" },
-    { "id": "C11", "name": "FactorBreakdown", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/breakdown/FactorBreakdown.kt", "symbol": "FactorBreakdown", "status": "existing", "action": "核对标签列/数值列对齐、行高 15 dp；禁 parse 否决文案" },
-    { "id": "C12", "name": "ConfidenceBadge", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/badge/ConfidenceBadge.kt", "symbol": "ConfidenceBadge(kind: Kind)", "status": "existing", "action": "圆角 4 dp / padding 6×2 已实现，勿改" },
-    { "id": "C13", "name": "TideChart", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "TideChartDerivations.kt + HourChart", "status": "partial", "action": "dh/dt 副轴 / 高低潮 / 校正前后对照为设计规定，需核对工程覆盖度" },
-    { "id": "C14", "name": "校准面板", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "CalibrationSheetContent (line 371) + core/domain/.../tide/TideCalibrator.kt", "status": "existing", "action": "已有 Sheet；核对现场校潮流程与免责第 5 条" },
-    { "id": "C15", "name": "水质 2×2 指标卡", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "WATER_QUALITY Tab 内容", "status": "partial", "action": "核对单卡高 ≥112 dp、clipsContent=false、不可用显示「—」" },
-    { "id": "C16", "name": "FilterChip / Switch", "code_file": "tidespot-android/feature/settings/src/main/kotlin/com/tidespot/feature/settings/SettingsScreen.kt", "symbol": "SettingsScreen + SettingsLogic", "status": "existing", "action": "六版块已实现；核对隐私逐源披露与占位版块" },
-    { "id": "C17", "name": "离线陈旧条", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "StaleBanner (line 425)", "status": "existing", "action": "核对深色态与文案" },
-    { "id": "C18", "name": "分维降级卡", "code_file": "tidespot-android/core/domain/src/main/kotlin/com/tidespot/core/domain/algorithm/VetoEvaluator.kt", "symbol": "VetoEvaluator + Models.kt VetoCode", "status": "partial", "action": "降级逻辑在 domain；UI 展示卡为设计规定，核对是否已透出" },
-    { "id": "C19", "name": "收藏列表 / 入口", "code_file": "tidespot-android/feature/favorites/src/main/kotlin/com/tidespot/feature/favorites/favorites/FavoritesScreen.kt", "symbol": "FavoritesScreen + FavoriteCard + EditSpotDialog", "status": "existing", "action": "已有列表/编辑对话框/Top10；核对空态与已收藏图标态" },
+    { "id": "C01", "name": "准星", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "CrosshairOverlay（Compose Canvas）", "status": "visual_tune", "action": "保留四向刻度 + F-1.3 真源；加细环 + 薄荷中心点三态（idle 薄荷 / preview 琥珀 #F59E0B / locked 主蓝），与图标同源。需改 Canvas 绘制。" },
+    { "id": "C02", "name": "顶部工具浮层", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "TopBarAction + 搜索收起展开", "status": "existing", "action": "视觉：L2 软阴影 + 搜索框 250dp" },
+    { "id": "C03", "name": "底部选点信息条", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "InfoBarPanel + infobar/InfoBarState.kt", "status": "existing", "action": "v1.16.0 为 236dp 浮条 + 独立操作面板；v2 的 366×200 已作废。视觉：L2 抬升。" },
+    { "id": "C04", "name": "确认收藏对话框", "code_file": "tidespot-android/app/src/main/kotlin/com/tidespot/app/MainActivity.kt", "symbol": "ConfirmFavoriteDialog (AlertDialog)", "status": "existing", "action": "预填逆地理名 + 坐标摘要；核对不遮挡信息条、保存中态" },
+    { "id": "C05", "name": "Top10 BottomSheet", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "ModalBottomSheet + Top10SheetContent + Top10ViewModel.top10Filtered", "status": "existing", "action": "v2『本点/全部范围切换』作废：本点 Top10 在 S02、跨点在 S08；Sheet 内改时段筛选四 Chip + 自选时段弹层。排序以 domain 为准。" },
+    { "id": "C06", "name": "免责 BottomSheet + 入口", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "ModalBottomSheet + DISCLAIMER_ITEMS + 各屏底部 56dp Surface", "status": "visual_tune", "action": "恒 5 条不动；v3 常驻入口条改 surfaceVariant 底 + 右侧 ›" },
+    { "id": "C07", "name": "DaySelector", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/selector/DaySelector.kt", "symbol": "DaySelector + DaySelectorLogic", "status": "existing", "action": "52dp 两行已落地；视觉：选中胶囊填充 primary" },
+    { "id": "C08", "name": "五维 TabBar", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/titles/WaterBodyTabTitles.kt", "symbol": "titlesInTabOrder + DetailScreen Tab 组装", "status": "visual_tune", "action": "标题三套已实现、渲染序恒 5 项；v3 选中态改胶囊填充" },
+    { "id": "C09", "name": "HourChart / 数值表", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/chart/HourChart.kt", "symbol": "HourChart + ChartMath（Compose Canvas 自绘）", "status": "visual_tune", "action": "null 断线与五档冻结色不动；v3 ≥80 窗格改薄荷小圆点；卡片高度建议 180→210dp" },
+    { "id": "C10", "name": "今日指数主卡", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DailySummaryLine + ScoreBadgeDerivations.kt", "status": "visual_tune", "action": "工程现纯色 #0D47A1；v3 改 brush 渐变 #1565C0→#0D47A1 + 柔光层，分数 48→56sp 建议，档位胶囊 + 五段色带选中高亮。冻结色带仍取 ScoreBands。" },
+    { "id": "C11", "name": "FactorBreakdown", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/breakdown/FactorBreakdown.kt", "symbol": "FactorBreakdown", "status": "existing", "action": "因子名已本地化；核对标签/数值对齐、行高 15dp；禁 parse 否决文案" },
+    { "id": "C12", "name": "ConfidenceBadge", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/badge/ConfidenceBadge.kt", "symbol": "ConfidenceBadge(kind: Kind)", "status": "existing", "action": "圆角 4dp / padding 6×2 已实现，勿改" },
+    { "id": "C13", "name": "TideChart", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "TideChartDerivations.kt + HourChart", "status": "existing", "action": "客户裁定以现有实现为准，不复刻旧 derived 细节；核对 dh/dt 副轴与校正前后图例" },
+    { "id": "C14", "name": "校准面板 / 现场校潮", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "CalibrationSheetContent + core/domain/.../tide/TideCalibrator.kt", "status": "existing", "action": "核对现场校潮流程与免责第 5 条" },
+    { "id": "C15", "name": "水质指标卡（1×3）", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "水质指标卡 height(112.dp)", "status": "existing", "action": "客户裁定删 pH，保留三项一行三卡；v3 加估算徽标（clipsContent=false 防裁切）" },
+    { "id": "C16", "name": "FilterChip / Switch / 凭据区", "code_file": "tidespot-android/feature/settings/src/main/kotlin/com/tidespot/feature/settings/SettingsScreen.kt", "symbol": "SettingsScreen + CopernicusCredentialStore + OpenMeteoClient", "status": "visual_tune", "action": "六版块已实现；决策①API Key/Copernicus 真实可交互（已落地）；v3 收进单卡、凭据区真实化视觉、地图样式三选卡片化；隐私逐源披露红线不放宽" },
+    { "id": "C17", "name": "离线/陈旧/48h 不可用条", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "StaleBanner + PullToRefreshBox", "status": "existing", "action": "两态合并 + ≥48h 不可用态独立保留（测试未删改）；v3 三态配色（灰/黄/红）+ 下拉刷新反馈" },
+    { "id": "C18", "name": "分维降级卡", "code_file": "tidespot-android/core/domain/src/main/kotlin/com/tidespot/core/domain/algorithm/VetoEvaluator.kt", "symbol": "VetoEvaluator + Models.kt VetoCode", "status": "existing", "action": "domain 逻辑冻结；UI 卡为设计规定，核对是否已透出；禁 parse reason" },
+    { "id": "C19", "name": "收藏列表 / 入口", "code_file": "tidespot-android/feature/favorites/src/main/kotlin/com/tidespot/feature/favorites/favorites/FavoritesScreen.kt", "symbol": "FavoritesScreen + FavoriteCard + EditSpotDialog + FavoritesSortLogic", "status": "visual_tune", "action": "搜索/排序四选/分组折叠/长按多选/批量栏/编辑删除已实现；v3 改白卡 + 左 4dp 档位色带，操作收进图标，≥48h alpha 0.6" },
     { "id": "C20", "name": "SearchPanel", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/search/SearchPanel.kt", "symbol": "SearchPanel", "status": "existing", "action": "核对选中结果仍把准星落到该坐标（F-1.3）" },
-    { "id": "C21", "name": "地图署名", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "底图右下文本", "status": "partial", "action": "核对 copy.attribution.map 文案" },
-    { "id": "C22", "name": "来源与更新时间行", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "SourceFooter (line 476) + sourceInfo (line 418)", "status": "partial", "action": "见 GAP-02：源端更新时刻数据层未透出，工程显示「—」，禁止硬编码 06:00 UTC" }
+    { "id": "C21", "name": "地图署名", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "底图右下文本", "status": "existing", "action": "v1.16.0 底图默认切 Voyager 彩色；署名『底图 OpenStreetMap · CARTO Voyager』；源更新显示「—」" },
+    { "id": "C22", "name": "来源与更新时间行", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "SourceFooter + sourceInfo（:app 透传 fetchedAt）", "status": "existing", "action": "源更新未透出显示「—」，禁止硬编码" },
+    { "id": "C23", "name": "星标层 + 气泡卡", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/FavoriteStarLayer.kt", "symbol": "FavoriteStarLayer + StarBubbleCard", "status": "existing", "action": "核对点星标不动准星；星名 z≥14 显示；≤100 条不聚合" },
+    { "id": "C24", "name": "水质实测录入 Sheet", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "水质实测录入 Sheet（全展开）", "status": "existing", "action": "核对按钮置顶常驻可点、离线可录入、水温参与 §6.1.3 融合" },
+    { "id": "C25", "name": "内陆引导卡", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "内陆水质首次引导卡（:app 注入）", "status": "existing", "action": "核对四条件注入逻辑；v3 卡左 4dp 薄荷色条" }
   ],
 
   "screens": [
-    { "id": "S01", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "MapScreen", "status": "existing" },
-    { "id": "S02", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DetailScreen (SCORE Tab)", "status": "existing" },
+    { "id": "S01", "code_file": "tidespot-android/feature/map/src/main/kotlin/com/tidespot/feature/map/MapScreen.kt", "symbol": "MapScreen", "status": "visual_tune" },
+    { "id": "S02", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DetailScreen (SCORE Tab)", "status": "visual_tune" },
     { "id": "S03", "code_file": "tidespot-android/core/ui/src/main/kotlin/com/tidespot/core/ui/breakdown/FactorBreakdown.kt", "symbol": "FactorBreakdown", "status": "existing" },
     { "id": "S04", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DetailScreen (WAVE Tab)", "status": "existing" },
     { "id": "S05", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DetailScreen (WEATHER Tab)", "status": "existing" },
     { "id": "S06", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DetailScreen (WATER_QUALITY Tab)", "status": "existing" },
     { "id": "S07", "code_file": "tidespot-android/feature/detail/src/main/kotlin/com/tidespot/feature/detail/detail/DetailScreen.kt", "symbol": "DetailScreen (TIDE Tab)", "status": "existing" },
-    { "id": "S08", "code_file": "tidespot-android/feature/favorites/src/main/kotlin/com/tidespot/feature/favorites/favorites/FavoritesScreen.kt", "symbol": "FavoritesScreen", "status": "existing" },
-    { "id": "S09", "code_file": "tidespot-android/feature/settings/src/main/kotlin/com/tidespot/feature/settings/SettingsScreen.kt", "symbol": "SettingsScreen", "status": "existing" },
-    { "id": "HOST", "code_file": "tidespot-android/app/src/main/kotlin/com/tidespot/app/MainActivity.kt", "symbol": "MainActivity / AppRoot / DetailPage / SettingsPage", "status": "conflict", "action": "见 CONFLICT-01" }
+    { "id": "S08", "code_file": "tidespot-android/feature/favorites/src/main/kotlin/com/tidespot/feature/favorites/favorites/FavoritesScreen.kt", "symbol": "FavoritesScreen", "status": "visual_tune" },
+    { "id": "S09", "code_file": "tidespot-android/feature/settings/src/main/kotlin/com/tidespot/feature/settings/SettingsScreen.kt", "symbol": "SettingsScreen", "status": "visual_tune" },
+    { "id": "HOST", "code_file": "tidespot-android/app/src/main/kotlin/com/tidespot/app/MainActivity.kt", "symbol": "MainActivity / AppRoot / when(page)", "status": "existing", "action": "地图优先已落地；无底栏；contentWindowInsets 归零" }
   ],
 
   "icon": {
@@ -67,60 +88,30 @@
       "design-handoff/icon/tidespot-icon-background.svg",
       "design-handoff/icon/tidespot-icon-foreground.svg",
       "design-handoff/icon/tidespot-icon-monochrome.svg",
+      "design-handoff/icon/tidespot-icon-monochrome-108.svg",
       "design-handoff/icon/tidespot-icon-preview.svg"
     ],
-    "current_state": "tidespot-android/app/src/main/AndroidManifest.xml:11 android:icon=\"@android:drawable/sym_def_app_icon\"（系统默认图标）",
-    "status": "missing",
-    "target": "mipmap-anydpi-v26 adaptive icon + drawable 三层 + legacy mipmap PNG；详见 icon/app-icon-spec.md",
+    "current_state": "已落地：AndroidManifest.xml:13 android:icon=\"@mipmap/ic_launcher\"；mipmap-anydpi-v26/{ic_launcher,ic_launcher_round}.xml + drawable/{ic_launcher_background,ic_launcher_foreground,ic_launcher_monochrome}.xml 五件齐全。",
+    "status": "existing",
+    "v3_change": "工程现有 foreground 为准星圆环 r22 + 四向刻度 + 薄荷点 + 双潮线；v3 SVG 源稿升级为细环 r21 + 四向刻度（落安全区 18..90）+ 薄荷点 r6.4 + 白芯、双潮线移至背景层，与准星 idle 态同源。属视觉替换，落地由实现方转 vector drawable 并替换 foreground/background/monochrome；manifest 指向无需改。",
+    "target": "替换现有 drawable 三层内容；详见 icon/app-icon-spec.md",
     "note": "本包只给设计侧 SVG 源稿，不产出可编译 res 资源。"
   },
 
-  "conflicts": [
-    {
-      "id": "CONFLICT-01",
-      "severity": "high",
-      "title": "导航模型：底部四项 NavigationBar vs 地图优先",
-      "design_says": "screens.json / v2 稿：地图优先导航，顶部浮层 + 准星 + 底部信息条 + Top10 入口，**无通用底部 Tab Bar**；收藏与设置走地图顶部入口。",
-      "code_does": "MainActivity.AppRoot 用 Scaffold(bottomBar = NavigationBar) 渲染四项：地图 / 收藏 / 详情 / 设置（TAB_ORDER，line 63 / 87–104）；详情 Tab 无上下文时禁用。",
-      "recommendation": "先由产品决策二选一：① 工程移除 NavigationBar，改为地图顶部入口 + Top10 入口（贴合设计稿与 §8.1 地图优先）；② 保留底栏，则由设计侧补一版带底部导航的屏组并更新本包 screens.json。未决策前不要按设计稿删底栏，也不要把设计稿当成对新导航的确认。",
-      "decision_owner": "产品 / 用户",
-      "design_files": ["screens/screens.json", "screens/screens.md", "tokens/design-tokens.json → layout.navigation_model"]
-    },
-    {
-      "id": "CONFLICT-02",
-      "severity": "medium",
-      "title": "免责第 5 条：需求 §9.6 原文 vs 工程 D11 文案",
-      "design_says": "本包 copy.json 采用工程 M6/D11 的「现场校潮」长文，恒 5 条。",
-      "code_does": "TIDESPORT_REQUIREMENTS.md §9.6 第 5 条原文为「校正仅在实测参考可用时生效；未校正点位显示\"未校正\"。」，与 TideSpotStrings.DISCLAIMER_TIDE_CORRECTION 不同。",
-      "recommendation": "以工程单源为准；§9.6 的「未校正」展示要求由 ConfidenceBadge.Kind.UNCALIBRATED 承载，不新增第 6 条免责。若要回归需求原文，需同时改 TideSpotStrings.kt、测试与 copy.json。",
-      "decision_owner": "产品 / 需求负责人"
-    },
-    {
-      "id": "CONFLICT-03",
-      "severity": "low",
-      "title": "源更新时间：稿件示意值 vs 工程实际能力",
-      "design_says": "assets/screen-02-score.svg 与 derived 稿显示「源更新 06:00 UTC」。",
-      "code_does": "DetailScreen.sourceInfo (line 418–419) 注释明确：源端更新时刻数据层未透出，为上报项，源更新显示「—」。",
-      "recommendation": "「06:00 UTC」是版式示意值，**实现禁止硬编码编造源更新时间**。UI 应显示工程透出的真实值或「—」；待数据层透出模型名/网格分辨率/UTC 更新时刻后再回填。",
-      "decision_owner": "数据层负责人"
-    }
-  ],
-
-  "gaps": [
-    { "id": "GAP-01", "what": "APP 图标", "code_status": "AndroidManifest 仍引用系统默认图标", "recommendation": "按 icon/app-icon-spec.md 落地 adaptive icon；SVG 源稿已在本包" },
-    { "id": "GAP-02", "what": "源端更新时刻 / 模型名 / 网格分辨率（F-3.7）", "code_status": "数据层未透出，工程显示「—」", "recommendation": "登记 v1.1；设计稿的示意值不得当成真实值实现" },
-    { "id": "GAP-03", "what": "Android 16 edge-to-edge 显式 insets", "code_status": "全仓 main 源码无 WindowInsets / enableEdgeToEdge / systemBarsPadding 调用；依赖 Scaffold + NavigationBar 的默认 padding", "recommendation": "设计稿的 58 dp 状态栏占位 / ≥24 dp 手势条预留为表现值；实现必须实测并用 WindowInsets 处理，禁止写死数值。若按 CONFLICT-01 移除底栏，务必补 navigationBarsPadding" },
-    { "id": "GAP-04", "what": "集中化的字阶 / 间距 / 圆角 / 安全区 token", "code_status": "无集中对象，分散在 MaterialTheme.typography 与 dp 字面量", "recommendation": "可选重构；若做，需同步更新 tokens/design-tokens.json 保持一致" },
-    { "id": "GAP-05", "what": "design_proposed 文案 17 条", "code_status": "工程未定义", "recommendation": "与产品确认后统一补进 TideSpotStrings.kt（FO-01），禁止散落在 feature 层" },
-    { "id": "GAP-06", "what": "整套深色屏组像素稿", "code_status": "TideSpotTheme 已有 darkColorScheme；本包只画了 DV01–DV03 三张深色样张 + DV04 全屏换色规则", "recommendation": "按 DV04 规则 + tokens.theme.dark 落地全套深色，冻结语义色不改值" },
-    { "id": "GAP-07", "what": "S03–S08 像素级精稿", "code_status": "本包给的是按规格推导的 SVG 结构稿", "recommendation": "结构表达已足够实现；如需逐屏像素验收，可基于 assets/derived/ 再细化" }
+  "open_items": [
+    { "id": "P2-01", "what": "地图 edge-to-edge 全屏铺入系统栏区", "code_status": "MainActivity contentWindowInsets=0 已全屏，但地图未铺入状态栏区（纯色条同色不可见）", "recommendation": "随下次 UI 批次：MainActivity Scaffold insets + MapScreen 地图全屏、浮层单独 insets；预算 1–2h，改后跑 map/app 测试。不阻塞本次美化。" },
+    { "id": "P2-02", "what": "英文真机验收", "code_status": "i18n_scan FAIL=0、Robolectric 中英锁测试在位；adb devices 为空，真机英文界面未验", "recommendation": "随下次真机批次；不阻塞。" },
+    { "id": "FO-03", "what": "v3 美化 token 集中化", "code_status": "工程 colorScheme/Shapes/Typography 已集中；v3 新增的 elevation/accent/准星三态/主卡渐变无工程 token", "recommendation": "实现方可按需另起设计扩展 token（如 TideSpotMotion/Dimensions 或视觉 brush 常量），并同步本包；非必须。" }
   ],
 
   "verification": [
     "色值改动只允许发生在 ScoreBands.kt / ConfidenceBadge.kt / TideSpotTheme.kt；本包不授权修改这三个文件的取值",
-    "改 UI 前先跑现有测试（M6 退出快照为 573 测试通过），保持零行为漂移",
-    "任何文案改动走 TideSpotStrings.kt，注意 TideSpotStringsTest 断言免责恒 5 条",
-    "不得新增 XML layout（项目禁 XML layout，全部 Compose）",
-    "不得把设计稿的示意数据（示例分数、示例时间、示例点位）当成业务数据实现"
+    "v3 美化只动视觉：三级层级 / 薄荷点缀 / 字阶 / 准星三态 / 主卡渐变 / 收藏白卡色带 / 深色独立设计；不动功能、结构、文案、Tab 序、导航流",
+    "改 UI 前先跑现有测试（V1.15 退出快照八模块 BUILD SUCCESSFUL、573+ 测试），保持零行为漂移",
+    "任何文案改动走 TideSpotStrings.kt，TideSpotStringsTest 断言免责恒 5 条必须保持通过",
+    "不得新增 XML layout（项目禁 XML layout，全部 Compose）；图标 drawable 属资源不构成 layout",
+    "不得把设计稿的示意数据（示例分数、示例时间、示例点位、源更新示意值）当成业务数据实现",
+    "CHG-56 硬约束：浅色次要文字 ≥4.5:1（#556579），禁用 #8A9DB0",
+    "深色下冻结语义色不改值，靠文字标签 / 描边 / 底色明度分层保证 ≥4.5:1"
   ]
 }

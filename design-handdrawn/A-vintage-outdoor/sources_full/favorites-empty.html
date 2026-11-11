@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 复古户外 · 收藏空态 · 鱼骨引导</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;font-family:KaiTi, 楷体, STKaiti, serif;color:#16324F;
+  background:#E4D9BC;}
+.bgfill{position:absolute;inset:0;background:linear-gradient(160deg,#E4D9BC 0%,#D8C9A5 100%);z-index:0}
+.grain{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:0.9}
+.screen{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:Georgia, serif;font-size:14px;font-weight:700;color:#16324F;position:relative;z-index:5}
+.statusbar .r{display:flex;gap:5px;align-items:center;font-size:12px}
+.notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:74px;height:20px;border-radius:12px;background:#16324F;opacity:0.85}
+.disp{font-family:Georgia, Times New Roman, serif;font-weight:700;letter-spacing:0.14em}
+.bodyf{font-family:KaiTi, 楷体, STKaiti, serif}
+.card{background:#F2EAD4;border:2.2px solid #16324F;border-radius:16px 20px 15px 19px / 19px 15px 20px 16px;
+  box-shadow:2px 3px 0 #16324F33;position:relative;overflow:hidden}
+.tape{position:absolute;background:#D9A734;opacity:0.85;transform:rotate(-3deg);z-index:3}
+.tag{display:inline-flex;align-items:center;gap:4px;border:2px solid #16324F;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;background:#F2EAD4;position:relative;z-index:4}
+.hl{color:#C15A3A}
+.mut{color:#5C5540}
+.row{display:flex;align-items:center}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="19" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.3" xChannelSelector="G" yChannelSelector="B"/>
+  </filter>
+  <filter id="watercolor" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="3.1" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.6"/>
+  </filter>
+  <filter id="papergrain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="ng"/>
+    <feComponentTransfer in="ng" result="na"><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+  </filter>
+  <filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="16324F" flood-opacity="0.18"/>
+  </filter>
+ </defs>
+</svg>
+<div class="bgfill"></div>
+<div class="screen"><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div><div class="row" style="padding:6px 16px 10px;position:relative;z-index:3"><span class="disp" style="font-size:24px;color:#16324F">我的收藏</span>
+      <span class="bodyf mut" style="font-size:10.5px;margin-left:auto">0 个点位</span></div>
+    <div style="margin:0 14px;position:relative;z-index:3"><div class="card" style="height:40px;display:flex;align-items:center;gap:8px;padding:0 12px">
+      <span style="font-size:16px;color:#C15A3A">⌕</span><span class="bodyf" style="font-size:12px;color:#5C5540">搜索收藏点位</span></div></div><div style="margin:60px 30px 0;text-align:center;position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:130px;opacity:.8"><svg viewBox="0 0 120 64" width="130"><g filter="url(#rough2)">
+              <path d="M20 32 L104 32" stroke="#16324F" stroke-width="3" stroke-linecap="round"/>
+              <path d="M30 24 L30 40 M44 24 L44 40 M58 24 L58 40 M72 24 L72 40 M86 24 L86 40" stroke="#16324F" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M20 32 L8 22 M20 32 L8 42 M104 32 L116 22 M104 32 L116 42" stroke="#16324F" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="26" cy="26" r="5" fill="none" stroke="#16324F" stroke-width="2.6"/></g></svg></div>
+      <div class="disp" style="font-size:16px;color:#1B3A5C">还没有收藏点</div>
+      <div class="bodyf mut" style="font-size:10.5px;line-height:1.7">在地图上拖动准星选点，点「收藏」<br>把常去的水域存到这里，随时回看。</div>
+      <div style="border:2px solid #16324F;border-radius:11px;text-align:center;padding:10px 22px;background:#D9A734;margin-top:6px"><b class="bodyf" style="font-size:12px;color:#16324F">＋ 回地图选点</b></div></div><div class="row" style="margin:9px 16px 0;position:relative;z-index:6;padding:8px 12px;border:1.8px dashed #16324F88;border-radius:11px;background:#F2EAD4EE;z-index:6;gap:8px;box-shadow:0 -2px 8px #D8C9A5AA">
+      <span style="font-size:14px;color:#C15A3A">ⓘ</span>
+      <span class="bodyf" style="font-size:10.5px;color:#5C5540;flex:1">免责声明 · 共 5 条 · 数据仅供参考</span>
+      <span style="color:#1B3A5C;font-size:13px">›</span></div></div>
+<svg class="grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <rect width="100%" height="100%" filter="url(#papergrain)" opacity="1"/>
+</svg>
+</body></html>

@@ -16,6 +16,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,15 +41,18 @@ import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.theme.TideSpotTheme
+import com.tidespot.core.ui.zone.SpotZones
 import com.tidespot.feature.detail.detail.DetailScreen
 import com.tidespot.feature.detail.detail.DetailViewModel
 import com.tidespot.feature.detail.detail.InlandCredentialGuideCard
 import com.tidespot.feature.favorites.favorites.FavoritesSaveRules
 import com.tidespot.feature.favorites.favorites.FavoritesScreen
+import com.tidespot.feature.favorites.favorites.FavoritesSummaryFormatter
 import com.tidespot.feature.favorites.favorites.FavoritesViewModel
 import com.tidespot.feature.map.MapScreen
 import com.tidespot.feature.map.model.GeoPoint
 import com.tidespot.feature.map.model.SpotConfirmed
+import com.tidespot.feature.map.stars.FavoriteStar
 import com.tidespot.feature.settings.CopernicusCredentialSection
 import com.tidespot.feature.settings.SettingsLogic
 import com.tidespot.feature.settings.SettingsScreen
@@ -97,7 +101,28 @@ private fun AppRoot(graph: AppGraph) {
     // OPT-V115-02 / S01 C22：最近一次详情拉取时刻（地图来源行透传；真实值，无数据显示「—」）
     var lastFetchedMillis by remember { mutableStateOf<Long?>(null) }
 
-    val favoritesVm = remember { FavoritesViewModel(graph.repository) }
+    val favoritesVm = remember { FavoritesViewModel(graph.repository, networkAvailable = { graph.isNetworkAvailable() }) }
+    // OPT-V12-01（CHG-57）：地图星标数据源（Room 读侧 → 收藏点 + 最佳窗口摘要；端侧零额外网络）
+    val favoritesState by favoritesVm.state.collectAsState()
+    val tideStrings = localTideSpotStrings()
+    val favoriteStars = remember(favoritesState.spots, favoritesState.summaries, favoritesState.nowEpochSec, tideStrings) {
+        favoritesState.spots.map { spot ->
+            FavoriteStar(
+                id = spot.id,
+                name = spot.name,
+                lat = spot.lat,
+                lon = spot.lon,
+                summary = favoritesState.summaries[spot.id]?.let { summary ->
+                    FavoritesSummaryFormatter.line(
+                        summary,
+                        SpotZones.zoneForSpot(spot),
+                        favoritesState.nowEpochSec.takeIf { it > 0 },
+                        tideStrings,
+                    )
+                },
+            )
+        }
+    }
     // OPT-V11-05（P1）：进入收藏列表 → 后台预刷新最近查看 5 条（TTL/2 + 令牌桶；失败静默、无 UI 状态）
     LaunchedEffect(navState.page, settingsState.prefetchEnabled) {
         if (navState.page == AppPage.FAVORITES && settingsState.prefetchEnabled) {
@@ -109,17 +134,23 @@ private fun AppRoot(graph: AppGraph) {
             }
         }
     }
+    // OPT-V12-02（CHG-57）：离开收藏页即取消进行中的刷新（切页取消，无残留进度/ANR）
+    LaunchedEffect(navState.page) {
+        if (navState.page != AppPage.FAVORITES) favoritesVm.cancelRefresh()
+    }
     // CHG-12④b：ZoneId 由 DetailViewModel 构造器默认值按 spot.tzOffsetSec 单源解析；
     // 设置 detailDays 变化或换点 → 重建（缓存先行语义不变）
     val detailSpot = navState.detailSpot
     val detailVm = remember(detailSpot?.id, settingsState.detailDays) {
-        detailSpot?.let { DetailViewModel(graph.repository, it, daysRange = settingsState.detailDays) }
+        detailSpot?.let { DetailViewModel(graph.repository, it, daysRange = settingsState.detailDays, networkAvailable = { graph.isNetworkAvailable() }) }
     }
 
     // ── v1.1 UX 批次（18/20/21）：浮动按钮 + 返回手势 + 返回地图定位 ──
     val context = LocalContext.current
     /** UX-18：返回地图的相机目标（上一查看点 → 否则 lastViewedAt 最新；null = 世界视图）。 */
     var pendingMapTarget by remember { mutableStateOf<GeoPoint?>(null) }
+    /** OPT-V12-01：地图相机中心（星标 → 详情 → 返回地图时保持位置不变）。 */
+    var lastMapTarget by remember { mutableStateOf<GeoPoint?>(null) }
     /** UX-20：地图浮动「Top10」→ 进收藏并自动展开 Top10 Sheet。 */
     var openFavoritesTop10 by remember { mutableStateOf(false) }
     var lastViewedSpot by remember { mutableStateOf<FavoriteSpot?>(null) }
@@ -159,6 +190,7 @@ private fun AppRoot(graph: AppGraph) {
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            // OPT-V12-01（CHG-57）：地图页（页面切换沿用原导航结构；MapView 生命周期问题另案登记）
             when (navState.page) {
                 AppPage.MAP -> MapScreen(
                     placeResolver = graph.placeResolver,
@@ -188,6 +220,21 @@ private fun AppRoot(graph: AppGraph) {
                     },
                     top10Label = stringResource(UiR.string.ts_top10_all),
                     sourceFetchedAtMillis = lastFetchedMillis,
+                    // OPT-V12-01：收藏星标 + 气泡卡（点击星标 → 气泡 → 查看详情；不移动准星）
+                    favoriteStars = favoriteStars,
+                    onOpenFavorite = { id ->
+                        favoritesVm.state.value.spots.firstOrNull { it.id == id }?.let { spot ->
+                            lastViewedSpot = spot
+                            favoritesVm.markViewed(spot.id)
+                            // 返回地图时相机回到点星标前的位置
+                            pendingMapTarget = lastMapTarget
+                            navState = AppNav.reduce(
+                                navState,
+                                AppNavEvent.OpenDetail(spot, source = AppPage.MAP),
+                            )
+                        }
+                    },
+                    onCameraTargetChanged = { lastMapTarget = it },
                     modifier = Modifier.fillMaxSize(),
                 )
 

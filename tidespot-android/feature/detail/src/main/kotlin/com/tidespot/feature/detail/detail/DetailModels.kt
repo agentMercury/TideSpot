@@ -39,6 +39,12 @@ data class TideObservationDraft(
 )
 
 /**
+ * OPT-V12-03（CHG-57）：手动下拉刷新的结果分类。
+ * 本层只携带**枚举**，文案由 UI 侧按资源映射（`:core:*` 纯 Kotlin 层禁硬编码中文）。
+ */
+enum class RefreshFeedback { UPDATED, FAILED, OFFLINE }
+
+/**
  * 详情页 UI 状态。scores/quality/tideRates 等派生序列只在 [SpotDetailResult] 到达时计算一次
  * （N-2：Tab 切换不重算）；Tab/Day/Hour 选择仅改选中位，不触发派生。
  */
@@ -60,4 +66,8 @@ data class DetailUiState(
     /** 当前选中小时（当地 0–23 下标位；null = 未选中）。 */
     val selectedHour: Int? = null,
     val daysRange: Int = 7,
+    /** OPT-V12-03：最近一次手动刷新结果（null = 尚无手动刷新 → 不渲染提示）。 */
+    val refreshFeedback: RefreshFeedback? = null,
+    /** OPT-V12-03：最近一次手动刷新成功时刻（epoch 毫秒；null = 无，禁编造时间）。 */
+    val lastRefreshAtMillis: Long? = null,
 )

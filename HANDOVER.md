@@ -25,7 +25,7 @@
 - **验证命令**（subst 后）：
   ```powershell
   $env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot'
-  D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:testDebugUnitTest :app:assembleRelease :core:domain:test :core:data:test :core:ui:testDebugUnitTest :feature:detail:testDebugUnitTest :feature:favorites:testDebugUnitTest :feature:map:testDebugUnitTest :feature:settings:testDebugUnitTest --console=plain -p T:\
+  D:\workspace\weatherfishcheck\.tools\gradle-8.9\bin\gradle.bat :app:testDebugUnitTest :app:assembleRelease :core:domain:test :core:data:test :core:ui:testDebugUnitTest :feature:detail:testDebugUnitTest :feature:favorites:testDebugUnitTest :feature:map:testDebugUnitTest :feature:settings:testDebugUnitTest --console=plain -p T:\
   ```
 - **M6 负责人偏差裁决（留证，勿重复决策）**：① Copernicus 凭据构建期 BuildConfig 注入（CHG-02 不上架 + CHG-11 单机自用下接受；运行期外部文件读取登记 v1.1）；② F-3.7 DTO 级模型名/网格分辨率透出登记 v1.1；③ 预取开关空操作语义（真预取 v1.1）；④ v3 旧行 `veto_codes='[]'` 读侧不再按文案排除（升级后首刷重算即闭合）。
 
@@ -57,7 +57,7 @@ tidespot-android/
 ## 4. 环境须知
 
 1. **JDK 17 / Android SDK / Gradle 8.9**：JDK `C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot`；SDK `C:\Users\gamer\AppData\Local\Android\Sdk`；Gradle 用 `.tools\gradle-8.9\`（不在 PATH）。
-2. **subst T:**（R-09）：`subst T: "D:\workspace\天气鱼情\tidespot-android"` 后在 `T:\` 下构建；**重启后失效，接手先查**（`subst` 无输出即重建）。
+2. **subst T:**（R-09）：`subst T: "D:\workspace\weatherfishcheck\tidespot-android"` 后在 `T:\` 下构建；**重启后失效，接手先查**（`subst` 无输出即重建）。
 3. **沙箱网络选择性放行**：`repo1.maven.org` / `services.gradle.org` **不可达** → **禁止新增任何依赖/插件**（Robolectric/ui-test 不可用，A-14 Compose 冒烟锁等网络可用）。新模块 build 脚本照抄 `:feature:detail`。
 4. **Copernicus 凭据**：有效，存 `local-secrets.properties`；禁硬编码；`:app` 接线时读取。
 5. **黄金资产**：`archive/m0-m3-assets/`（只归档不删；测试从 classpath `/golden/` 资源加载，与归档无关）；NOAA B7 校潮回归数据在 `core/domain/src/test/resources/`（OPT-08，M5 入库）。

@@ -119,6 +119,7 @@ object EnStrings : TideSpotStrings {
         "Day $offsetDays $weekday, $date"
 
     override fun dayShortToday(weekday: String): String = "Today $weekday"
+    override val dayTodayLabel = "Today"
     override val noDataHour = "No data for this hour"
     override val deviceZoneNote = "device time zone"
     override val unnamedWater = "Unnamed water"

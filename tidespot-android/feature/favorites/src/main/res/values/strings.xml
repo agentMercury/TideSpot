@@ -103,4 +103,14 @@
     <string name="ts_fav_err_batch_group">批量改分组失败，未做任何改动</string>
     <string name="ts_fav_err_no_coordinate">新建收藏点需携带坐标（请在地图上选点后保存）</string>
     <string name="ts_fav_summary_line">%1$s · %2$d 分 · %3$s</string>
+<!-- OPT-V12-02：下拉刷新 / 刷新全部 -->
+    <string name="ts_fav_refresh_all">刷新全部</string>
+    <string name="ts_fav_refresh_all_desc">刷新全部收藏点的数据</string>
+    <string name="ts_fav_refreshing">刷新中… %1$d/%2$d</string>
+    <string name="ts_fav_refresh_summary">已刷新 %1$d 条 · %2$d 条已是最新</string>
+    <string name="ts_fav_refresh_summary_failed">已刷新 %1$d 条 · %2$d 条已是最新 · %3$d 条失败</string>
+    <string name="ts_fav_refresh_offline">无网络，仅可查看缓存</string>
+    <!-- OPT-V12-07：标签预设 -->
+    <string name="ts_fav_tag_presets">常用标签</string>
+    <string name="ts_fav_tag_preset_desc">常用标签：%1$s</string>
 </resources>

@@ -8,6 +8,10 @@
     <string name="ts_detail_retry_desc">Retry loading this dimension</string>
     <string name="ts_detail_retry">Retry</string>
     <string name="ts_detail_loading">Loading…</string>
+    <!-- OPT-V12-03: pull-to-refresh feedback -->
+    <string name="ts_detail_refresh_updated">Updated %1$s</string>
+    <string name="ts_detail_refresh_failed">Refresh failed, showing cached data</string>
+    <string name="ts_detail_refresh_offline">No network. Cached data only</string>
     <string name="ts_detail_no_source">No data from this source for this spot</string>
     <string name="ts_detail_chart">Chart</string>
     <string name="ts_detail_chart_desc">Switch to hourly chart</string>

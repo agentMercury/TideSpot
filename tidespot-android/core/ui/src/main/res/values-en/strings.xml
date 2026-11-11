@@ -169,6 +169,7 @@
     <string name="ts_day_today">Today %1$s, %2$s</string>
     <string name="ts_day_future">Day %1$d %2$s, %3$s</string>
     <string name="ts_day_short_today">Today %1$s</string>
+    <string name="ts_day_today_label">Today</string>
     <string name="ts_no_data_hour">No data for this hour</string>
     <string name="ts_device_zone_note">device time zone</string>
     <string name="ts_info_unnamed_water">Unnamed water</string>

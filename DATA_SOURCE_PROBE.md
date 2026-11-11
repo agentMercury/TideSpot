@@ -45,7 +45,7 @@
 
 ### M3.0 环境自检结论
 
-- Gradle 8.9：zip 完好（136 MB/305 条目）；**沙箱禁写 `D:\tools` 与用户目录**，已解压至 `D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat` 并验证 `--version` 正常。本机执行 A-05 时建议在 `D:\tools` 补一份正式解压（CONTRACT 引用路径）。
+- Gradle 8.9：zip 完好（136 MB/305 条目）；**沙箱禁写 `D:\tools` 与用户目录**，已解压至 `D:\workspace\weatherfishcheck\.tools\gradle-8.9\bin\gradle.bat` 并验证 `--version` 正常。本机执行 A-05 时建议在 `D:\tools` 补一份正式解压（CONTRACT 引用路径）。
 - `subst T:` 映射创建成功；JDK 17 / Android SDK 路径正常。
 - 沙箱网络为选择性放行：`auth.marine.copernicus.eu` 可达；`stac.marine.copernicus.eu` 仅 curl.exe 可达（PowerShell Invoke-WebRequest 被代理拦为 400）；`catalogue/api.marine.copernicus.eu` DNS 不解析。后续沙箱内网络探针一律用 curl.exe。
 - 实现注意（M3.4 水体判定）：token 有效期 300 s，需缓存并按需刷新；湖泊判定查询属低频（仅显式选点 + 30 d 缓存），不会触碰频控。

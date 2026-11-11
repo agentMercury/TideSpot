@@ -1,0 +1,112 @@
+{
+  "schema": "tidespot.handdrawn.version/1.0",
+  "id": "B-gentleman-fish",
+  "no": "B",
+  "name": "拟人鱼绅士",
+  "name_en": "GENTLEMAN FISH",
+  "based_on": "工程 v1.16.0（versionCode 20）· 手绘视觉概念稿",
+  "source_images": [
+    "图4 微信图片_20261112105648_4_163.jpg（三条穿西装的鱼）"
+  ],
+  "visual_language": "克莱因亮蓝纯底 + 圆润拟人鱼（领带/条纹围巾/纽扣/圆眼/黄嘴）+ 轻纸颗粒 + Comic 手写标题",
+  "fish_motif": "拟人绅士鱼：西装领带 + 条纹 + 圆眼黄嘴，可做品牌 IP",
+  "best_for": "亲和可爱、记忆点最强；拟人鱼有 IP 延展潜力",
+  "tone": "明快纯色 · 亮蓝/湖绿双水体",
+  "offline": true,
+  "selfcontained": true,
+  "screens": [
+    {
+      "key": "detail-sea",
+      "label": "详情页 · 海洋/近海",
+      "png": "screens/detail-sea.png",
+      "html": "sources/detail-sea.html",
+      "sha256": "086114b058d8bf2505c609fffe45f9759ad37302d32b0cf66198596c16c52513"
+    },
+    {
+      "key": "detail-inland",
+      "label": "详情页 · 内陆/湖泊",
+      "png": "screens/detail-inland.png",
+      "html": "sources/detail-inland.html",
+      "sha256": "087ded051fe98ad37beeb3f749c11ae8f4893b102cb4f6be7ad070a177c3e017"
+    },
+    {
+      "key": "map-sea",
+      "label": "地图选点 · 海洋",
+      "png": "screens/map-sea.png",
+      "html": "sources/map-sea.html",
+      "sha256": "991061e2fcf2608efbffb15f01cca59d51b3ae6f9b4db13d69ae226fb6b3b811"
+    },
+    {
+      "key": "map-inland",
+      "label": "地图选点 · 内陆",
+      "png": "screens/map-inland.png",
+      "html": "sources/map-inland.html",
+      "sha256": "9ba5b42cca38098dd8807e3531978d89965092b90c05ce550999aec0998cdd45"
+    },
+    {
+      "key": "favorites",
+      "label": "收藏页",
+      "png": "screens/favorites.png",
+      "html": "sources/favorites.html",
+      "sha256": "a92b84cbd22fb6b36411a219af9d37564f06f9e87a67839ab75a34dc3278ebd7"
+    },
+    {
+      "key": "settings",
+      "label": "设置页",
+      "png": "screens/settings.png",
+      "html": "sources/settings.html",
+      "sha256": "762d7fc36053c5440e695a14bac445af33a0de61f7d5d4374f7ffffea668259c"
+    },
+    {
+      "key": "dark-detail",
+      "label": "详情页 · 深色",
+      "png": "screens/dark-detail.png",
+      "html": "sources/dark-detail.html",
+      "sha256": "2f16b601f34369368e98768c71a9f996331a8ef05ff89964a90be7b7f2452125"
+    }
+  ],
+  "frozen_contract": {
+    "tab_order_sea": [
+      "钓鱼指数",
+      "潮流",
+      "天气",
+      "水质",
+      "风浪"
+    ],
+    "tab_order_inland": [
+      "钓鱼指数",
+      "水位（无潮汐）",
+      "天气",
+      "水质",
+      "湖面风与水温"
+    ],
+    "disclaimer_items": 5,
+    "band_labels": [
+      "爆护窗口",
+      "很适合",
+      "可以",
+      "较差",
+      "别去"
+    ],
+    "badges": [
+      "实测",
+      "卫星",
+      "模型",
+      "估算",
+      "未校正",
+      "低置信"
+    ],
+    "day_selector": "52dp 两行",
+    "water_quality": "1 行 × 3 卡",
+    "note": "以上工程事实四版完全一致；手绘稿为视觉探索，落地时冻结语义色须回归 ScoreBands.kt / ConfidenceBadge.kt，档位恒带文字（N-7）"
+  },
+  "water_differentiators": [
+    "顶部鱼形徽标（浪+贝+海鸟 ↔ 山+日+芦苇）",
+    "主色冷暖/蓝绿",
+    "鱼种（海鱼↔淡水鱼）",
+    "第二 Tab（潮流↔水位）",
+    "图表（潮高·潮流↔水位·无潮汐）",
+    "地点/坐标"
+  ],
+  "example_data_notice": "分数/时刻/点位为版式示意，非业务数据；源更新时间显示 —，未硬编码"
+}

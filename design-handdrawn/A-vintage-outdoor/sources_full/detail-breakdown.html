@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 复古户外 · 因子分解展开</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+html,body{width:390px;height:844px;overflow:hidden}
+body{position:relative;font-family:KaiTi, 楷体, STKaiti, serif;color:#16324F;
+  background:#E4D9BC;}
+.bgfill{position:absolute;inset:0;background:linear-gradient(160deg,#E4D9BC 0%,#D8C9A5 100%);z-index:0}
+.grain{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:0.9}
+.screen{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}
+.statusbar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:Georgia, serif;font-size:14px;font-weight:700;color:#16324F;position:relative;z-index:5}
+.statusbar .r{display:flex;gap:5px;align-items:center;font-size:12px}
+.notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:74px;height:20px;border-radius:12px;background:#16324F;opacity:0.85}
+.disp{font-family:Georgia, Times New Roman, serif;font-weight:700;letter-spacing:0.14em}
+.bodyf{font-family:KaiTi, 楷体, STKaiti, serif}
+.card{background:#F2EAD4;border:2.2px solid #16324F;border-radius:16px 20px 15px 19px / 19px 15px 20px 16px;
+  box-shadow:2px 3px 0 #16324F33;position:relative;overflow:hidden}
+.tape{position:absolute;background:#D9A734;opacity:0.85;transform:rotate(-3deg);z-index:3}
+.tag{display:inline-flex;align-items:center;gap:4px;border:2px solid #16324F;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;background:#F2EAD4;position:relative;z-index:4}
+.hl{color:#C15A3A}
+.mut{color:#5C5540}
+.row{display:flex;align-items:center}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="rough" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="rough2" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="19" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="1.3" xChannelSelector="G" yChannelSelector="B"/>
+  </filter>
+  <filter id="watercolor" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="3" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="3.1" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0.6"/>
+  </filter>
+  <filter id="papergrain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="ng"/>
+    <feComponentTransfer in="ng" result="na"><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+  </filter>
+  <filter id="softshadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="16324F" flood-opacity="0.18"/>
+  </filter>
+ </defs>
+</svg>
+<div class="bgfill"></div>
+<div class="screen"><div class="statusbar"><span>9:41</span><div class="r"><span>▮▮▮</span><span>◕</span><span>▰</span></div></div><div class="notch"></div><div class="row" style="padding:6px 16px 8px;position:relative;z-index:5;border-bottom:1.6px dashed #16324F55">
+      <span style="font-size:22px;color:#16324F;width:26px">‹</span>
+      <div style="flex:1"><div class="disp" style="font-size:18px;color:#16324F;line-height:1.15">因子分解</div>
+        <div class="bodyf" style="font-size:10px;color:#5C5540;margin-top:2px">所选小时 13:00 · 78 分 · 很适合</div></div>
+      <div class="row" style="gap:8px"><span style="font-size:16px;color:#1B3A5C">✕</span></div>
+    </div><div class="row" style="margin:9px 16px 0;gap:6px;position:relative;z-index:4"><span class="tag" style="font-size:9px;padding:1px 7px;border-width:1.6px;border-color:#16324F;background:#16324F;color:#F7F1DE">实测</span><span class="tag" style="font-size:9px;padding:1px 7px;border-width:1.6px;border-color:#16324F;background:#16324F;color:#F7F1DE">模型</span><span class="bodyf mut" style="font-size:9px">禁止 parse 否决文案</span></div><div class="card" style="margin:8px 14px 0;padding:10px 12px;position:relative;z-index:4;"><div class="disp" style="font-size:12.5px;color:#1B3A5C;margin-bottom:4px">子分 · 权重 · 贡献</div><div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1.2px dashed #16324F44">
+          <span class="bodyf" style="font-size:10.5px;color:#16324F;width:74px">溶氧 DO_p</span>
+          <span class="bodyf" style="font-size:10px;color:#5C5540;width:30px">×0.21</span>
+          <span class="disp" style="font-size:11px;color:#1B3A5C;width:30px">0.95</span>
+          <div style="flex:1;height:9px;border:1.4px solid #16324F88;border-radius:6px;background:#E8DDBE;overflow:hidden"><div style="height:100%;width:95%;background:#2E6E7E"></div></div></div><div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1.2px dashed #16324F44">
+          <span class="bodyf" style="font-size:10.5px;color:#16324F;width:74px">气压 P</span>
+          <span class="bodyf" style="font-size:10px;color:#5C5540;width:30px">×0.14</span>
+          <span class="disp" style="font-size:11px;color:#1B3A5C;width:30px">0.79</span>
+          <div style="flex:1;height:9px;border:1.4px solid #16324F88;border-radius:6px;background:#E8DDBE;overflow:hidden"><div style="height:100%;width:79%;background:#2E6E7E"></div></div></div><div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1.2px dashed #16324F44">
+          <span class="bodyf" style="font-size:10.5px;color:#16324F;width:74px">Solunar</span>
+          <span class="bodyf" style="font-size:10px;color:#5C5540;width:30px">×0.17</span>
+          <span class="disp" style="font-size:11px;color:#1B3A5C;width:30px">0.62</span>
+          <div style="flex:1;height:9px;border:1.4px solid #16324F88;border-radius:6px;background:#E8DDBE;overflow:hidden"><div style="height:100%;width:62%;background:#2E6E7E"></div></div></div><div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1.2px dashed #16324F44">
+          <span class="bodyf" style="font-size:10.5px;color:#16324F;width:74px">水温适温</span>
+          <span class="bodyf" style="font-size:10px;color:#5C5540;width:30px">×0.18</span>
+          <span class="disp" style="font-size:11px;color:#1B3A5C;width:30px">0.88</span>
+          <div style="flex:1;height:9px;border:1.4px solid #16324F88;border-radius:6px;background:#E8DDBE;overflow:hidden"><div style="height:100%;width:88%;background:#2E6E7E"></div></div></div><div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1.2px dashed #16324F44">
+          <span class="bodyf" style="font-size:10.5px;color:#16324F;width:74px">天气窗口</span>
+          <span class="bodyf" style="font-size:10px;color:#5C5540;width:30px">×0.15</span>
+          <span class="disp" style="font-size:11px;color:#1B3A5C;width:30px">0.70</span>
+          <div style="flex:1;height:9px;border:1.4px solid #16324F88;border-radius:6px;background:#E8DDBE;overflow:hidden"><div style="height:100%;width:70%;background:#2E6E7E"></div></div></div><div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1.2px dashed #16324F44">
+          <span class="bodyf" style="font-size:10.5px;color:#16324F;width:74px">潮汐相位</span>
+          <span class="bodyf" style="font-size:10px;color:#5C5540;width:30px">×0.15</span>
+          <span class="disp" style="font-size:11px;color:#1B3A5C;width:30px">0.55</span>
+          <div style="flex:1;height:9px;border:1.4px solid #16324F88;border-radius:6px;background:#E8DDBE;overflow:hidden"><div style="height:100%;width:55%;background:#2E6E7E"></div></div></div></div><div class="card" style="margin:8px 14px 0;padding:10px 12px;position:relative;z-index:4;border-color:#D9A734">
+      <div class="disp" style="font-size:12.5px;color:#1B3A5C">安全 / 可作钓性衰减 ΠV</div>
+      <div class="bodyf" style="font-size:10px;line-height:1.7;margin-top:5px;color:#16324F">V = <b class="hl">0.95</b>（阵风 40 km/h）<br>V = <b class="hl">0.88</b>（雷暴风险 中）<br>ΠV = 0.95 × 0.88 = <b class="hl">0.836</b></div>
+      <div class="bodyf mut" style="font-size:8.8px;margin-top:4px">连续 sigmoid，非硬阈值；触发行以芥末黄标记。</div></div><div class="card" style="margin:8px 14px 0;padding:10px 12px;position:relative;z-index:4;background:#E8DDBE">
+      <div class="disp" style="font-size:12.5px;color:#1B3A5C">原始输入</div>
+      <div class="bodyf mut" style="font-size:9.5px;line-height:1.7;margin-top:4px">Tw 19.6℃ · DO_p 0.95 · P 1013 / ΔP3 −1.2 / ΔP24 +2.1<br>风 5.2 / 阵风 9.1 · 雨 2.1 · 云 68% · WMO 803<br>浪 0.8m · 潮位 1.4m · dh/dt +0.21 · 流速 0.6kn · 月龄 0.42 · 中天 12:48</div></div><div class="row" style="margin:12px 14px 0;gap:8px;position:relative;z-index:4">
+      <span class="tag" style="font-size:9.5px;background:#1B3A5C;color:#F7F1DE;border-color:#16324F">▮ 逐小时曲线</span>
+      <span class="tag" style="font-size:9.5px">☷ 等价数值表</span>
+      <span class="bodyf" style="font-size:8.5px;color:#5C5540;margin-left:auto">24 行 · TalkBack 可读</span></div><div class="bodyf" style="margin:9px 16px 0;font-size:9px;color:#5C5540;text-align:center;line-height:1.6;position:relative;z-index:4">
+      来源 Open-Meteo · 网格 8 km · UTC 更新 — · 本机拉取 09:41<br>null 断线不画 0 · 缺维按有效权重重算（F-3.6）</div><div class="row" style="margin:0 14px;position:absolute;left:0;right:0;bottom:14px;padding:8px 12px;border:1.8px dashed #16324F88;border-radius:11px;background:#F2EAD4EE;z-index:6;gap:8px;box-shadow:0 -2px 8px #D8C9A5AA">
+      <span style="font-size:14px;color:#C15A3A">ⓘ</span>
+      <span class="bodyf" style="font-size:10.5px;color:#5C5540;flex:1">免责声明 · 共 5 条 · 数据仅供参考</span>
+      <span style="color:#1B3A5C;font-size:13px">›</span></div></div>
+<svg class="grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <rect width="100%" height="100%" filter="url(#papergrain)" opacity="1"/>
+</svg>
+</body></html>

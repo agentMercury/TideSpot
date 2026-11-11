@@ -102,4 +102,14 @@
     <string name="ts_fav_err_batch_group">Batch group edit failed; no changes were made</string>
     <string name="ts_fav_err_no_coordinate">A new favorite needs coordinates (pick a spot on the map first)</string>
     <string name="ts_fav_summary_line">%1$s · %2$d pts · %3$s</string>
+<!-- OPT-V12-02: pull-to-refresh / refresh all -->
+    <string name="ts_fav_refresh_all">Refresh all</string>
+    <string name="ts_fav_refresh_all_desc">Refresh data for all favorites</string>
+    <string name="ts_fav_refreshing">Refreshing… %1$d/%2$d</string>
+    <string name="ts_fav_refresh_summary">%1$d refreshed · %2$d up to date</string>
+    <string name="ts_fav_refresh_summary_failed">%1$d refreshed · %2$d up to date · %3$d failed</string>
+    <string name="ts_fav_refresh_offline">No network. Cached data only</string>
+    <!-- OPT-V12-07: tag presets -->
+    <string name="ts_fav_tag_presets">Common tags</string>
+    <string name="ts_fav_tag_preset_desc">Common tag: %1$s</string>
 </resources>

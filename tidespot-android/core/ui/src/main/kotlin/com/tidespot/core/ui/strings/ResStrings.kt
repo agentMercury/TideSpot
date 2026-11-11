@@ -120,6 +120,7 @@ class ResStrings(private val res: Resources) : TideSpotStrings {
         res.getString(R.string.ts_day_future, offsetDays, weekday, date)
 
     override fun dayShortToday(weekday: String): String = res.getString(R.string.ts_day_short_today, weekday)
+    override val dayTodayLabel get() = s(R.string.ts_day_today_label)
     override val noDataHour get() = s(R.string.ts_no_data_hour)
     override val deviceZoneNote get() = s(R.string.ts_device_zone_note)
     override val unnamedWater get() = s(R.string.ts_info_unnamed_water)

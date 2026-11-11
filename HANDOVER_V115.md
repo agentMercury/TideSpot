@@ -10,7 +10,7 @@
 
 | 项 | 值 |
 |---|---|
-| 代码 | `D:\workspace\天气鱼情`，jj/git colocated（每次提交后手动 `git update-ref refs/heads/main <commit>`） |
+| 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated（每次提交后手动 `git update-ref refs/heads/main <commit>`） |
 | 版本 | **`versionCode=19` / `versionName=1.15.14`** |
 | APK | **`E:\Trans\潮点TideSpot-v1.15.14.apk`**（51,933,996 B；SHA-256 `40e59f66a644694d9c09f498ab9d2a5ddd5b43463ffffa95316ba07a1c8c0d3d`；自签名，已装 AAK-AN00） |
 | 测试 | 八模块 `gradlew test` **EXIT=0**（每次批次均跑） |
@@ -22,7 +22,7 @@
 
 ## 2. 环境红线（每次都踩，务必先看）
 
-1. **必须用 `T:` 盘构建**：`subst T: D:\workspace\天气鱼情`，命令在 `T:\tidespot-android` 下执行（中文路径会让 Gradle test worker 抛 `ClassNotFoundException`）。
+1. **必须用 `T:` 盘构建**：`subst T: D:\workspace\weatherfishcheck`，命令在 `T:\tidespot-android` 下执行（中文路径会让 Gradle test worker 抛 `ClassNotFoundException`）。
 2. `JAVA_HOME` 指向 JDK 17；`adb` = `C:\Users\gamer\AppData\Local\Android\Sdk\platform-tools\adb.exe`。
 3. Release 签名与 debug 不兼容 → **统一测 release 包**（`adb install -r`）。
 4. `assembleRelease` 偶发 `lintVitalAnalyzeRelease … FileSystemException` → 关 Studio / 杀 java 后重跑，或 `-x lintVitalAnalyzeRelease` 再补跑一次。
@@ -73,7 +73,7 @@ P0-1（凭据外部化/引导卡/图标）、P0-2（水质录入/时段筛选/F-
 
 ## 7. 接手第一步
 
-1. `subst T: D:\workspace\天气鱼情` → `.\gradlew.bat test` 确认基线绿；`node .tools/i18n_scan.mjs`、`node .tools/contrast_check.mjs` 均应为 0 FAIL。
+1. `subst T: D:\workspace\weatherfishcheck` → `.\gradlew.bat test` 确认基线绿；`node .tools/i18n_scan.mjs`、`node .tools/contrast_check.mjs` 均应为 0 FAIL。
 2. 读 `REQUIREMENTS_REGISTER` CHG-46~56，了解每批改动与遗留裁定。
 3. 后续方向：**V1.2 池**（`OPT_REQUIREMENTS_V11.md` §7：星标 OPT-V12-01、列表刷新 02、详情刷新 03、DaySelector 两行 04、高德 OPT-V12-05）或客户新需求。
 4. 改 UI 前先看 `design-handoff/` 的 **SVG 几何**（不是只看 `screens.json` 的 box），改完 `adb` 截图比对。
@@ -99,3 +99,18 @@ P0-1（凭据外部化/引导卡/图标）、P0-2（水质录入/时段筛选/F-
 | 54 | GAP-05 回归修复（15/17 → 17/17） |
 | 55 | 英文真机验收 + 3 处英文缺陷修复 |
 | 56 | 22 组件余 6 项对齐 + 对比度量化 FAIL=0/29 + 深色四屏留证 |
+| 57 | **V1.2 需求池批次**：OPT-V12-01/02/03/04/07（v1.16.0，versionCode 20） |
+
+## 10. V1.2 需求池批次（2026-11-11，CHG-57，v1.16.0）——接手先读本节
+
+- **范围**：`OPT_REQUIREMENTS_V11.md` §7 的 **OPT-V12-01/02/03/04/07**（客户裁定）。**05 高德仍缓行**（前置：客户开发测试 Key），**06 已于 v1.15.11 闭环**。
+- **当前基线**：`versionCode=20 / versionName=1.16.0`；八模块 `gradlew test` **BUILD SUCCESSFUL**；`i18n_scan` **FAIL=0**（豁免 13）；APK `E:\Trans\潮点TideSpot-v1.16.0.apk`。
+- **新增能力（接手勿重做）**：
+  1. 令牌优先级：`TokenBucket.Priority{USER,BACKGROUND}`（用户操作优先、预取让出；6 req/min 速率不变）；
+  2. 详情页下拉刷新：`force` 绕 15 min 门、不绕令牌桶；同点去重（`UserRefreshGate`）；离线/失败/成功提示走资源；
+  3. 收藏列表下拉刷新 + 「刷新全部」：非 force、并发 2、进度与汇总、切页取消；
+  4. DaySelector 两行 chip（`今天`/`11-12` + `周三`；52dp/56dp；一行 ≥5；来源行在下方）；
+  5. 标签预设 chips（`TagPresets` 7 项，忽略大小写去重，存量 `night` 原样保留）；
+  6. 地图收藏星标 + 气泡卡（`FavoriteStarLayer`；名称 z≥14 显示；点击星标不动准星；返回相机保持）。
+- **未闭环（阻塞）**：真机冒烟（`adb devices` 为空）——按 `PROGRESS_TRACKER §11` 验收单逐条执行。
+- **契约**：`tidespot-android/CONTRACT.md`「V1.2 需求池子契约」；SRS §8.1/§8.2-1 描述回写待下一批次。

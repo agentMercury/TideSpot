@@ -1,4 +1,4 @@
-# 工作区根 .gitignore（覆盖 tidespot-android 之外的本机文件）
+﻿# 工作区根 .gitignore（覆盖 tidespot-android 之外的本机文件）
 # 密钥（最高优先级，一旦 git init 必须被忽略）
 tidespot-android/local-secrets.properties
 local-secrets.properties
@@ -30,3 +30,6 @@ archive/
 
 # Kotlin 构建期临时目录（errors 日志，V1.15）
 .kotlin/
+
+# WorkBuddy 工作区数据（本机，不入库）
+.workbuddy/

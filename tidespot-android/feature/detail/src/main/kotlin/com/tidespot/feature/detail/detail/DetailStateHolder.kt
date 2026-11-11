@@ -113,6 +113,26 @@ class DetailStateHolder(
     fun setLoading(loading: Boolean) = _state.update { it.copy(loading = loading) }
     fun setRefreshing(refreshing: Boolean) = _state.update { it.copy(refreshing = refreshing) }
 
+    /**
+     * OPT-V12-03（CHG-57）：手动刷新结果回执。
+     * 仅 [RefreshFeedback.UPDATED] 更新「已更新 HH:mm」时刻（失败/离线保留上一成功时刻，禁编造）。
+     */
+    fun onUserRefresh(feedback: RefreshFeedback, nowMillis: Long = System.currentTimeMillis()) {
+        _state.update {
+            it.copy(
+                refreshFeedback = feedback,
+                lastRefreshAtMillis = if (feedback == RefreshFeedback.UPDATED) {
+                    nowMillis
+                } else {
+                    it.lastRefreshAtMillis
+                },
+            )
+        }
+    }
+
+    /** 提示读罢清除（避免常驻文案）。 */
+    fun clearRefreshFeedback() = _state.update { it.copy(refreshFeedback = null) }
+
     /** Tab 切换：仅改选中位（N-2 不重算）。 */
     fun selectTab(tab: DetailTab) = _state.update { it.copy(selectedTab = tab, selectedHour = null) }
 

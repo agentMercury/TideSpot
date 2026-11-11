@@ -112,6 +112,7 @@ object ZhStrings : TideSpotStrings {
         "未来第 $offsetDays 天 $weekday，$date"
 
     override fun dayShortToday(weekday: String): String = "今天 $weekday"
+    override val dayTodayLabel = "今天"
     override val noDataHour = "该小时无数据"
     override val deviceZoneNote = "本机时区"
     override val unnamedWater = "未命名水域"

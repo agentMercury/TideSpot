@@ -291,3 +291,48 @@
 - **对比度**：`.tools/contrast_check.mjs` 29 对组合 **FAIL=0**；浅色 `onSurfaceVariant` 由设计 `#8A9DB0`（2.19–2.79:1）压深为 `#556579`（4.68–5.96:1），偏离已留证。
 - **深色真机**：S01/S02/S08/S09 四屏留证。
 - **范围项③（22 组件）与⑤（深色对比度）标记为闭环。**
+
+---
+
+## 11. V1.2 需求池批次（2026-11-11，CHG-57，v1.16.0）
+
+### 目标与范围
+
+- **目标**：交付 `OPT_REQUIREMENTS_V11.md` §7 V1.2 需求池（01/02/03/04/07），版本 **1.16.0 / versionCode 20**。
+- **范围裁定**：客户确认「01/02/03/04/07（推荐）」；**OPT-V12-05 高德跳过**（前置：客户开发测试 Key 未提供，评估 8–12 人日）；**OPT-V12-06 已于 v1.15.11 闭环**（17/17）。
+- **开工前取证（先评估后动手）**：`MapScreen` 无任何图层 API 调用、全仓无 `PullToRefresh`、`TokenBucket` 无优先级、`DaySelector` chip 仍单行、无 `TagPresets` —— 五项均属真实缺口。
+
+### 完成项（5/5）
+
+| 条目 | 交付内容 | 关键位置 |
+|---|---|---|
+| OPT-V12-03 令牌优先级 + 详情下拉刷新 | `TokenBucket.Priority{USER,BACKGROUND}`；USER 优先、BACKGROUND 让出、`tryAcquire` 让出；`DetailViewModel.userRefresh()`（force 绕 15min 门不绕桶）+ `UserRefreshGate` 去重 + `RefreshFeedback` | `core/data/remote/TokenBucket.kt`、`feature/detail/detail/DetailViewModel.kt`、`UserRefreshGate.kt`、`DetailScreen.kt` |
+| OPT-V12-02 收藏列表刷新 | `FavoritesRefreshLogic`（分类/汇总/去重目标）+ `refreshAll`（非 force、并发 2、进度、切页取消）+ 下拉刷新与「刷新全部」 | `feature/favorites/.../FavoritesRefreshLogic.kt`、`FavoritesViewModel.kt`、`FavoritesScreen.kt` |
+| OPT-V12-04 两行 Chip | `DayChip.topLabel/weekdayLabel`；52dp/56dp → 一行 ≥5；来源行移到 chip 行下方；TalkBack 单句保留 | `core/ui/selector/DaySelector.kt`、`TideSpotStrings`（`dayTodayLabel`） |
+| OPT-V12-07 标签预设 | `TagPresets`（7 预设、忽略大小写去重、存量英文原样保留）+ 编辑/批量对话框 chips | `feature/favorites/.../TagPresets.kt`、`FavoritesScreen.kt` |
+| OPT-V12-01 地图星标 | `FavoriteStarLayer`（GeoJSON/命中解析）+ SymbolLayer（z≥14 名称）+ 琥珀星 bitmap + 气泡卡（名称/摘要/详情/关闭）+ 相机位置保持 | `feature/map/stars/FavoriteStars.kt`、`MapScreen.kt`、`app/MainActivity.kt` |
+
+### 验证
+
+- 八模块 `gradlew test`：**BUILD SUCCESSFUL**（新增 4 组锁：令牌优先级 3 例、`UserRefreshGate` 1 例、`FavoritesRefreshLogic` 6 例、`TagPresets` 6 例、`FavoriteStarLayer` 5 例、DaySelector 两行 2 例；Robolectric smoke 同步更新）。
+- `node .tools/i18n_scan.mjs`：**FAIL=0**（豁免 13，新增 `TagPresets.kt`＝写入 `spot.tags` 的数据协议值）。
+- `assembleRelease`：`E:\Trans\潮点TideSpot-v1.16.0.apk`（51,973,772 B）。
+
+### 阻塞项 / 下一步
+
+- **阻塞**：`adb devices` 为空 → 真机冒烟未执行（下拉刷新四条 GWT、星标增删/点击/返回相机、两行 chip 一行 ≥5、标签预设去重）。**恢复 USB 后按验收单逐条执行**。
+- **遗留**：OPT-V12-05 高德（等客户开发测试 Key）；SRS §8.1/§8.2-1 描述回写（地图星标、详情下拉刷新、DaySelector 两行）待下一批次与 SRS 版本合并处理。
+
+### 真机验收结果（2026-11-11 18:00-18:55，AAK-AN00 / Android 16，CHG-58）
+
+| 条目 | 结果 | 证据 |
+|---|---|---|
+| OPT-V12-04 两行 chip | ✅ 一行 **6 个**（今天/11-12…11/16），来源行独立下方 | `.shots/v16_04_detail.png` |
+| OPT-V12-03 详情下拉 | ✅ 顶部「已更新 18:15」+ 本机拉取时间同步 | `.shots/v16_05_detail_pull.png`、`ui_pull_a.xml` |
+| OPT-V12-02 列表下拉 | ✅ 「已刷新 2 条 · 4 条已是最新」（6 条收藏） | `ui_pull` 系列 dump、`v16_02_fav.png` |
+| OPT-V12-07 标签预设 | ✅ chips 展示 + 点选写入 + 再点取消 | `.shots/v16_14_edit_tags.png`、`v16_15_tag_selected.png` |
+| OPT-V12-01 星标/气泡 | ✅ 3 枚星标、气泡卡名称+摘要、查看详情、返回相机保持 | `.shots/v16_50_final_map.png`、`v16_51_final_bubble.png` |
+
+**本轮修复**：星标图层重复 `setStyle` 覆盖（改单点样式入口）；`MapView.onCreate` 晚于挂载导致重进纯色空白（onCreate 前移到创建处 + 零时长相机重绘兜底）。
+
+**已知缺陷（未闭环）**：连续 ≥2 次页面往返后 MapLibre `SurfaceView` 偶发不出图（纯色 + 准星，定位可恢复）。已尝试 onCreate 时序 / 可见性 pause-resume / 地图常驻组合三方案，均不稳定 → 归入 AM-06 `MapView` 宿主生命周期，单列「MapView 宿主化」重构项。

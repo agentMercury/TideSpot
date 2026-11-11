@@ -116,5 +116,30 @@ class DaySelectorLogicTest {
         // 同一对 epoch 在 UTC 下均为 11-06 → 同日（两时区口径互不串轴）
         assertTrue(DaySelectorLogic.isSameLocalDay(lateEvening, pastMidnight, ZoneOffset.UTC))
     }
+
+    // ── OPT-V12-04（CHG-57）：两行 chip（上行日期/今天、下行星期） ──
+
+    @Test
+    fun chips_twoLine_topIsTodayOrDate_bottomIsWeekday() {
+        val chips = DaySelectorLogic.chips(7, zone, lateEvening)
+        assertEquals("今天", chips[0].topLabel)
+        assertEquals("周五", chips[0].weekdayLabel)
+        assertEquals("11/7", chips[1].topLabel)
+        assertEquals("周六", chips[1].weekdayLabel)
+        // 单行合并态与 TalkBack 单句同源（既有锁口径不漂移）
+        assertEquals("今天 周五", chips[0].chipLabel)
+        assertEquals("11/7 周六", chips[1].chipLabel)
+    }
+
+    @Test
+    fun chips_twoLine_crossMonthKeepsTopLabelDate() {
+        val nowEpoch = LocalDateTime.of(2026, 11, 30, 12, 0)
+            .toInstant(ZoneOffset.ofHours(9)).epochSecond
+        val chips = DaySelectorLogic.chips(7, zone, nowEpoch)
+        assertEquals("今天", chips[0].topLabel)
+        assertEquals("周一", chips[0].weekdayLabel)
+        assertEquals("12/1", chips[1].topLabel)
+        assertEquals("周二", chips[1].weekdayLabel)
+    }
 }
 

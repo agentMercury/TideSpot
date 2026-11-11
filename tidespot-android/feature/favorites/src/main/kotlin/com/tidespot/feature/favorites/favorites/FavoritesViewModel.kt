@@ -11,8 +11,10 @@ import com.tidespot.core.domain.window.BestWindowFinder
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.strings.ZhStrings
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -20,6 +22,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 
 /**
  * 收藏列表 ViewModel（SRS F-2.1~F-2.6）：构造器注入 [TideSpotRepository]（与 :feature:detail
@@ -36,6 +40,8 @@ class FavoritesViewModel(
     private val repository: TideSpotRepository,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val strings: TideSpotStrings = ZhStrings,
+    /** OPT-V12-02（CHG-57）：联网判定（:app 注入；默认 true = 既有行为零漂移）。 */
+    private val networkAvailable: () -> Boolean = { true },
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FavoritesUiState())
@@ -125,6 +131,87 @@ class FavoritesViewModel(
     fun setSortOrder(order: SortOrder) {
         topCache.clear()
         _state.update { it.copy(sortOrder = order) }
+    }
+
+    // ────────────── OPT-V12-02（CHG-57）：下拉刷新 + 「刷新全部」（用户显式入口） ──────────────
+
+    /** 进行中的列表刷新任务（切页即 [cancelRefresh]；并发 ≤2 由本层信号量约束）。 */
+    private var refreshJob: Job? = null
+
+    /**
+     * 刷新当前列表全部条目（≤100）：
+     * - **非 force**：逐点 `refreshSpotDetail(spot)`——TTL 命中即 0 请求；超 TTL 者受全局
+     *   6 req/min 令牌桶与 15 min 最小刷新门约束（§12 频控不可绕过）；
+     * - 并发 ≤2、逐点回执进度；失败项不动旧数据（陈旧标记由既有逻辑保留）；
+     * - 结果分类/汇总走纯函数 [FavoritesRefreshLogic]（已刷新 X / 已是最新 Y / 失败 Z）。
+     */
+    fun refreshAll(spots: List<FavoriteSpot>) {
+        if (refreshJob?.isActive == true) return
+        val targets = spots.distinctBy { it.id }
+        if (targets.isEmpty()) return
+        if (!networkAvailable()) {
+            // 离线：直接提示，不逐点失败刷屏、不改标记（GWT 第四条）
+            _state.update { it.copy(refreshOffline = true, refreshSummary = null) }
+            return
+        }
+        refreshJob = viewModelScope.launch(ioDispatcher) {
+            _state.update {
+                it.copy(
+                    refreshing = true,
+                    refreshDone = 0,
+                    refreshTotal = targets.size,
+                    refreshOffline = false,
+                    refreshSummary = null,
+                )
+            }
+            val outcomes = java.util.Collections.synchronizedList(
+                mutableListOf<FavoritesRefreshLogic.Outcome>(),
+            )
+            try {
+                coroutineScope {
+                    val permits = Semaphore(2)
+                    targets.forEach { spot ->
+                        launch {
+                            permits.withPermit {
+                                val outcome = runCatching { repository.refreshSpotDetail(spot) }.fold(
+                                    onSuccess = { FavoritesRefreshLogic.classify(it) },
+                                    onFailure = { FavoritesRefreshLogic.Outcome.FAILED },
+                                )
+                                // 真实刷新过的点 → 跨点窗口缓存失效（否则列表仍显示旧 rank/摘要）
+                                if (outcome == FavoritesRefreshLogic.Outcome.REFRESHED) {
+                                    topCache.invalidateSpot(spot.id)
+                                }
+                                outcomes.add(outcome)
+                                _state.update { s -> s.copy(refreshDone = s.refreshDone + 1) }
+                            }
+                        }
+                    }
+                }
+                _state.update {
+                    it.copy(
+                        refreshing = false,
+                        refreshSummary = FavoritesRefreshLogic.summarize(outcomes.toList()),
+                    )
+                }
+                load(showLoading = false)
+            } catch (e: CancellationException) {
+                // 切页/退出：清理进度态后向上传播（无残留 loading）
+                _state.update { it.copy(refreshing = false, refreshDone = 0, refreshTotal = 0) }
+                throw e
+            }
+        }
+    }
+
+    /** 离开收藏页 / 退出：取消进行中的刷新（协程即取消，无 ANR/无残留进度）。 */
+    fun cancelRefresh() {
+        refreshJob?.cancel()
+        refreshJob = null
+        _state.update { it.copy(refreshing = false, refreshDone = 0, refreshTotal = 0) }
+    }
+
+    /** 清空离线/汇总提示。 */
+    fun clearRefreshMessage() {
+        _state.update { it.copy(refreshOffline = false, refreshSummary = null) }
     }
 
     /** OPT-V11-10（P1）：搜索/筛选条件变更（纯展示，不触网络/不触 DB）。 */

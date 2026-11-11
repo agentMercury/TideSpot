@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Switch
 import androidx.compose.material3.MaterialTheme
@@ -129,7 +130,14 @@ fun DetailScreen(
 
     val screenDesc = stringResource(R.string.ts_detail_content_desc)
     val tabsDesc = stringResource(R.string.ts_detail_tabs_desc)
-    LazyColumn(modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().semantics { contentDescription = screenDesc }) {
+    // OPT-V12-03（CHG-57）：下拉刷新——force 绕 15 min 最小刷新门，但不绕 6 req/min 令牌桶；
+    // 用户操作令牌通道优先于后台预取（:core:data TokenBucket.Priority.USER）
+    PullToRefreshBox(
+        isRefreshing = state.refreshing,
+        onRefresh = viewModel::userRefresh,
+        modifier = modifier.fillMaxSize(),
+    ) {
+        LazyColumn(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().semantics { contentDescription = screenDesc }) {
         // OPT-V115-02 / S02 TOPBAR：返回 + 点位名称 + 坐标副标题（设计层 y=58, h=52）
         item {
             Row(
@@ -156,6 +164,34 @@ fun DetailScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                     )
+                }
+            }
+        }
+
+        // OPT-V12-03（CHG-57）：手动刷新反馈（成功「已更新 HH:mm」；失败/离线给出原因，数据保留不隐藏）
+        state.refreshFeedback?.let { fb ->
+            item {
+                val feedbackText = when (fb) {
+                    RefreshFeedback.UPDATED -> stringResource(
+                        R.string.ts_detail_refresh_updated,
+                        state.lastRefreshAtMillis?.let { Format.clockMillis(it, zone) } ?: Format.MISSING,
+                    )
+                    RefreshFeedback.FAILED -> stringResource(R.string.ts_detail_refresh_failed)
+                    RefreshFeedback.OFFLINE -> stringResource(R.string.ts_detail_refresh_offline)
+                }
+                Text(
+                    feedbackText,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (fb == RefreshFeedback.UPDATED) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp),
+                )
+                LaunchedEffect(fb) {
+                    delay(4_000)
+                    viewModel.clearRefreshFeedback()
                 }
             }
         }
@@ -543,6 +579,7 @@ fun DetailScreen(
                         )
                     }
                 }
+        }
         }
     }
 

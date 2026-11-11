@@ -1,8 +1,11 @@
-package com.tidespot.feature.map
+﻿package com.tidespot.feature.map
 
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Paint
+import android.graphics.Path
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -35,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +75,8 @@ import com.tidespot.feature.map.location.PermissionStateMachine
 import com.tidespot.feature.map.model.GeoPoint
 import com.tidespot.feature.map.model.SpotConfirmed
 import com.tidespot.feature.map.search.SearchPanel
+import com.tidespot.feature.map.stars.FavoriteStar
+import com.tidespot.feature.map.stars.FavoriteStarLayer
 import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -78,6 +84,10 @@ import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import org.maplibre.android.style.expressions.Expression
+import org.maplibre.android.style.layers.PropertyFactory
+import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.android.style.sources.GeoJsonSource
 
 /** §7.1：CARTO Positron 免费矢量样式（已验证 200），无任何 Key。 */
 const val CARTO_POSITRON_STYLE_URL = com.tidespot.core.data.remote.TideSpotUrls.CARTO_POSITRON_STYLE_URL
@@ -117,8 +127,14 @@ fun MapScreen(
     settingsLabel: String = "",
     onOpenTop10: (() -> Unit)? = null,
     top10Label: String = "",
-    /** OPT-V115-02 / S01 C22：最近一次数据拉取时刻（:app 透传；null → 显示「—」，禁编造）。 */
+/** OPT-V115-02 / S01 C22：最近一次数据拉取时刻（:app 透传；null → 显示「—」，禁编造）。 */
     sourceFetchedAtMillis: Long? = null,
+    /** OPT-V12-01（CHG-57）：收藏点星标（Room 读侧由 :app 注入；空 = 不显示星标图层）。 */
+    favoriteStars: List<FavoriteStar> = emptyList(),
+    /** OPT-V12-01：气泡卡「查看详情」→ 进详情（null = 不渲染该入口）。 */
+    onOpenFavorite: ((Long) -> Unit)? = null,
+    /** OPT-V12-01：相机中心回报（:app 用于「返回地图相机位置不变」）。 */
+    onCameraTargetChanged: (GeoPoint) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -144,6 +160,58 @@ fun MapScreen(
     var suppressNextIdle by remember { mutableStateOf(false) }
     /** CHG-35：最近一次相机移动是否来自用户手势（决定 Idle 是否进入 Preview）。 */
     var lastMoveWasGesture by remember { mutableStateOf(false) }
+    /** OPT-V12-01：命中星标的气泡卡目标（null = 未选中；点击星标不移动准星/不发起选点请求）。 */
+    var tappedStar by remember { mutableStateOf<FavoriteStar?>(null) }
+    /** OPT-V12-01：星标图层所在样式（样式切换/重建时更新 GeoJSON）。 */
+    var starStyle by remember { mutableStateOf<Style?>(null) }
+    // 地图点击监听只注册一次 → 星标集合/相机回报用 rememberUpdatedState 取最新值（防闭包捕获旧值）
+    val latestStars by rememberUpdatedState(favoriteStars)
+    val latestCameraTarget by rememberUpdatedState(onCameraTargetChanged)
+
+    /** OPT-V12-01：安装星标图层（图标 + GeoJSON 源 + SymbolLayer；重复调用幂等）。 */
+    fun installStarLayer(style: Style) {
+        starStyle = style
+        // N-4：图层属性不受支持/样式异常时不得崩溃（星标为增强项，失败即不显示）
+        runCatching {
+            if (style.getImage(FavoriteStarLayer.ICON_ID) == null) {
+                style.addImage(FavoriteStarLayer.ICON_ID, starBitmap(72))
+            }
+            if (style.getSource(FavoriteStarLayer.SOURCE_ID) == null) {
+                style.addSource(GeoJsonSource(FavoriteStarLayer.SOURCE_ID, FavoriteStarLayer.geoJson(latestStars)))
+            }
+            if (style.getLayer(FavoriteStarLayer.LAYER_ID) == null) {
+                val layer = SymbolLayer(FavoriteStarLayer.LAYER_ID, FavoriteStarLayer.SOURCE_ID)
+                // 先只装图标（保证星标本体必然可见），文本属性单独兜底：字体/表达式不支持时不影响星标
+                layer.setProperties(
+                    PropertyFactory.iconImage(FavoriteStarLayer.ICON_ID),
+                    PropertyFactory.iconAllowOverlap(true),
+                    PropertyFactory.iconIgnorePlacement(true),
+                    PropertyFactory.iconSize(1.0f),
+                )
+                style.addLayer(layer)
+                // 名称：街道级（z≥14）才显示，避免全国视图文字过密（GWT 设计要求）
+                runCatching {
+                    layer.setProperties(
+                        PropertyFactory.textField(Expression.toString(Expression.get("name"))),
+                        PropertyFactory.textSize(10.5f),
+                        PropertyFactory.textColor("#0D47A1"),
+                        PropertyFactory.textHaloColor("#FFFFFF"),
+                        PropertyFactory.textHaloWidth(1.5f),
+                        PropertyFactory.textOffset(arrayOf(0f, 1.1f)),
+                        PropertyFactory.textAnchor("top"),
+                        PropertyFactory.textOpacity(
+                            Expression.interpolate(
+                                Expression.exponential(1f),
+                                Expression.zoom(),
+                                Expression.stop(13, 0f),
+                                Expression.stop(14, 1f),
+                            ),
+                        ),
+                    )
+                }
+            }
+        }
+    }
 
     // F-1.1 + CHG-09⑦（NEW-07）：冷启动先查系统权限——已授权直接可用（不重复弹窗），
     // 未授权才发请求；Denied(permanent) 后状态机不再放行（无死循环）
@@ -176,16 +244,19 @@ fun MapScreen(
 
     val mapView = remember(context) {
         MapLibre.getInstance(context)
-        MapView(context)
+        // OPT-V12-01：onCreate 必须在视图挂载前完成（重进地图时 MapView 立即被 attach，延迟到
+        // DisposableEffect 会晚于挂载 → 渲染器不初始化，真机表现为纯色空白）
+        MapView(context).also { it.onCreate(null) }
     }
 
     DisposableEffect(lifecycleOwner, mapView) {
+        // 离开地图页时 MapView 已 onDestroy → 后续 Activity 生命周期回调不得再转发（N-4 防崩溃）
         val observer = object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) = mapView.onStart()
-            override fun onResume(owner: LifecycleOwner) = mapView.onResume()
-            override fun onPause(owner: LifecycleOwner) = mapView.onPause()
-            override fun onStop(owner: LifecycleOwner) = mapView.onStop()
-            override fun onDestroy(owner: LifecycleOwner) = mapView.onDestroy()
+            override fun onStart(owner: LifecycleOwner) { runCatching { mapView.onStart() } }
+            override fun onResume(owner: LifecycleOwner) { runCatching { mapView.onResume() } }
+            override fun onPause(owner: LifecycleOwner) { runCatching { mapView.onPause() } }
+            override fun onStop(owner: LifecycleOwner) { runCatching { mapView.onStop() } }
+            override fun onDestroy(owner: LifecycleOwner) { runCatching { mapView.onDestroy() } }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -194,9 +265,23 @@ fun MapScreen(
     DisposableEffect(mapView) {
         mapView.getMapAsync { map ->
             mapLibre = map
-            // §12 红线：底图样式自带 attribution，由 MapLibre 默认控件渲染，禁止关闭或遮挡
-            map.setStyle(Style.Builder().fromUri(styleUrl))
-            appliedStyleUrl = styleUrl
+            // OPT-V12-01：样式统一由下方 LaunchedEffect 应用（单点入口，避免重复 setStyle 导致星标图层丢失）
+            // OPT-V12-01（CHG-57）：点击星标 → 气泡卡（只消费命中点击；不移动准星、不发选点请求）
+            map.addOnMapClickListener { latLng ->
+                val screenPoint = map.projection.toScreenLocation(latLng)
+                val id = runCatching {
+                    map.queryRenderedFeatures(screenPoint, FavoriteStarLayer.LAYER_ID)
+                        .firstOrNull()
+                        ?.let { FavoriteStarLayer.starIdOf(it.getNumberProperty("spotId")) }
+                }.getOrNull()
+                val star = id?.let { spotId -> latestStars.firstOrNull { it.id == spotId } }
+                if (star != null) {
+                    tappedStar = star
+                    true
+                } else {
+                    false
+                }
+            }
             map.addOnMapLongClickListener { latLng ->
                 crosshair.onLongPress(GeoPoint(latLng.latitude, latLng.longitude))
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng))
@@ -219,6 +304,8 @@ fun MapScreen(
                 }
                 val target = map.cameraPosition.target
                 if (target != null) {
+                    // OPT-V12-01：回报相机中心（:app 用于「星标 → 详情 → 返回地图」相机位置不变）
+                    latestCameraTarget(GeoPoint(target.latitude, target.longitude))
                     // CHG-35：冷启动/返回地图（Idle 态）用户拖动 → 进入 Preview，信息条随中心更新
                     crosshair.onMapMoved(
                         GeoPoint(target.latitude, target.longitude),
@@ -227,15 +314,53 @@ fun MapScreen(
                 }
             }
         }
+        // 不在离开组合时销毁 MapView：MapView.onDestroy 仅随 Activity 生命周期调用；
+        // 提前销毁会让下一次重建的 MapView 渲染器不出图（真机复现纯色空白）
         onDispose { }
     }
 
+    // OPT-V12-01（CHG-57）：重进地图首帧强制重绘（MapView 重建后渲染器偶发不出图，真机复现纯色空白；
+// 零时长相机移动只触发重绘，不改变位置/准星语义）
+    LaunchedEffect(mapLibre) {
+        val map = mapLibre ?: return@LaunchedEffect
+        repeat(3) { attempt ->
+            kotlinx.coroutines.delay(if (attempt == 0) 400L else 900L)
+            runCatching {
+                map.cameraPosition.target?.let { target ->
+                    map.animateCamera(CameraUpdateFactory.newLatLng(target), 0)
+                }
+            }
+        }
+    }
+
     // UX-19（OPT-V11-19）：样式切换即刻生效（重进地图同样生效；attribution 由 MapLibre 默认控件保持）
+    // OPT-V12-01：**唯一样式应用入口**——首次建图与切换样式都走这里（带回调安装星标图层），
+    // 避免"建图时 setStyle + 该效果再 setStyle"的竞态（第二次 setStyle 会丢弃星标图层）。
     LaunchedEffect(styleUrl, mapLibre) {
         val map = mapLibre ?: return@LaunchedEffect
         if (appliedStyleUrl != styleUrl) {
-            map.setStyle(Style.Builder().fromUri(styleUrl))
+            // §12 红线：底图样式自带 attribution，由 MapLibre 默认控件渲染，禁止关闭或遮挡
+            map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
+                installStarLayer(style)
+                // 重进地图的首帧刷新：MapView 重建后渲染器可能不立即出图（真机复现纯色空白），
+                // 以零时长相机移动强制重绘（位置不变；触摸/准星语义不受影响）
+                map.cameraPosition.target?.let { target ->
+                    runCatching { map.animateCamera(CameraUpdateFactory.newLatLng(target), 0) }
+                }
+            }
             appliedStyleUrl = styleUrl
+        }
+    }
+
+    // OPT-V12-01（CHG-57）：收藏点增删 → GeoJSON 即时更新（全本地读侧，端侧零网络请求）
+    // 注意：`starStyle` 必须作为 key——样式异步加载完成前本效果会早退，样式就绪后需重跑补数据
+    LaunchedEffect(favoriteStars, mapLibre, starStyle) {
+        val style = starStyle ?: return@LaunchedEffect
+        val source = style.getSourceAs<GeoJsonSource>(FavoriteStarLayer.SOURCE_ID) ?: return@LaunchedEffect
+        source.setGeoJson(FavoriteStarLayer.geoJson(favoriteStars))
+        // 已删除的点：气泡卡同步消失（GWT：删除 1 条星标即时消失）
+        tappedStar?.let { tapped ->
+            if (favoriteStars.none { it.id == tapped.id }) tappedStar = null
         }
     }
 
@@ -452,6 +577,20 @@ fun MapScreen(
                 )
             }
 
+            // OPT-V12-01（CHG-57）：收藏星标气泡卡（名称 + 最佳窗口摘要；不进详情也可关闭）
+            tappedStar?.let { star ->
+                StarBubbleCard(
+                    star = star,
+                    canOpenDetail = onOpenFavorite != null,
+                    onOpenDetail = {
+                        tappedStar = null
+                        onOpenFavorite?.invoke(star.id)
+                    },
+                    onDismiss = { tappedStar = null },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                )
+            }
+
             InfoBarPanel(
                 state = infoState,
                 preview = crosshairState is CrosshairState.Preview,
@@ -607,4 +746,79 @@ private fun TopHint(text: String, isError: Boolean) {
             color = if (isError) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer,
         )
     }
+}
+
+/**
+ * OPT-V12-01（CHG-57）：收藏星标气泡卡（设计：先弹卡、再进详情；不移动准星）。
+ * 摘要缺失时显示「暂无窗口摘要」+ 坐标，禁编造数据。
+ */
+@Composable
+private fun StarBubbleCard(
+    star: FavoriteStar,
+    canOpenDetail: Boolean,
+    onOpenDetail: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = modifier.semantics { contentDescription = star.name },
+    ) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Text(
+                star.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+            Text(
+                star.summary ?: stringResource(R.string.ts_map_star_no_summary),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+            )
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.ts_map_star_close))
+                }
+                if (canOpenDetail) {
+                    TextButton(onClick = onOpenDetail) {
+                        Text(stringResource(R.string.ts_map_star_detail))
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** OPT-V12-01：星形图标 bitmap（琥珀色，与预览准星同色系；不占用冻结的档位色值）。 */
+private fun starBitmap(sizePx: Int): Bitmap {
+    val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+    val canvas = android.graphics.Canvas(bitmap)
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = 0xFFFFC107.toInt()
+        style = Paint.Style.FILL
+        setShadowLayer(2f, 0f, 1f, 0x33000000)
+    }
+    val path = Path()
+    val cx = sizePx / 2f
+    val cy = sizePx / 2f
+    val outer = sizePx * 0.46f
+    val inner = outer * 0.42f
+    for (i in 0 until 10) {
+        val radius = if (i % 2 == 0) outer else inner
+        val angle = Math.toRadians((-90 + i * 36).toDouble())
+        val x = cx + (radius * Math.cos(angle)).toFloat()
+        val y = cy + (radius * Math.sin(angle)).toFloat()
+        if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+    }
+    path.close()
+    canvas.drawPath(path, paint)
+    return bitmap
 }

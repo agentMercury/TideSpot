@@ -22,9 +22,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -100,12 +102,18 @@ fun FavoritesScreen(
     )
     val groups = FavoritesGroupLogic.groups(sorted)
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .semantics { contentDescription = screenDesc },
+    // OPT-V12-02（CHG-57）：下拉刷新（非 force；TTL 命中 0 请求；切页即取消）
+    PullToRefreshBox(
+        isRefreshing = state.refreshing,
+        onRefresh = { viewModel.refreshAll(sorted) },
+        modifier = modifier.fillMaxSize(),
     ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .semantics { contentDescription = screenDesc },
+        ) {
         // OPT-V115-01 #4（ts_offline）：离线横幅（不阻断离线数据，仅提示）
         item { OfflineBanner() }
         item {
@@ -199,12 +207,26 @@ fun FavoritesScreen(
             }
             if (!state.isSelecting) {
                 val top10Desc = stringResource(R.string.ts_fav_top10_desc)
-                Button(
-                    onClick = { showTop10 = true },
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                        .semantics { contentDescription = top10Desc },
+                val refreshAllDesc = stringResource(R.string.ts_fav_refresh_all_desc)
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(UiR.string.ts_top10_all))
+                    Button(
+                        onClick = { showTop10 = true },
+                        modifier = Modifier.weight(1f).semantics { contentDescription = top10Desc },
+                    ) {
+                        Text(stringResource(UiR.string.ts_top10_all))
+                    }
+                    // OPT-V12-02：显式刷新入口（下拉不可及时仍可用；非 force，受 TTL/令牌桶约束）
+                    OutlinedButton(
+                        onClick = { viewModel.refreshAll(sorted) },
+                        enabled = !state.refreshing && sorted.isNotEmpty(),
+                        modifier = Modifier.semantics { contentDescription = refreshAllDesc },
+                    ) {
+                        Text(stringResource(R.string.ts_fav_refresh_all))
+                    }
                 }
             }
             if (state.loading) Text(stringResource(R.string.ts_fav_loading), Modifier.padding(12.dp))
@@ -224,6 +246,46 @@ fun FavoritesScreen(
                         style = MaterialTheme.typography.bodySmall,
                     )
                     TextButton(onClick = { viewModel.clearBatchMessage() }) { Text(stringResource(R.string.ts_fav_got_it)) }
+                }
+            }
+            // OPT-V12-02：刷新进度 / 汇总 / 离线提示（失败项保留旧数据与陈旧标记，不隐藏真实状态）
+            if (state.refreshing) {
+                Text(
+                    stringResource(R.string.ts_fav_refreshing, state.refreshDone, state.refreshTotal),
+                    Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            state.refreshSummary?.let { summary ->
+                Text(
+                    if (summary.failed > 0) {
+                        stringResource(
+                            R.string.ts_fav_refresh_summary_failed,
+                            summary.refreshed,
+                            summary.upToDate,
+                            summary.failed,
+                        )
+                    } else {
+                        stringResource(R.string.ts_fav_refresh_summary, summary.refreshed, summary.upToDate)
+                    },
+                    Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (summary.failed > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (state.refreshOffline) {
+                Text(
+                    stringResource(R.string.ts_fav_refresh_offline),
+                    Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+            if (state.refreshSummary != null || state.refreshOffline) {
+                LaunchedEffect(state.refreshSummary, state.refreshOffline) {
+                    kotlinx.coroutines.delay(5_000)
+                    viewModel.clearRefreshMessage()
                 }
             }
         }
@@ -303,8 +365,17 @@ fun FavoritesScreen(
                 } else {
                     Text(stringResource(R.string.ts_fav_empty), Modifier.padding(12.dp),
                         style = MaterialTheme.typography.bodySmall)
+                    // OPT-V12-02：空态/失败态同样提供「刷新全部」（下拉不可及时仍可用）
+                    val refreshAllDesc = stringResource(R.string.ts_fav_refresh_all_desc)
+                    OutlinedButton(
+                        onClick = { viewModel.refreshAll(state.spots) },
+                        enabled = !state.refreshing && state.spots.isNotEmpty(),
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                            .semantics { contentDescription = refreshAllDesc },
+                    ) { Text(stringResource(R.string.ts_fav_refresh_all)) }
                 }
             }
+        }
         }
     }
 
@@ -681,6 +752,19 @@ private fun EditSpotDialog(
                     label = { Text(stringResource(R.string.ts_fav_tags_label)) },
                     modifier = Modifier.semantics { contentDescription = tagsInputDesc },
                 )
+                // OPT-V12-07（CHG-57）：高频标签预设 chips（点选加入/再点取消；与手输共存）
+                Text(stringResource(R.string.ts_fav_tag_presets), style = MaterialTheme.typography.labelMedium)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    items(TagPresets.DEFAULT, key = { "preset-$it" }) { preset ->
+                        val presetDesc = stringResource(R.string.ts_fav_tag_preset_desc, preset)
+                        FilterChip(
+                            selected = TagPresets.selectedInRaw(tagsRaw, preset),
+                            onClick = { tagsRaw = TagPresets.toggleRaw(tagsRaw, preset) },
+                            label = { Text(preset) },
+                            modifier = Modifier.semantics { contentDescription = presetDesc },
+                        )
+                    }
+                }
                 OutlinedTextField(
                     value = group,
                     onValueChange = { group = it },
@@ -748,6 +832,19 @@ private fun BatchTagsDialog(
                     label = { Text(stringResource(R.string.ts_fav_batch_tags_label)) },
                     modifier = Modifier.semantics { contentDescription = batchTagsDesc },
                 )
+                // OPT-V12-07：预设 chips（追加/替换语义不变；点选仅改变待写入标签串）
+                Text(stringResource(R.string.ts_fav_tag_presets), style = MaterialTheme.typography.labelMedium)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    items(TagPresets.DEFAULT, key = { "batch-preset-$it" }) { preset ->
+                        val presetDesc = stringResource(R.string.ts_fav_tag_preset_desc, preset)
+                        FilterChip(
+                            selected = TagPresets.selectedInRaw(raw, preset),
+                            onClick = { raw = TagPresets.toggleRaw(raw, preset) },
+                            label = { Text(preset) },
+                            modifier = Modifier.semantics { contentDescription = presetDesc },
+                        )
+                    }
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     FilterChip(
                         selected = !replace,

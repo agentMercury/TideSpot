@@ -1,0 +1,54 @@
+# A · 复古户外（VINTAGE OUTDOOR）
+
+手绘风格视觉概念稿 · 基于工程 v1.16.0 · 与其他三版完全独立。
+
+## 风格来源
+- 图5 微信图片_20261112105649_5_163.jpg（MOUNTAIN ADVENTURE）
+- 图6 微信图片_20261112105650_6_163.jpg（ADVENTURE IS CALLING）
+
+## 视觉语言
+墨绿做旧纸底 + 丝网颗粒噪点 + 藏蓝线描山峦/松林/日轮/星芒 + 芥末黄衬线大标题 + 套印错位阴影 + 双线边框
+
+**鱼形母题**：版画套印鱼：限色块 + 错位描边 + 网点鳍条
+
+**适合**：户外硬朗、品牌调性最鲜明；复古质感最强
+
+## 双水体（详情页各一版，一眼可辨）
+- `screens/detail-sea.png` — 海洋 / 近海：藏蓝/墨绿双水体，浪+贝+海鸟母题，第二 Tab「潮流」，图表「潮高·潮流」
+- `screens/detail-inland.png` — 内陆 / 湖泊：山+日+芦苇母题，第二 Tab「水位（无潮汐）」，图表「水位·无潮汐」
+
+## 文件
+- `screens/` — 7 张 2x PNG（780×1688）：详情页×2、地图×2、收藏、设置、深色详情
+- `sources/` — 对应 7 份自包含 HTML 源稿（SVG 内联、系统字体、无外链，可离线双击改色改字）
+- `spec.json` — 机器可读规格 + 冻结契约 + SHA-256
+- `preview.html` — 本版 7 屏缩略预览
+
+---
+
+## 【扩展】完整 UI（28 屏）+ APP 功能优化需求
+
+在基础 7 屏之上，按设计侧完整清单（`design-handoff/screens/screens.json` 9 屏 + 6 叠层 + 4 深色）补齐到**覆盖全功能**的 28 屏：
+
+| 组 | 屏 | 说明 |
+|---|---|---|
+| ① 基础主屏 · 7 | `screens/`（设置页已改版，余 6 张原样） | 详情海/陆、地图海/陆、收藏、设置（OPT-A-01/02/09）、深色详情 |
+| ② 详情 5 Tab + 因子分解 · 7 | `screens_full/` | 潮流·海 / 水位·内陆、天气、水质 1×3、风浪·海 / 湖面风·内陆、因子分解展开 |
+| ③ 6 叠层 · 6 | `screens_full/` | OV01 Top10 时段筛选、OV02 免责 5 条、OV03 收藏确认、OV04 水质录入、OV05 星标气泡、OV06 删除确认 |
+| ④ 状态态 · 6 | `screens_full/` | 离线 / 陈旧 / 48h 不可用 / 分维降级、收藏空态、多选批量 |
+| ⑤ 深色变体 · 2 | `screens_full/` | 深色地图、深色收藏（深色独立 token，非机械反转） |
+
+**新增交付文件**
+- `index-full.html` — 自包含索引页（28 屏分组拼览 + 需求摘要，双击离线看）
+- `APP功能优化需求.md` — 功能差异清单 + 优化需求（逐条现状 / 代码证据 / 目标 / 验收 / 工程落点）
+- `SKIN-DESIGN-SPEC.md` — 皮肤（Skin）设计规范：三轴正交 / 可变 vs 冻结 token / 新增皮肤 A1–A10 接入清单 / 换肤验收表
+- `feature-gaps.json` — 机器可读差异表（9 条：3 ui_new + 2 ui_remove + 2 mismatch + 2 code_ahead）
+- `screens_full/*.png`（21 张 2x 780×1688）+ `sources_full/*.html`（21 份自包含离线源稿）
+
+**对照结论（2026-11-12 修订）**：工程 v1.16.0 功能完成度高，**9 条差异 / 7 条转需求**（P1×2：深色手动开关、地图 Top10 入口语义；P2×5：四态视觉分级、fetch_log 入口、换皮肤、下线用例/物种/权重、下线 API Key），**2 条仅记录**（批量不做导出、星标气泡/现场校潮/自选时段等工程已实现）。冻结契约未改动。OPT-A-01/02 由「升级/接线」改为**从设置页删除**；新增 **OPT-A-09 换皮肤**（首版仅内置 A，B/C/D 不并入），扩展规范见 `SKIN-DESIGN-SPEC.md`。
+
+> **设置页改版（2026-11-12，需求已确认）**：`sources/settings.html` / `screens/settings.png` 已按 OPT-A-01/02/09 更新——删除「用例·物种·权重」「API Key」两版块、新增「外观·皮肤」入口（当前 = 手绘 A 复古户外 + 敬请期待占位）。独立外观选择页本轮未做（「只做需求 + 入口」）。屏数仍 28。
+
+**复现**：`generator/engine.py` 先生成 4 版 base 7 屏 → `generator/engine_full.py` 补 A 版 21 张 `sources_full/*.html` 并覆盖改版 `sources/settings.html`（`render_settings_revised()`，不动 B/C/D）→ Edge 2x 截 PNG → `generator/gen_full_index.py` → `index-full.html`。
+
+## 边界
+纯视觉概念稿 + 需求清单，非工程交付、不改 `tidespot-android/` 源码。冻结语义色落地时须回归 `ScoreBands.kt` / `ConfidenceBadge.kt`；档位恒带文字；示例数值非业务数据。功能结论均来自 2026-11-12 实际代码核对。
