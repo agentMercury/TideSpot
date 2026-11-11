@@ -548,13 +548,15 @@ fun DetailScreen(
 
     // M5（F-3.5）：Top10 Sheet——state.top10 渲染（Top10Formatter 纯函数格式化；单层 LazyColumn 不嵌套）
     if (showTop10) {
-        ModalBottomSheet(onDismissRequest = { showTop10 = false }) {
+        ModalBottomSheet(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),onDismissRequest = { showTop10 = false }) {
             Top10SheetContent(state.top10, zone, viewModel)
         }
     }
     // OPT-V11-02（CHG-27）：水质实测录入 Sheet（操作按钮置顶；全展开避免半展开态按钮不可点）
     if (showQualityEntry) {
         ModalBottomSheet(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             onDismissRequest = { showQualityEntry = false },
             sheetState = qualityEntrySheetState,
         ) {
@@ -563,13 +565,15 @@ fun DetailScreen(
     }
     // M5（§6.2b 规则 5）：现场校潮 Sheet（观测 Session 级存 DetailViewModel；持久化登记 M6）
     if (showCalibration) {
-        ModalBottomSheet(onDismissRequest = { showCalibration = false }) {
+        ModalBottomSheet(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),onDismissRequest = { showCalibration = false }) {
             CalibrationSheetContent(viewModel, state, zone)
         }
     }
     // D11：免责 Sheet（§9.6 共 5 条，含新增第 5 条「潮汐校正」；TideSpotStrings 单源）
     if (showDisclaimer) {
-        ModalBottomSheet(onDismissRequest = { showDisclaimer = false }) {
+        ModalBottomSheet(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),onDismissRequest = { showDisclaimer = false }) {
             Column(Modifier.padding(12.dp).navigationBarsPadding()) {
                 Text(localTideSpotStrings().disclaimerTitle, style = MaterialTheme.typography.titleMedium)
                 localTideSpotStrings().disclaimerItems().forEachIndexed { i, line ->

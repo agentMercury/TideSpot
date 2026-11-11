@@ -29,7 +29,8 @@ private val LightColors = lightColorScheme(
     background = Color(0xFFEEF3F8),
     onBackground = Color(0xFF10243A),
     onSurface = Color(0xFF10243A),
-    onSurfaceVariant = Color(0xFF8A9DB0),
+    // 设计稿 #8A9DB0 在浅底仅 2.2–2.8:1，不满足 DoD ≥4.5:1；压深为 #556579（4.68–5.96:1，色相一致）
+    onSurfaceVariant = Color(0xFF556579),
     surface = Color(0xFFFFFFFF),
     surfaceVariant = Color(0xFFEEF3F8),
     outline = Color(0xFFDCE5EE),

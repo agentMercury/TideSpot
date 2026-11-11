@@ -397,7 +397,8 @@ fun FavoritesScreen(
 
     // F-2.6 跨点 Top10（Sheet 内独立滚动 = 单层 LazyColumn，无嵌套同向 LazyColumn，D02）
     if (showTop10) {
-        ModalBottomSheet(onDismissRequest = { showTop10 = false }) {
+        ModalBottomSheet(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),onDismissRequest = { showTop10 = false }) {
             Column(Modifier.navigationBarsPadding()) {
                 Top10Content(top10 = state.top10)
             }

@@ -229,7 +229,8 @@ fun SettingsScreen(
             }
         }
         if (showDisclaimer) {
-            ModalBottomSheet(onDismissRequest = { showDisclaimer = false }) {
+            ModalBottomSheet(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),onDismissRequest = { showDisclaimer = false }) {
                 Column(Modifier.padding(12.dp).navigationBarsPadding()) {
                     Text(disclaimerText.disclaimerTitle, style = MaterialTheme.typography.titleMedium)
                     disclaimerText.disclaimerItems().forEachIndexed { i, line ->
