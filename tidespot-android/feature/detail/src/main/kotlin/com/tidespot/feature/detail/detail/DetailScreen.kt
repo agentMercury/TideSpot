@@ -280,10 +280,13 @@ fun DetailScreen(
             var showTable by remember(state.selectedTab, state.selectedDay) { mutableStateOf(false) } // 默认图表
             // OPT-V115-01 #7（ts_chart_table_switch）：双 FilterChip → 单开关，标签=设计稿文案，状态说明沿用模块文案
             // OPT-V115-02 / S02 C09：设计稿分段胶囊切换（容器 #DCE5EE rx12，选中白胶囊 rx10）
+            val chartSwitchDesc = stringResource(UiR.string.ts_chart_table_switch)
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).height(36.dp),
+                // OPT-V115-01 #7：切换控件组语义标签（恢复 ts_chart_table_switch 引用）
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).height(36.dp)
+                    .semantics { contentDescription = chartSwitchDesc },
             ) {
                 Row(Modifier.fillMaxHeight().padding(3.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     listOf(false to R.string.ts_detail_chart, true to R.string.ts_detail_table)
@@ -1077,6 +1080,14 @@ private fun ScoreMainCard(
             androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
             if (kind != null) {
                 ConfidenceBadge(kind)
+                if (kind == Kind.LOW_CONFIDENCE) {
+                    // OPT-V115-01 #6（ts_dimension_degraded）：低置信 → 有效权重重算说明
+                    Text(
+                        stringResource(UiR.string.ts_dimension_degraded),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.85f),
+                    )
+                }
                 androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
