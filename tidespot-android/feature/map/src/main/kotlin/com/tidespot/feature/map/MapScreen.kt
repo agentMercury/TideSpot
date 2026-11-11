@@ -364,7 +364,7 @@ fun MapScreen(
                             Modifier.fillMaxSize().padding(horizontal = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text("⌕", style = MaterialTheme.typography.titleMedium, color = Color(0xFF1565C0))
+                            Text("⌕", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                             Text(
                                 searchHintText,
                                 Modifier.padding(start = 8.dp),
@@ -457,6 +457,15 @@ fun MapScreen(
                 // GAP-03：edge-to-edge 安全区（信息条不被手势条遮挡）
                 modifier = Modifier.fillMaxWidth().padding(12.dp).navigationBarsPadding(),
             )
+
+ 
+            // OPT-V115-02 / S01 C21：底图署名行（设计 y=818；与 Top10/信息条不重叠）
+            Text(
+                stringResource(R.string.ts_map_attribution),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
+            )
         }
     }
 }
@@ -467,14 +476,14 @@ private fun TopBarButton(icon: String, description: String, filled: Boolean, onC
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
-        color = if (filled) Color(0xFF1565C0) else MaterialTheme.colorScheme.surface,
+        color = if (filled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         modifier = Modifier.size(44.dp, 46.dp).semantics { contentDescription = description },
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 icon,
                 style = MaterialTheme.typography.titleLarge,
-                color = if (filled) Color.White else Color(0xFF1565C0),
+                color = if (filled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
             )
         }
     }

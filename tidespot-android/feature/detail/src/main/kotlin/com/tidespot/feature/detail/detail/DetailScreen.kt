@@ -183,7 +183,7 @@ fun DetailScreen(
         item {
             // OPT-V115-02 / S02 C08：设计稿分段控件（容器 358×40 rx12 #EAF1F7，选中白胶囊 rx10）
             Surface(
-                color = Color(0xFFDCE5EE),
+                color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).height(40.dp),
             ) {
@@ -207,7 +207,7 @@ fun DetailScreen(
                                     Text(
                                         tabTitles[i],
                                         style = MaterialTheme.typography.labelLarge,
-                                        color = if (selected) Color(0xFF1565C0) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
                                     )
                                 }
@@ -281,7 +281,7 @@ fun DetailScreen(
             // OPT-V115-01 #7（ts_chart_table_switch）：双 FilterChip → 单开关，标签=设计稿文案，状态说明沿用模块文案
             // OPT-V115-02 / S02 C09：设计稿分段胶囊切换（容器 #DCE5EE rx12，选中白胶囊 rx10）
             Surface(
-                color = Color(0xFFDCE5EE),
+                color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).height(36.dp),
             ) {
@@ -301,7 +301,7 @@ fun DetailScreen(
                                     Text(
                                         label,
                                         style = MaterialTheme.typography.labelLarge,
-                                        color = if (selected) Color(0xFF1565C0) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
                             }
@@ -425,6 +425,44 @@ fun DetailScreen(
                                 androidx.compose.ui.res.stringResource(UiR.string.ts_water_quality_estimate_note),
                                 style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.padding(start = 6.dp),
+                            )
+                        }
+                    }
+                }
+                // OPT-V115-02 / S06 C15：水质 2×2 指标卡（水温/溶氧/浊度/pH；单卡高 112dp）
+                val wqSample = daySlices.firstNotNullOfOrNull { qualityByEpoch[it.timeEpochSec] }
+                if (wqSample != null) {
+                    val wqKind = Kind.fromConfidence(wqSample.confidence)
+                    Column(
+                        Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            WaterQualityMetricCard(
+                                stringResource(R.string.ts_detail_wq_label_temp),
+                                wqSample.waterTempC?.let { Format.valueUnit(it, "°C") } ?: Format.MISSING,
+                                wqKind,
+                                Modifier.weight(1f),
+                            )
+                            WaterQualityMetricCard(
+                                stringResource(R.string.ts_detail_wq_label_do),
+                                wqSample.doMgL?.let { Format.valueUnit(it, "mg/L") } ?: Format.MISSING,
+                                wqKind,
+                                Modifier.weight(1f),
+                            )
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            WaterQualityMetricCard(
+                                stringResource(R.string.ts_detail_wq_label_turb),
+                                wqSample.turbidityProxy?.let { Format.valueUnit(it, "") } ?: Format.MISSING,
+                                wqKind,
+                                Modifier.weight(1f),
+                            )
+                            WaterQualityMetricCard(
+                                "pH",
+                                Format.MISSING,
+                                null,
+                                Modifier.weight(1f),
                             )
                         }
                     }
@@ -1036,6 +1074,33 @@ private fun ScoreMainCard(
                     )
                 }
             }
+        }
+    }
+}
+/** OPT-V115-02 / S06 C15：水质指标卡（标签 / 值 / 置信徽标；单卡高 112dp，禁裁切）。 */
+@Composable
+private fun WaterQualityMetricCard(
+    label: String,
+    value: String,
+    kind: Kind?,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = modifier.height(112.dp),
+    ) {
+        Column(
+            Modifier.fillMaxSize().padding(12.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(value, style = MaterialTheme.typography.titleLarge)
+            if (kind != null) ConfidenceBadge(kind)
         }
     }
 }

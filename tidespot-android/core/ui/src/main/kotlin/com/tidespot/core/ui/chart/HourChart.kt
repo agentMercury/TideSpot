@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.chart
+package com.tidespot.core.ui.chart
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -71,7 +71,7 @@ fun HourChart(
     val tooltipFg = MaterialTheme.colorScheme.inverseOnSurface
     val axisTextStyle = MaterialTheme.typography.labelSmall
     val tooltipTextStyle = MaterialTheme.typography.labelMedium
-    val axisLabelStyle = axisTextStyle.copy(color = axisColor)
+    val axisLabelStyle = axisTextStyle.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
     val tooltipLabelStyle = tooltipTextStyle.copy(color = tooltipFg)
     val textMeasurer = rememberTextMeasurer()
     val strings = localTideSpotStrings()
