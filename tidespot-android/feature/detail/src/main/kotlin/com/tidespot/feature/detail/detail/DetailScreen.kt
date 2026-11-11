@@ -455,38 +455,29 @@ fun DetailScreen(
                 val wqSample = daySlices.firstNotNullOfOrNull { qualityByEpoch[it.timeEpochSec] }
                 if (wqSample != null) {
                     val wqKind = Kind.fromConfidence(wqSample.confidence)
-                    Column(
-                        Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    // 客户裁定：删除 pH 指标（领域模型无字段，不虚构），保留三项一行三卡
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            WaterQualityMetricCard(
-                                stringResource(R.string.ts_detail_wq_label_temp),
-                                wqSample.waterTempC?.let { Format.valueUnit(it, "°C") } ?: Format.MISSING,
-                                wqKind,
-                                Modifier.weight(1f),
-                            )
-                            WaterQualityMetricCard(
-                                stringResource(R.string.ts_detail_wq_label_do),
-                                wqSample.doMgL?.let { Format.valueUnit(it, "mg/L") } ?: Format.MISSING,
-                                wqKind,
-                                Modifier.weight(1f),
-                            )
-                        }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            WaterQualityMetricCard(
-                                stringResource(R.string.ts_detail_wq_label_turb),
-                                wqSample.turbidityProxy?.let { Format.valueUnit(it, "") } ?: Format.MISSING,
-                                wqKind,
-                                Modifier.weight(1f),
-                            )
-                            WaterQualityMetricCard(
-                                "pH",
-                                Format.MISSING,
-                                null,
-                                Modifier.weight(1f),
-                            )
-                        }
+                        WaterQualityMetricCard(
+                            stringResource(R.string.ts_detail_wq_label_temp),
+                            wqSample.waterTempC?.let { Format.valueUnit(it, "°C") } ?: Format.MISSING,
+                            wqKind,
+                            Modifier.weight(1f),
+                        )
+                        WaterQualityMetricCard(
+                            stringResource(R.string.ts_detail_wq_label_do),
+                            wqSample.doMgL?.let { Format.valueUnit(it, "mg/L") } ?: Format.MISSING,
+                            wqKind,
+                            Modifier.weight(1f),
+                        )
+                        WaterQualityMetricCard(
+                            stringResource(R.string.ts_detail_wq_label_turb),
+                            wqSample.turbidityProxy?.let { Format.valueUnit(it, "") } ?: Format.MISSING,
+                            wqKind,
+                            Modifier.weight(1f),
+                        )
                     }
                 }
                 // CHG-25（P0-1）：内陆点首次配置引导卡（:app 判定：内陆 + 未配置 + 未跳过）
