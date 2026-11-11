@@ -1,10 +1,12 @@
 package com.tidespot.feature.detail.detail
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -175,20 +178,39 @@ fun DetailScreen(
         }
 
         item {
-            TabRow(
-                selectedTabIndex = state.selectedTab.ordinal,
-                modifier = Modifier.semantics { contentDescription = tabsDesc },
+            // OPT-V115-02 / S02 C08：设计稿分段控件（容器 358×40 rx12 #EAF1F7，选中白胶囊 rx10）
+            Surface(
+                color = Color(0xFFDCE5EE),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).height(40.dp),
             ) {
-                listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
-                    .forEachIndexed { i, tab ->
-                        val tabDesc = stringResource(R.string.ts_detail_tab_desc, tabTitles[i])
-                        Tab(
-                            selected = state.selectedTab == tab,
-                            onClick = { viewModel.selectTab(tab) },
-                            text = { Text(tabTitles[i]) },
-                            modifier = Modifier.semantics { contentDescription = tabDesc },
-                        )
-                    }
+                Row(
+                    Modifier.fillMaxSize().padding(3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
+                        .forEachIndexed { i, tab ->
+                            val tabDesc = stringResource(R.string.ts_detail_tab_desc, tabTitles[i])
+                            val selected = state.selectedTab == tab
+                            Surface(
+                                onClick = { viewModel.selectTab(tab) },
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (selected) MaterialTheme.colorScheme.surface else Color.Transparent,
+                                border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                                    .semantics { contentDescription = tabDesc },
+                            ) {
+                                Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
+                                    Text(
+                                        tabTitles[i],
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = if (selected) Color(0xFF1565C0) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                    )
+                                }
+                            }
+                        }
+                }
             }
         }
 
@@ -267,7 +289,6 @@ fun DetailScreen(
                     onCheckedChange = { showTable = it },
                     modifier = Modifier.semantics { contentDescription = chartTableState },
                 )
-                Text(chartTableState, style = MaterialTheme.typography.labelMedium)
             }
 
             val scoresByEpoch = state.scores.associateBy { it.timeEpochSec }
@@ -348,32 +369,6 @@ fun DetailScreen(
                             Text(cmp.beforeLine, style = MaterialTheme.typography.bodySmall)
                             Text(cmp.afterLine, style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary)
-                        }
-                    }
-                }
-            }
-
-            // D10/OPT-M5-05（CHG-16⑫）：数值区徽标接 domain confidence；§6.7 权重降级 →「低置信」
-            val presetWeightSum = viewModel.holderInternal().preset.weightSum
-            if (state.selectedTab == DetailTab.SCORE) {
-                val badgeScore = state.selectedHour?.let { idx ->
-                    daySlices.getOrNull(idx)?.timeEpochSec?.let { scoresByEpoch[it] }
-                } ?: daySlices.firstNotNullOfOrNull { scoresByEpoch[it.timeEpochSec] }
-                ScoreBadgeDerivations.badgeKind(badgeScore, presetWeightSum)?.let { kind ->
-                    Row(
-                        Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                    ) {
-                        ConfidenceBadge(kind)
-                        // OPT-V115-01 #6（ts_dimension_degraded）：有效权重 <0.6 → 低置信徽标同行附降级说明
-                        if (kind == Kind.LOW_CONFIDENCE) {
-                            val degradedNote = stringResource(UiR.string.ts_dimension_degraded)
-                            Text(
-                                degradedNote,
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(start = 6.dp)
-                                    .semantics { contentDescription = degradedNote },
-                            )
                         }
                     }
                 }
@@ -957,9 +952,8 @@ private fun disclaimerFor(tab: DetailTab, strings: TideSpotStrings): String = wh
     DetailTab.WATER_QUALITY -> strings.disclaimerWaterQuality
 }
 /**
- * OPT-V115-02 / S02 C10：今日指数主卡（设计 366×152）。
- * 结构：五档色块（分数 + 档位文字，N-7 不靠颜色单独编码）｜当日摘要｜置信徽标。
- * 色值一律取 [ScoreBand] 冻结值，不在本组件内定义新色。
+ * OPT-V115-02 / S02 C10：今日指数主卡（设计 366×152 · 深蓝 #0D47A1 · rx16）。
+ * 内部：大号分数 + 档位文字 + 档位胶囊（冻结 ScoreBand 色）+ 五段色带图例。
  */
 @Composable
 private fun ScoreMainCard(
@@ -969,69 +963,61 @@ private fun ScoreMainCard(
     presetWeightSum: Double,
     zone: ZoneId,
 ) {
-    val unit = chartUnit(DetailTab.SCORE, stringResource(R.string.ts_detail_unit_score))
     val validIdx = values.indices.filter { values[it] != null }
-    if (validIdx.isEmpty()) {
-        Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
-            Text(
-                stringResource(R.string.ts_detail_summary_empty),
-                Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-        return
-    }
-    val peakIdx = validIdx.maxByOrNull { values[it]!! }!!
-    val lowIdx = validIdx.minByOrNull { values[it]!! }!!
-    val peak = values[peakIdx]!!
-    val low = values[lowIdx]!!
-    val peakEpoch = daySlices.getOrNull(peakIdx)?.timeEpochSec
-    val lowEpoch = daySlices.getOrNull(lowIdx)?.timeEpochSec
-    val score = peak.toInt().coerceIn(0, 100)
-    val band = ScoreBand.of(score)
-    val bandLabel = BandTitles.fromDomainTier(score, localTideSpotStrings())
-    val kind = peakEpoch?.let { scoresByEpoch[it] }?.let {
-        ScoreBadgeDerivations.badgeKind(it, presetWeightSum)
-    }
+    val peakIdx = validIdx.maxByOrNull { values[it]!! }
+    val score = peakIdx?.let { values[it] }?.toInt()?.coerceIn(0, 100)
+    val band = score?.let { ScoreBand.of(it) }
+    val bandLabel = score?.let { BandTitles.fromDomainTier(it, localTideSpotStrings()) }
+    val kind = peakIdx
+        ?.let { daySlices.getOrNull(it)?.timeEpochSec }
+        ?.let { scoresByEpoch[it] }
+        ?.let { ScoreBadgeDerivations.badgeKind(it, presetWeightSum) }
 
-    Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
-        Row(
-            Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-        ) {
-            Box(
-                Modifier.size(88.dp).background(Color(band.argb), MaterialTheme.shapes.medium),
-                contentAlignment = androidx.compose.ui.Alignment.Center,
-            ) {
-                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+    Surface(
+        color = Color(0xFF0D47A1),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp).height(152.dp),
+    ) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Column {
                     Text(
-                        score.toString(),
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
-                        color = Color(band.onArgb),
+                        score?.toString() ?: Format.MISSING,
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.Bold),
+                        color = Color.White,
                     )
-                    Text(
-                        bandLabel,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Color(band.onArgb),
-                    )
+                    if (bandLabel == null) {
+                        Text(
+                            stringResource(R.string.ts_detail_summary_empty),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.White.copy(alpha = 0.85f),
+                        )
+                    }
+                }
+                androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                if (band != null && bandLabel != null) {
+                    Surface(color = Color(band.argb), shape = RoundedCornerShape(12.dp)) {
+                        Text(
+                            bandLabel,
+                            Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(band.onArgb),
+                        )
+                    }
                 }
             }
-            Column(
-                Modifier.weight(1f).padding(start = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Text(
-                    stringResource(
-                        R.string.ts_detail_summary_unit,
-                        Format.valueUnit(peak, unit),
-                        peakEpoch?.let { Format.hourLocal(it, zone) } ?: Format.MISSING,
-                        Format.valueUnit(low, unit),
-                        lowEpoch?.let { Format.hourLocal(it, zone) } ?: Format.MISSING,
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                kind?.let { ConfidenceBadge(it) }
+            androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+            if (kind != null) {
+                ConfidenceBadge(kind)
+                androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                ScoreBand.entries.reversed().forEach { b ->
+                    Box(
+                        Modifier.weight(1f).height(8.dp)
+                            .background(Color(b.argb), RoundedCornerShape(3.dp)),
+                    )
+                }
             }
         }
     }

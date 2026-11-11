@@ -255,3 +255,12 @@
 - **开工顺序建议**：01 内先做 `ts_record_high_tide`/`ts_stale`/`ts_dimension_degraded`/`ts_chart_table_switch`/`ts_reverse_geo_off`（改动小），再做 `ts_window_bar`（Canvas 绘制）与 `ts_offline`（需连通性探测）；随后 02。
 - **完成判据（GAP-05 闭环）**：17/17 每 key ≥1 处 `R.string.` 引用 + `DECISIONS.md §6` 七项复核全绿 + `i18n_scan.mjs` FAIL=0。
 - **V1.1 收官口径（2026-11-11）**：V1.1 池 26 项 = **25 项已交付 + 1 项移除（OPT-V11-17/D21）**；功能目标全部达成，**剩余为验收性收尾**（P2 真机冒烟五项、v1.1.1 两 bug 复测、v1（M0–M6）交付验收 12-04~12-08），及 GAP-05 7 条（已转入 V1.15，不在 V1.1 记未完成）。
+
+### V1.15 视觉校准（2026-11-11 / CHG-48，真机取图比对）
+
+- 方法：db 截图（AAK-AN00 1272×2800）+ 设计 SVG 几何提取，替代只看层坐标。
+- S01：白色搜索框 206×46 + 3 个 44×46 方块按钮（定位实心）+ Top10 深蓝横幅 366×48。
+- S02：分段 Tab（容器 358×40 + 白胶囊）、日期胶囊 rx18、**深蓝主卡 #0D47A1 + 档位胶囊 + 五段色带**、图表卡 210dp。
+- 文字色：onSurface #10243A / onSurfaceVariant #8A9DB0（深色 #E6EDF5 / #9FB0C0）。
+- 产物：E:\\Trans\\潮点TideSpot-v1.15.2.apk（versionCode 7）；已重装真机验证。
+- 剩余：图表切换版式、日期行拥挤、S09 卡片化、C03 信息条、C21/C22 底部行、S03–S08 未对齐。

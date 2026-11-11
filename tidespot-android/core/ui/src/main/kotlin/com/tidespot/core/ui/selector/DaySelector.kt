@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.selector
+package com.tidespot.core.ui.selector
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -117,12 +122,24 @@ fun DaySelector(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             items(chips, key = { it.offsetDays }) { chip ->
-                FilterChip(
-                    selected = chip.offsetDays == selectedDay,
+                // OPT-V115-02 / S02 C07：设计稿胶囊 chip（rx18；选中 #1565C0 填充白字，其余白底 1dp 描边）
+                val selected = chip.offsetDays == selectedDay
+                Surface(
                     onClick = { onDaySelected(chip.offsetDays) },
-                    label = { Text(chip.chipLabel) },
-                    modifier = Modifier.semantics { contentDescription = chip.contentDescription },
-                )
+                    shape = RoundedCornerShape(18.dp),
+                    color = if (selected) Color(0xFF1565C0) else MaterialTheme.colorScheme.surface,
+                    border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    modifier = Modifier.height(36.dp).semantics { contentDescription = chip.contentDescription },
+                ) {
+                    Box(Modifier.padding(horizontal = 12.dp), contentAlignment = Alignment.Center) {
+                        Text(
+                            chip.chipLabel,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = if (selected) Color.White else MaterialTheme.colorScheme.secondary,
+                            maxLines = 1,
+                        )
+                    }
+                }
             }
         }
         infoSlot()

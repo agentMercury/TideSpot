@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -343,30 +344,43 @@ fun MapScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp)) {
-                // OPT-V115-02 / S01 C02：顶部工具浮层（定位 / 搜索 / 收藏 / 设置，16dp 圆角卡片）
-                Surface(
-                    shape = MaterialTheme.shapes.medium,
-                    tonalElevation = 3.dp,
-                    modifier = Modifier.fillMaxWidth(),
+                // OPT-V115-02 / S01 C02：设计稿顶部工具浮层——搜索框 206×46 rx12 + 3 个 44×46 rx12 方块按钮
+                val searchHintText = stringResource(R.string.ts_map_search_hint)
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Row(
-                        Modifier.fillMaxWidth().padding(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    Surface(
+                        onClick = { searchExpanded = !searchExpanded },
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f).height(46.dp)
+                            .semantics { contentDescription = searchHintText },
                     ) {
-                        if (permissionState is PermissionUiState.Granted && locationController != null) {
-                            TopBarAction("◎", stringResource(R.string.ts_map_my_location)) { locateMe() }
+                        Row(
+                            Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text("⌕", style = MaterialTheme.typography.titleMedium, color = Color(0xFF1565C0))
+                            Text(
+                                searchHintText,
+                                Modifier.padding(start = 8.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                            )
                         }
-                        TopBarAction("⌕", stringResource(R.string.ts_map_search_hint)) {
-                            searchExpanded = !searchExpanded
-                        }
-                        Spacer(Modifier.weight(1f))
-                        if (onOpenFavorites != null && favoritesLabel.isNotEmpty()) {
-                            TopBarAction("★", favoritesLabel) { onOpenFavorites.invoke() }
-                        }
-                        if (onOpenSettings != null && settingsLabel.isNotEmpty()) {
-                            TopBarAction("⚙", settingsLabel) { onOpenSettings.invoke() }
-                        }
+                    }
+                    if (permissionState is PermissionUiState.Granted && locationController != null) {
+                        // 定位：设计稿为实心主色方块（选中/激活态）
+                        TopBarButton("◎", stringResource(R.string.ts_map_my_location), filled = true) { locateMe() }
+                    }
+                    if (onOpenFavorites != null && favoritesLabel.isNotEmpty()) {
+                        TopBarButton("★", favoritesLabel, filled = false) { onOpenFavorites.invoke() }
+                    }
+                    if (onOpenSettings != null && settingsLabel.isNotEmpty()) {
+                        TopBarButton("⚙", settingsLabel, filled = false) { onOpenSettings.invoke() }
                     }
                 }
                 if (searchExpanded) {
@@ -387,12 +401,6 @@ fun MapScreen(
                 when (val ps = permissionState) {
                     is PermissionUiState.Denied ->
                         TopHint(stringResource(UiR.string.ts_location_denied), isError = ps.permanent)
-                    PermissionUiState.Granted -> lastFix?.let { fix ->
-                        TopHint(
-                            stringResource(R.string.ts_map_location_ok, fix.accuracyMeters?.toInt() ?: 0),
-                            isError = false,
-                        )
-                    }
                     else -> {}
                 }
             }
@@ -403,8 +411,8 @@ fun MapScreen(
             if (onOpenTop10 != null && top10Label.isNotEmpty()) {
                 Surface(
                     onClick = { onOpenTop10.invoke() },
-                    shape = MaterialTheme.shapes.medium,
-                    tonalElevation = 3.dp,
+                    color = Color(0xFF0D47A1),
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
                 ) {
                     Row(
@@ -412,11 +420,15 @@ fun MapScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text(top10Label, style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            top10Label,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Color.White,
+                        )
                         Text(
                             "›",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = Color.White,
                         )
                     }
                 }
@@ -447,14 +459,22 @@ fun MapScreen(
     }
 }
 
-/** OPT-V115-02 / S01 C02：顶部工具浮层单个动作（图标 + TalkBack 描述）。 */
+/** OPT-V115-02 / S01 C02：顶部工具浮层方块按钮（44×46 rx12；filled 为主色实心，其余白底主色图标）。 */
 @Composable
-private fun TopBarAction(icon: String, description: String, onClick: () -> Unit) {
-    TextButton(
+private fun TopBarButton(icon: String, description: String, filled: Boolean, onClick: () -> Unit) {
+    Surface(
         onClick = onClick,
-        modifier = Modifier.semantics { contentDescription = description },
+        shape = RoundedCornerShape(12.dp),
+        color = if (filled) Color(0xFF1565C0) else MaterialTheme.colorScheme.surface,
+        modifier = Modifier.size(44.dp, 46.dp).semantics { contentDescription = description },
     ) {
-        Text(icon, style = MaterialTheme.typography.titleLarge)
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                icon,
+                style = MaterialTheme.typography.titleLarge,
+                color = if (filled) Color.White else Color(0xFF1565C0),
+            )
+        }
     }
 }
 
