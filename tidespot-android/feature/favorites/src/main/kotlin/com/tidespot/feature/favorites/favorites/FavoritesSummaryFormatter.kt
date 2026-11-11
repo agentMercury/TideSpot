@@ -1,7 +1,8 @@
-﻿package com.tidespot.feature.favorites.favorites
+package com.tidespot.feature.favorites.favorites
 
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.ui.format.RelativeTimeFormatter
+import com.tidespot.core.ui.band.BandTitles
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.strings.ZhStrings
 import java.time.Instant
@@ -30,7 +31,11 @@ object FavoritesSummaryFormatter {
         window: BestWindow,
         zone: ZoneId,
         strings: TideSpotStrings = ZhStrings,
-    ): String = strings.summaryLine(time(window.peakEpochSec, zone, strings), window.peakScore, window.tier)
+    ): String = strings.summaryLine(
+        time(window.peakEpochSec, zone, strings),
+        window.peakScore,
+        BandTitles.localize(window.tier, window.peakScore, strings),
+    )
 
     /**
      * OPT-V11-06（P1）：相对时间摘要行——时刻改「今天/明天/周X/M月d日 HH:mm」（当地时区语义）。
@@ -44,7 +49,7 @@ object FavoritesSummaryFormatter {
     ): String {
         val timeText = nowEpochSec?.let { RelativeTimeFormatter.format(window.peakEpochSec, zone, it, strings) }
             ?: time(window.peakEpochSec, zone, strings)
-        return strings.summaryLine(timeText, window.peakScore, window.tier)
+        return strings.summaryLine(timeText, window.peakScore, BandTitles.localize(window.tier, window.peakScore, strings))
     }
 
     /** 兜底行：fallbackMessage + 「（M月d日 HH:mm）」（兜底最高分时刻；无时刻则只显示文案）。 */

@@ -1,6 +1,7 @@
 package com.tidespot.feature.detail.detail
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -188,7 +190,9 @@ fun DetailScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).height(40.dp),
             ) {
                 Row(
-                    Modifier.fillMaxSize().padding(3.dp),
+                    Modifier.fillMaxWidth().height(40.dp)
+                        .horizontalScroll(rememberScrollState())
+                        .padding(3.dp),
                     horizontalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
@@ -200,7 +204,7 @@ fun DetailScreen(
                                 shape = RoundedCornerShape(10.dp),
                                 color = if (selected) MaterialTheme.colorScheme.surface else Color.Transparent,
                                 border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
-                                modifier = Modifier.weight(1f).fillMaxHeight()
+                                modifier = Modifier.fillMaxHeight()
                                     .semantics { contentDescription = tabDesc },
                             ) {
                                 Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
@@ -209,6 +213,7 @@ fun DetailScreen(
                                         style = MaterialTheme.typography.labelLarge,
                                         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
+                                        modifier = Modifier.padding(horizontal = 10.dp),
                                     )
                                 }
                             }

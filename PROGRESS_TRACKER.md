@@ -276,3 +276,11 @@
 | 5. 台账回写 | ✅ | CHG-46~54；本节即 §10 收官回写 |
 
 **结论**：功能与视觉主体已交付；**第 4 项（英文真机）是唯一未闭环的验收项**，需客户手工切系统语言后补截图。
+
+### 英文验收补记（2026-11-11，CHG-55）
+
+- **App locale**：`en`（`adb shell cmd locale get-app-locales com.tidespot.app` → `[en]`）。
+- **扫描结果**：S01/S02/S08/S09 + Water Quality/Weather/Lake Wind/Water Level 四个 Tab，`uiautomator dump` 中文残留 **0**（点位名为用户数据，保留中文属正常）。
+- **修复**：地图兜底名未注入 strings、收藏档位透传 domain 中文、五维 Tab 英文等分截断（改横滑）。
+- **深色英文**：详情页截图留证。
+- **DoD 第 4 项状态：✅ 闭环**。

@@ -53,6 +53,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.tidespot.core.domain.model.NamedPlace
 import com.tidespot.core.ui.R as UiR
+import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.format.Format
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.feature.map.crosshair.CrosshairState
@@ -314,14 +315,14 @@ fun MapScreen(
     // 信息条（永不空白）：Preview 且已有确认点时仍显示已确认数据（F-1.4）
     val infoState: InfoBarState = when (val cs = crosshairState) {
         is CrosshairState.Confirmed ->
-            buildInfoBarState(InfoBarMode.CONFIRMED, cs.spot.lat, cs.spot.lon, confirmedPlace, reverseGeoEnabled)
+            buildInfoBarState(InfoBarMode.CONFIRMED, cs.spot.lat, cs.spot.lon, confirmedPlace, reverseGeoEnabled, localTideSpotStrings())
         is CrosshairState.Preview ->
             if (confirmedSpot != null) {
-                buildInfoBarState(InfoBarMode.PREVIEW, confirmedSpot?.lat, confirmedSpot?.lon, confirmedPlace, reverseGeoEnabled)
+                buildInfoBarState(InfoBarMode.PREVIEW, confirmedSpot?.lat, confirmedSpot?.lon, confirmedPlace, reverseGeoEnabled, localTideSpotStrings())
             } else {
-                buildInfoBarState(InfoBarMode.PREVIEW, cs.center.lat, cs.center.lon, null, reverseGeoEnabled)
+                buildInfoBarState(InfoBarMode.PREVIEW, cs.center.lat, cs.center.lon, null, reverseGeoEnabled, localTideSpotStrings())
             }
-        CrosshairState.Idle -> buildInfoBarState(InfoBarMode.CONFIRMED, null, null, null, reverseGeoEnabled)
+        CrosshairState.Idle -> buildInfoBarState(InfoBarMode.CONFIRMED, null, null, null, reverseGeoEnabled, localTideSpotStrings())
     }
 
     // OPT-V115-02 / S01 C02：搜索面板展开态（默认收起，点顶部「搜索」展开）
