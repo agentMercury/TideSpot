@@ -53,6 +53,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.tidespot.core.domain.model.NamedPlace
 import com.tidespot.core.ui.R as UiR
+import com.tidespot.core.ui.format.Format
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.feature.map.crosshair.CrosshairState
 import com.tidespot.feature.map.crosshair.CrosshairStateMachine
@@ -115,6 +116,8 @@ fun MapScreen(
     settingsLabel: String = "",
     onOpenTop10: (() -> Unit)? = null,
     top10Label: String = "",
+    /** OPT-V115-02 / S01 C22：最近一次数据拉取时刻（:app 透传；null → 显示「—」，禁编造）。 */
+    sourceFetchedAtMillis: Long? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -459,6 +462,18 @@ fun MapScreen(
             )
 
  
+            // OPT-V115-02 / S01 C22：来源行（源更新 / 本机拉取；无数据显「—」）
+            Text(
+                stringResource(
+                    R.string.ts_map_source_line,
+                    Format.MISSING,
+                    sourceFetchedAtMillis?.let { Format.clockMillis(it, java.time.ZoneId.systemDefault()) } ?: Format.MISSING,
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
+            )
+
             // OPT-V115-02 / S01 C21：底图署名行（设计 y=818；与 Top10/信息条不重叠）
             Text(
                 stringResource(R.string.ts_map_attribution),

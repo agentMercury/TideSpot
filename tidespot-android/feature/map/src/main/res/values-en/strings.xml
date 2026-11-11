@@ -7,4 +7,5 @@
     <string name="ts_map_search_clear">Clear</string>
     <string name="ts_map_search_hint">Search a place (e.g. Wanlu Lake)</string>
     <string name="ts_map_attribution">Map data: OpenStreetMap contributors · CARTO</string>
+    <string name="ts_map_source_line">Source update %1$s · Device fetch %2$s</string>
 </resources>

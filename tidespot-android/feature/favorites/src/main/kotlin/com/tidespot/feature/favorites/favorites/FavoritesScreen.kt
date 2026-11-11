@@ -542,6 +542,12 @@ private fun FavoriteCard(
                     Checkbox(checked = selected, onCheckedChange = { onLongPress() })
                 }
                 Text(spot.name, style = MaterialTheme.typography.titleMedium)
+                // OPT-V115-02 / S08：水体类型行（设计：名称下方）
+                Text(
+                    FavoritesInfoCardLogic.waterBodyLabel(spot.waterBody, strings),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 // OPT-V11-11：陈旧 / 已过期徽标（NONE 不渲染，禁空串）
                 staleBadge?.let { badge ->
                     AssistChip(

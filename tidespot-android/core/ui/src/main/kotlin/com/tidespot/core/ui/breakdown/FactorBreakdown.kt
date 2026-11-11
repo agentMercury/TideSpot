@@ -55,7 +55,8 @@ data class RawInputRow(val label: String, val value: String)
  * OPT-V11-13：唯一入口，文案由 [TideSpotStrings] 注入；未知 id 原样返回。
  */
 fun factorLabel(id: String, strings: TideSpotStrings = ZhStrings): String = try {
-    when (FactorId.valueOf(id)) {
+    // OPT-V115-02 / S03：因子 id 大小写不敏感解析（domain 侧 id 为小写，此前直接 valueOf 抛错回落原始 id）
+    when (FactorId.valueOf(id.uppercase())) {
         FactorId.OXYGEN -> strings.factorOxygen
         FactorId.PRESSURE -> strings.factorPressure
         FactorId.SOLUNAR -> strings.factorSolunar

@@ -398,13 +398,35 @@ fun DetailScreen(
                 if (epoch != null && score != null) {
                     val veto = Derivations.vetoRows(epoch, result.weather.associateBy { it.timeEpochSec },
                         result.marine.associateBy { it.timeEpochSec }, viewModel.holderInternal().doPotentialByEpoch())
-                    FactorBreakdown(
-                        rows = score.factors.map {
-                            com.tidespot.core.ui.breakdown.FactorRow(it.id, factorLabel(it.id), it.sub, it.weight, it.detail)
-                        },
-                        vetoRows = veto,
-                        rawInputs = holderRawInputs(viewModel, epoch),
-                    )
+                    // OPT-V115-02 / S03：因子分解卡（设计：因子行 / ΠV 明细 / 原始输入三区，卡内）
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                        FactorBreakdown(
+                            rows = score.factors.map {
+                                com.tidespot.core.ui.breakdown.FactorRow(it.id, factorLabel(it.id), it.sub, it.weight, it.detail)
+                            },
+                            vetoRows = veto,
+                            rawInputs = holderRawInputs(viewModel, epoch),
+                        )
+                    }
+                }
+            }
+            // OPT-V115-02 / S05：天气 Tab 安全摘要卡（免责第 2 条原文完整展示）
+            if (state.selectedTab == DetailTab.WEATHER) {
+                Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                    Column(
+                        Modifier.fillMaxWidth().padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            stringResource(R.string.ts_detail_safety_title),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            localTideSpotStrings().disclaimerWeather,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
             if (state.selectedTab == DetailTab.WATER_QUALITY) {

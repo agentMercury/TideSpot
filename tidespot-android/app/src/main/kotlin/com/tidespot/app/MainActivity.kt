@@ -21,6 +21,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -93,6 +94,8 @@ private fun AppRoot(graph: AppGraph) {
     }
     // OPT-M5-07：确认选点 → 收藏对话框（预填逆地理名称）
     var pendingConfirm by remember { mutableStateOf<SpotConfirmed?>(null) }
+    // OPT-V115-02 / S01 C22：最近一次详情拉取时刻（地图来源行透传；真实值，无数据显示「—」）
+    var lastFetchedMillis by remember { mutableStateOf<Long?>(null) }
 
     val favoritesVm = remember { FavoritesViewModel(graph.repository) }
     // OPT-V11-05（P1）：进入收藏列表 → 后台预刷新最近查看 5 条（TTL/2 + 令牌桶；失败静默、无 UI 状态）
@@ -184,6 +187,7 @@ private fun AppRoot(graph: AppGraph) {
                         navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
                     },
                     top10Label = stringResource(UiR.string.ts_top10_all),
+                    sourceFetchedAtMillis = lastFetchedMillis,
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -211,6 +215,7 @@ private fun AppRoot(graph: AppGraph) {
                             spot = spot,
                             viewModel = vm,
                             onBack = { navState = AppNav.reduce(navState, AppNavEvent.BackFromDetail) },
+                            onFetched = { lastFetchedMillis = it },
                             // UX-21：详情返回按来源页呈现（从地图进 → 回地图）
                             backLabel = if (navState.sourcePage == AppPage.MAP) stringResource(R.string.ts_app_back_map) else stringResource(R.string.ts_app_back_favorites),
                             showCredentialGuide = spot.waterBody == WaterBodyType.INLAND_WATER &&
@@ -274,10 +279,16 @@ private fun DetailPage(
     viewModel: DetailViewModel,
     onBack: () -> Unit,
     backLabel: String,
+    /** OPT-V115-02：详情数据拉取时刻上报（地图 C22 来源行用）。 */
+    onFetched: (Long?) -> Unit = {},
     showCredentialGuide: Boolean,
     onOpenCredentialSettings: () -> Unit,
     onSkipCredentialGuide: () -> Unit,
 ) {
+    val state by viewModel.state.collectAsState()
+    LaunchedEffect(state.result?.fetchedAtMillis) {
+        onFetched(state.result?.fetchedAtMillis?.values?.maxOrNull())
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         DetailScreen(
             spot = spot,

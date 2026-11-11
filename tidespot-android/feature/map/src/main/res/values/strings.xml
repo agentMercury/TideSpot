@@ -8,4 +8,5 @@
     <string name="ts_map_search_hint">搜索地点（如：万绿湖）</string>
     <!-- OPT-V115-02 / S01 C21：底图署名行 -->
     <string name="ts_map_attribution">底图：OpenStreetMap 贡献者 · CARTO</string>
+    <string name="ts_map_source_line">源更新 %1$s · 本机拉取 %2$s</string>
 </resources>

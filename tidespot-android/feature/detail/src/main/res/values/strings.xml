@@ -107,4 +107,5 @@
     <string name="ts_detail_wq_label_temp">水温</string>
     <string name="ts_detail_wq_label_do">溶解氧</string>
     <string name="ts_detail_wq_label_turb">浊度</string>
+    <string name="ts_detail_safety_title">安全摘要</string>
 </resources>

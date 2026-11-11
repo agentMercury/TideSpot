@@ -98,4 +98,5 @@
     <string name="ts_detail_wq_label_temp">Water temp</string>
     <string name="ts_detail_wq_label_do">Dissolved oxygen</string>
     <string name="ts_detail_wq_label_turb">Turbidity</string>
+    <string name="ts_detail_safety_title">Safety summary</string>
 </resources>
