@@ -223,9 +223,9 @@
 | OPT-V11-17 缩略图 | ⛔ **已移除（客户裁定 D21）** | 实现期实证：CARTO `rastertiles/*` 已要求 API key，无 key 返回「API KEY REQUIRED」占位图（v1.2.0 真机截图留证）→ 客户裁定删除该功能；`MapThumbnailStore`/`ThumbnailCachePolicy`/`TileMath`/`cartoStaticTile` 全量移除，本轮不做 |
 | OPT-V11-13 i18n 存量全量外移 | ⬜ **未开工（评估完成，需专项批次）** | 见下「i18n 评估」 |
 
-- **验证**：`core:ui` / `core:data` / `feature:favorites` 单测全绿；`assembleRelease` 产出 `潮点TideSpot-v1.2.0.apk`（`versionCode=4`，自动分发 `E:\Trans`）。
+- **验证**：`core:ui` / `core:data` / `feature:favorites` 单测全绿；`assembleRelease` 产出 `潮点TideSpot-v1.2.0.apk`（`versionCode=4`，自动分发 `E:\Trans`）；**真机 AAK-AN00/Android 16：`connectedDebugAndroidTest` 8/8 通过**（含新增 `v4→v5`、`v5→v6` 迁移用例；真实升级路径另由 v1.2.0 覆盖安装验证：5 条收藏全保留、`groupName` 列生效）。
 - **开发期发现并修正的既有缺陷**：① `Format.value(v, digits)` 的 digits 上限 3 → 收藏列表「坐标 6 位小数」实际只有 3 位 → 新增 `Format.coordinate`（6 位专用，`value()` 上限不变以免行为漂移）；② `deleteFavorite` 只删 `spot` + `hourly_score`，遗留 4 张表孤儿行 → 按 D19 一并级联清理。
-- **风险**：① 缩略图在列表滚动时的帧率与磁盘缓存增长（30 d × 每点 1 张 ≈ 数十 KB/点，可接受；真机滚动冒烟验证）；② Room v5→v6 需真机 `MigrationTestHelper`（`RoomMigrationInstrumentedTest` 需补 v5→v6 用例）；③ 长按/点按手势区分需真机确认（多选态点按 = 选择、非多选态点按 = 进详情）。
+- **风险**：① 缩略图在列表滚动时的帧率与磁盘缓存增长（30 d × 每点 1 张 ≈ 数十 KB/点，可接受；真机滚动冒烟验证）；② Room v5→v6 真机迁移锁 **已补齐并真机通过**（`RoomMigrationInstrumentedTest` v4→v5/v5→v6，8/8）；③ 长按/点按手势区分需真机确认（多选态点按 = 选择、非多选态点按 = 进详情）。
 - **下一步**：① 真机冒烟 P2 五项；② 补 `RoomMigrationInstrumentedTest` v5→v6 用例并真机跑；③ **OPT-V11-13 专项批次**（方案见下）。
 
 ### i18n（OPT-V11-13）评估（未开工，供客户裁定）

@@ -186,8 +186,8 @@ D:\workspace\天气鱼情\.tools\gradle-8.9\bin\gradle.bat :app:assembleRelease 
 
 1. 跑 `verify.ps1` 确认基线 **767/0/0**
 2. **真机冒烟 P2 五项**（APK `潮点TideSpot-v1.2.0.apk` 已分发）：① 分组：新建/编辑点设分组 → 组头折叠/展开 → 组内顺序随排序 → 「未分组」恒在最后；② 长按卡片进多选 → 全选/反选 → 批量删除二次确认（条数）→ 列表与缓存同步；批量改标签（追加/替换）、批量改分组；③ 点按（非多选态）进详情、多选态点按 = 选择；④ 卡片「信息」展开：坐标 6 位、海拔/最近拉取缺值显示 `—`；⑤ 缩略图：滚动帧率、断网 → 占位不破图；⑥ **Room v5→v6 升级不丢数据**（老收藏全部进「未分组」）
-3. **真机迁移测试**：`RoomMigrationInstrumentedTest` 已补 v4→v5 / v5→v6 用例（需连 AAK-AN00 跑 `connectedDebugAndroidTest`）
-4. **OPT-V11-13 i18n 存量全量外移**：单开专项批次（评估见 `PROGRESS_TRACKER.md` §9：468 处/47 文件、domain 注入层、30+ 测试改造、注释感知红线扫描；预估 2–3 天）
+3. **真机迁移测试**：✅ 已完成（2026-11-11，AAK-AN00/Android 16）——`connectedDebugAndroidTest` **8/8 通过**，含 `v4→v5`（kind/value 默认值）与 `v5→v6`（groupName 归未分组）用例；另经 v1.2.0 覆盖安装实证「5 条收藏保留 + 分组列生效」。**注意**：AGP 8.7.3 需 `com.android.tools.utp:*-31.7.3`，本机代理关闭时无法下载 → 可清空 `GRADLE_OPTS` 走 Google Maven 直连（实测可达）
+4. **OPT-V11-13 i18n 存量全量外移**：**移交后续对话执行**（专项批次；评估见 `PROGRESS_TRACKER.md` §9：468 处/47 文件、domain 注入层、30+ 测试改造、注释感知红线扫描；预估 2–3 天）。接手起点：`core:ui/strings/TideSpotStrings.kt`（33+ 常量）、`:core:ui/res/values{-en}/strings.xml`（现有 30 条 `ts_`）、`HourlyScoreStore.resolvePreset`（预设按 D18 改稳定 id + 旧中文值兼容）
 5. 每完成一项：登记台账 CHG → 纯函数锁测试 → 全量回归 → 真机冒烟（可行时）→ jj 提交（描述用 cmd 管道）
 6. P2 收口后更新本文件或再交接
 
