@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
@@ -38,7 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tidespot.core.data.repo.DataSource
 import com.tidespot.core.data.repo.SourceMetaRegistry
 import com.tidespot.core.data.repo.Ttl
@@ -46,6 +50,7 @@ import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.ui.badge.ConfidenceBadge
 import com.tidespot.core.ui.badge.Kind
 import com.tidespot.core.ui.banner.OfflineBanner
+import com.tidespot.core.ui.band.BandTitles
 import com.tidespot.core.ui.band.ScoreBand
 import com.tidespot.core.ui.chart.HourChart
 import com.tidespot.core.ui.chart.HourChartMode
@@ -78,6 +83,10 @@ fun DetailScreen(
     spot: FavoriteSpot,
     viewModel: DetailViewModel,
     modifier: Modifier = Modifier,
+    /** OPT-V115-02 / S02 TOPBAR：返回回调（null = 不渲染返回位，零行为漂移）。 */
+    onBack: (() -> Unit)? = null,
+    /** OPT-V115-02 / S02 TOPBAR：返回 TalkBack 标签（由 :app 按来源页传入）。 */
+    backLabel: String = "",
     /** CHG-25（P0-1）：内陆水质首次引导卡槽位（:app 判定条件后注入；null = 不渲染，零行为漂移）。 */
     credentialGuideSlot: (@Composable () -> Unit)? = null,
 ) {
@@ -116,11 +125,56 @@ fun DetailScreen(
     val screenDesc = stringResource(R.string.ts_detail_content_desc)
     val tabsDesc = stringResource(R.string.ts_detail_tabs_desc)
     LazyColumn(modifier = modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().semantics { contentDescription = screenDesc }) {
+        // OPT-V115-02 / S02 TOPBAR：返回 + 点位名称 + 坐标副标题（设计层 y=58, h=52）
+        item {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            ) {
+                if (onBack != null) {
+                    TextButton(
+                        onClick = onBack,
+                        modifier = Modifier.semantics { contentDescription = backLabel },
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    ) { Text("‹", style = MaterialTheme.typography.titleLarge) }
+                }
+                Column(Modifier.weight(1f).padding(start = 4.dp)) {
+                    Text(
+                        spot.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        "${Format.coordinate(spot.lat)}, ${Format.coordinate(spot.lon)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+
+        // C17（设计：离线/陈旧条插在 DaySelector 上方）
+        item { OfflineBanner() }
+        item {
+            state.result?.let { StaleBanner(it, zone) }
+        }
+
         item {
             titles.notice?.let {
                 Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp))
             }
+            DaySelector(
+                chips = chips,
+                selectedDay = state.selectedDay,
+                onDaySelected = viewModel::selectDay,
+                infoSlot = { sourceInfo(state.result?.fetchedAtMillis, zone) },
+            )
+        }
+
+        item {
             TabRow(
                 selectedTabIndex = state.selectedTab.ordinal,
                 modifier = Modifier.semantics { contentDescription = tabsDesc },
@@ -135,23 +189,6 @@ fun DetailScreen(
                             modifier = Modifier.semantics { contentDescription = tabDesc },
                         )
                     }
-            }
-            DaySelector(
-                chips = chips,
-                selectedDay = state.selectedDay,
-                onDaySelected = viewModel::selectDay,
-                infoSlot = { sourceInfo(state.result?.fetchedAtMillis, zone) },
-            )
-        }
-
-        // OPT-V115-01 #4（ts_offline）：离线横幅（不阻断离线数据，仅提示）
-        item { OfflineBanner() }
-
-        item {
-            val result = state.result
-            if (result != null) {
-                // §6.7：缓存超 TTL → 顶部黄条「数据时间 X，已过期」
-                StaleBanner(result, zone)
             }
         }
 
@@ -181,6 +218,28 @@ fun DetailScreen(
                 }
             }
             if (state.loading) Text(stringResource(R.string.ts_detail_loading), Modifier.padding(12.dp))
+        }
+
+        // OPT-V115-02 / S02 C10：今日指数主卡（设计 366×152，仅指数 Tab）
+        item {
+            if (state.selectedTab == DetailTab.SCORE) {
+                val result = state.result
+                if (result != null) {
+                    val today = LocalDate.now(zone)
+                    val daySlices = Derivations.slicesForDay(result.slices, state.selectedDay, zone, today)
+                    val scoresByEpoch = state.scores.associateBy { it.timeEpochSec }
+                    val cardValues = Derivations.chartValues(
+                        DetailTab.SCORE, daySlices, scoresByEpoch, emptyMap(), state.tideRates,
+                    )
+                    ScoreMainCard(
+                        daySlices = daySlices,
+                        values = cardValues,
+                        scoresByEpoch = scoresByEpoch,
+                        presetWeightSum = viewModel.holderInternal().preset.weightSum,
+                        zone = zone,
+                    )
+                }
+            }
         }
 
         item {
@@ -219,16 +278,20 @@ fun DetailScreen(
             val dayLocalHours = daySlices.map { Derivations.hourLocal(it.timeEpochSec, zone) }
 
             if (!showTable) {
-                HourChart(
-                    values = values,
-                    mode = if (state.selectedTab == DetailTab.SCORE) HourChartMode.BAR else HourChartMode.LINE,
-                    unit = chartUnit(state.selectedTab, stringResource(R.string.ts_detail_unit_score)),
-                    selectedHour = state.selectedHour,
-                    onHourSelected = viewModel::selectHour,
-                    windowHours = if (state.selectedTab == DetailTab.SCORE)
-                        com.tidespot.core.ui.chart.ChartMath.windowHours(values) else emptySet(),
-                    localHours = dayLocalHours,
-                )
+                // OPT-V115-02 / S02 C09：图表卡容器（设计 366×210）
+                Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                    HourChart(
+                        values = values,
+                        mode = if (state.selectedTab == DetailTab.SCORE) HourChartMode.BAR else HourChartMode.LINE,
+                        unit = chartUnit(state.selectedTab, stringResource(R.string.ts_detail_unit_score)),
+                        selectedHour = state.selectedHour,
+                        onHourSelected = viewModel::selectHour,
+                        windowHours = if (state.selectedTab == DetailTab.SCORE)
+                            com.tidespot.core.ui.chart.ChartMath.windowHours(values) else emptySet(),
+                        localHours = dayLocalHours,
+                        modifier = Modifier.padding(8.dp),
+                    )
+                }
             } else {
                 val rows = Derivations.rowsFor(state.selectedTab, daySlices, zone, state, localTideSpotStrings())
                 // CHG-13/D02：外层已是 LazyColumn，此处**禁止**再嵌同向 LazyColumn（无限高约束直接崩溃）；
@@ -387,14 +450,28 @@ fun DetailScreen(
                     Text(stringResource(R.string.ts_detail_calibration))
                 }
             }
-            // D11：常驻免责入口（全 Tab 可见；Sheet 复用既有 ModalBottomSheet 模式）
-            TextButton(
-                onClick = { showDisclaimer = true },
-                modifier = Modifier.padding(horizontal = 12.dp)
-                    .semantics { contentDescription = disclaimerDesc },
-            ) {
-                Text(localTideSpotStrings().disclaimerEntry)
-            }
+// OPT-V115-02 / S02 C06：底部常驻免责入口条（设计 366×56）
+                Surface(
+                    onClick = { showDisclaimer = true },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .semantics { contentDescription = disclaimerDesc },
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 12.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(localTideSpotStrings().disclaimerEntry, style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "›",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
         }
     }
 
@@ -879,11 +956,83 @@ private fun disclaimerFor(tab: DetailTab, strings: TideSpotStrings): String = wh
     DetailTab.SCORE -> strings.disclaimerScore
     DetailTab.WATER_QUALITY -> strings.disclaimerWaterQuality
 }
+/**
+ * OPT-V115-02 / S02 C10：今日指数主卡（设计 366×152）。
+ * 结构：五档色块（分数 + 档位文字，N-7 不靠颜色单独编码）｜当日摘要｜置信徽标。
+ * 色值一律取 [ScoreBand] 冻结值，不在本组件内定义新色。
+ */
+@Composable
+private fun ScoreMainCard(
+    daySlices: List<com.tidespot.core.data.repo.HourSlice>,
+    values: List<Double?>,
+    scoresByEpoch: Map<Long, com.tidespot.core.domain.model.FishScoreResult>,
+    presetWeightSum: Double,
+    zone: ZoneId,
+) {
+    val unit = chartUnit(DetailTab.SCORE, stringResource(R.string.ts_detail_unit_score))
+    val validIdx = values.indices.filter { values[it] != null }
+    if (validIdx.isEmpty()) {
+        Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+            Text(
+                stringResource(R.string.ts_detail_summary_empty),
+                Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        return
+    }
+    val peakIdx = validIdx.maxByOrNull { values[it]!! }!!
+    val lowIdx = validIdx.minByOrNull { values[it]!! }!!
+    val peak = values[peakIdx]!!
+    val low = values[lowIdx]!!
+    val peakEpoch = daySlices.getOrNull(peakIdx)?.timeEpochSec
+    val lowEpoch = daySlices.getOrNull(lowIdx)?.timeEpochSec
+    val score = peak.toInt().coerceIn(0, 100)
+    val band = ScoreBand.of(score)
+    val bandLabel = BandTitles.fromDomainTier(score, localTideSpotStrings())
+    val kind = peakEpoch?.let { scoresByEpoch[it] }?.let {
+        ScoreBadgeDerivations.badgeKind(it, presetWeightSum)
+    }
 
-
-
-
-
-
-
-
+    Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier.size(88.dp).background(Color(band.argb), MaterialTheme.shapes.medium),
+                contentAlignment = androidx.compose.ui.Alignment.Center,
+            ) {
+                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                    Text(
+                        score.toString(),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
+                        color = Color(band.onArgb),
+                    )
+                    Text(
+                        bandLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(band.onArgb),
+                    )
+                }
+            }
+            Column(
+                Modifier.weight(1f).padding(start = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(
+                    stringResource(
+                        R.string.ts_detail_summary_unit,
+                        Format.valueUnit(peak, unit),
+                        peakEpoch?.let { Format.hourLocal(it, zone) } ?: Format.MISSING,
+                        Format.valueUnit(low, unit),
+                        lowEpoch?.let { Format.hourLocal(it, zone) } ?: Format.MISSING,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                kind?.let { ConfidenceBadge(it) }
+            }
+        }
+    }
+}

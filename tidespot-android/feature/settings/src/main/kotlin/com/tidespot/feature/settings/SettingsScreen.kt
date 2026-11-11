@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -12,7 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -28,6 +32,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.ui.R as UiR
+import com.tidespot.core.ui.strings.localTideSpotStrings
 
 /**
  * SettingsScreen（CHG-16⑱ 薄组装）：所有状态经 [SettingsState] 注入、交互回调上抛，
@@ -39,6 +44,7 @@ import com.tidespot.core.ui.R as UiR
  * OPT-V11-13：全部用户可见文案走资源（`stringResource`），本文件名零中文字面量。
  */
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun SettingsScreen(
     state: SettingsState,
     onUnitSystemChange: (UnitSystem) -> Unit,
@@ -62,7 +68,11 @@ fun SettingsScreen(
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text(stringResource(R.string.ts_settings_title), style = MaterialTheme.typography.titleLarge)
+        Text(
+            stringResource(R.string.ts_settings_title),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(vertical = 14.dp),
+        )
 
         // ── 显示 ──
         SectionTitle(stringResource(R.string.ts_settings_display))
@@ -186,6 +196,45 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodySmall,
             )
             Text(stringResource(line.toggleNoteRes), style = MaterialTheme.typography.labelSmall)
+        }
+
+        // OPT-V115-02 / S09 C06：底部常驻免责入口条（设计 366×56，与详情页同形态）
+        SectionDivider()
+        var showDisclaimer by remember { mutableStateOf(false) }
+        val disclaimerText = localTideSpotStrings()
+        Surface(
+            onClick = { showDisclaimer = true },
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth()
+                .semantics { contentDescription = disclaimerText.disclaimerEntry },
+        ) {
+            Row(
+                Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(disclaimerText.disclaimerEntry, style = MaterialTheme.typography.titleSmall)
+                Text(
+                    "›",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (showDisclaimer) {
+            ModalBottomSheet(onDismissRequest = { showDisclaimer = false }) {
+                Column(Modifier.padding(12.dp).navigationBarsPadding()) {
+                    Text(disclaimerText.disclaimerTitle, style = MaterialTheme.typography.titleMedium)
+                    disclaimerText.disclaimerItems().forEachIndexed { i, line ->
+                        Text(
+                            "${i + 1}. $line",
+                            Modifier.padding(vertical = 4.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+            }
         }
     }
 }

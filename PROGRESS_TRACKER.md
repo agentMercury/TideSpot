@@ -250,7 +250,7 @@
 | 项 | 状态 | 说明 / 落点 |
 |---|---|---|
 | OPT-V115-01 GAP-05 剩余 7 条接线 | ✅ 已交付（2026-11-11，CHG-46） | 7 条全部接线：`ts_reverse_geo_off`（地图信息条上方 5s 提示）｜`ts_window_bar`（HourChart BAR 段内文字标签，段宽不足降级细条）｜`ts_record_high_tide`（校潮 Sheet 空态引导）｜`ts_offline`（`:core:ui` 新增 `OfflineBanner`，详情/收藏页顶部）｜`ts_stale`（黄条=通用句+数据时间，新增 `ts_stale_with_time` 中英双语）｜`ts_dimension_degraded`（低置信徽标同行说明）｜`ts_chart_table_switch`（图表/数值表→单 Switch）。GAP-05 **17/17** 每 key ≥1 处引用；`i18n_scan` FAIL=0；八模块 `test` 全绿 |
-| OPT-V115-02 UI v2 设计包全量落地 | 🔶 骨架完成（2026-11-11，CHG-46）；视觉逐屏待设备 | **GAP-03 收口**：`WindowCompat.setDecorFitsSystemWindows(window,false)` + `Scaffold(contentWindowInsets=0)`，Map/Detail/Favorites/Settings 各屏 `statusBarsPadding()+navigationBarsPadding()`，Top10/校潮/免责/收藏 Top10 四个 Sheet 内容补 `navigationBarsPadding()`。**token 对齐**：`TideSpotTheme` 新增 `Shapes`（card 16 / small 12 / medium 16 / large 20）与 `Typography`（20/16/14/15/13/12/12/10），色值零改动。**遗留**：22 组件逐项像素校对、9 屏真机中英+深色截图、正文对比度 ≥4.5:1 实测（`adb devices` 为空，待设备接入） |
+| OPT-V115-02 UI v2 设计包落地 | 🔶 主体已落地（CHG-46 骨架 + **CHG-47 视觉重排**）；剩余见下 | **已落地**：S01 C02 顶部工具浮层（定位/搜索/收藏/设置）+ C19 Top10 入口 + 移除浮动三按钮；S02 TOPBAR + C10 今日指数主卡 + C09 图表卡 + C17 位置修正 + C06 底部免责条；S09 TOPBAR + C06 底部免责条；Theme 画布/卡片/描边 token（冻结色不动）。**剩余**：C03 信息条 236×48 浮条版式、C16 六版块卡片化、C21/C22 地图署名与来源行、9 屏真机中英+深色截图与对比度 ≥4.5:1（`adb devices` 为空）。产物 `E:\Trans\潮点TideSpot-v1.15.1.apk` |
 
 - **开工顺序建议**：01 内先做 `ts_record_high_tide`/`ts_stale`/`ts_dimension_degraded`/`ts_chart_table_switch`/`ts_reverse_geo_off`（改动小），再做 `ts_window_bar`（Canvas 绘制）与 `ts_offline`（需连通性探测）；随后 02。
 - **完成判据（GAP-05 闭环）**：17/17 每 key ≥1 处 `R.string.` 引用 + `DECISIONS.md §6` 七项复核全绿 + `i18n_scan.mjs` FAIL=0。

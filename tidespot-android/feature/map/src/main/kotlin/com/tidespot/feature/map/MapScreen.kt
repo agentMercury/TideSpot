@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -104,8 +105,13 @@ fun MapScreen(
     styleUrl: String = com.tidespot.core.data.remote.TideSpotUrls.CARTO_VOYAGER_STYLE_URL,
     /** UX-18（OPT-V11-18）：返回地图时的相机目标（上一查看点 / lastViewed 最新点；null = 世界视图）。 */
     initialCameraTarget: GeoPoint? = null,
-    /** UX-20（OPT-V11-20）：右下浮动按钮组（收藏/Top10/设置）由 :app 注入。 */
-    floatingActions: (@Composable () -> Unit)? = null,
+    /** OPT-V115-02 / S01 C02：顶部工具浮层动作（收藏/设置/Top10 由 :app 注入；null = 不渲染）。 */
+    onOpenFavorites: (() -> Unit)? = null,
+    favoritesLabel: String = "",
+    onOpenSettings: (() -> Unit)? = null,
+    settingsLabel: String = "",
+    onOpenTop10: (() -> Unit)? = null,
+    top10Label: String = "",
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -312,6 +318,9 @@ fun MapScreen(
         CrosshairState.Idle -> buildInfoBarState(InfoBarMode.CONFIRMED, null, null, null, reverseGeoEnabled)
     }
 
+    // OPT-V115-02 / S01 C02：搜索面板展开态（默认收起，点顶部「搜索」展开）
+    var searchExpanded by remember { mutableStateOf(false) }
+
     // OPT-V115-01 #1（ts_reverse_geo_off）：逆地理关闭 → 信息条上方一次性提示，5s 自动隐藏
     var showReverseGeoOffHint by remember(reverseGeoEnabled) { mutableStateOf(!reverseGeoEnabled) }
     LaunchedEffect(reverseGeoEnabled) {
@@ -334,18 +343,47 @@ fun MapScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(12.dp)) {
-                SearchPanel(
-                    geocoder = geocoder,
-                    onSelect = { candidate ->
-                        // F-1.5：选中候选 → 地图飞行并设准星（进入 Preview，待确认）；
-                        // CHG-09①：候选自带海拔 → 透出给水体判定
-                        pendingElevation = candidate.elevation
-                        crosshair.onLongPress(GeoPoint(candidate.lat, candidate.lon))
-                        mapLibre?.animateCamera(
-                            CameraUpdateFactory.newLatLngZoom(LatLng(candidate.lat, candidate.lon), 13.0),
-                        )
-                    },
-                )
+                // OPT-V115-02 / S01 C02：顶部工具浮层（定位 / 搜索 / 收藏 / 设置，16dp 圆角卡片）
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    tonalElevation = 3.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        if (permissionState is PermissionUiState.Granted && locationController != null) {
+                            TopBarAction("◎", stringResource(R.string.ts_map_my_location)) { locateMe() }
+                        }
+                        TopBarAction("⌕", stringResource(R.string.ts_map_search_hint)) {
+                            searchExpanded = !searchExpanded
+                        }
+                        Spacer(Modifier.weight(1f))
+                        if (onOpenFavorites != null && favoritesLabel.isNotEmpty()) {
+                            TopBarAction("★", favoritesLabel) { onOpenFavorites.invoke() }
+                        }
+                        if (onOpenSettings != null && settingsLabel.isNotEmpty()) {
+                            TopBarAction("⚙", settingsLabel) { onOpenSettings.invoke() }
+                        }
+                    }
+                }
+                if (searchExpanded) {
+                    SearchPanel(
+                        geocoder = geocoder,
+                        onSelect = { candidate ->
+                            // F-1.5：选中候选 → 地图飞行并设准星（进入 Preview，待确认）；
+                            // CHG-09①：候选自带海拔 → 透出给水体判定
+                            pendingElevation = candidate.elevation
+                            crosshair.onLongPress(GeoPoint(candidate.lat, candidate.lon))
+                            mapLibre?.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(LatLng(candidate.lat, candidate.lon), 13.0),
+                            )
+                            searchExpanded = false
+                        },
+                    )
+                }
                 when (val ps = permissionState) {
                     is PermissionUiState.Denied ->
                         TopHint(stringResource(UiR.string.ts_location_denied), isError = ps.permanent)
@@ -360,6 +398,29 @@ fun MapScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            // OPT-V115-02 / S01 C19：Top10 入口（信息条上方，设计 366×48）
+            if (onOpenTop10 != null && top10Label.isNotEmpty()) {
+                Surface(
+                    onClick = { onOpenTop10.invoke() },
+                    shape = MaterialTheme.shapes.medium,
+                    tonalElevation = 3.dp,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(top10Label, style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "›",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
 
             if (showReverseGeoOffHint) {
                 val geoOffHint = stringResource(UiR.string.ts_reverse_geo_off)
@@ -383,23 +444,17 @@ fun MapScreen(
                 modifier = Modifier.fillMaxWidth().padding(12.dp).navigationBarsPadding(),
             )
         }
+    }
+}
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .navigationBarsPadding()
-                .padding(end = 16.dp, bottom = 120.dp),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            // UX-20（OPT-V11-20）：浮动三按钮（收藏/Top10/设置）由 :app 注入
-            floatingActions?.invoke()
-            if (permissionState is PermissionUiState.Granted && locationController != null) {
-                FloatingActionButton(onClick = { locateMe() }) {
-                    Text(stringResource(R.string.ts_map_my_location))
-                }
-            }
-        }
+/** OPT-V115-02 / S01 C02：顶部工具浮层单个动作（图标 + TalkBack 描述）。 */
+@Composable
+private fun TopBarAction(icon: String, description: String, onClick: () -> Unit) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.semantics { contentDescription = description },
+    ) {
+        Text(icon, style = MaterialTheme.typography.titleLarge)
     }
 }
 

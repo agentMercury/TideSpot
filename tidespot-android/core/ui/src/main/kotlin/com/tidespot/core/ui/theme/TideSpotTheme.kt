@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.theme
+package com.tidespot.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +25,12 @@ import androidx.compose.ui.unit.sp
  */
 private val LightColors = lightColorScheme(
     primary = Color(0xFF1565C0),
+    // OPT-V115-02 / design-tokens.json surface：画布 #EEF3F8 / 卡片 #FFFFFF / 描边 #DCE5EE（非冻结色）
+    background = Color(0xFFEEF3F8),
+    surface = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0xFFEEF3F8),
+    outline = Color(0xFFDCE5EE),
+    outlineVariant = Color(0xFFDCE5EE),
     secondary = Color(0xFF00695C),
     tertiary = Color(0xFF6A1B9A),
     error = Color(0xFFC62828),
@@ -32,6 +38,11 @@ private val LightColors = lightColorScheme(
 
 private val DarkColors = darkColorScheme(
     primary = Color(0xFF90CAF9),
+    background = Color(0xFF0E1721),
+    surface = Color(0xFF16212E),
+    surfaceVariant = Color(0xFF1E2C3A),
+    outline = Color(0xFF2A3A4C),
+    outlineVariant = Color(0xFF2A3A4C),
     secondary = Color(0xFF80CBC4),
     tertiary = Color(0xFFCE93D8),
     error = Color(0xFFEF9A9A),

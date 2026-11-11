@@ -169,32 +169,21 @@ private fun AppRoot(graph: AppGraph) {
                     styleUrl = settingsState.mapStyle.url,
                     // UX-18：返回地图 → 上一查看点 / lastViewed 最新（冷启动 null → 定位/世界视图）
                     initialCameraTarget = pendingMapTarget,
-                    // UX-20：右下浮动三按钮（收藏 / Top10 / 设置）
-                    floatingActions = {
-                        val favDesc = stringResource(R.string.ts_app_favorites)
-                        val top10Desc = stringResource(UiR.string.ts_top10_all)
-                        val settingsDesc = stringResource(R.string.ts_app_settings)
-                        FloatingActionButton(
-                            onClick = {
-                                openFavoritesTop10 = false
-                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
-                            },
-                            modifier = Modifier.semantics { contentDescription = favDesc },
-                        ) { Text(stringResource(R.string.ts_app_favorites)) }
-                        FloatingActionButton(
-                            onClick = {
-                                openFavoritesTop10 = true
-                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
-                            },
-                            modifier = Modifier.semantics { contentDescription = top10Desc },
-                        ) { Text("Top10") }
-                        FloatingActionButton(
-                            onClick = {
-                                navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.SETTINGS))
-                            },
-                            modifier = Modifier.semantics { contentDescription = settingsDesc },
-                        ) { Text(stringResource(R.string.ts_app_settings)) }
+                    // OPT-V115-02 / S01：顶部工具浮层（定位/搜索/收藏/设置）+ 信息条上方 Top10 入口
+                    onOpenFavorites = {
+                        openFavoritesTop10 = false
+                        navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
                     },
+                    favoritesLabel = stringResource(R.string.ts_app_favorites),
+                    onOpenSettings = {
+                        navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.SETTINGS))
+                    },
+                    settingsLabel = stringResource(R.string.ts_app_settings),
+                    onOpenTop10 = {
+                        openFavoritesTop10 = true
+                        navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
+                    },
+                    top10Label = stringResource(UiR.string.ts_top10_all),
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -290,19 +279,13 @@ private fun DetailPage(
     onSkipCredentialGuide: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            val backDesc = stringResource(R.string.ts_app_back)
-            TextButton(
-                onClick = onBack,
-                modifier = Modifier.semantics { contentDescription = backDesc },
-            ) {
-                Text(backLabel)
-            }
-        }
         DetailScreen(
             spot = spot,
             viewModel = viewModel,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxSize(),
+            // OPT-V115-02 / S02 TOPBAR：返回位收进详情屏顶栏（原独立 TextButton 行移除）
+            onBack = onBack,
+            backLabel = backLabel,
             credentialGuideSlot = if (showCredentialGuide) {
                 {
                     InlandCredentialGuideCard(
