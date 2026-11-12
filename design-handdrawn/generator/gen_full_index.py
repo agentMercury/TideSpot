@@ -27,10 +27,10 @@ groups = [
         ("ov03-confirm-favorite", "OV03 收藏确认〔旧底〕", SHOT), ("ov04-water-entry", "OV04 水质录入〔新稿〕", SHOT),
         ("ov05-star-bubble", "OV05 星标气泡〔旧底〕", SHOT), ("ov06-delete-confirm", "OV06 删除确认〔旧底〕", SHOT),
     ]),
-    ("④ 4 状态态 + 空态 / 批量 · 6（状态4+批量旧底，空态新稿）", "#6E7B3E", [
-        ("state-offline", "离线〔旧底〕", SHOT), ("state-stale", "陈旧〔旧底〕", SHOT),
-        ("state-unusable-48h", "48h不可用〔旧底〕", SHOT), ("state-degraded", "分维降级〔旧底〕", SHOT),
-        ("favorites-empty", "收藏空态〔新稿〕", SHOT), ("favorites-multiselect", "多选批量〔旧底〕", SHOT),
+    ("④ 4 状态态 + 空态 / 批量 · 6（状态态×4 + 批量已转新稿；空态新稿）", "#6E7B3E", [
+        ("state-offline", "离线〔新稿〕", SHOT), ("state-stale", "陈旧〔新稿〕", SHOT),
+        ("state-unusable-48h", "48h不可用〔新稿〕", SHOT), ("state-degraded", "分维降级〔新稿〕", SHOT),
+        ("favorites-empty", "收藏空态〔新稿〕", SHOT), ("favorites-multiselect", "多选批量〔新稿〕", SHOT),
     ]),
     ("⑤ 深色变体 · 2（旧 base 稿 + DARK 调色板重渲）", "#16324F", [
         ("dark-map", "深色地图〔旧底重渲〕", SHOT), ("dark-favorites", "深色收藏〔旧底重渲〕", SHOT),
@@ -90,7 +90,7 @@ th{color:#5C5540;font-weight:700;width:74px}.p1{color:#8A3B2E;font-weight:700}.p
 <div class="errata" style="border-color:#2E5A48;color:#21402E;background:#EEF2DA"><h3 style="color:#2E5A48">完整性提示：28→30 屏，新稿为主、旧底屏待统一（认新稿推进中）</h3>
 这套"完整 UI"现已扩到 <b>30 屏</b>（基础 7 + 新增 23），各屏底稿来源已标在〔旧底〕〔新稿〕里：
 <br>① <b>详情 5 Tab 已齐（新稿）</b>：钓鱼指数 / 潮流（水位）/ 天气 / 水质 / 风浪 首 Tab 均出新稿样式；<b>钓鱼指数 SCORE 首 Tab 此前缺失，本次已补</b>（海/陆两版，②组现为 5 Tab + 因子分解 · 9 屏）。
-<br>② <b>仍沿用旧 base 稿当底、待重绘为新稿骨架的屏</b>：第④组 4 状态态（离线/陈旧/48h/分维）、第③组 OV01/OV02/OV03/OV05/OV06、第④组多选批量、第⑤组深色地图/收藏——均拿 <b>engine.py 旧 base 详情/地图/收藏页</b>加工，因此与第①组旧稿同源；真正新稿重画的仅 第②组 Tab + OV04 水质录入 + 收藏空态。
+<br>② <b>仍沿用旧 base 稿当底、待重绘为新稿骨架的屏</b>：第③组 OV01/OV02/OV03/OV05/OV06、第⑤组深色地图/收藏——均拿 <b>engine.py 旧 base 详情/地图/收藏页</b>加工，因此与第①组旧稿同源；真正新稿重画的为 第②组 Tab + OV04 水质录入 + 收藏空态 + <b>第④组 4 状态态与多选批量（已于本次转新稿骨架）</b>。
 <br>③ <b>地图底图保留手绘原稿</b>：认新稿仅重绘地图页周边组件，手绘地图底图（map_land/map_water/map_road 三色 + 路网）不作重绘，避免重画地图。
 </div>
 """]
@@ -119,7 +119,7 @@ html.append('''<div class="frozen"><b>冻结契约（本次完整 UI 未改动�
 4. DaySelector 两行 52dp · 水质 1×3（pH 已删） · 5. 地图优先、无底部 NavigationBar、准星唯一选点真源 F-1.3<br>
 6. 双水体六重区分：徽标 / 配色 / 鱼种 / 第二 Tab / 图表单位 / 地点 · 7. 示例数值非业务数据，源更新时间显示「—」<br>
 8. 换皮肤(OPT-A-09)只替换视觉 token，以上逐项不变；明暗(OPT-A-03)为与皮肤正交的独立轴 · 皮肤扩展规范见 SKIN-DESIGN-SPEC.md</div>
-<div class="foot">视觉概念稿（28 屏）+ 需求清单。详情页已做 Compose 试点（<b>VintageOutdoorTheme.kt</b> 等，工程 <b>tidespot-android/</b>），四态真机对拍见 <b>device-compare/真机对拍报告.md</b>，落地说明见 <b>Compose试点落地说明.md</b>；其余 3 页未换皮、换肤数据层未实现。逐条证据 / 验收 / 工程落点见 APP功能优化需求.md。<br>复现：generator/engine.py（早期 base 7 屏）→ engine_full.py（新稿 21 补齐屏 + 改版设置页）→ gen_full_index.py（本索引，含参照稿勘误）</div>
+<div class="foot">视觉概念稿（30 屏）+ 需求清单。详情页已做 Compose 试点（<b>VintageOutdoorTheme.kt</b> 等，工程 <b>tidespot-android/</b>），四态真机对拍见 <b>device-compare/真机对拍报告.md</b>，落地说明见 <b>Compose试点落地说明.md</b>；其余 3 页未换皮、换肤数据层未实现。逐条证据 / 验收 / 工程落点见 APP功能优化需求.md。<br>复现：generator/engine.py（早期 base 7 屏）→ engine_full.py（新稿 21 补齐屏 + 改版设置页）→ gen_full_index.py（本索引，含参照稿勘误）</div>
 </div></body></html>''')
 
 OUT.write_text("\n".join(html), encoding="utf-8")

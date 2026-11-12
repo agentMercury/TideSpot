@@ -213,28 +213,28 @@
         "label": "状态·离线",
         "png": "screens_full/state-offline.png",
         "html": "sources_full/state-offline.html",
-        "sha256_png": "8069e7ff6bfda3a019683620b1d3e99e271261fd3e8dfc189c3fddf931d2c79a"
+        "sha256_png": "c73f2fd794ece25ae6c86215128b777592d5c125b75cdc5613cba5e13e189e97"
       },
       {
         "key": "state-stale",
         "label": "状态·陈旧",
         "png": "screens_full/state-stale.png",
         "html": "sources_full/state-stale.html",
-        "sha256_png": "14bbfbb0b3316db4b22d01b852e7c2fece17bfc388552eae251f4330772f3a12"
+        "sha256_png": "3b5e890a8ca9fda6a7d46e0d34c6b960cb4fc0bab443e75fcac724917b9e922f"
       },
       {
         "key": "state-unusable-48h",
         "label": "状态·48h 不可用",
         "png": "screens_full/state-unusable-48h.png",
         "html": "sources_full/state-unusable-48h.html",
-        "sha256_png": "0e2d4c8f4434280d0eca0429d227598dae13acbab9cc110c2cf655aeb5d6c4e2"
+        "sha256_png": "aca2681636e9e987085ce6c12d3ee6653a24919effe17c72d3ac3c001c212c7e"
       },
       {
         "key": "state-degraded",
         "label": "状态·分维降级",
         "png": "screens_full/state-degraded.png",
         "html": "sources_full/state-degraded.html",
-        "sha256_png": "e7801aed4dcf0c8968c5f2988f81a23bbff8d3f571740548e9607abc73c3ea9e"
+        "sha256_png": "c922af6865aa534477131fd9b3f11504b1d0e4a4b31a20df598577c67858456c"
       },
       {
         "key": "favorites-empty",
@@ -248,7 +248,7 @@
         "label": "收藏多选批量",
         "png": "screens_full/favorites-multiselect.png",
         "html": "sources_full/favorites-multiselect.html",
-        "sha256_png": "02222f3948a131cbdec957502f5181426bccaecca47c29f531dc81c23a3a8169"
+        "sha256_png": "85a4fab2c97ae5caefc71d8948e9e9f05de4f528d9bdf216184d7794f240474e"
       },
       {
         "key": "dark-map",
@@ -293,15 +293,25 @@
     "requirement_ref": "OPT-A-09（换皮肤），明暗独立轴见 OPT-A-03",
     "spec": "SKIN-DESIGN-SPEC.md",
     "definition": "皮肤 = 一组可替换的视觉 token（色板/字体/形状/纸张质感/鱼形装饰），结构/文案/交互/冻结契约全部共用",
-    "three_orthogonal_axes": ["皮肤 Skin（用户偏好）", "水体 Water（点位数据决定，不可切）", "明暗 Mode（跟随系统/浅/深）"],
+    "three_orthogonal_axes": [
+      "皮肤 Skin（用户偏好）",
+      "水体 Water（点位数据决定，不可切）",
+      "明暗 Mode（跟随系统/浅/深）"
+    ],
     "built_in_skins": [
       {
         "id": "a-vintage",
         "name": "手绘 A · 复古户外",
         "name_en": "VINTAGE OUTDOOR",
         "status": "使用中 / 首版唯一内置",
-        "source_images": ["图5 MOUNTAIN ADVENTURE", "图6 ADVENTURE IS CALLING"],
-        "palettes": ["sea", "inland"],
+        "source_images": [
+          "图5 MOUNTAIN ADVENTURE",
+          "图6 ADVENTURE IS CALLING"
+        ],
+        "palettes": [
+          "sea",
+          "inland"
+        ],
         "screens": 28
       }
     ],
@@ -310,11 +320,25 @@
     "excluded": "B 拟人鱼绅士 / C 水彩几何鱼 / D 手绘鱼种图鉴是独立风格探索稿，不作为皮肤、不并入、本轮不并入",
     "entry_screen": "screens/settings.png（外观·皮肤入口卡，含五色色板 + 当前皮肤 + 敬请期待占位）",
     "selection_page": "本轮未做（用户选「只做需求 + 入口」，对应 OPT-A-09 验收第 3 条）",
-    "mutable_tokens": ["色板(sea/inland 两套)", "字体", "形状/圆角", "纸张质感", "鱼形装饰", "深色 token"],
+    "mutable_tokens": [
+      "色板(sea/inland 两套)",
+      "字体",
+      "形状/圆角",
+      "纸张质感",
+      "鱼形装饰",
+      "深色 token"
+    ],
     "frozen_not_in_skin": [
-      "Tab 渲染序", "免责 5 条", "五档/六徽标色(ScoreBands.kt / ConfidenceBadge.kt)",
-      "DaySelector 52dp", "水质 1×3", "无底部 NavigationBar", "地图优先", "准星唯一真源",
-      "双水体六重区分", "全部文案(TideSpotStrings.kt 单源)"
+      "Tab 渲染序",
+      "免责 5 条",
+      "五档/六徽标色(ScoreBands.kt / ConfidenceBadge.kt)",
+      "DaySelector 52dp",
+      "水质 1×3",
+      "无底部 NavigationBar",
+      "地图优先",
+      "准星唯一真源",
+      "双水体六重区分",
+      "全部文案(TideSpotStrings.kt 单源)"
     ],
     "new_skin_checklist": "SKIN-DESIGN-SPEC.md §5（A1–A10，业务 Composable 零改动）",
     "ui_scope_this_round": "仅设置页加「外观·皮肤」入口；不新增屏、不做换肤演示、不并入 B/C/D"

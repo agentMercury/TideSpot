@@ -296,8 +296,10 @@ def render_tab_wave(water="sea"):
 # 详情 Tab 变体 0：钓鱼指数（S01/S02）— 首 Tab 新稿（此前缺失，旧稿在 base detail）
 #   大分数 + 五档色带（档位=鱼数，恒带文字 N-7，冻结 ScoreBands.kt 语义）+ 潮高曲线 + 水质 1×3 + Top10
 # ---------------------------------------------------------------------------
-def render_tab_score(water="sea"):
-    p = C(water); wc = E.WATER_COPY[water]
+def score_body(p, water):
+    """钓鱼指数(SCORE) 首 Tab 纯内容体（detail_head 之下、tab_footer 在内）。
+    状态态亦复用本函数，保证新稿骨架 100% 一致（用户要求：新组件保持手绘 A 风格）。"""
+    wc = E.WATER_COPY[water]
     ink, line, card, card2, accent, accent2, green, muted, primary, white = (
         H(p['ink']), H(p['line']), H(p['card']), H(p['card2']), H(p['accent']), H(p['accent2']),
         H(p['green']), H(p['muted']), H(p['primary']), H(p['white']))
@@ -353,7 +355,12 @@ def render_tab_score(water="sea"):
       <div style="flex:1"><div class="disp" style="font-size:13px;color:{white}">全部收藏 Top10</div><div class="bodyf" style="font-size:9.5px;color:{white}AA">时段筛选 · 本周末窗口</div></div>
       <span style="color:{accent2};font-size:18px">›</span></div>"""
     body += tab_footer(p, water, "1/5")
-    return shell(statusbar(p) + detail_head(p, water, 0) + body, water, "钓鱼指数 Tab")
+    return body
+
+
+def render_tab_score(water="sea"):
+    p = C(water)
+    return shell(statusbar(p) + detail_head(p, water, 0) + score_body(p, water), water, "钓鱼指数 Tab")
 
 
 # ---------------------------------------------------------------------------
@@ -548,24 +555,11 @@ def state_bar(p, kind):
 
 
 def render_state_detail(water, kind="unusable"):
-    """在详情指数页顶部注入状态条（水体徽标之后、DaySelector 上方），其余骨架不变。
-    同时压缩内容区高度，保证状态条 pushes 下移后仍能在一屏内收尾。"""
-    import re
+    """状态态：在「钓鱼指数(新稿)」详情骨架顶部注入状态条，其余 100% 复用新稿组件。
+    不再叠加旧 base 详情页，确保与第②组 Tab 同源同风（用户要求：新组件保持手绘 A 风格）。"""
     p = C(water)
-    base = E.render_detail(SID, water)
-    inner = screen_inner_of(base)
-    # 稳健定位：水体徽标行 «…COASTAL/INLAND</i></span>» 之后最近的 </div> 闭合该行容器
-    lang = E.WATER_COPY[water]["badge_en"]  # COASTAL / INLAND
-    pat = re.compile(r'(</i></span>\s*</div>)')
-    m = pat.search(inner)
-    if m:
-        insert_at = m.end()
-        inner = inner[:insert_at] + state_bar(p, kind) + inner[insert_at:]
-    else:
-        # 兜底：插在 DaySelector 第一个「今天」chip 所在容器之前
-        idx = inner.find('今天')
-        inner = inner[:idx] + state_bar(p, kind) + inner[idx:] if idx > 0 else state_bar(p, kind) + inner
-    return shell(inner, water, f"状态态 · {kind}")
+    body = state_bar(p, kind) + score_body(p, water)
+    return shell(statusbar(p) + detail_head(p, water, 0) + body, water, f"状态态 · {kind}")
 
 
 def render_favorites_empty(water="sea"):
@@ -585,24 +579,43 @@ def render_favorites_empty(water="sea"):
     return shell(body, water, "收藏空态 · 鱼骨引导")
 
 
+def fav_item(p, place, sub, score, band_label, checked):
+    """收藏列表单行（新稿骨架）：勾选圈 + 点位名 + 坐标/更新时间 + 分数 + 鱼标。"""
+    line, card, card2, ink, muted, primary, accent2, white, green = (
+        H(p['line']), H(p['card']), H(p['card2']), H(p['ink']), H(p['muted']),
+        H(p['primary']), H(p['accent2']), H(p['white']), H(p['green']))
+    chk = (f'<div style="width:24px;height:24px;border-radius:50%;border:2px solid {primary};display:flex;align-items:center;justify-content:center;background:{primary}"><span style="font-size:13px;color:{white}">✓</span></div>'
+           if checked else
+           f'<div style="width:24px;height:24px;border-radius:50%;border:2px solid {line};display:flex;align-items:center;justify-content:center;background:{card}"></div>')
+    return f"""<div class="card" style="margin:8px 14px 0;padding:9px 11px;position:relative;z-index:4;display:flex;gap:11px;align-items:center">
+      {chk}
+      <div style="flex:1;min-width:0">
+        <div class="disp" style="font-size:13px;color:{ink}">{place}</div>
+        <div class="bodyf mut" style="font-size:9px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{sub}</div></div>
+      <div style="text-align:center;min-width:46px"><div class="disp" style="font-size:18px;color:{primary}">{score}</div><div class="bodyf mut" style="font-size:8px">{band_label}</div></div>
+      <span style="width:22px">{E.fish_icon(SID, 'sea', accent2, 20)}</span></div>"""
+
+
 def render_favorites_multiselect(water="sea"):
-    p = C(water); line, card, card2, ink, muted, primary, white, accent2 = (
-        H(p['line']), H(p['card']), H(p['card2']), H(p['ink']), H(p['muted']), H(p['primary']), H(p['white']), H(p['accent2']))
-    base = E.render_favorites(SID, water)
-    inner = screen_inner_of(base)
-    # 顶部替换成多选批量栏（全选/反选/已选N/退出）
-    bar = f"""<div class="row" style="padding:6px 16px 10px;position:relative;z-index:8;gap:8px;border-bottom:2px solid {line};background:{card}">
+    """多选批量：新稿收藏列表骨架 + 顶部「已选N」栏 + 底部批量操作栏。
+    不再叠加旧 base 收藏页，与第②组同源同风（用户要求：新组件保持手绘 A 风格）。"""
+    p = C(water)
+    line, card, card2, ink, muted, primary, white, accent2 = (
+        H(p['line']), H(p['card']), H(p['card2']), H(p['ink']), H(p['muted']),
+        H(p['primary']), H(p['white']), H(p['accent2']))
+    topbar = f"""<div class="row" style="padding:6px 16px 10px;position:relative;z-index:8;gap:8px;border-bottom:2px solid {line};background:{card}">
       <span style="font-size:16px;color:{primary}">✓</span><span class="disp" style="font-size:14px;color:{ink}">已选 3 项</span>
       <span class="tag" style="font-size:9px;margin-left:auto">全选</span><span class="tag" style="font-size:9px">反选</span><span class="tag" style="font-size:9px">退出</span></div>"""
-    # 在原有 screen 内容顶部叠加多选提示条 + 底部批量操作栏
-    topbar_ms = f"""<div class="row" style="padding:6px 16px 10px;position:relative;z-index:8;gap:8px;border-bottom:2px solid {line};background:{card}">
-      <span style="font-size:16px;color:{primary}">✓</span><span class="disp" style="font-size:14px;color:{ink}">已选 3 项</span>
-      <span class="tag" style="font-size:9px;margin-left:auto">全选</span><span class="tag" style="font-size:9px">反选</span><span class="tag" style="font-size:9px">退出</span></div>"""
+    items = [
+        ("小麦岛外海", "青岛 · 36.05°N 120.44°E · 更新 昨日 21:10", "82", "很适合", True),
+        ("灵山湾", "青岛 · 35.92°N 120.21°E · 更新 今日 09:12", "76", "很适合", True),
+        ("唐岛湾", "青岛 · 35.98°N 120.18°E · 更新 今日 08:40", "64", "可以", True),
+        ("鳌山湾", "青岛 · 36.38°N 120.71°E · 更新 11-09", "58", "可以", False),
+    ]
+    rows = "".join(fav_item(p, *it) for it in items)
     batch = f"""<div style="position:absolute;left:0;right:0;bottom:0;z-index:9;background:{card};border-top:2.4px solid {line};padding:11px 14px 18px;display:flex;gap:9px;justify-content:space-around">
       {''.join(f'<div style="text-align:center;min-width:50px"><span style="font-size:17px;color:{primary}">{ic}</span><div class="bodyf" style="font-size:10px;color:{ink};margin-top:2px">{lb}</div></div>' for ic, lb in [('✕','删除'),('⌁','改标签'),('▤','改分组'),('✓','全选')])}</div>"""
-    # 用多选提示条替换原 screen 内容最前面的 statusbar
-    inner = topbar_ms + inner.replace(statusbar(p), "", 1) + batch
-    return shell(inner, water, "收藏多选批量栏")
+    return shell(statusbar(p) + topbar + rows + batch, water, "收藏多选批量栏")
 
 
 # ---------------------------------------------------------------------------
