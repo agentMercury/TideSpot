@@ -293,6 +293,70 @@ def render_tab_wave(water="sea"):
 
 
 # ---------------------------------------------------------------------------
+# 详情 Tab 变体 0：钓鱼指数（S01/S02）— 首 Tab 新稿（此前缺失，旧稿在 base detail）
+#   大分数 + 五档色带（档位=鱼数，恒带文字 N-7，冻结 ScoreBands.kt 语义）+ 潮高曲线 + 水质 1×3 + Top10
+# ---------------------------------------------------------------------------
+def render_tab_score(water="sea"):
+    p = C(water); wc = E.WATER_COPY[water]
+    ink, line, card, card2, accent, accent2, green, muted, primary, white = (
+        H(p['ink']), H(p['line']), H(p['card']), H(p['card2']), H(p['accent']), H(p['accent2']),
+        H(p['green']), H(p['muted']), H(p['primary']), H(p['white']))
+    band = p['band']
+    # 头部：大分数 + 档位
+    body = sec_title(p, "钓鱼指数", "今日 · 综合评分")
+    body += mkcard(p, f"""
+      <div class="row" style="align-items:center;gap:12px">
+        <div style="text-align:center;min-width:62px">
+          <div class="disp" style="font-size:38px;color:{accent};line-height:1">{E.SCORE}</div>
+          <div class="bodyf" style="font-size:10px;color:{muted}">/ 100</div></div>
+        <div style="width:1.6px;height:42px;background:{line};opacity:.35"></div>
+        <div style="flex:1">
+          <div class="disp" style="font-size:16px;color:{primary}">{E.BAND_LABELS[E.SCORE_BAND]} <span class="hl">●</span></div>
+          <div class="row" style="gap:5px;margin-top:5px">{badge(p, E.BADGES[0])}{badge(p, E.BADGES[2])}<span class="bodyf mut" style="font-size:10px">{wc['note']}</span></div>
+        </div>
+        <div style="width:40px;height:40px;border:2px dashed {green};border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)">{E.fish_icon(SID, water, green, 28)}</div>
+      </div>""")
+    # 五档色带（档位=鱼数量 5→1，选中档加手绘描边；鱼恒配文字 N-7）
+    bandfish = ""
+    for i in range(5):
+        sel = i == E.SCORE_BAND
+        nfish = 5 - i
+        fishe = "".join(
+            f"<span style='display:inline-block;width:13px;height:13px;vertical-align:middle'>{E.fish_icon(SID, water, (white if i < 3 else ink), 13)}</span>"
+            for _ in range(nfish))
+        bgc = H(band[i]); txtc = white if i < 3 else ink
+        bandfish += f"""<div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:34px;background:{bgc};
+          border:{'2.6px solid '+accent2 if sel else '1.6px solid '+line};border-radius:9px;opacity:{1 if sel else 0.72};
+          box-shadow:{'2px 2px 0 '+line if sel else 'none'};gap:1px'>
+          <span style='line-height:0;height:13px;white-space:nowrap;overflow:hidden'>{fishe}</span>
+          <span style='font-size:8.5px;color:{txtc};font-weight:{700 if sel else 600};white-space:nowrap'>{E.BAND_LABELS[i]}</span></div>"""
+    body += f"""<div style="margin:9px 16px 0;position:relative;z-index:4">
+      <div class="row" style="gap:4px">{bandfish}</div>
+      <div class="bodyf mut" style="font-size:9.5px;margin-top:4px;text-align:center">五档 · 档位恒带文字 · 鱼多者优</div></div>"""
+    # 潮高 / 水位曲线
+    body += sec_title(p, wc['chart'], "模型估算")
+    body += mkcard(p, f"""
+      <div class="row" style="justify-content:space-between"><span class="disp" style="font-size:12px;color:{primary}">{wc['chart']}</span>{badge(p,'模型',p['line'])}</div>
+      {mini_chart(p, water, 'line', [30,46,72,88,70,44,30,52,78], 88)}
+      <div class="bodyf mut" style="font-size:9px;margin-top:2px">{wc['hi']} 14:20 · {wc['lo']} 08:10 · 源更新 —</div>""")
+    # 水质 1×3（水温/溶解氧/浊度，pH 已删）
+    cards = []
+    for lab, val, unit, bd, tone in [("水温","19.6","℃","估算","8A6D2E"),("溶解氧","7.2","mg/L","模型",p['line']),("浊度","3.1","NTU","估算","8A6D2E")]:
+        cards.append(f"""<div class="card" style="flex:1;min-height:112px;padding:9px 8px;overflow:visible;background:{card2}">
+          <div class="row" style="justify-content:space-between"><span class="bodyf mut" style="font-size:10px">{lab}</span><span style="font-size:8.5px;color:{white};background:{H(tone)};border-radius:5px;padding:1px 4px">{bd}</span></div>
+          <div class="disp" style="font-size:22px;color:{primary};margin-top:8px">{val}<span style="font-size:10px;color:{muted}"> {unit}</span></div>
+          <div class="bodyf mut" style="font-size:8.5px;margin-top:6px">源更新 —</div></div>""")
+    body += f"""<div class="row" style="gap:8px;margin:9px 14px 0;position:relative;z-index:4">{''.join(cards)}</div>"""
+    # Top10 入口（鱼形排名）
+    body += f"""<div style="margin:9px 14px 0;position:relative;z-index:4;border:2.2px solid {line};border-radius:14px;background:{primary};padding:8px 12px;display:flex;align-items:center;gap:10px;box-shadow:2px 3px 0 {line}44">
+      <div class="row" style="gap:-2px">{E.fish_icon(SID,water,accent2,20)}{E.fish_icon(SID,water,accent2,24)}{E.fish_icon(SID,water,accent2,20)}</div>
+      <div style="flex:1"><div class="disp" style="font-size:13px;color:{white}">全部收藏 Top10</div><div class="bodyf" style="font-size:9.5px;color:{white}AA">时段筛选 · 本周末窗口</div></div>
+      <span style="color:{accent2};font-size:18px">›</span></div>"""
+    body += tab_footer(p, water, "1/5")
+    return shell(statusbar(p) + detail_head(p, water, 0) + body, water, "钓鱼指数 Tab")
+
+
+# ---------------------------------------------------------------------------
 # 详情展开态：因子分解（S03）— 子分/权重/贡献条 → ΠV → 原始输入
 # ---------------------------------------------------------------------------
 def render_breakdown(water="sea"):
@@ -631,7 +695,9 @@ def revise_settings():
 
 def build():
     jobs = {
-        # 详情 5 Tab 变体（指数复用原 detail；其余补齐）
+        # 详情 5 Tab 变体（含 SCORE 首 Tab，海/陆；其余补齐）
+        "detail-tab-score-sea": lambda: render_tab_score("sea"),
+        "detail-tab-score-inland": lambda: render_tab_score("inland"),
         "detail-tab-tide-sea": lambda: render_tab_tide("sea"),
         "detail-tab-tide-inland": lambda: render_tab_tide("inland"),
         "detail-tab-weather": lambda: render_tab_weather("sea"),

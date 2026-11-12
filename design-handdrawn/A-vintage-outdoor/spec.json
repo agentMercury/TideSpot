@@ -113,8 +113,8 @@
   ],
   "example_data_notice": "分数/时刻/点位为版式示意，非业务数据；源更新时间显示 —，未硬编码",
   "full_ui": {
-    "screen_count": 28,
-    "added_count": 21,
+    "screen_count": 30,
+    "added_count": 23,
     "base_count": 7,
     "added_screens": [
       {
@@ -263,6 +263,20 @@
         "png": "screens_full/dark-favorites.png",
         "html": "sources_full/dark-favorites.html",
         "sha256_png": "befe92fd8f5bb530fc7d904cb08d29bf8f777a12772e0921f1a56253962ee613"
+      },
+      {
+        "key": "detail-tab-score-sea",
+        "label": "详情·钓鱼指数 Tab（海洋）",
+        "png": "screens_full/detail-tab-score-sea.png",
+        "html": "sources_full/detail-tab-score-sea.html",
+        "sha256_png": "d3f2495029c46921929fcf0fab5223895a636b6cd4d83b59ae0e3272bc872410"
+      },
+      {
+        "key": "detail-tab-score-inland",
+        "label": "详情·钓鱼指数 Tab（内陆）",
+        "png": "screens_full/detail-tab-score-inland.png",
+        "html": "sources_full/detail-tab-score-inland.html",
+        "sha256_png": "8a28c370ebe567e9968bb04e2cdac9274fdb7a233eea10231d7d6cf46721ee9d"
       }
     ],
     "index": "index-full.html",

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""生成「手绘 A 完整 UI」自包含索引页 index-full.html（28 屏分组拼览 + 需求摘要）。"""
+"""生成「手绘 A 完整 UI」自包含索引页 index-full.html（30 屏分组拼览 + 需求摘要）。"""
 from pathlib import Path
 import base64, io, json
 from PIL import Image
@@ -15,7 +15,8 @@ groups = [
         ("map-sea", "地图·海洋", BASE), ("map-inland", "地图·内陆", BASE),
         ("favorites", "收藏", BASE), ("settings", "设置", BASE), ("dark-detail", "深色详情", BASE),
     ]),
-    ("② 详情 Tab 变体 4 + 因子分解 · 7（新稿结构；缺 SCORE 首 Tab）", "#2E6E7E", [
+    ("② 详情 5 Tab 变体 + 因子分解 · 9（新稿结构）", "#2E6E7E", [
+        ("detail-tab-score-sea", "钓鱼指数·海", SHOT), ("detail-tab-score-inland", "钓鱼指数·内陆", SHOT),
         ("detail-tab-tide-sea", "潮流·海", SHOT), ("detail-tab-tide-inland", "水位·内陆", SHOT),
         ("detail-tab-weather", "天气", SHOT), ("detail-tab-water", "水质 1×3", SHOT),
         ("detail-tab-wave-sea", "风浪·海", SHOT), ("detail-tab-wave-inland", "湖面风·内陆", SHOT),
@@ -76,21 +77,21 @@ th{color:#5C5540;font-weight:700;width:74px}.p1{color:#8A3B2E;font-weight:700}.p
 .errata .new{background:#2E5A48;color:#F7F1DE;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700;margin-right:6px}
 </style></head><body><div class="wrap">
 <span class="badge">DESIGN CONCEPT A · VINTAGE OUTDOOR · COMPLETE UI</span>
-<h1>潮点 TideSpot · 手绘 A 复古户外 · 完整 UI（28 屏）</h1>
+<h1>潮点 TideSpot · 手绘 A 复古户外 · 完整 UI（30 屏）</h1>
 <div class="sub">基于工程 v1.16.0（versionCode 20）· 视觉概念稿 · 全部离线自包含 · 双水体（海洋/近海 ↔ 内陆/湖泊）一眼可辨<br>
 设置页已按需求决策改版：下线「用例·物种·权重」「API Key」，新增「外观·皮肤」入口（首版仅内置手绘 A，扩展规范见 <b>SKIN-DESIGN-SPEC.md</b>）。<br>
 右下方为《APP 功能优化需求》摘要（{REQ_N} 条转需求 + {NOTE_N} 条仅记录）；逐条代码证据与验收见 <b>APP功能优化需求.md</b> / <b>feature-gaps.json</b>。</div>
 <div class="errata"><h3>参照稿勘误（2026-11-12 · 阅读前必看）</h3>
 本索引里存在 <b>两套并存的详情页视觉稿</b>，它们是不同时间、不同生成器产出的<b>两个版本</b>，<b>不是同一张稿的多个 Tab 变体</b>，请勿当作"逐屏对齐"来读：<br>
 <span class="k">旧稿 · base 7 屏</span>第①组 <b>detail-sea / detail-inland</b>（分数 <b>78</b>／<b>白底细边</b>／圆鱼徽标／虚线鱼框，图表为「潮高·潮流」折线柱）由 <b>engine.py</b> 生成，是手绘 A 最早的一版；索引第①组、早期 <b>preview.html</b> 展示的是这套。<br>
-<span class="new">新稿 · 完整 UI 变体</span>第②组 <b>detail-tab-*</b>（分数 <b>82</b>／<b>苔绿·米黄纸底</b>／五档鱼数卡片／图表⇄数值表切换）由 <b>engine_full.py</b> 生成，是后续"完整 28 屏"扩出的版本。<br>
+<span class="new">新稿 · 完整 UI 变体</span>第②组 <b>detail-tab-*</b>（分数 <b>82</b>／<b>苔绿·米黄纸底</b>／五档鱼数卡片／图表⇄数值表切换）由 <b>engine_full.py</b> 生成，是后续"完整 UI"扩出的版本（现 30 屏）。<br>
 <b>真机 Compose 试点参照的是新稿（screens_full）+ 工程既有骨架，不是旧稿。</b>此前把旧稿标成"设计稿"与真机并排称"对齐/通过"属参照错位，已在 <b>device-compare/真机对拍报告.md</b> §0 勘误。两套稿暂不合并、不定稿，待用户决策；本轮仅纠错，未改任何视觉。
 </div>
-<div class="errata" style="border-color:#2E5A48;color:#21402E;background:#EEF2DA"><h3 style="color:#2E5A48">完整性提示：28 屏并非全是新稿结构（2026-11-12 补充勘误）</h3>
-这套"完整 28 屏"是<b>新旧稿混搭</b>，各屏底稿来源已标在标题/标签的〔旧底〕〔新稿〕里，请勿默认为同一套视觉语言：
-<br>① <b>②组缺第一个 Tab</b>：详情 5 个 Tab 只出了 4 个新稿变体（潮流 / 天气 / 水质 / 风浪），<b>缺「钓鱼指数 / SCORE」首 Tab 的新稿样式</b>——它当初被放在第①组 base 旧稿的详情主屏里，补 21 张时漏做，故标题从"5 Tab"更正为"4 Tab + 因子分解"。
-<br>② <b>多组沿用旧 base 稿当底</b>：第④组 4 个状态态（离线 / 陈旧 / 48h / 分维）、第③组 OV01/OV02/OV03/OV05/OV06、第④组多选批量、第⑤组深色地图/收藏，都是拿 <b>engine.py 的旧 base 详情 / 地图 / 收藏页</b>加工（叠层只加蒙层与弹窗、状态态只插一条状态条），所以与第①组旧稿长得一样；真正重画的新稿结构仅 <b>第②组 Tab 变体 + OV04 水质录入 + 收藏空态</b>。
-<br>③ <b>补这两处缺口需先定稿</b>（补 SCORE 首 Tab 新稿、把旧底屏改为新稿骨架），属重画视觉，本轮按"暂不定稿"未动；已如实标注，避免再被当成"完整一致 28 屏"。
+<div class="errata" style="border-color:#2E5A48;color:#21402E;background:#EEF2DA"><h3 style="color:#2E5A48">完整性提示：28→30 屏，新稿为主、旧底屏待统一（认新稿推进中）</h3>
+这套"完整 UI"现已扩到 <b>30 屏</b>（基础 7 + 新增 23），各屏底稿来源已标在〔旧底〕〔新稿〕里：
+<br>① <b>详情 5 Tab 已齐（新稿）</b>：钓鱼指数 / 潮流（水位）/ 天气 / 水质 / 风浪 首 Tab 均出新稿样式；<b>钓鱼指数 SCORE 首 Tab 此前缺失，本次已补</b>（海/陆两版，②组现为 5 Tab + 因子分解 · 9 屏）。
+<br>② <b>仍沿用旧 base 稿当底、待重绘为新稿骨架的屏</b>：第④组 4 状态态（离线/陈旧/48h/分维）、第③组 OV01/OV02/OV03/OV05/OV06、第④组多选批量、第⑤组深色地图/收藏——均拿 <b>engine.py 旧 base 详情/地图/收藏页</b>加工，因此与第①组旧稿同源；真正新稿重画的仅 第②组 Tab + OV04 水质录入 + 收藏空态。
+<br>③ <b>地图底图保留手绘原稿</b>：认新稿仅重绘地图页周边组件，手绘地图底图（map_land/map_water/map_road 三色 + 路网）不作重绘，避免重画地图。
 </div>
 """]
 

@@ -14,9 +14,9 @@ def ok(cond, msg):
 
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 
-# 1. 28 PNG 尺寸 + 签名 + spec SHA
+# 1. 30 PNG 尺寸 + 签名 + spec SHA
 all_png = list((A / "screens").glob("*.png")) + list((A / "screens_full").glob("*.png"))
-ok(len(all_png) == 28, f"PNG 总数=28（实际 {len(all_png)}）")
+ok(len(all_png) == 30, f"PNG 总数=30（实际 {len(all_png)}）")
 for p in all_png:
     b = p.read_bytes()
     ok(b[:8] == b"\x89PNG\r\n\x1a\n", f"{p.name} PNG 签名")
@@ -32,7 +32,9 @@ ok(sha(A / _st["html"]) == _st["html_sha256"], "settings.html 改版后 SHA 匹�
 
 # 2. 21 HTML 自包含（无外链 / 无相对 src / 无 file://）
 htmls = list((A / "sources_full").glob("*.html"))
-ok(len(htmls) == 21, f"HTML 总数=21（实际 {len(htmls)}）")
+ok(len(htmls) == 23, f"HTML 总数=23（实际 {len(htmls)}）")
+ok("钓鱼指数" in (A / "sources_full" / "detail-tab-score-sea.html").read_text(encoding="utf-8"), "SCORE 首 Tab(海) 含「钓鱼指数」")
+ok("五档" in (A / "sources_full" / "detail-tab-score-inland.html").read_text(encoding="utf-8"), "SCORE 首 Tab(内陆) 含「五档」")
 for p in htmls:
     t = p.read_text(encoding="utf-8")
     ok("http://" not in t and "https://" not in t, f"{p.name} 无网络外链")
@@ -106,7 +108,7 @@ ok("selection_page" in spec["skin_system"] and "本轮未做" in spec["skin_syst
 # 6. 索引页 + README + spec
 idx = (A / "index-full.html").read_text(encoding="utf-8")
 ok("data:image/jpeg;base64" in idx, "索引页内嵌缩略 base64")
-ok(idx.count("data:image/jpeg;base64") == 28, f"索引页 28 张缩略（实 {idx.count('data:image/jpeg;base64')}）")
+ok(idx.count("data:image/jpeg;base64") == 30, f"索引页 30 张缩略（实 {idx.count('data:image/jpeg;base64')}）")
 ok("http://" not in idx and "https://" not in idx, "索引页无外链")
 ok("摘要（7 条转需求）" in idx and "tag-rm" in idx, "索引页反映 7 条转需求 + 下线标签")
 ok("OPT-A-09" in idx and "SKIN-DESIGN-SPEC.md" in idx and "换皮肤(OPT-A-09)" in idx, "索引页含换皮肤需求/规范/冻结条款")
@@ -117,11 +119,12 @@ ok("早期 base 稿" in idx and "非真机参照" in idx, "索引页第①组标
 ok("真机 Compose 试点参照的是新稿" in idx, "索引页声明真机参照新稿")
 ok("不含 Compose 代码" not in idx and "Compose 试点" in idx, "索引页脚已修正过时声明、如实提试点")
 ok("⚠" not in idx, "索引页无缺字特殊符号")
-# 完整性缺口标注（2026-11-12 补充勘误）
-ok("完整性提示" in idx and "28 屏并非全是新稿结构" in idx, "索引页含完整性缺口提示块")
-ok("缺「钓鱼指数 / SCORE」首 Tab" in idx and "4 Tab + 因子分解" in idx, "索引页标注缺 SCORE 首 Tab")
-ok("新旧稿混搭" in idx and "〔旧底〕" in idx and "〔新稿〕" in idx, "索引页逐屏标稿源(旧底/新稿)")
-ok("详情 5 个 Tab 只出了 4 个" in idx and "补这两处缺口需先定稿" in idx, "索引页交代旧底屏范围与暂不定稿")
+# 完整性缺口标注（认新稿推进中）
+ok("完整性提示" in idx and "新稿为主、旧底屏待统一" in idx, "索引页含完整性提示块")
+ok("钓鱼指数 SCORE 首 Tab 此前缺失，本次已补" in idx and "5 Tab + 因子分解" in idx, "索引页标注 SCORE 首 Tab 已补、②组 5 Tab")
+ok("〔旧底〕" in idx and "〔新稿〕" in idx, "索引页逐屏标稿源(旧底/新稿)")
+ok("仍沿用旧 base 稿当底" in idx and "待重绘为新稿骨架" in idx, "索引页交代旧底屏待重绘")
+ok("地图底图保留手绘原稿" in idx, "索引页标注地图底图保留手绘")
 for cf in ["make_compare_v3.py", "make_compare_v4.py"]:
     ct = (Path(__file__).resolve().parent / cf).read_text(encoding="utf-8")
     ok("早期 base 旧稿" in ct and "非参照稿" in ct, f"{cf} 左标题改早期旧稿")
@@ -135,8 +138,8 @@ ok("参照稿勘误" in note and "不是" in note and "早期 base" in note, "�
 ok("两版稿暂不合并、不定稿" in note, "落地说明标注暂不定稿")
 
 readme = (A / "README.md").read_text(encoding="utf-8")
-ok("完整 UI" in readme and "28" in readme, "README 含完整 UI 说明")
-ok(spec["full_ui"]["screen_count"] == 28 and spec["full_ui"]["added_count"] == 21, "spec full_ui 计数")
+ok("完整 UI" in readme and "30" in readme, "README 含完整 UI 说明")
+ok(spec["full_ui"]["screen_count"] == 30 and spec["full_ui"]["added_count"] == 23, "spec full_ui 计数")
 
 # 7. 原 7 屏 base 文件仍在且未被本轮覆盖（存在性 + 尺寸由第1步覆盖）
 for n in ["detail-sea","detail-inland","map-sea","map-inland","favorites","settings","dark-detail"]:
