@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.settings
+package com.tidespot.feature.settings
 
 import androidx.annotation.StringRes
 import com.tidespot.core.data.remote.TideSpotUrls

@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.settings
+package com.tidespot.feature.settings
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

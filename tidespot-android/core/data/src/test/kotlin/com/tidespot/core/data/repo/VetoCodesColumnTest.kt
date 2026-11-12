@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.repo
+package com.tidespot.core.data.repo
 
 import com.tidespot.core.data.mock.MockFixtures
 import com.tidespot.core.domain.FishScoreCalculator

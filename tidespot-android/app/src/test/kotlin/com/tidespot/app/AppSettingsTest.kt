@@ -1,4 +1,4 @@
-﻿package com.tidespot.app
+package com.tidespot.app
 
 import com.tidespot.feature.settings.SettingsKeys
 import com.tidespot.feature.settings.SettingsState

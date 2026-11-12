@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.dto
+package com.tidespot.core.data.dto
 
 import kotlinx.serialization.Serializable
 

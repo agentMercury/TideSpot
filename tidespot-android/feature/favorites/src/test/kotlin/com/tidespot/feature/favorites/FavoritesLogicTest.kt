@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.favorites
+package com.tidespot.feature.favorites
 
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.domain.model.FavoriteSpot

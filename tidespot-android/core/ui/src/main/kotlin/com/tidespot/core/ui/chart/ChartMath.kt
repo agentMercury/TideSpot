@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.chart
+package com.tidespot.core.ui.chart
 
 /**
  * HourChart 纯计算层（§8.2-2）：把「null 断线不连线 / 断段切分 / y 轴自适应 / ≥80 窗口段」

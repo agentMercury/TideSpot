@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.repo
+package com.tidespot.core.data.repo
 
 import com.tidespot.core.data.dto.MarineResponseDto
 import com.tidespot.core.data.dto.OpenMeteoTime

@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.location
+package com.tidespot.feature.map.location
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

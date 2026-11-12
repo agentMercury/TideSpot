@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.settings
+package com.tidespot.feature.settings
 
 /**
  * 设置键值存储接口（CHG-16⑱）：仅声明键值读写；:app 批次 3 以 SharedPreferences 实现。

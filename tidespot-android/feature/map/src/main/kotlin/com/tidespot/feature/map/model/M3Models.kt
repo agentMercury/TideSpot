@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.model
+package com.tidespot.feature.map.model
 
 import com.tidespot.core.domain.model.NamedPlace
 import com.tidespot.core.domain.model.WaterBodyType

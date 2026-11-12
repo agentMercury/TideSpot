@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.geo
+package com.tidespot.core.data.geo
 
 import com.tidespot.core.data.dto.BigDataCloudReverseDto
 import com.tidespot.core.data.dto.PhotonReverseDto

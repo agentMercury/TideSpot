@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain.window
+package com.tidespot.core.domain.window
 
 import com.tidespot.core.domain.model.BestWindow
 import com.tidespot.core.domain.model.FishScoreResult

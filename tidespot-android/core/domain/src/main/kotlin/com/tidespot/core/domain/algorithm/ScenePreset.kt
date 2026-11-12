@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain.algorithm
+package com.tidespot.core.domain.algorithm
 
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.domain.strings.DomainCopy

@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.local
+package com.tidespot.core.data.local
 
 import androidx.room.migration.Migration
 import kotlin.test.Test

@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain
+package com.tidespot.core.domain
 
 import com.tidespot.core.domain.algorithm.Presets
 import com.tidespot.core.domain.algorithm.VetoEvaluator

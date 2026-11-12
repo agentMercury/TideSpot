@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain.water
+package com.tidespot.core.domain.water
 
 /**
  * 水温融合 Tw（SRS §6.1，先算——DO 与适温依赖它）。

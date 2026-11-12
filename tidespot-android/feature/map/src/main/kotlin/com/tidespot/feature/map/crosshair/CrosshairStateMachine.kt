@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.crosshair
+package com.tidespot.feature.map.crosshair
 
 import com.tidespot.feature.map.model.GeoPoint
 import kotlinx.coroutines.flow.MutableStateFlow

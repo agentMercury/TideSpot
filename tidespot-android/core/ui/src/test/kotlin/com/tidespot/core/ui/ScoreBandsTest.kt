@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui
+package com.tidespot.core.ui
 
 import com.tidespot.core.ui.band.BandTitles
 import com.tidespot.core.ui.band.ScoreBand

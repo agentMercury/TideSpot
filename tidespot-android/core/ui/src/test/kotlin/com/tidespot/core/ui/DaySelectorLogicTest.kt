@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui
+package com.tidespot.core.ui
 
 import com.tidespot.core.ui.selector.DaySelectorLogic
 import java.time.Instant

@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.remote
+package com.tidespot.core.data.remote
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

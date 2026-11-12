@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.geo
+package com.tidespot.core.data.geo
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

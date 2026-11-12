@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.geo
+package com.tidespot.core.data.geo
 
 import com.tidespot.core.data.mock.FakeReverseCacheDao
 import com.tidespot.core.data.remote.TideSpotUserAgent

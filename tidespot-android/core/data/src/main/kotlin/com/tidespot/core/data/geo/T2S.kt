@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.geo
+package com.tidespot.core.data.geo
 
 /**
  * 简繁归一（SRS §5.8 坑 1：RG-A 对中国点层级简繁不一致 —— 实测 `山東省/青島市/嶗山區`、

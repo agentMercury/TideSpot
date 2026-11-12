@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.tabs
+package com.tidespot.feature.map.tabs
 
 import com.tidespot.core.domain.model.WaterBodyType
 import kotlin.test.Test

@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain.util
+package com.tidespot.core.domain.util
 
 /**
  * Open Location Code（Plus Code）编码 —— 全工程**单一实现**（CHG-09⑤ / NEW-R3 / GAP-M3-10）。

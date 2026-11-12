@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.detail.detail
+package com.tidespot.feature.detail.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.location
+package com.tidespot.feature.map.location
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

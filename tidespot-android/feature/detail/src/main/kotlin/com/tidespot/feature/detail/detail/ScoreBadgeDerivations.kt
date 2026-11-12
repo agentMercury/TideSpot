@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.detail.detail
+package com.tidespot.feature.detail.detail
 
 import com.tidespot.core.domain.model.FactorScore
 import com.tidespot.core.domain.model.FishScoreResult

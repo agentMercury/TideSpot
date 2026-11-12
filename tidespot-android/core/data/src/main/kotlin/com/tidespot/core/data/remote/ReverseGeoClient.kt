@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.remote
+package com.tidespot.core.data.remote
 
 import com.tidespot.core.data.dto.BigDataCloudReverseDto
 import com.tidespot.core.data.dto.PhotonReverseDto

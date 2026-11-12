@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.infobar
+package com.tidespot.feature.map.infobar
 
 import com.tidespot.core.domain.model.NamedPlace
 import com.tidespot.core.domain.util.OpenLocationCode

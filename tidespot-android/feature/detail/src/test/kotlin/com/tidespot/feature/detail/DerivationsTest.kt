@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.detail
+package com.tidespot.feature.detail
 
 import com.tidespot.core.data.repo.HourSlice
 import com.tidespot.core.data.repo.SpotDetailResult

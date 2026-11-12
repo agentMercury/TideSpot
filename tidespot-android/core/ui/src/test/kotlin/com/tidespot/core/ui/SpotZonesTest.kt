@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui
+package com.tidespot.core.ui
 
 import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.ui.zone.SpotZones

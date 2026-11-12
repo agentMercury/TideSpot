@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain.tide
+package com.tidespot.core.domain.tide
 
 import com.tidespot.core.domain.strings.DomainCopy
 import com.tidespot.core.domain.strings.ZhDomainCopy

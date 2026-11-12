@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui.format
+package com.tidespot.core.ui.format
 
 import java.time.Instant
 import java.time.LocalDate

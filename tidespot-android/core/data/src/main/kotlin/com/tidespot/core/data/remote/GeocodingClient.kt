@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.remote
+package com.tidespot.core.data.remote
 
 import com.tidespot.core.data.ApiErrorClassifier
 import com.tidespot.core.data.dto.GeocodingSearchResponseDto

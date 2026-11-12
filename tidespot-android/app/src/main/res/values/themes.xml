@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 单 Activity + Compose（禁 XML 布局）：仅承载窗口主题，配色由 TideSpotTheme token 管理 -->
     <style name="Theme.TideSpot" parent="android:Theme.Material.Light.NoActionBar">

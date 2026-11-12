@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map
+package com.tidespot.feature.map
 
 import android.Manifest
 import android.app.Activity

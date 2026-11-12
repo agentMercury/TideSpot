@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.ui
+package com.tidespot.core.ui
 
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.titles.WaterBodyTabTitles

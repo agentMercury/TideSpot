@@ -1,4 +1,4 @@
-﻿package com.tidespot.feature.map.geo
+package com.tidespot.feature.map.geo
 
 import com.tidespot.core.data.water.WaterBodyClassifier
 import com.tidespot.core.domain.model.WaterBodyType

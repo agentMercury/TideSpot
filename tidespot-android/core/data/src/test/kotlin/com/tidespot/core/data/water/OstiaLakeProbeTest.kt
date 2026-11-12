@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.water
+package com.tidespot.core.data.water
 
 import com.tidespot.core.data.remote.TideSpotUserAgent
 import kotlinx.coroutines.test.TestScope

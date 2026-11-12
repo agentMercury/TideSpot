@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.data.local
+package com.tidespot.core.data.local
 
 /**
  * 格点缓存键（§5.8 逆地理 30 d 缓存 / §6.9 水体判定 30 d 缓存共用口径）。

@@ -1,4 +1,4 @@
-﻿package com.tidespot.core.domain
+package com.tidespot.core.domain
 
 import com.tidespot.core.domain.algorithm.FactorId
 import com.tidespot.core.domain.algorithm.SpeciesPresets

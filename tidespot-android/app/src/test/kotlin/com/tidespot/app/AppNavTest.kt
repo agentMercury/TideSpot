@@ -1,4 +1,4 @@
-﻿package com.tidespot.app
+package com.tidespot.app
 
 import com.tidespot.core.domain.model.FavoriteSpot
 import kotlin.test.Test
