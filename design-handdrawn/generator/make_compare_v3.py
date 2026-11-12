@@ -67,10 +67,13 @@ pair(D / "v3-inland-dark.png", D / "v3-sea-dark.png", D / "v3-water-dark.png",
      "深色 · 内陆水体", "深色 · 近海/海洋",
      "深墨绿 vs 深藏蓝；暖白纸纹在两种深色上均可辨；皮肤/水体/明暗三轴正交")
 
-# 4) 设计稿对照（D5 后差距明显收窄）
+# 4) 参照稿说明（勘误：左为早期 base 旧稿，非真机参照稿）
+# 注意：screens/detail-inland.png 是 engine.py 的早期 78/白底旧稿；真机参照的是
+# engine_full.py 的 82/苔绿纸底新稿（screens_full/detail-tab-*）+ 工程骨架。
+# 两列并非同一张稿的"设计 vs 实现"，只是并列展示两个并存版本，不可当作对齐证据。
 pair(A / "screens" / "detail-inland.png", D / "v3-inland-light.png", D / "v3-design-device.png",
-     "设计稿 · 手绘A 内陆浅色", "真机 · D5 后内陆浅色",
-     "纸纹/鱼形/手绘描边已工程化；仍缺手绘地图、五档色带鱼数图标与图表笔触")
+     "早期 base 旧稿 · 78/白底（非参照稿）", "真机 D5 · 参照新稿82/苔绿纸底",
+     "【勘误】两列非同稿：左=engine.py旧稿，右=真机(参照engine_full.py新稿)；仅并列展示，非对齐证据")
 
 # 5) 试点边界：地图页仍是原样
 pair(D / "v3-inland-map.png", D / "v3-inland-light.png", D / "v3-boundary.png",

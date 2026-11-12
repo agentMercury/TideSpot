@@ -110,6 +110,25 @@ ok(idx.count("data:image/jpeg;base64") == 28, f"索引页 28 张缩略（实 {id
 ok("http://" not in idx and "https://" not in idx, "索引页无外链")
 ok("摘要（7 条转需求）" in idx and "tag-rm" in idx, "索引页反映 7 条转需求 + 下线标签")
 ok("OPT-A-09" in idx and "SKIN-DESIGN-SPEC.md" in idx and "换皮肤(OPT-A-09)" in idx, "索引页含换皮肤需求/规范/冻结条款")
+
+# 6b. 参照稿错位勘误（2026-11-12）：确保索引/对照/文档不再把旧稿当对齐目标
+ok("参照稿勘误" in idx and "两套并存的详情页视觉稿" in idx, "索引页含两套并存稿勘误块")
+ok("早期 base 稿" in idx and "非真机参照" in idx, "索引页第①组标早期 base 稿")
+ok("真机 Compose 试点参照的是新稿" in idx, "索引页声明真机参照新稿")
+ok("不含 Compose 代码" not in idx and "Compose 试点" in idx, "索引页脚已修正过时声明、如实提试点")
+ok("⚠" not in idx, "索引页无缺字特殊符号")
+for cf in ["make_compare_v3.py", "make_compare_v4.py"]:
+    ct = (Path(__file__).resolve().parent / cf).read_text(encoding="utf-8")
+    ok("早期 base 旧稿" in ct and "非参照稿" in ct, f"{cf} 左标题改早期旧稿")
+    ok("参照新稿" in ct and "非对齐证据" in ct and "⚠" not in ct, f"{cf} 右标题/说明口径已勘误")
+rpt = (A / "device-compare" / "真机对拍报告.md").read_text(encoding="utf-8")
+ok("参照稿勘误" in rpt and "两套并存的详情页视觉稿" in rpt, "对拍报告含参照稿勘误块")
+ok("配色 token 层与功能入口红线" in rpt and "不含结构" in rpt, "对拍报告限定通过口径")
+ok("不是照着旧稿做的" in rpt and "完全不一样" in rpt, "对拍报告交代错位主因")
+note = (A / "Compose试点落地说明.md").read_text(encoding="utf-8")
+ok("参照稿勘误" in note and "不是" in note and "早期 base" in note, "落地说明含参照稿勘误")
+ok("两版稿暂不合并、不定稿" in note, "落地说明标注暂不定稿")
+
 readme = (A / "README.md").read_text(encoding="utf-8")
 ok("完整 UI" in readme and "28" in readme, "README 含完整 UI 说明")
 ok(spec["full_ui"]["screen_count"] == 28 and spec["full_ui"]["added_count"] == 21, "spec full_ui 计数")

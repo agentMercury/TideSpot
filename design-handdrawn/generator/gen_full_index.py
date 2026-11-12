@@ -10,8 +10,8 @@ BASE = A / "screens"
 OUT = A / "index-full.html"
 
 groups = [
-    ("① 基础主屏 · 7", "#0D47A1", [
-        ("detail-sea", "详情·海洋", BASE), ("detail-inland", "详情·内陆", BASE),
+    ("① 基础主屏 · 7（早期 base 稿 · 非真机参照）", "#0D47A1", [
+        ("detail-sea", "详情·海洋〔旧稿78〕", BASE), ("detail-inland", "详情·内陆〔旧稿78〕", BASE),
         ("map-sea", "地图·海洋", BASE), ("map-inland", "地图·内陆", BASE),
         ("favorites", "收藏", BASE), ("settings", "设置", BASE), ("dark-detail", "深色详情", BASE),
     ]),
@@ -70,12 +70,22 @@ th{color:#5C5540;font-weight:700;width:74px}.p1{color:#8A3B2E;font-weight:700}.p
 .frozen{background:#1B3A5C;color:#F2EAD4;border-radius:14px;padding:18px 22px;font-size:12.5px;line-height:1.9;margin-top:8px}
 .frozen b{color:#D9A734}.foot{color:#5C5540;font-size:11.5px;line-height:1.8;margin-top:18px;text-align:center}
 .note{font-size:11px;color:#5C5540;line-height:1.7;margin-top:8px}
+.errata{background:#FBF3D9;border:2.6px dashed #8A3B2E;border-radius:14px;padding:16px 20px;margin-bottom:22px;font-size:12.5px;line-height:1.8;color:#5C2E22}
+.errata h3{font-family:Georgia,serif;font-size:16px;color:#8A3B2E;margin-bottom:8px}
+.errata b{color:#8A3B2E}.errata .k{background:#8A3B2E;color:#F7F1DE;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700;margin-right:6px}
+.errata .new{background:#2E5A48;color:#F7F1DE;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700;margin-right:6px}
 </style></head><body><div class="wrap">
 <span class="badge">DESIGN CONCEPT A · VINTAGE OUTDOOR · COMPLETE UI</span>
 <h1>潮点 TideSpot · 手绘 A 复古户外 · 完整 UI（28 屏）</h1>
 <div class="sub">基于工程 v1.16.0（versionCode 20）· 视觉概念稿 · 全部离线自包含 · 双水体（海洋/近海 ↔ 内陆/湖泊）一眼可辨<br>
 设置页已按需求决策改版：下线「用例·物种·权重」「API Key」，新增「外观·皮肤」入口（首版仅内置手绘 A，扩展规范见 <b>SKIN-DESIGN-SPEC.md</b>）。<br>
 右下方为《APP 功能优化需求》摘要（{REQ_N} 条转需求 + {NOTE_N} 条仅记录）；逐条代码证据与验收见 <b>APP功能优化需求.md</b> / <b>feature-gaps.json</b>。</div>
+<div class="errata"><h3>参照稿勘误（2026-11-12 · 阅读前必看）</h3>
+本索引里存在 <b>两套并存的详情页视觉稿</b>，它们是不同时间、不同生成器产出的<b>两个版本</b>，<b>不是同一张稿的多个 Tab 变体</b>，请勿当作"逐屏对齐"来读：<br>
+<span class="k">旧稿 · base 7 屏</span>第①组 <b>detail-sea / detail-inland</b>（分数 <b>78</b>／<b>白底细边</b>／圆鱼徽标／虚线鱼框，图表为「潮高·潮流」折线柱）由 <b>engine.py</b> 生成，是手绘 A 最早的一版；索引第①组、早期 <b>preview.html</b> 展示的是这套。<br>
+<span class="new">新稿 · 完整 UI 变体</span>第②组 <b>detail-tab-*</b>（分数 <b>82</b>／<b>苔绿·米黄纸底</b>／五档鱼数卡片／图表⇄数值表切换）由 <b>engine_full.py</b> 生成，是后续"完整 28 屏"扩出的版本。<br>
+<b>真机 Compose 试点参照的是新稿（screens_full）+ 工程既有骨架，不是旧稿。</b>此前把旧稿标成"设计稿"与真机并排称"对齐/通过"属参照错位，已在 <b>device-compare/真机对拍报告.md</b> §0 勘误。两套稿暂不合并、不定稿，待用户决策；本轮仅纠错，未改任何视觉。
+</div>
 """]
 
 for gtitle, color, items in groups:
@@ -102,7 +112,7 @@ html.append('''<div class="frozen"><b>冻结契约（本次完整 UI 未改动�
 4. DaySelector 两行 52dp · 水质 1×3（pH 已删） · 5. 地图优先、无底部 NavigationBar、准星唯一选点真源 F-1.3<br>
 6. 双水体六重区分：徽标 / 配色 / 鱼种 / 第二 Tab / 图表单位 / 地点 · 7. 示例数值非业务数据，源更新时间显示「—」<br>
 8. 换皮肤(OPT-A-09)只替换视觉 token，以上逐项不变；明暗(OPT-A-03)为与皮肤正交的独立轴 · 皮肤扩展规范见 SKIN-DESIGN-SPEC.md</div>
-<div class="foot">视觉概念稿 + 需求清单，不含 Compose 代码、不改工程源码。完整逐条证据 / 验收 / 工程落点见 APP功能优化需求.md。复现：generator/engine.py（base 7 屏）→ engine_full.py（21 补齐屏 + 改版设置页）→ gen_full_index.py</div>
+<div class="foot">视觉概念稿（28 屏）+ 需求清单。详情页已做 Compose 试点（<b>VintageOutdoorTheme.kt</b> 等，工程 <b>tidespot-android/</b>），四态真机对拍见 <b>device-compare/真机对拍报告.md</b>，落地说明见 <b>Compose试点落地说明.md</b>；其余 3 页未换皮、换肤数据层未实现。逐条证据 / 验收 / 工程落点见 APP功能优化需求.md。<br>复现：generator/engine.py（早期 base 7 屏）→ engine_full.py（新稿 21 补齐屏 + 改版设置页）→ gen_full_index.py（本索引，含参照稿勘误）</div>
 </div></body></html>''')
 
 OUT.write_text("\n".join(html), encoding="utf-8")
