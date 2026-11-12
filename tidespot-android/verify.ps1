@@ -1,7 +1,8 @@
-# 潮点 TideSpot 本地一键验证脚本（HANDOVER §6 A-3）
+﻿# 潮点 TideSpot 本地一键验证脚本（HANDOVER §6 A-3）
 # 作用：工程根目录校验 + JAVA_HOME + 八模块单测 + 红线扫描 + assembleRelease
 #       （OPT-05 CI 门禁的本地形态；命令与 HANDOVER §2 验证命令一致）
 # 用法：powershell -ExecutionPolicy Bypass -File verify.ps1 [-SkipAssemble]
+# Encoding: UTF-8 with BOM. Windows PS 5.1 reads BOM-less scripts as ANSI and mangles CJK strings; keep the BOM on this file.
 param(
     [switch]$SkipAssemble
 )

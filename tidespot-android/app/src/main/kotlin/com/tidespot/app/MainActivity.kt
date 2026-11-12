@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.theme.TideSpotTheme
+import com.tidespot.core.ui.theme.VintageOutdoorTheme
 import com.tidespot.core.ui.zone.SpotZones
 import com.tidespot.feature.detail.detail.DetailScreen
 import com.tidespot.feature.detail.detail.DetailViewModel
@@ -336,33 +338,42 @@ private fun DetailPage(
     LaunchedEffect(state.result?.fetchedAtMillis) {
         onFetched(state.result?.fetchedAtMillis?.values?.maxOrNull())
     }
-    Column(modifier = Modifier.fillMaxSize()) {
-        DetailScreen(
-            spot = spot,
-            viewModel = viewModel,
-            modifier = Modifier.fillMaxSize(),
-            // OPT-V115-02 / S02 TOPBAR：返回位收进详情屏顶栏（原独立 TextButton 行移除）
-            onBack = onBack,
-            backLabel = backLabel,
-            credentialGuideSlot = if (showCredentialGuide) {
-                {
-                    InlandCredentialGuideCard(
-                        onOpenSettings = onOpenCredentialSettings,
-                        onSkip = onSkipCredentialGuide,
-                    )
-                }
-            } else {
-                null
-            },
-        )
-        Text(
-            localTideSpotStrings().modelAttribution,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+    // 手绘 A · 复古户外：详情页一屏试点皮肤（仅视觉 token，参数/回调/导航零改动）
+    VintageOutdoorTheme(
+        waterBody = state.result?.effectiveWaterBody ?: spot.waterBody,
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-        )
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+        ) {
+            DetailScreen(
+                spot = spot,
+                viewModel = viewModel,
+                modifier = Modifier.fillMaxSize(),
+                // OPT-V115-02 / S02 TOPBAR：返回位收进详情屏顶栏（原独立 TextButton 行移除）
+                onBack = onBack,
+                backLabel = backLabel,
+                credentialGuideSlot = if (showCredentialGuide) {
+                    {
+                        InlandCredentialGuideCard(
+                            onOpenSettings = onOpenCredentialSettings,
+                            onSkip = onSkipCredentialGuide,
+                        )
+                    }
+                } else {
+                    null
+                },
+            )
+            Text(
+                localTideSpotStrings().modelAttribution,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+            )
+        }
     }
 }
 
