@@ -430,12 +430,103 @@ def dialog_buttons(p, confirm="确认", cancel="取消", tone="ok"):
 
 
 # ---------------------------------------------------------------------------
+# 新稿底页：地图（保留手绘地图底图）/ 收藏。供 OV 叠层与 #84 主屏共用
+# ---------------------------------------------------------------------------
+def map_canvas(p, water):
+    """手绘地图底图（保留原稿）：land/water/road 三色 + 路网，不重绘。"""
+    return f"""<svg width="390" height="844" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position:absolute;inset:0;z-index:1">
+      <rect width="390" height="844" fill="{H(p['map_land'])}"/>
+      <path d="M-20 470 Q80 430 170 480 Q260 530 340 470 Q390 440 410 470 L410 864 L-20 864 Z" fill="{H(p['map_water'])}" filter="url(#rough2)"/>
+      <path d="M-10 150 Q120 210 230 130 Q320 70 400 150" fill="none" stroke="{H(p['map_road'])}" stroke-width="14" filter="url(#rough2)"/>
+      <path d="M60 -10 Q110 300 40 560 Q10 700 80 860" fill="none" stroke="{H(p['map_road'])}" stroke-width="12" filter="url(#rough2)"/>
+      <path d="M300 -10 Q250 300 330 560" fill="none" stroke="{H(p['map_road'])}" stroke-width="10" filter="url(#rough2)"/>
+      <path d="M-10 320 Q390 300 400 330" fill="none" stroke="{H(p['map_road'])}" stroke-width="8" filter="url(#rough2)"/>
+      <g fill="none" stroke="{H(p['line'])}" stroke-width="1.1" opacity="0.32" filter="url(#rough2)">
+        <rect x="150" y="180" width="46" height="34"/><rect x="230" y="220" width="60" height="26"/><rect x="120" y="600" width="52" height="30"/>
+        <path d="M0 640 Q100 620 180 660"/><path d="M210 380 Q280 360 340 400"/></g>
+      <g fill="{H(p['green'])}" opacity="0.55"><circle cx="105" cy="250" r="9"/><circle cx="270" cy="560" r="11"/><circle cx="200" cy="700" r="8"/></g>
+    </svg>"""
+
+
+def render_map_new(water="sea"):
+    """地图页（新稿骨架）：保留手绘地图底图，周边组件用新稿原语重画。"""
+    p = C(water); wc = E.WATER_COPY[water]
+    ink, line, card, card2, accent, accent2, green, muted, primary, white = (
+        H(p['ink']), H(p['line']), H(p['card']), H(p['card2']), H(p['accent']), H(p['accent2']),
+        H(p['green']), H(p['muted']), H(p['primary']), H(p['white']))
+    motif = E.water_motif(SID, water, 54)
+    cross = E.fish_icon(SID, water, p['accent'], 34)
+    body = map_canvas(p, water)
+    top = f"""<div style="position:absolute;left:0;right:0;top:38px;z-index:5;padding:8px 14px">
+      <div class="card" style="height:44px;display:flex;align-items:center;gap:9px;padding:0 13px">
+        <span style="font-size:17px;color:{accent}">⌕</span>
+        <span class="bodyf" style="font-size:13px;color:{muted};flex:1">搜索地点 / 水域</span>
+        <span style="width:1.5px;height:20px;background:{line};opacity:.3"></span>
+        <span style="font-size:15px;color:{primary}">☷</span></div>
+      <div style="margin-top:8px;display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+        <span class="tag" style="background:{card};color:{ink};border-color:{line};box-shadow:2px 2px 0 {line}55">{motif}<b style="font-size:11px">{wc['badge']}</b></span>
+        <span class="tag" style="background:{card};color:{muted};border-color:{line};font-size:10px">Map data · OpenStreetMap · CARTO</span></div></div>"""
+    crosshair = f"""<div style="position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4">
+      <svg width="78" height="78" viewBox="0 0 78 78" aria-hidden="true"><g stroke="{white}" stroke-width="3" stroke-linecap="round" filter="url(#rough2)">
+        <path d="M39 2 L39 20 M39 58 L39 76 M2 39 L20 39 M58 39 L76 39"/></g>
+        <circle cx="39" cy="39" r="24" fill="none" stroke="{white}" stroke-width="2.4" opacity="0.92" filter="url(#rough2)"/></svg>
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)">{cross}</div>
+      <div class="bodyf" style="position:absolute;left:50%;top:calc(50% + 46px);transform:translateX(-50%);white-space:nowrap;background:{ink}CC;color:{white};font-size:10px;padding:3px 10px;border-radius:10px">⌖ 准星落点 · 拖动地图选点</div></div>"""
+    tools = f"""<div style="position:absolute;right:14px;top:150px;z-index:5;display:flex;flex-direction:column;gap:9px">
+      <div class="card" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;color:{primary}">◎</div>
+      <div class="card" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:17px;color:{primary}">▤</div></div>"""
+    bottom = f"""<div style="position:absolute;left:0;right:0;bottom:0;z-index:5;padding:0 12px 16px">
+      <div class="card" style="padding:12px 14px;box-shadow:2px 3px 0 {line}44">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div><div class="disp" style="font-size:16px;color:{ink}">{wc['place']}</div>
+               <div class="bodyf mut" style="font-size:10px;margin-top:2px">⌖ {wc['coord']}</div></div>
+          <span class="tag" style="font-size:10px;background:{accent2};color:{ink};border-color:{line}">{wc['water_short']}</span></div>
+        <div class="row" style="gap:9px;margin-top:10px;align-items:center">
+          <div class="disp" style="font-size:30px;color:{accent};line-height:1">{E.SCORE}</div>
+          <div style="flex:1"><div class="disp" style="font-size:14px;color:{primary}">{E.BAND_LABELS[E.SCORE_BAND]}</div>
+              <div class="bodyf mut" style="font-size:9.5px;margin-top:2px">点击查看 {wc['chart']} · 五档指数</div></div>
+          <div style="width:46px;height:46px;border:2px dashed {green};border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)">{E.fish_icon(SID, water, green, 32)}</div></div>
+        <div style="margin-top:10px;border-top:1.6px dashed {line}55;padding-top:9px;display:flex;align-items:center;gap:9px">
+          <div class="row">{E.fish_icon(SID,water,accent2,18)}{E.fish_icon(SID,water,accent2,22)}{E.fish_icon(SID,water,accent2,18)}</div>
+          <div class="bodyf" style="font-size:11px;color:{primary};flex:1;font-weight:700">全部收藏 Top10 · 最佳窗口</div><span style="color:{accent};font-size:16px">›</span></div></div></div>"""
+    return shell(statusbar(p) + top + crosshair + tools + bottom, water, "地图选点 · 新稿")
+
+
+def render_favorites_new(water="sea"):
+    """收藏页（新稿骨架）：列表行用 fav_item 新稿原语，与多选/空态同源。"""
+    p = C(water)
+    line, card, card2, ink, muted, primary, white, accent2, green = (
+        H(p['line']), H(p['card']), H(p['card2']), H(p['ink']), H(p['muted']),
+        H(p['primary']), H(p['white']), H(p['accent2']), H(p['green']))
+    head = f"""<div style="padding:6px 16px 8px;position:relative;z-index:3">
+      <div class="disp" style="font-size:24px;color:{ink}">我的收藏</div>
+      <div class="bodyf mut" style="font-size:11px;margin-top:2px">12 个点位 · 3 个分组</div></div>
+    <div style="padding:0 14px;position:relative;z-index:3"><div class="card" style="height:40px;display:flex;align-items:center;gap:8px;padding:0 12px">
+      <span style="font-size:16px;color:{accent2}">⌕</span><span class="bodyf" style="font-size:12px;color:{muted}">搜索收藏点位</span>
+      <span style="margin-left:auto;font-size:13px;color:{primary}">☷</span></div></div>
+    <div class="row" style="padding:9px 14px 0;gap:6px;position:relative;z-index:3">
+      <span class="tag" style="background:{primary};color:{white};border-color:{line};font-size:10px">综合推荐 ▾</span>
+      <span class="tag" style="font-size:10px">全部分组 ▾</span>
+      <span class="tag" style="font-size:10px;margin-left:auto">⠿ 批量</span></div>"""
+    items = [
+        ("小麦岛外海", "青岛 · 海域", "86", "爆护窗口", 0),
+        ("鲤鱼湾", "千岛湖 · 湖湾", "78", "很适合", 1),
+        ("东澳礁", "珠海 · 近海", "64", "可以", 2),
+    ]
+    rows = "".join(fav_item(p, name, sub, score, band, False) for (name, sub, score, band, bi) in items)
+    extra = f"""<div style="margin:11px 14px 0;border:2.2px solid {line};border-radius:14px;background:{primary};padding:10px 13px;display:flex;align-items:center;gap:9px;box-shadow:2px 3px 0 {line}44">
+      <div class="row">{E.fish_icon(SID,water,accent2,18)}{E.fish_icon(SID,water,accent2,22)}{E.fish_icon(SID,water,accent2,18)}</div>
+      <div style="flex:1"><div class="disp" style="font-size:13px;color:{white}">全部收藏 Top10</div><div class="bodyf" style="font-size:9.5px;color:{white}AA">本周末 · 时段筛选</div></div><span style="color:{accent2};font-size:17px">›</span></div>"""
+    return shell(statusbar(p) + head + rows + extra, water, "收藏 · 新稿")
+
+
+# ---------------------------------------------------------------------------
 # OV01 Top10 BottomSheet — 时段筛选四 Chip + 排名(鱼群) + 空态禁止兜底造假
 # ---------------------------------------------------------------------------
 def render_ov_top10(water="sea"):
     p = C(water); line, card, card2, accent, accent2, green, muted, primary, ink = (
         H(p['line']), H(p['card']), H(p['card2']), H(p['accent']), H(p['accent2']), H(p['green']), H(p['muted']), H(p['primary']), H(p['ink']))
-    base = E.render_detail(SID, water)  # 背景：详情指数页
+    base = render_tab_score(water)  # 背景：新稿详情指数页
     screen_inner = screen_inner_of(base)
     chips = "".join(f"""<span class="tag" style="font-size:9.5px;{'background:'+primary+';color:'+H(p['white']) if i==1 else ''}">{t}</span>"""
                     for i, t in enumerate(["全部", "接下来 24h", "本周末", "自选时段"]))
@@ -460,7 +551,7 @@ def render_ov_top10(water="sea"):
 # ---------------------------------------------------------------------------
 def render_ov_disclaimer(water="sea"):
     p = C(water); line, card, ink, muted, accent = H(p['line']), H(p['card']), H(p['ink']), H(p['muted']), H(p['accent'])
-    base = E.render_detail(SID, water)
+    base = render_tab_score(water)  # 新稿详情页
     screen_inner = screen_inner_of(base)
     items = "".join(f"""<div class="row" style="gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1.2px dashed {line}44">
         <span class="disp" style="font-size:13px;color:{accent};width:16px">{i}.</span>
@@ -476,7 +567,7 @@ def render_ov_disclaimer(water="sea"):
 def render_ov_confirm_fav(water="sea"):
     p = C(water); line, card, card2, ink, muted, primary, white = (
         H(p['line']), H(p['card']), H(p['card2']), H(p['ink']), H(p['muted']), H(p['primary']), H(p['white']))
-    base = E.render_map(SID, water)
+    base = render_map_new(water)  # 新稿地图（保留手绘底图）
     screen_inner = screen_inner_of(base)
     inner = f"""<div class="bodyf mut" style="font-size:9.5px;margin-bottom:4px">⌖ 36.050000, 120.440000 · 青岛 · 小麦岛外海</div>
       <div style="border:1.8px solid {line};border-radius:10px;padding:8px 10px;margin-bottom:7px"><div class="bodyf mut" style="font-size:8.5px">名称（必填）</div><div class="bodyf" style="font-size:12px;color:{ink};margin-top:2px">小麦岛外海</div></div>
@@ -512,7 +603,7 @@ def render_ov_water_entry(water="sea"):
 def render_ov_star_bubble(water="sea"):
     p = C(water); line, card, card2, ink, muted, primary, white, accent2 = (
         H(p['line']), H(p['card']), H(p['card2']), H(p['ink']), H(p['muted']), H(p['primary']), H(p['white']), H(p['accent2']))
-    base = E.render_map(SID, water)
+    base = render_map_new(water)  # 新稿地图（保留手绘底图）
     screen_inner = screen_inner_of(base)
     bubble = f"""<div style="position:absolute;left:40px;top:250px;width:250px;background:{card};border:2.4px solid {line};border-radius:16px;z-index:42;box-shadow:3px 5px 0 {line}44;padding:12px 13px">
       <div style="position:absolute;right:24px;bottom:-11px;width:18px;height:18px;background:{card};border-right:2.4px solid {line};border-bottom:2.4px solid {line};transform:rotate(45deg)"></div>
@@ -529,7 +620,7 @@ def render_ov_star_bubble(water="sea"):
 # ---------------------------------------------------------------------------
 def render_ov_delete_confirm(water="sea"):
     p = C(water); line, card, ink, muted = H(p['line']), H(p['card']), H(p['ink']), H(p['muted'])
-    base = E.render_favorites(SID, water)
+    base = render_favorites_new(water)  # 新稿收藏页
     screen_inner = screen_inner_of(base)
     inner = f"""<div class="bodyf" style="font-size:12px;color:{ink};line-height:1.7">确定删除已选的 <b class="hl">3</b> 个收藏点？<br><span class="bodyf mut" style="font-size:10px">此操作不可撤销；取消不会产生任何副作用。</span></div>
       {dialog_buttons(p, confirm='删除', cancel='取消', tone='danger')}"""

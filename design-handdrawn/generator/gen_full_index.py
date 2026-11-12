@@ -22,10 +22,10 @@ groups = [
         ("detail-tab-wave-sea", "风浪·海", SHOT), ("detail-tab-wave-inland", "湖面风·内陆", SHOT),
         ("detail-breakdown", "因子分解", SHOT),
     ]),
-    ("③ 6 叠层 · Sheet / Dialog / 气泡 · 6（多数旧 base 稿加工）", "#8C5A3A", [
-        ("ov01-top10", "OV01 Top10〔旧底〕", SHOT), ("ov02-disclaimer", "OV02 免责5条〔旧底〕", SHOT),
-        ("ov03-confirm-favorite", "OV03 收藏确认〔旧底〕", SHOT), ("ov04-water-entry", "OV04 水质录入〔新稿〕", SHOT),
-        ("ov05-star-bubble", "OV05 星标气泡〔旧底〕", SHOT), ("ov06-delete-confirm", "OV06 删除确认〔旧底〕", SHOT),
+    ("③ 6 叠层 · Sheet / Dialog / 气泡 · 6（新稿骨架）", "#8C5A3A", [
+        ("ov01-top10", "OV01 Top10〔新稿〕", SHOT), ("ov02-disclaimer", "OV02 免责5条〔新稿〕", SHOT),
+        ("ov03-confirm-favorite", "OV03 收藏确认〔新稿〕", SHOT), ("ov04-water-entry", "OV04 水质录入〔新稿〕", SHOT),
+        ("ov05-star-bubble", "OV05 星标气泡〔新稿〕", SHOT), ("ov06-delete-confirm", "OV06 删除确认〔新稿〕", SHOT),
     ]),
     ("④ 4 状态态 + 空态 / 批量 · 6（状态态×4 + 批量已转新稿；空态新稿）", "#6E7B3E", [
         ("state-offline", "离线〔新稿〕", SHOT), ("state-stale", "陈旧〔新稿〕", SHOT),
@@ -90,7 +90,7 @@ th{color:#5C5540;font-weight:700;width:74px}.p1{color:#8A3B2E;font-weight:700}.p
 <div class="errata" style="border-color:#2E5A48;color:#21402E;background:#EEF2DA"><h3 style="color:#2E5A48">完整性提示：28→30 屏，新稿为主、旧底屏待统一（认新稿推进中）</h3>
 这套"完整 UI"现已扩到 <b>30 屏</b>（基础 7 + 新增 23），各屏底稿来源已标在〔旧底〕〔新稿〕里：
 <br>① <b>详情 5 Tab 已齐（新稿）</b>：钓鱼指数 / 潮流（水位）/ 天气 / 水质 / 风浪 首 Tab 均出新稿样式；<b>钓鱼指数 SCORE 首 Tab 此前缺失，本次已补</b>（海/陆两版，②组现为 5 Tab + 因子分解 · 9 屏）。
-<br>② <b>仍沿用旧 base 稿当底、待重绘为新稿骨架的屏</b>：第③组 OV01/OV02/OV03/OV05/OV06、第⑤组深色地图/收藏——均拿 <b>engine.py 旧 base 详情/地图/收藏页</b>加工，因此与第①组旧稿同源；真正新稿重画的为 第②组 Tab + OV04 水质录入 + 收藏空态 + <b>第④组 4 状态态与多选批量（已于本次转新稿骨架）</b>。
+<br>② <b>仍沿用旧 base 稿当底、待重绘为新稿骨架的屏</b>：第⑤组深色地图/收藏——拿 <b>engine.py 旧 base 地图/收藏页</b>加工，与第①组旧稿同源（地图底图保留手绘原稿）；<b>第③组 OV01–OV06 叠层已于本次 #83 全部转新稿骨架</b>（底页换为新稿详情/地图/收藏，地图底图保留）；真正新稿重画的为 第②组 Tab + OV04 水质录入 + 收藏空态 + 第④组 4 状态态与多选批量。
 <br>③ <b>地图底图保留手绘原稿</b>：认新稿仅重绘地图页周边组件，手绘地图底图（map_land/map_water/map_road 三色 + 路网）不作重绘，避免重画地图。
 </div>
 """]

@@ -171,21 +171,21 @@
         "label": "OV01 Top10 时段筛选",
         "png": "screens_full/ov01-top10.png",
         "html": "sources_full/ov01-top10.html",
-        "sha256_png": "48a38f740d4356377a6f4941440b7a037f1fabc1a37f7ae6017f21287d3df1eb"
+        "sha256_png": "782c8b895139845882d5e2f946d5b3121fda2d4ca70b54478aec6eab8a281859"
       },
       {
         "key": "ov02-disclaimer",
         "label": "OV02 免责声明 5 条",
         "png": "screens_full/ov02-disclaimer.png",
         "html": "sources_full/ov02-disclaimer.html",
-        "sha256_png": "49b6c814cdfd479d66d79b6940b90825c2245039f9fc3b1a8a1e025f6ea57952"
+        "sha256_png": "1827eb12e99a0c66a98e0233076c2294cecac9e2a5f9bac146731b3a0cae42a4"
       },
       {
         "key": "ov03-confirm-favorite",
         "label": "OV03 确认收藏对话框",
         "png": "screens_full/ov03-confirm-favorite.png",
         "html": "sources_full/ov03-confirm-favorite.html",
-        "sha256_png": "c5341d0a72669777f1ab10c142d399ce0a1ec2f69d6cb561fd15421203995a0e"
+        "sha256_png": "990fe72aab729ab03720dda22271fedb3cf0c80db46f8fd6409a383496e95d63"
       },
       {
         "key": "ov04-water-entry",
@@ -199,14 +199,14 @@
         "label": "OV05 星标气泡卡",
         "png": "screens_full/ov05-star-bubble.png",
         "html": "sources_full/ov05-star-bubble.html",
-        "sha256_png": "832a1054ae74b60adbc28fec41b17cf61b68756f32d7ad6b6edb9dfa8db94148"
+        "sha256_png": "15112893d3c75f6417c3b72387bf4ee6e74a28875b42c11348dd88992717aeb9"
       },
       {
         "key": "ov06-delete-confirm",
         "label": "OV06 删除二次确认",
         "png": "screens_full/ov06-delete-confirm.png",
         "html": "sources_full/ov06-delete-confirm.html",
-        "sha256_png": "5b57dcffa1e7d4f0017a996d2aee80e800915f44081661d7fc543d7c98338e8d"
+        "sha256_png": "8a06a3be068dc9613254b5d343f4f85b6e83193141b9fb8651103703f49c5a7b"
       },
       {
         "key": "state-offline",
