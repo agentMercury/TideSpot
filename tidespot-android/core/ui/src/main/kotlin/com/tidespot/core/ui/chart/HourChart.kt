@@ -11,7 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -24,9 +28,40 @@ import com.tidespot.core.ui.R
 import com.tidespot.core.ui.band.ScoreBand
 import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.strings.localTideSpotStrings
+import kotlin.random.Random
 
 /** 图表模式：LINE=折线（数值维度）/ BAR=柱（钓鱼指数，5 档色带 + ≥80 窗口横条，§8.2-2）。 */
 enum class HourChartMode { LINE, BAR }
+
+/**
+ * 手绘笔触：把一条线段细分成若干点并加确定性抖动，模拟版画毛边。
+ * 只作用于绘制路径；数值、断点、柱色、窗口段全部沿用原逻辑。固定 seed 保证重组不闪烁。
+ */
+private fun DrawScope.sketchyLine(
+    from: Offset,
+    to: Offset,
+    color: Color,
+    strokeWidth: Float,
+    seed: Int,
+    amplitude: Float = 1.1f,
+    segments: Int = 4,
+) {
+    val rnd = Random(seed)
+    val path = Path().apply {
+        for (i in 0..segments) {
+            val t = i.toFloat() / segments
+            val base = Offset(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t)
+            val x = base.x + (rnd.nextFloat() - 0.5f) * 2f * amplitude
+            val y = base.y + (rnd.nextFloat() - 0.5f) * 2f * amplitude
+            if (i == 0) moveTo(x, y) else lineTo(x, y)
+        }
+    }
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round),
+    )
+}
 
 /**
  * 24 点逐小时图表（§7.1 Compose Canvas 自绘，禁第三方图表库；§8.2-2）。
@@ -56,6 +91,8 @@ fun HourChart(
      * null = 沿用旧下标标注（零行为漂移；有日切片的调用方一律传当地小时）。
      */
     localHours: List<Int>? = null,
+    /** 手绘 A：开启后网格线 / 折线走抖动路径、柱体叠手绘描边；默认关闭，其他页零变化。 */
+    handDrawn: Boolean = false,
 ) {
     // D04：BAR 型（钓鱼指数）固定 0–100 轴，不随当日数据缩放；LINE 仍自适应
     val axis = remember(values, mode) {
@@ -120,9 +157,15 @@ fun HourChart(
         fun yOf(v: Double): Float = 8.dp.toPx() + chartH * (1f - axis.normalized(v).toFloat())
 
         // y 轴 + 刻度
-        axis.ticks.forEach { tick ->
+        axis.ticks.forEachIndexed { tickIndex, tick ->
             val y = yOf(tick)
-            drawLine(axisColor, Offset(leftPad, y), Offset(size.width - 8.dp.toPx(), y), strokeWidth = 1f)
+            val gridStart = Offset(leftPad, y)
+            val gridEnd = Offset(size.width - 8.dp.toPx(), y)
+            if (handDrawn) {
+                sketchyLine(gridStart, gridEnd, axisColor, 1f, seed = 100 + tickIndex, amplitude = 0.9f, segments = 6)
+            } else {
+                drawLine(axisColor, gridStart, gridEnd, strokeWidth = 1f)
+            }
             drawText(
                 textMeasurer,
                 text = Format.value(tick, 1),
@@ -149,13 +192,19 @@ fun HourChart(
                     for (i in 0 until pts.size - 1) {
                         val (h1, v1) = pts[i]
                         val (h2, v2) = pts[i + 1]
-                        drawLine(
-                            color = lineColor,
-                            start = Offset(xOf(h1), yOf(v1)),
-                            end = Offset(xOf(h2), yOf(v2)),
-                            strokeWidth = 3f,
-                            cap = StrokeCap.Round,
-                        )
+                        val start = Offset(xOf(h1), yOf(v1))
+                        val end = Offset(xOf(h2), yOf(v2))
+                        if (handDrawn) {
+                            sketchyLine(start, end, lineColor, 3f, seed = 200 + h1, amplitude = 1.3f, segments = 4)
+                        } else {
+                            drawLine(
+                                color = lineColor,
+                                start = start,
+                                end = end,
+                                strokeWidth = 3f,
+                                cap = StrokeCap.Round,
+                            )
+                        }
                     }
                     pts.forEach { (h, v) ->
                         drawCircle(lineColor, radius = 3f, center = Offset(xOf(h), yOf(v)))
@@ -169,11 +218,31 @@ fun HourChart(
                         val score = v.toInt().coerceIn(0, 100)
                         val barW = chartW / n * 0.7f
                         val top = yOf(v)
+                        val barLeft = xOf(h) - barW / 2
+                        val barRight = barLeft + barW
+                        val barBottom = 8.dp.toPx() + chartH
                         drawRect(
                             color = Color(ScoreBand.colorOf(score)),
-                            topLeft = Offset(xOf(h) - barW / 2, top),
-                            size = Size(barW, 8.dp.toPx() + chartH - top),
+                            topLeft = Offset(barLeft, top),
+                            size = Size(barW, barBottom - top),
                         )
+                        if (handDrawn) {
+                            // 仅在冻结柱色之上叠一条手绘描边，不改变柱体数值 / 颜色 / 缺测逻辑
+                            val rnd = Random(300 + h)
+                            fun jx(v: Float) = v + (rnd.nextFloat() - 0.5f) * 2.4f
+                            fun jy(v: Float) = v + (rnd.nextFloat() - 0.5f) * 2.4f
+                            drawPath(
+                                path = Path().apply {
+                                    moveTo(jx(barLeft), jy(top))
+                                    lineTo(jx(barRight), jy(top))
+                                    lineTo(jx(barRight), jy(barBottom))
+                                    lineTo(jx(barLeft), jy(barBottom))
+                                    close()
+                                },
+                                color = axisColor.copy(alpha = 0.55f),
+                                style = Stroke(width = 1.4f, join = StrokeJoin.Round),
+                            )
+                        }
                     }
                 }
                 // ≥80 段叠「窗口」横条（OPT-V115-01 #2：段宽足够时在条内绘制 ts_window_bar 标签）

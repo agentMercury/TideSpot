@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 ADB = r"C:\Users\gamer\AppData\Local\Android\Sdk\platform-tools\adb.exe"
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "design-handdrawn" / "A-vintage-outdoor" / "device-compare"
 PKG = "com.tidespot.app"
 XML, PNG = "/sdcard/ts_v3.xml", "/sdcard/ts_v3.png"

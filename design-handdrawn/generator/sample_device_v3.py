@@ -9,7 +9,7 @@ from pathlib import Path
 from statistics import median, pstdev
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 D = ROOT / "design-handdrawn" / "A-vintage-outdoor" / "device-compare"
 S = 3
 PTS = {

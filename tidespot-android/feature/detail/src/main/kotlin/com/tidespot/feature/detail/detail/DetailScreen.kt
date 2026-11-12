@@ -3,6 +3,7 @@ package com.tidespot.feature.detail.detail
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -250,13 +251,24 @@ fun DetailScreen(
                                 modifier = Modifier.fillMaxHeight()
                                     .semantics { contentDescription = tabDesc },
                             ) {
-                                Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
+                                Column(
+                                    modifier = Modifier.fillMaxHeight(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                ) {
+                                    // 手绘 A：Tab 图标统一换成版画鱼（纯装饰，不改 Tab 数量与 contentDescription）
+                                    Icon(
+                                        painter = painterResource(UiR.drawable.ic_fish_vintage),
+                                        contentDescription = null,
+                                        tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.width(18.dp).height(10.dp),
+                                    )
                                     Text(
                                         tabTitles[i],
-                                        style = MaterialTheme.typography.labelLarge,
+                                        style = MaterialTheme.typography.labelSmall,
                                         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
-                                        modifier = Modifier.padding(horizontal = 10.dp),
+                                        modifier = Modifier.padding(horizontal = 8.dp),
                                     )
                                 }
                             }
@@ -383,6 +395,7 @@ fun DetailScreen(
                         windowHours = if (state.selectedTab == DetailTab.SCORE)
                             com.tidespot.core.ui.chart.ChartMath.windowHours(values) else emptySet(),
                         localHours = dayLocalHours,
+                        handDrawn = true,
                         modifier = Modifier.padding(8.dp),
                     )
                 }
@@ -435,6 +448,7 @@ fun DetailScreen(
                     selectedHour = state.selectedHour,
                     onHourSelected = viewModel::selectHour,
                     localHours = dayLocalHours,
+                    handDrawn = true,
                 )
                 result.tideCorrection?.let { tc ->
                     TideChartDerivations.correctionCompare(dayExtremes, tc, zone, localTideSpotStrings())?.let { cmp ->
@@ -1165,14 +1179,49 @@ private fun ScoreMainCard(
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
                         )
                     }
-                    androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
+                    androidx.compose.foundation.layout.Spacer(Modifier.height(2.dp))
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                    ScoreBand.entries.reversed().forEach { b ->
-                        Box(
-                            Modifier.weight(1f).height(8.dp)
-                                .background(Color(b.argb), RoundedCornerShape(3.dp)),
-                        )
+                // 五档色带：档位 = 鱼数（好→差 5→1），恒带档位文字（N-7）；
+                // 色值 / onColor 仍取 ScoreBand 冻结单源，选中档由当前分数档位高亮。
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                ) {
+                    ScoreBand.entries.forEachIndexed { i, b ->
+                        val selected = b == band
+                        val onColor = Color(b.onArgb)
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(22.dp)
+                                .background(Color(b.argb), RoundedCornerShape(7.dp))
+                                .then(
+                                    if (selected) Modifier.border(
+                                        2.dp,
+                                        MaterialTheme.colorScheme.tertiary,
+                                        RoundedCornerShape(7.dp),
+                                    ) else Modifier,
+                                ),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+                                repeat(5 - i) {
+                                    Icon(
+                                        painter = painterResource(UiR.drawable.ic_fish_vintage),
+                                        contentDescription = null,
+                                        tint = onColor,
+                                        modifier = Modifier.width(9.dp).height(5.dp),
+                                    )
+                                }
+                            }
+                            Text(
+                                stringResource(b.labelRes),
+                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                                color = onColor,
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
             }

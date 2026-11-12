@@ -50,6 +50,19 @@
 `DaySelector.kt` 仅替换颜色取值，**逻辑、文案、交互零改动**。所有新增质感资源均单色可 tint，
 配色仍由 `MaterialTheme` 单源决定，皮肤 / 水体 / 明暗三轴保持正交。
 
+**V4 · ① 阶段（用户放开布局权限后的三项补齐，详见 `device-compare/真机对拍报告.md` §12）**
+
+| 动作 | 文件 | 内容 |
+|---|---|---|
+| 改 | `feature/detail/.../DetailScreen.kt` `ScoreMainCard` | 5 段纯色条 → 5 个档位卡片：鱼数 5→1、档位文字取 `ScoreBand.labelRes`、当前档高亮描边；色值 / `onArgb` 仍取 `ScoreBands.kt` 冻结单源；主卡高度保持 **152dp** |
+| 改 | `feature/detail/.../DetailScreen.kt` 分段控件 | 5 个 Tab 加鱼形图标（图标 + 文字两行）；容器 40dp、Tab 数量、`contentDescription` 均不变 |
+| 改 | `core/ui/.../chart/HourChart.kt` | 新增 `handDrawn: Boolean = false`；开启时网格线 / 折线走固定 seed 抖动 Path、柱体叠手绘描边；详情页两处调用开启，其他页零变化。`ChartMath` 与柱色逻辑未动 |
+
+用户红线「不增减功能或功能入口、不改算法逻辑」由 `generator/check_entries_v4.py` 验证：
+四态「消失标签」为空、可交互节点数一致、Top10 bounds 与 D5 基线**逐像素一致**（**36 PASS / 0 FAIL**）。
+**手绘地图带经用户确认本轮不做**：设计稿是静态 SVG 装饰且带「拖动选点」误导性功能文案，
+工程地图页为 CARTO 真实矢量瓦片，无法 1:1 复刻；地图页本轮零改动。
+
 ## 3. Token 映射（设计稿 → 工程）
 
 | 设计侧（`engine.py` A-vintage palette） | 工程侧 ColorScheme | 海洋 / 近海 | 内陆水体 |
@@ -125,6 +138,19 @@ VERIFY PASS（全部步骤通过）   BUILD SUCCESSFUL
 
 `verify.ps1` 首次运行曾遇 Gradle daemon 启动意外退出（环境抖动，非代码错误），重跑即通过。
 
+**V4 / ① 阶段（最新，2026-11-12 15:47）**
+
+```
+verify.ps1（全量）→ 红线扫描 120 个 .kt 零命中 → 八模块单测全绿
+→ BUILD SUCCESSFUL 1m54s → VERIFY PASS
+→ adb install -r 覆盖安装（保留数据）→ 四态复拍（INLAND / SEA）
+→ check_entries_v4.py：ENTRY_CHECK PASS=36 FAIL=0
+→ selfcheck_full.py：234 PASS / 0 FAIL
+```
+
+首版曾把主卡高度 152→160dp，Top10 按钮被裁（dump 量化下移 28px）；
+精确回退到 152dp 后，四态 Top10 bounds 与 D5 基线逐像素一致。
+
 ## 8. 试点边界（诚实清单）
 
 - **已做（D5）**：纸纹颗粒、套印错位、鱼形矢量装饰、非平滑手绘描边全部工程化，
@@ -133,8 +159,10 @@ VERIFY PASS（全部步骤通过）   BUILD SUCCESSFUL
 - **已补**：`assembleRelease` 打包（含 lintVital）；真机对拍首轮四态见报告 §1–9（部分通过）；
   **D1/D2/D3 修复**与海洋色板取证见 §10；**D5 质感层**见 §11。结论：详情页一屏的视觉语言已自洽，
   但手绘地图 / 五档色带鱼数图标 / 图表笔触未做，**仍不建议直接铺开**。
-- **未做**：手绘地图（属地图页）、五档色带鱼数图标、`HourChart` 笔触手绘化（共享 `core/ui`，
-  避免影响其他页）、视觉回归基准、对比度仪器测量、TalkBack 与多分辨率回归。
+- **已做（V4 / ① 阶段）**：五档色带鱼数图标、`HourChart` 手绘笔触（默认关闭参数，仅详情页开启）、
+  Tab 鱼图标；地图页零改动，入口红线校验 36 PASS / 0 FAIL。详见报告 §12。
+- **未做**：手绘地图带（用户本轮明确决定留到全 App 铺开阶段）、视觉回归基准、
+  对比度仪器测量、TalkBack 与多分辨率回归。
 - **未做**：其余 3 个顶层页（MAP / FAVORITES / SETTINGS）换皮；设置页「外观·皮肤」入口仍为静态稿。
 - **未做**：OPT-A-09 的皮肤数据类、切换逻辑与持久化（本文件是视觉 token 前置，不是换肤功能实现）。
 - **一次被回退的试错**：曾把 `DetailScreen(fillMaxSize)` 改成 `weight(1f)` 想让模型署名行可见，
@@ -154,7 +182,8 @@ ed89d39  v1.16.0 基线固化
 5542734  详情页皮肤试点
 4bd3bce  首轮真机对拍
 7c1a722  D1/D2/D3 修复 + V2 复拍
-(本轮)   D5 手绘质感层 + V3 复拍
+d416683  D5 手绘质感层 + V3 复拍
+(本轮)   ① 阶段：五档鱼数 / Tab 鱼图标 / 图表笔触 + V4 复拍
 ```
 
 建议顺序：
