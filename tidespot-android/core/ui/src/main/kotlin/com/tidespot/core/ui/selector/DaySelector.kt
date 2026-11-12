@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
-import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -130,13 +129,13 @@ fun DaySelector(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             items(chips, key = { it.offsetDays }) { chip ->
-                // OPT-V115-02 / S02 C07：设计稿胶囊 chip（rx18；选中 #1565C0 填充白字，其余白底 1dp 描边）
+                // OPT-V115-02 / S02 C07：胶囊 chip（rx18）；选中态改读 MaterialTheme primary/onPrimary（皮肤可换）
                 // OPT-V12-04：两行排版（52dp 高、最小 56dp 宽 → 一行 ≥5 个），TalkBack 合并为单句
                 val selected = chip.offsetDays == selectedDay
                 Surface(
                     onClick = { onDaySelected(chip.offsetDays) },
                     shape = RoundedCornerShape(18.dp),
-                    color = if (selected) Color(0xFF1565C0) else MaterialTheme.colorScheme.surface,
+                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
                     border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     modifier = Modifier.height(52.dp).widthIn(min = 56.dp)
                         .semantics(mergeDescendants = true) { contentDescription = chip.contentDescription },
@@ -149,13 +148,13 @@ fun DaySelector(
                         Text(
                             chip.topLabel,
                             style = MaterialTheme.typography.labelLarge,
-                            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                         )
                         Text(
                             chip.weekdayLabel,
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                         )
                     }

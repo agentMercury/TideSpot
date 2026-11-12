@@ -16,16 +16,27 @@
 这也是 `SKIN-DESIGN-SPEC.md` 里「皮肤 = 一组可替换视觉 token」的第一处实证：
 **结构/文案/交互共用，只替换视觉 token。**
 
-## 2. 改动清单（3 个文件）
+## 2. 改动清单
+
+**首轮 · 试点接入（3 个文件）**
 
 | 动作 | 文件 | 内容 |
 |---|---|---|
-| 新增 | `core/ui/.../theme/VintageOutdoorTheme.kt`（194 行） | 4 套 ColorScheme（海/陆 × 浅/深）、非对称圆角 Shapes、衬线 Typography、`VintageOutdoorTheme()` |
+| 新增 | `core/ui/.../theme/VintageOutdoorTheme.kt` | 4 套 ColorScheme（海/陆 × 浅/深）、非对称圆角 Shapes、衬线 Typography、`VintageOutdoorTheme()` |
 | 改 | `app/.../MainActivity.kt` 的 `DetailPage` | 加 2 个 import；外层包 `VintageOutdoorTheme(waterBody = ...)`；Column 加 `.background(colorScheme.background)` |
 | 改 | `tidespot-android/verify.ps1` | 恢复 UTF-8 BOM 并加编码说明（见 §6） |
 
-**明确未动**：`DetailScreen.kt`、`ScoreBands.kt`、`ConfidenceBadge.kt`、`TideSpotStrings.kt`、
-`WaterBodyTabTitles.kt`、`TideSpotTheme.kt`、任何文案 / Tab 序 / 导航 / ViewModel / 资源。
+**V2 · 真机对拍暴露的三处换肤缺口，已修复（3 个文件，详见 `device-compare/真机对拍报告.md` §10）**
+
+| 动作 | 文件 | 内容 |
+|---|---|---|
+| 改 | `feature/detail/.../DetailScreen.kt` `ScoreMainCard` | 背景 `Color(0xFF0D47A1)` → `primaryContainer`；3 处 `Color.White` → `onPrimaryContainer` |
+| 改 | `core/ui/.../selector/DaySelector.kt` | 选中态 `Color(0xFF1565C0)` → `primary`；2 处白字 → `onPrimary`；移除失效 import |
+| 改 | `core/ui/.../theme/VintageOutdoorTheme.kt` | 4 套 ColorScheme 各补 13 个字段（`surfaceContainer*` / `inverse*` / `surfaceTint` / `errorContainer` / `tertiaryContainer`） |
+
+**明确未动**：`ScoreBands.kt`、`ConfidenceBadge.kt`、`TideSpotStrings.kt`、`WaterBodyTabTitles.kt`、
+`TideSpotTheme.kt`、任何文案 / Tab 序 / 导航 / ViewModel / 资源；`DetailScreen.kt` 与 `DaySelector.kt`
+**仅替换颜色取值，逻辑、文案、交互零改动**。
 
 ## 3. Token 映射（设计稿 → 工程）
 
@@ -92,7 +103,7 @@ VERIFY PASS（全部步骤通过）
 
 - **未做**：纸张颗粒、套印错位、鱼形矢量装饰的 Compose 实现（需 drawable / Canvas 资源），
   本轮只落地可由 token 直接表达的三类视觉差异。
-- **已补**：`assembleRelease` 打包（`BUILD SUCCESSFUL in 3m28s`，含 lintVital）；**真机对拍四态**（AAK_AN00，浅/深详情页 + 地图/收藏对照）见 `device-compare/真机对拍报告.md`。对拍结论为**部分通过**：背景/字族/边界正确，但暴露出分数主卡、日历选中态、卡片底的硬编码色不跟随主题，不建议直接铺开。
+- **已补**：`assembleRelease` 打包（含 lintVital）；**真机对拍首轮四态**（AAK_AN00）见 `device-compare/真机对拍报告.md` §1–9。首轮为「部分通过」，暴露分数主卡 / DaySelector 选中态 / `surfaceContainer*` 三处不跟随主题；**D1/D2/D3 已修复**，复拍内陆 + 近海 × 浅/深四态全部通过，藏蓝海洋色板与墨绿内陆色板一眼可辨（见该报告 §10）。结论：视觉 token 层自洽，但手绘语言未工程化，仍不建议直接铺开。
 - **未做**：视觉回归基准、对比度仪器测量、TalkBack 与多分辨率。
 - **未做**：其余 3 个顶层页（MAP / FAVORITES / SETTINGS）换皮；设置页「外观·皮肤」入口仍为静态稿。
 - **未做**：OPT-A-09 的皮肤数据类、切换逻辑与持久化（本文件是视觉 token 前置，不是换肤功能实现）。

@@ -60,6 +60,19 @@ private val VintageSeaLight = lightColorScheme(
     error = Color(0xFFC15A3A),
     onError = Color(0xFFF7F1DE),
     scrim = Color(0xFF16324F),
+    surfaceTint = Color(0xFF1B3A5C),
+    inverseSurface = Color(0xFF16324F),
+    inverseOnSurface = Color(0xFFF7F1DE),
+    inversePrimary = Color(0xFF90CAF9),
+    errorContainer = Color(0xFFE8DDBE),
+    onErrorContainer = Color(0xFF8A3B2E),
+    tertiaryContainer = Color(0xFFE8DDBE),
+    onTertiaryContainer = Color(0xFF16324F),
+    surfaceContainerLowest = Color(0xFFF7F1DE),
+    surfaceContainerLow = Color(0xFFF2EAD4),
+    surfaceContainer = Color(0xFFE8DDBE),
+    surfaceContainerHigh = Color(0xFFD8C9A5),
+    surfaceContainerHighest = Color(0xFFCBB98E),
 )
 
 // ── 浅色 · 内陆水体（墨绿 + 苔绿纸）─────────────────────────────────────
@@ -85,6 +98,19 @@ private val VintageInlandLight = lightColorScheme(
     error = Color(0xFFC15A3A),
     onError = Color(0xFFF7F4E2),
     scrim = Color(0xFF213D2A),
+    surfaceTint = Color(0xFF2E5A48),
+    inverseSurface = Color(0xFF213D2A),
+    inverseOnSurface = Color(0xFFF7F4E2),
+    inversePrimary = Color(0xFFA5D6A7),
+    errorContainer = Color(0xFFE4E6C6),
+    onErrorContainer = Color(0xFF8A3B2E),
+    tertiaryContainer = Color(0xFFE4E6C6),
+    onTertiaryContainer = Color(0xFF213D2A),
+    surfaceContainerLowest = Color(0xFFF7F4E2),
+    surfaceContainerLow = Color(0xFFF1EED8),
+    surfaceContainer = Color(0xFFE4E6C6),
+    surfaceContainerHigh = Color(0xFFCDD6B0),
+    surfaceContainerHighest = Color(0xFFBFC99E),
 )
 
 // ── 深色 · 海洋 / 近海 ───────────────────────────────────────────────────
@@ -110,6 +136,19 @@ private val VintageSeaDark = darkColorScheme(
     error = Color(0xFFFF8A65),
     onError = Color(0xFF0E1C2B),
     scrim = Color(0xFF0E1C2B),
+    surfaceTint = Color(0xFF90CAF9),
+    inverseSurface = Color(0xFFE6EDF5),
+    inverseOnSurface = Color(0xFF0E1C2B),
+    inversePrimary = Color(0xFF1B3A5C),
+    errorContainer = Color(0xFF3A2A26),
+    onErrorContainer = Color(0xFFFF8A65),
+    tertiaryContainer = Color(0xFF1E344A),
+    onTertiaryContainer = Color(0xFFE6EDF5),
+    surfaceContainerLowest = Color(0xFF0E1C2B),
+    surfaceContainerLow = Color(0xFF132538),
+    surfaceContainer = Color(0xFF17293B),
+    surfaceContainerHigh = Color(0xFF1E344A),
+    surfaceContainerHighest = Color(0xFF26405A),
 )
 
 // ── 深色 · 内陆水体 ──────────────────────────────────────────────────────
@@ -135,6 +174,19 @@ private val VintageInlandDark = darkColorScheme(
     error = Color(0xFFFFAB91),
     onError = Color(0xFF101D18),
     scrim = Color(0xFF101D18),
+    surfaceTint = Color(0xFFA5D6A7),
+    inverseSurface = Color(0xFFE6F0E9),
+    inverseOnSurface = Color(0xFF101D18),
+    inversePrimary = Color(0xFF2E5A48),
+    errorContainer = Color(0xFF3A2A24),
+    onErrorContainer = Color(0xFFFFAB91),
+    tertiaryContainer = Color(0xFF1E372A),
+    onTertiaryContainer = Color(0xFFE6F0E9),
+    surfaceContainerLowest = Color(0xFF101D18),
+    surfaceContainerLow = Color(0xFF162A20),
+    surfaceContainer = Color(0xFF172B21),
+    surfaceContainerHigh = Color(0xFF1E372A),
+    surfaceContainerHighest = Color(0xFF2A4736),
 )
 
 /**

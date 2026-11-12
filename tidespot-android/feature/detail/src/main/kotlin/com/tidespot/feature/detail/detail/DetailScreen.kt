@@ -1091,7 +1091,7 @@ private fun ScoreMainCard(
         ?.let { ScoreBadgeDerivations.badgeKind(it, presetWeightSum) }
 
     Surface(
-        color = Color(0xFF0D47A1),
+        color = MaterialTheme.colorScheme.primaryContainer,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp).height(152.dp),
     ) {
@@ -1101,13 +1101,13 @@ private fun ScoreMainCard(
                     Text(
                         score?.toString() ?: Format.MISSING,
                         style = MaterialTheme.typography.titleLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.Bold),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                     if (bandLabel == null) {
                         Text(
                             stringResource(R.string.ts_detail_summary_empty),
                             style = MaterialTheme.typography.labelLarge,
-                            color = Color.White.copy(alpha = 0.85f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
                         )
                     }
                 }
@@ -1131,7 +1131,7 @@ private fun ScoreMainCard(
                     Text(
                         stringResource(UiR.string.ts_dimension_degraded),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.85f),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
                     )
                 }
                 androidx.compose.foundation.layout.Spacer(Modifier.height(8.dp))
