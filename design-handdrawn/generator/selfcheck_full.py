@@ -117,6 +117,11 @@ ok("早期 base 稿" in idx and "非真机参照" in idx, "索引页第①组标
 ok("真机 Compose 试点参照的是新稿" in idx, "索引页声明真机参照新稿")
 ok("不含 Compose 代码" not in idx and "Compose 试点" in idx, "索引页脚已修正过时声明、如实提试点")
 ok("⚠" not in idx, "索引页无缺字特殊符号")
+# 完整性缺口标注（2026-11-12 补充勘误）
+ok("完整性提示" in idx and "28 屏并非全是新稿结构" in idx, "索引页含完整性缺口提示块")
+ok("缺「钓鱼指数 / SCORE」首 Tab" in idx and "4 Tab + 因子分解" in idx, "索引页标注缺 SCORE 首 Tab")
+ok("新旧稿混搭" in idx and "〔旧底〕" in idx and "〔新稿〕" in idx, "索引页逐屏标稿源(旧底/新稿)")
+ok("详情 5 个 Tab 只出了 4 个" in idx and "补这两处缺口需先定稿" in idx, "索引页交代旧底屏范围与暂不定稿")
 for cf in ["make_compare_v3.py", "make_compare_v4.py"]:
     ct = (Path(__file__).resolve().parent / cf).read_text(encoding="utf-8")
     ok("早期 base 旧稿" in ct and "非参照稿" in ct, f"{cf} 左标题改早期旧稿")
