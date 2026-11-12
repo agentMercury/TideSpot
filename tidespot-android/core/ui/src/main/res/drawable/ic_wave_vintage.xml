@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 手绘 A · 海洋母题：双层浪 + 贝 + 海鸟（engine.py water_motif sea） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="48dp"
+    android:viewportWidth="80"
+    android:viewportHeight="48">
+    <path android:pathData="M2 30 Q12 21 22 30 Q32 39 42 30 Q52 21 62 30 Q70 37 78 30" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M2 41 Q12 32 22 41 Q32 50 42 41 Q52 32 62 41 Q70 48 78 41" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M50 24 Q56 9 62 24 Z" android:fillColor="#FF000000" android:strokeColor="#FF000000" android:strokeWidth="1.8" android:strokeLineJoin="round"/>
+    <path android:pathData="M66 20 Q71 15 76 20 Q71 25 66 20" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>

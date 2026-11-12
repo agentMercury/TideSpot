@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 手绘 A · 丝网版画鱼剪影（engine.py fish_svg a-vintage）；运行时由 Icon tint 着色 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="64dp"
+    android:viewportWidth="120"
+    android:viewportHeight="64">
+    <path android:pathData="M22 32 Q46 10 92 27 Q100 30 92 34 Q46 54 22 32 Z" android:fillColor="#FF000000"/>
+    <path android:pathData="M22 32 L4 16 L10 32 L4 48 Z" android:fillColor="#FF000000"/>
+    <path android:pathData="M60 15 Q66 6 76 14 Z" android:fillColor="#FF000000"/>
+</vector>

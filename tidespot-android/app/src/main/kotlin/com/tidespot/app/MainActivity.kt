@@ -6,14 +6,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -28,7 +34,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
@@ -43,6 +52,8 @@ import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.theme.TideSpotTheme
 import com.tidespot.core.ui.theme.VintageOutdoorTheme
+import com.tidespot.core.ui.theme.paperGrain
+import com.tidespot.core.ui.theme.rememberPaperGrainBrush
 import com.tidespot.core.ui.zone.SpotZones
 import com.tidespot.feature.detail.detail.DetailScreen
 import com.tidespot.feature.detail.detail.DetailViewModel
@@ -338,41 +349,91 @@ private fun DetailPage(
     LaunchedEffect(state.result?.fetchedAtMillis) {
         onFetched(state.result?.fetchedAtMillis?.values?.maxOrNull())
     }
-    // 手绘 A · 复古户外：详情页一屏试点皮肤（仅视觉 token，参数/回调/导航零改动）
-    VintageOutdoorTheme(
-        waterBody = state.result?.effectiveWaterBody ?: spot.waterBody,
-    ) {
-        Column(
+    // 手绘 A · 复古户外：详情页一屏试点皮肤（仅视觉，参数/回调/导航零改动）。
+    // 水体 / 明暗在此显式取一次，保证色板、纸纹 tile、装饰母题三者同口径。
+    val waterBody = state.result?.effectiveWaterBody ?: spot.waterBody
+    val inland = waterBody == WaterBodyType.INLAND_WATER
+    val dark = isSystemInDarkTheme()
+    VintageOutdoorTheme(waterBody = waterBody, darkTheme = dark) {
+        val grain = rememberPaperGrainBrush(dark)
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background)
+                .paperGrain(grain),
         ) {
-            DetailScreen(
-                spot = spot,
-                viewModel = viewModel,
-                modifier = Modifier.fillMaxSize(),
-                // OPT-V115-02 / S02 TOPBAR：返回位收进详情屏顶栏（原独立 TextButton 行移除）
-                onBack = onBack,
-                backLabel = backLabel,
-                credentialGuideSlot = if (showCredentialGuide) {
-                    {
-                        InlandCredentialGuideCard(
-                            onOpenSettings = onOpenCredentialSettings,
-                            onSkip = onSkipCredentialGuide,
-                        )
-                    }
-                } else {
-                    null
-                },
-            )
-            Text(
-                localTideSpotStrings().modelAttribution,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            // 鱼群水印：A 版「把装饰元素替换成鱼形」的母题，纯绘制、不拦截触摸
+            FishWatermark(
+                inland = inland,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 12.dp, bottom = 46.dp),
             )
+            Column(modifier = Modifier.fillMaxSize()) {
+                DetailScreen(
+                    spot = spot,
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxSize(),
+                    // OPT-V115-02 / S02 TOPBAR：返回位收进详情屏顶栏（原独立 TextButton 行移除）
+                    onBack = onBack,
+                    backLabel = backLabel,
+                    credentialGuideSlot = if (showCredentialGuide) {
+                        {
+                            InlandCredentialGuideCard(
+                                onOpenSettings = onOpenCredentialSettings,
+                                onSkip = onSkipCredentialGuide,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+                Text(
+                    localTideSpotStrings().modelAttribution,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 右下角手绘水印：内陆 = 山 / 日 / 芦苇，海洋 = 浪 / 贝 / 海鸟，后接三条递减版画鱼。
+ * 纯绘制、不参与测量、不消费触摸；透明度极低，只提供氛围不干扰读数。
+ * 放在水印而非模型署名行：原详情页 fillMaxSize 会把署名行挤出视口，
+ * 改动该布局会连带挤掉「最佳窗口 Top10」入口，因此不动布局。
+ */
+@Composable
+private fun FishWatermark(inland: Boolean, modifier: Modifier = Modifier) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(
+                if (inland) UiR.drawable.ic_mount_vintage else UiR.drawable.ic_wave_vintage,
+            ),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .width(56.dp)
+                .height(34.dp)
+                .graphicsLayer(alpha = 0.22f),
+        )
+        Spacer(Modifier.width(4.dp))
+        Row(
+            modifier = Modifier.graphicsLayer(alpha = 0.12f),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            listOf(30.dp, 44.dp, 60.dp).forEach { h ->
+                Icon(
+                    painter = painterResource(UiR.drawable.ic_fish_vintage),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.width(h * 1.875f).height(h),
+                )
+            }
         }
     }
 }

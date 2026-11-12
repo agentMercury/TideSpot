@@ -33,8 +33,10 @@ import com.tidespot.core.domain.model.WaterBodyType
  *  - 字号 / 行高与 TideSpotTypography 完全一致，仅换字族为衬线（零布局漂移）
  *  - 不含任何业务逻辑、导航、状态变更；本文件只提供视觉 token
  *
- * 试点边界：纸张颗粒、套印错位、鱼形矢量装饰尚未工程化（需 drawable / Canvas 资源），
- * 本轮先落地色板 / 形状 / 字阶三类可由 token 直接表达的视觉差异。
+ * D5 质感层已落地但职责分离：纸张颗粒 / 套印错位 / 手绘描边 / 鱼形矢量装饰由
+ * HandDrawn.kt + core/ui/src/main/res/drawable*（design-handdrawn/generator/gen_android_assets.py
+ * 生成）提供；本文件仍只负责色板 / 形状 / 字阶三类 token，不含任何资源引用。
+ * 明确的未做项：手绘地图（属地图页）、五档色带鱼数图标、其余 3 页铺开。
  */
 
 // ── 浅色 · 海洋 / 近海（藏蓝 + 做旧米纸）────────────────────────────────

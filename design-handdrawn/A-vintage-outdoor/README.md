@@ -50,5 +50,22 @@
 
 **复现**：`generator/engine.py` 先生成 4 版 base 7 屏 → `generator/engine_full.py` 补 A 版 21 张 `sources_full/*.html` 并覆盖改版 `sources/settings.html`（`render_settings_revised()`，不动 B/C/D）→ Edge 2x 截 PNG → `generator/gen_full_index.py` → `index-full.html`。
 
+## 【工程侧】详情页 Compose 试点与 D5 质感层（2026-11-12）
+
+设计稿之外，工程侧已按「**只做美化、不动功能**」在**详情页一屏**落地：
+
+- `tidespot-android/core/ui/.../theme/VintageOutdoorTheme.kt` — 4 套色板（海/陆 × 浅/深）+ 非对称圆角 + 衬线字阶
+- `tidespot-android/core/ui/.../theme/HandDrawn.kt` 与 `core/ui/src/main/res/drawable*` — D5 纸纹颗粒 / 鱼形装饰 / 套印错位 / 手绘描边
+- `generator/gen_android_assets.py` — 上述质感资源的可复现生成脚本（重跑 SHA 一致）
+- 完整改动清单 / token 映射 / 验收：`Compose试点落地说明.md`
+- 真机四态对拍、像素证据、差异清单：`device-compare/真机对拍报告.md` §10（D1–D3）与 §11（D5）
+
+结论：详情页视觉语言已自洽；**手绘地图、五档色带鱼数图标、图表笔触、其余 3 页**仍未做，
+不建议直接铺开。**设计稿本身（28 屏 / `index-full.html` / `spec.json`）未因工程侧落地而改动**。
+
 ## 边界
-纯视觉概念稿 + 需求清单，非工程交付、不改 `tidespot-android/` 源码。冻结语义色落地时须回归 `ScoreBands.kt` / `ConfidenceBadge.kt`；档位恒带文字；示例数值非业务数据。功能结论均来自 2026-11-12 实际代码核对。
+设计稿为纯视觉概念稿 + 需求清单；示例数值非业务数据，档位恒带文字。
+工程侧落地仅限 `tidespot-android/` 的详情页一屏（视觉 token 与质感层），
+功能、文案、Tab 序、导航、冻结语义色（`ScoreBands.kt` / `ConfidenceBadge.kt`）一律未动；
+设置页「外观·皮肤」仍是静态稿，OPT-A-09 换肤数据层与切换逻辑未实现。
+详见 `Compose试点落地说明.md`。功能结论均来自 2026-11-12 实际代码核对。

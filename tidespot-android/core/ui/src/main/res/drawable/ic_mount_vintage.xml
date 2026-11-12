@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 手绘 A · 内陆母题：尖山 + 日轮 + 水线 + 芦苇（engine.py water_motif inland） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="48dp"
+    android:viewportWidth="80"
+    android:viewportHeight="48">
+    <path android:pathData="M2 42 L20 12 L33 32 L47 6 L66 36 L78 22" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M2 45 Q40 39 78 45" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M12 45 Q9 28 14 18 M14 45 Q18 30 13 21" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+    <path android:pathData="M55.5 12 A6.5 6.5 0 1 0 68.5 12 A6.5 6.5 0 1 0 55.5 12 Z" android:fillColor="#00000000" android:strokeColor="#FF000000" android:strokeWidth="2.6" android:strokeLineCap="round" android:strokeLineJoin="round"/>
+</vector>

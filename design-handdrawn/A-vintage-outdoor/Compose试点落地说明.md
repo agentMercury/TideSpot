@@ -34,9 +34,21 @@
 | 改 | `core/ui/.../selector/DaySelector.kt` | 选中态 `Color(0xFF1565C0)` → `primary`；2 处白字 → `onPrimary`；移除失效 import |
 | 改 | `core/ui/.../theme/VintageOutdoorTheme.kt` | 4 套 ColorScheme 各补 13 个字段（`surfaceContainer*` / `inverse*` / `surfaceTint` / `errorContainer` / `tertiaryContainer`） |
 
+**V3 · D5 手绘质感层（新增 6 个文件 + 改 3 个文件，详见 `device-compare/真机对拍报告.md` §11）**
+
+| 动作 | 文件 | 内容 |
+|---|---|---|
+| 新增 | `design-handdrawn/generator/gen_android_assets.py` | 可复现生成脚本：2 张无缝纸纹 tile + 3 个可 tint vector（版画鱼 / 海洋浪纹 / 内陆山纹），路径取自 `engine.py` 的 `fish_svg()` / `water_motif()` |
+| 新增 | `core/ui/src/main/res/drawable-nodpi/paper_grain_{light,dark}.png` | 96×96 周期性分形噪点 tile，alpha 上限对齐设计稿 `grain=0.16`，`ImageShader` Repeated 平铺 |
+| 新增 | `core/ui/src/main/res/drawable/ic_{fish,wave,mount}_vintage.xml` | 单色可 tint 矢量装饰，不含任何皮肤配色常量 |
+| 新增 | `core/ui/.../theme/HandDrawn.kt` | `rememberPaperGrainBrush()` / `paperGrain()` / `printMisregister()` / `handDrawnOutline()`，全为无状态纯绘制 Modifier，不消费触摸、不改测量 |
+| 改 | `app/.../MainActivity.kt` 的 `DetailPage` | 外层 `Box` 铺纸纹；右下角鱼群 + 水体母题水印；水体 / 明暗显式取一次，保证色板、tile、母题三者同口径 |
+| 改 | `feature/detail/.../DetailScreen.kt` | `ScoreMainCard` 挂套印错位 + 手绘描边 + 版画鱼角标；图表卡挂手绘描边外框 |
+
 **明确未动**：`ScoreBands.kt`、`ConfidenceBadge.kt`、`TideSpotStrings.kt`、`WaterBodyTabTitles.kt`、
-`TideSpotTheme.kt`、任何文案 / Tab 序 / 导航 / ViewModel / 资源；`DetailScreen.kt` 与 `DaySelector.kt`
-**仅替换颜色取值，逻辑、文案、交互零改动**。
+`TideSpotTheme.kt`、任何文案 / Tab 序 / 导航 / ViewModel；`DetailScreen.kt` 仅替换颜色取值与追加纯绘制装饰，
+`DaySelector.kt` 仅替换颜色取值，**逻辑、文案、交互零改动**。所有新增质感资源均单色可 tint，
+配色仍由 `MaterialTheme` 单源决定，皮肤 / 水体 / 明暗三轴保持正交。
 
 ## 3. Token 映射（设计稿 → 工程）
 
@@ -99,21 +111,53 @@ VERIFY PASS（全部步骤通过）
 八模块单测覆盖 Kotlin 全模块编译，确认 4 套 ColorScheme / 非对称圆角 / 衬线字阶 /
 `WaterBodyType` 接入均可编译，`AppNavTest` 等导航测试全绿（功能零回归）。
 
+**D5 后（最新，2026-11-12 15:07）**
+
+```
+verify.ps1（全量，含 assembleRelease）
+[PASS] 红线扫描 main 源码零域名命中（120 个 .kt 文件）
+[PASS] Gradle 八模块测试 + assembleRelease 全绿（退出码 0）
+VERIFY PASS（全部步骤通过）   BUILD SUCCESSFUL
+→ adb install -r 同签名 release 覆盖安装（保留真机收藏数据）
+→ 复拍内陆 / 海洋 × 浅 / 深四态，UI dump 判定 INLAND / SEA
+→ 纯背景块灰度标准差 0.00 → 4.97~5.62（四态全部纸纹生效）
+```
+
+`verify.ps1` 首次运行曾遇 Gradle daemon 启动意外退出（环境抖动，非代码错误），重跑即通过。
+
 ## 8. 试点边界（诚实清单）
 
-- **未做**：纸张颗粒、套印错位、鱼形矢量装饰的 Compose 实现（需 drawable / Canvas 资源），
-  本轮只落地可由 token 直接表达的三类视觉差异。
-- **已补**：`assembleRelease` 打包（含 lintVital）；**真机对拍首轮四态**（AAK_AN00）见 `device-compare/真机对拍报告.md` §1–9。首轮为「部分通过」，暴露分数主卡 / DaySelector 选中态 / `surfaceContainer*` 三处不跟随主题；**D1/D2/D3 已修复**，复拍内陆 + 近海 × 浅/深四态全部通过，藏蓝海洋色板与墨绿内陆色板一眼可辨（见该报告 §10）。结论：视觉 token 层自洽，但手绘语言未工程化，仍不建议直接铺开。
-- **未做**：视觉回归基准、对比度仪器测量、TalkBack 与多分辨率。
+- **已做（D5）**：纸纹颗粒、套印错位、鱼形矢量装饰、非平滑手绘描边全部工程化，
+  由 `gen_android_assets.py` 可复现生成 + `HandDrawn.kt` 无状态 Modifier 提供；
+  真机四态复拍验证通过，见 `device-compare/真机对拍报告.md` §11。
+- **已补**：`assembleRelease` 打包（含 lintVital）；真机对拍首轮四态见报告 §1–9（部分通过）；
+  **D1/D2/D3 修复**与海洋色板取证见 §10；**D5 质感层**见 §11。结论：详情页一屏的视觉语言已自洽，
+  但手绘地图 / 五档色带鱼数图标 / 图表笔触未做，**仍不建议直接铺开**。
+- **未做**：手绘地图（属地图页）、五档色带鱼数图标、`HourChart` 笔触手绘化（共享 `core/ui`，
+  避免影响其他页）、视觉回归基准、对比度仪器测量、TalkBack 与多分辨率回归。
 - **未做**：其余 3 个顶层页（MAP / FAVORITES / SETTINGS）换皮；设置页「外观·皮肤」入口仍为静态稿。
 - **未做**：OPT-A-09 的皮肤数据类、切换逻辑与持久化（本文件是视觉 token 前置，不是换肤功能实现）。
+- **一次被回退的试错**：曾把 `DetailScreen(fillMaxSize)` 改成 `weight(1f)` 想让模型署名行可见，
+  结果把「最佳窗口 Top10」入口挤出视口；已立即回退，改为把水体母题 / 鱼形并进右下角水印，
+  **最终版不动任何布局**。详见报告 §11.2。
 - **不能承诺像素级 1:1**：手绘纸纹 / 套印在 Compose 里是近似还原，不是复印。
+  `paperGrain(brush, strength)` 的 `strength` 可从 1.0 下调（如 0.6）以收敛颗粒强度。
 
 ## 9. 回滚与下一步
 
-回滚点：`93d3c19`（试点前基线，工作树干净）。本试点改动如需撤销，回到该提交即可。
+回滚链（每步都是带描述、可独立撤销的提交）：
+
+```
+7d88338  v1.15.14
+ed89d39  v1.16.0 基线固化
+93d3c19  清理 BOM / 编译日志
+5542734  详情页皮肤试点
+4bd3bce  首轮真机对拍
+7c1a722  D1/D2/D3 修复 + V2 复拍
+(本轮)   D5 手绘质感层 + V3 复拍
+```
 
 建议顺序：
-1. 真机装 debug 包对拍详情页浅色海 / 浅色陆 / 深色三态，确认配色与对比度；
-2. 若视觉认可，再补纸纹与鱼形矢量资源，并把同一层主题推广到其余 3 页；
-3. 最后才做 OPT-A-09 的换肤数据层与设置页交互（那属于功能实现，需单独排期）。
+1. 若认可 D5 质感，补手绘地图 / 图表笔触 / 五档色带鱼数图标；
+2. 跑全页回归（尤其 `core/ui` 共享层）后，再把同一层主题推广到其余 3 页；
+3. 最后做 OPT-A-09 换肤数据层与设置页交互——那属于功能实现，需单独授权与排期。
