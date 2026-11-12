@@ -35,21 +35,21 @@
       "label": "地图选点 · 海洋",
       "png": "screens/map-sea.png",
       "html": "sources/map-sea.html",
-      "sha256": "57e5bae8174d3578add911b5895356841ffc0fb9492df281e768f1bb80fe2d05"
+      "sha256": "df309cc18ffdf8173a009d44150397c4172824358d81d23e42f28b19486e0e81"
     },
     {
       "key": "map-inland",
       "label": "地图选点 · 内陆",
       "png": "screens/map-inland.png",
       "html": "sources/map-inland.html",
-      "sha256": "8e15d5895d6028a3386fff5c2d7fb3eb21911f170a833071480debd5a58be985"
+      "sha256": "58e03524bc1f22fd9638a61a7fd4f319a1df9012875ed6706dbc103b69afa81e"
     },
     {
       "key": "favorites",
       "label": "收藏页",
       "png": "screens/favorites.png",
       "html": "sources/favorites.html",
-      "sha256": "9840ba944969daa0fb44e97a84bbbc6ddb5e48fe776f1e964af9dc958aa99949"
+      "sha256": "7b6c337c12184d137fcd29f3c35aa6c25897646293228bbf40a2bbb0d83fa4f9"
     },
     {
       "key": "settings",
@@ -185,7 +185,7 @@
         "label": "OV03 确认收藏对话框",
         "png": "screens_full/ov03-confirm-favorite.png",
         "html": "sources_full/ov03-confirm-favorite.html",
-        "sha256_png": "990fe72aab729ab03720dda22271fedb3cf0c80db46f8fd6409a383496e95d63"
+        "sha256_png": "96f4c2e15904069d3303d786955f55f8071c71377f11d7158a721f2083dae90b"
       },
       {
         "key": "ov04-water-entry",
@@ -199,7 +199,7 @@
         "label": "OV05 星标气泡卡",
         "png": "screens_full/ov05-star-bubble.png",
         "html": "sources_full/ov05-star-bubble.html",
-        "sha256_png": "15112893d3c75f6417c3b72387bf4ee6e74a28875b42c11348dd88992717aeb9"
+        "sha256_png": "f655d9bac713d035b71a768953e8db972dd7b9f37c8e1df119de84f95cef4ac8"
       },
       {
         "key": "ov06-delete-confirm",

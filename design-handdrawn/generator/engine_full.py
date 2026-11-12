@@ -489,7 +489,7 @@ def render_map_new(water="sea"):
         <div style="margin-top:10px;border-top:1.6px dashed {line}55;padding-top:9px;display:flex;align-items:center;gap:9px">
           <div class="row">{E.fish_icon(SID,water,accent2,18)}{E.fish_icon(SID,water,accent2,22)}{E.fish_icon(SID,water,accent2,18)}</div>
           <div class="bodyf" style="font-size:11px;color:{primary};flex:1;font-weight:700">全部收藏 Top10 · 最佳窗口</div><span style="color:{accent};font-size:16px">›</span></div></div></div>"""
-    return shell(statusbar(p) + top + crosshair + tools + bottom, water, "地图选点 · 新稿")
+    return shell(statusbar(p) + body + top + crosshair + tools + bottom, water, "地图选点 · 新稿")
 
 
 def render_favorites_new(water="sea"):
@@ -797,6 +797,23 @@ def revise_settings():
     return "revised"
 
 
+def render_base_redraw():
+    """#84 认新稿：地图/收藏/设置主屏其他组件重绘（地图底图保留手绘原稿）。
+    覆盖 base sources/ 的 map-sea/inland、favorites、settings 为 new-draft；
+    PNG 由 Edge 渲到 base screens/。dark-detail 留 #85 深色统一。"""
+    base_src = OUT.parent / "sources"
+    base_src.mkdir(parents=True, exist_ok=True)
+    jobs = {
+        "map-sea": render_map_new("sea"),
+        "map-inland": render_map_new("inland"),
+        "favorites": render_favorites_new("sea"),
+        "settings": E.render_settings(SID, "sea"),
+    }
+    for name, html in jobs.items():
+        (base_src / f"{name}.html").write_text(html, encoding="utf-8")
+    return sorted(jobs.keys())
+
+
 def build():
     jobs = {
         # 详情 5 Tab 变体（含 SCORE 首 Tab，海/陆；其余补齐）
@@ -835,6 +852,11 @@ def build():
             made.append(name)
         except Exception as e:
             print(f"  FAIL {name}: {type(e).__name__}: {e}")
+    # #84 认新稿：地图/收藏/设置主屏其他组件重绘（地图底图保留）
+    try:
+        print("  BASE_REDRAW", render_base_redraw())
+    except Exception as e:
+        print(f"  FAIL base redraw: {type(e).__name__}: {e}")
     # 需求 OPT-A-01/02/09：覆盖改版 A 版设置页（幂等，不动 engine.py / B/C/D）
     try:
         print("  SETTINGS_REVISED", revise_settings())

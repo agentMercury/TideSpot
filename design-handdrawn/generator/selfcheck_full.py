@@ -115,7 +115,7 @@ ok("OPT-A-09" in idx and "SKIN-DESIGN-SPEC.md" in idx and "换皮肤(OPT-A-09)" 
 
 # 6b. 参照稿错位勘误（2026-11-12）：确保索引/对照/文档不再把旧稿当对齐目标
 ok("参照稿勘误" in idx and "两套并存的详情页视觉稿" in idx, "索引页含两套并存稿勘误块")
-ok("早期 base 稿" in idx and "非真机参照" in idx, "索引页第①组标早期 base 稿")
+ok("早期 base 旧稿" in idx and "非真机参照" in idx, "索引页第①组标早期 base 旧稿/非真机参照")
 ok("真机 Compose 试点参照的是新稿" in idx, "索引页声明真机参照新稿")
 ok("不含 Compose 代码" not in idx and "Compose 试点" in idx, "索引页脚已修正过时声明、如实提试点")
 ok("⚠" not in idx, "索引页无缺字特殊符号")
