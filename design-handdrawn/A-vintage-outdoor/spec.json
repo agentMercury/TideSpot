@@ -65,7 +65,7 @@
       "label": "详情页 · 深色",
       "png": "screens/dark-detail.png",
       "html": "sources/dark-detail.html",
-      "sha256": "da004e249fcd75e1d07f7686438904ed3b5e9f54f7918ffacac84a2f732e21d7"
+      "sha256": "a8fb891374a7eca82e0fc9e099af77f1e9fc90b27321c9216ebb18ccd6d36d87"
     }
   ],
   "frozen_contract": {
@@ -255,14 +255,14 @@
         "label": "深色·地图选点",
         "png": "screens_full/dark-map.png",
         "html": "sources_full/dark-map.html",
-        "sha256_png": "ac01f388f45e1e1a78e1abdc536b87bb72d328be75ff5ed9ad05fcaa62ace59c"
+        "sha256_png": "f8f5599eec045b4bbc1af774e711e89b0c9ce863fb439d700530952cd79e0edc"
       },
       {
         "key": "dark-favorites",
         "label": "深色·收藏列表",
         "png": "screens_full/dark-favorites.png",
         "html": "sources_full/dark-favorites.html",
-        "sha256_png": "befe92fd8f5bb530fc7d904cb08d29bf8f777a12772e0921f1a56253962ee613"
+        "sha256_png": "e017114988de68d6ad87eaf3eef9953976b1ce7118f8c26c6af3d2e4a2d50621"
       },
       {
         "key": "detail-tab-score-sea",

@@ -808,6 +808,8 @@ def render_base_redraw():
         "map-inland": render_map_new("inland"),
         "favorites": render_favorites_new("sea"),
         "settings": E.render_settings(SID, "sea"),
+        # #85 认新稿：深色详情（base 屏）用新稿 钓鱼指数骨架 + DARK 调色板，替换旧稿 E.render_detail_dark
+        "dark-detail": render_dark(render_tab_score, "sea", "深色详情"),
     }
     for name, html in jobs.items():
         (base_src / f"{name}.html").write_text(html, encoding="utf-8")
@@ -840,9 +842,9 @@ def build():
         "state-degraded": lambda: render_state_detail("sea", "degraded"),
         "favorites-empty": lambda: render_favorites_empty("sea"),
         "favorites-multiselect": lambda: render_favorites_multiselect("sea"),
-        # 深色变体
-        "dark-map": lambda: render_dark(E.render_map, "sea", "深色地图"),
-        "dark-favorites": lambda: render_dark(E.render_favorites, "sea", "深色收藏"),
+        # 深色变体（#85 认新稿：新稿骨架 + DARK 调色板；dark-detail（base 屏）见 render_base_redraw）
+        "dark-map": lambda: render_dark(render_map_new, "sea", "深色地图"),
+        "dark-favorites": lambda: render_dark(render_favorites_new, "sea", "深色收藏"),
     }
     made = []
     for name, fn in jobs.items():
