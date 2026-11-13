@@ -31,8 +31,8 @@
 
 | 组 | 屏 | 说明 |
 |---|---|---|
-| ① 基础主屏 · 7 | `screens/`（设置页已改版，余 6 张原样） | 详情海/陆、地图海/陆、收藏、设置（OPT-A-01/02/09）、深色详情 |
-| ② 详情 5 Tab + 因子分解 · 7 | `screens_full/` | 潮流·海 / 水位·内陆、天气、水质 1×3、风浪·海 / 湖面风·内陆、因子分解展开 |
+| ① 基础主屏 · 7 | `screens/`（地图/收藏/设置/深色详情已认新稿重绘；仅详情海·陆为早期 base 旧稿） | 详情海/陆、地图海/陆、收藏、设置（OPT-A-01/02/09）、深色详情 |
+| ② 详情 5 Tab + 因子分解 · 9 | `screens_full/` | 钓鱼指数·海/陆、潮流·海 / 水位·内陆、天气、水质 1×3、风浪·海 / 湖面风·内陆、因子分解展开 |
 | ③ 6 叠层 · 6 | `screens_full/` | OV01 Top10 时段筛选、OV02 免责 5 条、OV03 收藏确认、OV04 水质录入、OV05 星标气泡、OV06 删除确认 |
 | ④ 状态态 · 6 | `screens_full/` | 离线 / 陈旧 / 48h 不可用 / 分维降级、收藏空态、多选批量 |
 | ⑤ 深色变体 · 2 | `screens_full/` | 深色地图、深色收藏（深色独立 token，非机械反转） |
@@ -42,13 +42,13 @@
 - `APP功能优化需求.md` — 功能差异清单 + 优化需求（逐条现状 / 代码证据 / 目标 / 验收 / 工程落点）
 - `SKIN-DESIGN-SPEC.md` — 皮肤（Skin）设计规范：三轴正交 / 可变 vs 冻结 token / 新增皮肤 A1–A10 接入清单 / 换肤验收表
 - `feature-gaps.json` — 机器可读差异表（9 条：3 ui_new + 2 ui_remove + 2 mismatch + 2 code_ahead）
-- `screens_full/*.png`（21 张 2x 780×1688）+ `sources_full/*.html`（21 份自包含离线源稿）
+- `screens_full/*.png`（23 张 2x 780×1688）+ `sources_full/*.html`（23 份自包含离线源稿）
 
 **对照结论（2026-11-12 修订）**：工程 v1.16.0 功能完成度高，**9 条差异 / 7 条转需求**（P1×2：深色手动开关、地图 Top10 入口语义；P2×5：四态视觉分级、fetch_log 入口、换皮肤、下线用例/物种/权重、下线 API Key），**2 条仅记录**（批量不做导出、星标气泡/现场校潮/自选时段等工程已实现）。冻结契约未改动。OPT-A-01/02 由「升级/接线」改为**从设置页删除**；新增 **OPT-A-09 换皮肤**（首版仅内置 A，B/C/D 不并入），扩展规范见 `SKIN-DESIGN-SPEC.md`。
 
-> **设置页改版（2026-11-12，需求已确认）**：`sources/settings.html` / `screens/settings.png` 已按 OPT-A-01/02/09 更新——删除「用例·物种·权重」「API Key」两版块、新增「外观·皮肤」入口（当前 = 手绘 A 复古户外 + 敬请期待占位）。独立外观选择页本轮未做（「只做需求 + 入口」）。屏数仍 28。
+> **设置页改版（2026-11-12，需求已确认）**：`sources/settings.html` / `screens/settings.png` 已按 OPT-A-01/02/09 更新——删除「用例·物种·权重」「API Key」两版块、新增「外观·皮肤」入口（当前 = 手绘 A 复古户外 + 敬请期待占位）。独立外观选择页本轮未做（「只做需求 + 入口」）。屏数仍 30。
 
-**复现**：`generator/engine.py` 先生成 4 版 base 7 屏 → `generator/engine_full.py` 补 A 版 21 张 `sources_full/*.html` 并覆盖改版 `sources/settings.html`（`render_settings_revised()`，不动 B/C/D）→ Edge 2x 截 PNG → `generator/gen_full_index.py` → `index-full.html`。
+**复现**：`generator/engine.py` 先生成 4 版 base 7 屏 → `generator/engine_full.py` 补 A 版 23 张 `sources_full/*.html` 并覆盖改版 `sources/settings.html`（`render_settings_revised()`，不动 B/C/D）→ Edge 2x 截 PNG → `generator/gen_full_index.py` → `index-full.html`。
 
 ## 【工程侧】详情页 Compose 试点与 D5 质感层（2026-11-12）
 

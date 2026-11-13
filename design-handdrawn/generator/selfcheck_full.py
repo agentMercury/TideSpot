@@ -145,5 +145,17 @@ ok(spec["full_ui"]["screen_count"] == 30 and spec["full_ui"]["added_count"] == 2
 for n in ["detail-sea","detail-inland","map-sea","map-inland","favorites","settings","dark-detail"]:
     ok((A / "screens" / f"{n}.png").exists(), f"base 屏 {n} 仍在")
 
+# 8. 认新稿收尾固化（#83–#85）：深色=新稿骨架+DARK 调色板；地图底图三色保留手绘
+_dm = (A / "sources_full" / "dark-map.html").read_text(encoding="utf-8")
+_dr = (A / "sources_full" / "dark-favorites.html").read_text(encoding="utf-8")
+_dd = (A / "sources" / "dark-detail.html").read_text(encoding="utf-8")
+_ms = (A / "sources" / "map-sea.html").read_text(encoding="utf-8")
+ok("0E1C2B" in _dm and "1B3044" in _dm, "dark-map = DARK 调色板 + 新稿地图底图")
+ok("OpenStreetMap" in _dm and "搜索地点" in _dm, "dark-map 含新稿地图周边组件")
+ok("0E1C2B" in _dr and "我的收藏" in _dr, "dark-favorites = DARK 调色板 + 新稿收藏骨架")
+ok("0E1C2B" in _dd and "钓鱼指数" in _dd, "深色详情 = DARK 调色板 + 新稿钓鱼指数骨架")
+ok(all(c in _ms for c in ["D6C6A0", "9FB8B4", "EFE6CC"]), "map-sea 保留手绘地图底图三色（浅色）")
+ok(all(c in _dm for c in ["1B3044", "123A55", "2A4358"]), "dark-map 保留手绘地图底图三色（DARK）")
+
 print(f"\nSELFCHECK PASS={PASS} FAIL={FAIL}")
 if FAIL: raise SystemExit(1)
