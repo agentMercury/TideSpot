@@ -37,8 +37,8 @@ android {
         applicationId = "com.tidespot.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 20
-        versionName = "1.16.0"
+        versionCode = 21
+        versionName = "1.17.0"
 
         // FO-25：显式声明 targetSdk，消除 AGP 缺省推断告警
         // CHG-25（P0-1）：Copernicus 凭据**构建期注入已移除**——APK 内零凭据；

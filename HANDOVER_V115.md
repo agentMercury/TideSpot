@@ -54,10 +54,36 @@
 
 | 位置 | 过时内容 | 现状 |
 |---|---|---|
-| §1 基线表 | `versionName=1.15.14` / `versionCode=19` | 以 `tidespot-android/app/build.gradle.kts` 为准（已到 1.16.0+） |
+| §1 基线表 | 版本行已回填为 1.17.0；**同表其余行**（APK 路径 / SHA / i18n 豁免数 / 对比度对数）仍是 1.15.14 快照 | 版本号以 `tidespot-android/app/build.gradle.kts` 为准 |
 | §2 第 1 条 | 「必须用 `T:` 盘构建（`subst T:`）」 | **已废弃**：2026-11-11 移除 `subst T:` 与 `android.overridePathCheck`，`verify.ps1` 直接用真实路径 |
 | §9 台账表 | 只到 `CHG-57` | `CHG-58` 之后以 `jj log` 与 `PROGRESS_TRACKER.md` 为准 |
 | `PROGRESS_TRACKER.md` §1 | 「v1.1 P0 完成 → P1 待开工」 | 与现状（v1.16.0、手绘 A 全屏换肤已落地）不符，属未回填 |
+
+### 0.6 发版与版本号（每次发版必改，客户 2026-11-13 明确要求）
+
+**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `20` / `1.16.0`）。
+
+| 改动性质 | 怎么加 | 例子 |
+|---|---|---|
+| **小版本**：修 bug、文案 / 样式微调，**无功能变化** | **第二个 `.` 之后 +1** | `1.16.0` → `1.16.1` |
+| **有功能修改 / 新增** | **第一个 `.` 之后 +1，末位归零** | `1.16.1` → `1.17.0` |
+| **重大更新** | **第一位 +1**，且**必须经客户明确认证** | `1.17.0` → `2.0.0` |
+
+铁律：
+
+1. **每个发版都必须动版本号**，不许「内容少就不改」——同名同码的包会让真机验收与回滚失真。
+2. **`versionCode` 每次 +1**（严格递增），与 `versionName` 同批改；只改 `versionName` 会导致覆盖安装失败。
+3. **第一位只在客户认证的重大更新时加**。自评「这次改动很大」不算认证；未经客户明确同意，版本号永远停在 `1.x`。
+4. 定性拿不准时按**低一档**处理（拿不准是功能还是修补 → 当小版本），不要擅自升 MINOR/MAJOR。
+5. 版本号变更后产物名自动跟随（`潮点TideSpot-v{versionName}.apk`），`copyApkToTrans` 分发到 `E:\Trans`，无需改脚本。
+
+**发版必做（缺一不算发版）**：
+
+1. 改 `versionCode` / `versionName`；
+2. `assembleRelease` 出包 → 真机 `adb install -r` 冒烟（至少地图 / 详情 / 收藏 / 设置四页 + 明暗切换）；
+3. 更新本文件 §1 基线表的版本号（或 §0.5 标注差异）+ `PROGRESS_TRACKER.md` 台账 + 相关需求清单状态；
+4. `jj describe` 写清版本号变化（`chore(release): vX.Y.Z`）+ 门禁结果 → `git update-ref refs/heads/main`。
+
 
 
 ---
@@ -67,7 +93,7 @@
 | 项 | 值 |
 |---|---|
 | 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated（每次提交后手动 `git update-ref refs/heads/main <commit>`） |
-| 版本 | **`versionCode=19` / `versionName=1.15.14`** |
+| 版本 | **`versionCode=21` / `versionName=1.17.0`**（2026-11-13 回填；发版规则见 §0.6） |
 | APK | **`E:\Trans\潮点TideSpot-v1.15.14.apk`**（51,933,996 B；SHA-256 `40e59f66a644694d9c09f498ab9d2a5ddd5b43463ffffa95316ba07a1c8c0d3d`；自签名，已装 AAK-AN00） |
 | 测试 | 八模块 `gradlew test` **EXIT=0**（每次批次均跑） |
 | i18n | `.tools/i18n_scan.mjs` **FAIL=0**（豁免 12）；`values` / `values-en` 241/241 |
