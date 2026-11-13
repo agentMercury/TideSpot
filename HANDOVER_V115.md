@@ -4,6 +4,62 @@
 > 交接方：V1.15 交付会话（交付负责人） ｜ 接手方：下一开发会话
 > **必读顺序**：本文件 → `REQUIREMENTS_REGISTER.md`（**CHG-46~56 为 V1.15**）→ `PROGRESS_TRACKER.md` §10（V1.15 台账 + DoD 收官 + 英文验收 + 收尾补记）→ `design-handoff/DECISIONS.md`（§1 裁定 / §2 GAP-05 明细 / §6 复核 / §8 视觉进度 / §9 结论）→ `OPT_REQUIREMENTS_V115.md` → `tidespot-android/CONTRACT.md` → `HANDOVER_V11.md`（v1.1 细节与环境雷区）
 
+## 0. 文档维护契约（改代码前读，收工前必须执行）
+
+> **为什么单列成一节**：本工程出现过「代码已落地、文档还写着没做」，下一个 agent 照旧描述误判或重做
+> （2026-11-13 实例：某处仍写「还没有 SKIN-1 抽象层」，实际已落地 3 个批次）。
+> **文档是交接物的一部分，不是交付后的可选动作。**
+
+### 0.1 三条硬规则
+
+1. **同批更新**：代码 / 资源 / 配置的任何语义改动，必须与代码在**同一个提交**内更新受影响文档，禁止「下次一起补」。
+2. **不许留过时断言**：无法改写的历史材料（已发布报告、旧对拍记录），必须在文首加
+   `> ⚠️ 历史快照（日期）｜已被 <提交号/需求 ID> 取代，勿用于判断现有代码`。
+   **禁止让旧结论以现在时态留在正文**——这是最容易误导下一个 agent 的形态。
+3. **冲突以代码为准**：文档与代码不一致时，代码是唯一事实来源；立刻改文档；确实改不动就写明差异与原因，不留隐性歧义。
+
+### 0.2 改动 → 必更文档（映射表）
+
+| 你改了什么 | 必须同步 |
+|---|---|
+| `:core:*` 公共签名 / 数据模型 / 冻结点 | `tidespot-android/CONTRACT.md`（附变更记录 + 回滚方式） |
+| 用户可见文案 | `values` + `values-en` 双资源；`node .tools/i18n_scan.mjs` 必须 FAIL=0 |
+| 设置项 / 持久化键 | `SettingsKeys` + `AppSettings` + `CONTRACT.md` + 设置页文案与其说明行 |
+| 皮肤 / 主题 token / 换肤入口 | `design-handdrawn/A-vintage-outdoor/SKIN-DEV-STANDARD.md`（版本号 +1 + 顶部变更行） |
+| 有意偏离设计稿（色值 / 布局 / 结构） | 本文件 §5「已知偏离」+ `device-compare/` 对拍报告（附量化对比度） |
+| 一批需求做完 | `design-handdrawn/A-vintage-outdoor/未开始需求清单.md`（状态 + **落地结果指向真实文件与行号**） |
+| 每个提交 | `jj describe` 写清「改了什么 / 为什么 / 门禁结果」；建 change 后 `git update-ref refs/heads/main <commit>` |
+| 会话结束 | `.workbuddy/memory/YYYY-MM-DD.md` 追加当天决策与踩坑（不记临时路径、工具报错） |
+
+### 0.3 文档地图（谁管什么、谁权威）
+
+| 文件 | 管什么 | 权威度 |
+|---|---|---|
+| `HANDOVER_V115.md`（本文件） | 交接指引、环境红线、已知偏离、**文档维护契约** | 规则类权威 |
+| `tidespot-android/CONTRACT.md` | 模块契约与冻结点、变更记录 | 契约类权威（改动必须登记） |
+| `PROGRESS_TRACKER.md` | 里程碑台账、验收结论 | 台账类，**状态可能滞后，以代码与本文件为准** |
+| `REQUIREMENTS_REGISTER.md` | 需求登记与裁定（`CHG-*`） | 索引类 |
+| `design-handdrawn/A-vintage-outdoor/` | 设计稿；`SKIN-DEV-STANDARD.md` 换肤执行手册；`未开始需求清单.md` 需求状态；`device-compare/` 真机证据 | 设计 / 皮肤权威 |
+| `.workbuddy/memory/` | 跨会话工作记忆（决策、踩坑、行尾与构建陷阱） | 经验类，非交付物 |
+
+### 0.4 收工自检（4 条，缺一不算完成）
+
+1. 把本次改过的关键词在全仓 `.md` 里搜一遍，确认没有「现在时态的旧结论」残留：
+   `grep -rn "<关键词>" --include=*.md .`
+2. 门禁全绿：八模块测试 / `node .tools/i18n_scan.mjs` / `node .tools/contrast_check.mjs` / `assembleRelease`。
+3. 需求状态旁有「落地结果」并指向真实文件与行号，**不是只写「已完成」三个字**。
+4. §0.5「已知过时项」受影响时同步增删。
+
+### 0.5 已知过时项（读到先核实代码，不要直接采信）
+
+| 位置 | 过时内容 | 现状 |
+|---|---|---|
+| §1 基线表 | `versionName=1.15.14` / `versionCode=19` | 以 `tidespot-android/app/build.gradle.kts` 为准（已到 1.16.0+） |
+| §2 第 1 条 | 「必须用 `T:` 盘构建（`subst T:`）」 | **已废弃**：2026-11-11 移除 `subst T:` 与 `android.overridePathCheck`，`verify.ps1` 直接用真实路径 |
+| §9 台账表 | 只到 `CHG-57` | `CHG-58` 之后以 `jj log` 与 `PROGRESS_TRACKER.md` 为准 |
+| `PROGRESS_TRACKER.md` §1 | 「v1.1 P0 完成 → P1 待开工」 | 与现状（v1.16.0、手绘 A 全屏换肤已落地）不符，属未回填 |
+
+
 ---
 
 ## 1. 当前基线（2026-11-11 收官时）
