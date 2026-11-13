@@ -146,7 +146,7 @@ STYLES = {
         "idea": "冷白/薄荷平涂纸底 + 近黑粗描边 + 硬投影贴纸 + 小圆角印章 + 海蓝/珊瑚（海）· 青绿/琥珀（陆）",
         "fit": "信息感强、贴纸感足；与「钓什么鱼」的图鉴语义天然契合",
         "font": {
-            "display": "Microsoft YaHei, PingFang SC, sans-serif", "display_weight": "800",
+            "display": "Microsoft YaHei, PingFang SC, sans-serif", "display_weight": "700",
             "body": "Microsoft YaHei, PingFang SC, sans-serif", "num": "Microsoft YaHei, sans-serif",
             "caps": "Microsoft YaHei, sans-serif", "track": "0.04em",
         },

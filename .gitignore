@@ -33,3 +33,9 @@ archive/
 
 # WorkBuddy 工作区数据（本机，不入库）
 .workbuddy/
+
+# 设计生成器缓存 / 渲染中间产物 / 真机截图（本机，不入库）
+__pycache__/
+*.pyc
+design-handdrawn/_work/
+.shots/device/

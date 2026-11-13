@@ -324,7 +324,7 @@ grep -rn "Color(0x" tidespot-android/feature tidespot-android/app \
 5. ❌ 伪造可切换样式 / 空卡让用户以为能点。
 6. ❌ 把 B/C/D 探索稿命名/呈现为「皮肤」并入（需产品决策）。
 7. ❌ 复制 30 屏渲染函数改色（应只换 `STYLES` 参数）。
-8. ❌ 改字号/行高来做「手绘感」（会破坏换行与卡片高度）。
+8. ❌ 改字号/行高/字重来做「手绘感」（字重变粗会改变文本宽度，同样破坏换行与卡片高度；D 的「英制」chip 真机换行即此坑）。
 9. ❌ **双层主题嵌套**：`TideSpotTheme` 内再包一套不同 skin 的 `MaterialTheme`（A 已在 SKIN-2 合并为单层；仅允许「同 skin 不同 water」的覆盖）。
 10. ❌ **MapLibre 图层写死 `"#0D47A1"`**：不走 Compose 主题，必须 `colorScheme.primary.toHexRgb()`。
 11. ❌ 详情页与外壳各挂一层纸纹（双层颗粒，文字发糊）。
@@ -368,7 +368,7 @@ grep -rn "Color(0x" tidespot-android/feature tidespot-android/app \
 | LAND-FAV/SET | 收藏/设置 | 继承全局纸底 + 纸纹 + 衬线字阶；设置页新增皮肤/明暗控件 |
 | LAND-STATE | 四态 | `StaleBanner` 陈旧改 `onSurfaceVariant`（弱于 48h 的 `error`）；离线/低置信沿用既有 token 与冻结徽标 |
 | LAND-DARK | 深色 | 由 4 套色板覆盖；真机逐屏已验（`device-compare/r2-换肤对拍.md`） |
-| **D 皮肤** | DES-SKIN2（第 2 款） | 设计侧：`D-field-guide/` 30 屏（`engine.py STYLES["d-guidebook"]` 参数化，`build_style.py` 一键复现，`selfcheck_style.py` 273/0）；工程侧：`d-fieldguide` 4 套 `ColorScheme` + `FieldGuideShapes(3/8/12/14/18)` + `FieldGuideTypography(SansSerif/Black，字号行高不变)` + 注册表追加；复用 A drawable；设置页下拉自动出现，**零业务代码改动** |
+| **D 皮肤** | DES-SKIN2（第 2 款） | 设计侧：`D-field-guide/` 30 屏（`engine.py STYLES["d-guidebook"]` 参数化，`build_style.py` 一键复现，`selfcheck_style.py` 273/0）；工程侧：`d-fieldguide` 4 套 `ColorScheme` + `FieldGuideShapes(3/8/12/14/18)` + `FieldGuideTypography(SansSerif，字重/字号/行高与 A 全等)` + 注册表追加；复用 A drawable；设置页下拉自动出现，**零业务代码改动**；真机走查通过（`device-compare/D-真机走查-2026-11-13.md`：字重 Black→Bold 修复 chip 换行） |
 
 **真机对拍修复（r2，2026-11-13）**——这三条都是 token 层问题，换肤时必须一并检查：
 
