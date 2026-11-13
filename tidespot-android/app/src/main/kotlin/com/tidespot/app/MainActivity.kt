@@ -50,6 +50,7 @@ import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.theme.TideSpotSkins
 import com.tidespot.core.ui.theme.TideSpotTheme
 import com.tidespot.core.ui.theme.VintageOutdoorTheme
 import com.tidespot.core.ui.theme.paperGrain
@@ -83,9 +84,24 @@ class MainActivity : ComponentActivity() {
         // OPT-V115-02 / GAP-03：edge-to-edge（Android 15+ 强制；统一显式关闭 decor fits，insets 由各屏自管）
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         val graph = AppGraph(this)
+        // OPT-A-02：API Key 版块已下线，启动时一次性清理历史写入的本地键（不读取、不上传）
+        AppSettings.clearLegacyApiKey(graph.settingsStore)
         setContent {
-            TideSpotTheme {
-                AppRoot(graph)
+            // SKIN-2 / SKIN-3 / OPT-A-03：主题是唯一视觉入口——皮肤 + 明暗从设置读取，
+            // 外壳页跨水体（海洋兜底），详情页按点位水体再包一层同 skin 主题。
+            var settings by remember { mutableStateOf(AppSettings.read(graph.settingsStore)) }
+            val skin = TideSpotSkins.byId(settings.skinId)
+            val darkTheme = SettingsLogic.resolveDarkTheme(settings.themeMode, isSystemInDarkTheme())
+            TideSpotTheme(skin = skin, water = WaterBodyType.OCEAN, darkTheme = darkTheme) {
+                AppRoot(
+                    graph = graph,
+                    settingsState = settings,
+                    onSettingsChange = { next ->
+                        // 三轴互不重置：persistSettings 逐键写回，切皮肤不动明暗、切明暗不动皮肤
+                        persistSettings(graph, next)
+                        settings = next
+                    },
+                )
             }
         }
     }
@@ -99,9 +115,14 @@ private const val GUIDE_SKIP_COPERNICUS = "guide.copernicus.skipped"
 private const val EXIT_BACK_WINDOW_MILLIS = 2_000L
 
 @Composable
-private fun AppRoot(graph: AppGraph) {
+private fun AppRoot(
+    graph: AppGraph,
+    settingsState: SettingsState,
+    onSettingsChange: (SettingsState) -> Unit,
+) {
     var navState by remember { mutableStateOf(AppNavState()) }
-    var settingsState by remember { mutableStateOf(AppSettings.read(graph.settingsStore)) }
+    // 明暗轴：供详情页皮肤再包一层时复用同一解析结果（与全局主题同口径）
+    val darkTheme = SettingsLogic.resolveDarkTheme(settingsState.themeMode, isSystemInDarkTheme())
     // CHG-25（P0-1）：Copernicus 凭据配置态（运行期读凭据存储；保存/清除即时刷新）
     var copernicusConfigured by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { copernicusConfigured = graph.hasCopernicusCredential() }
@@ -195,13 +216,21 @@ private fun AppRoot(graph: AppGraph) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        // SKIN-2：外壳页统一铺皮肤纸底（A = 做旧米纸），各页不再各自写底色
+        containerColor = MaterialTheme.colorScheme.background,
         // OPT-V115-02 / GAP-03：edge-to-edge 收口——insets 下沉到各屏自管（地图全屏、控件单独 pad）
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
+        // SKIN-2：纸纹统一挂在外壳——地图页跳过（底图是 CARTO 真实瓦片，颗粒会伤可读性），
+        // 收藏/设置/详情继承同一层颗粒；详情页不再各自叠加，避免双层颗粒把文字糊掉。
+        val grain = rememberPaperGrainBrush(darkTheme)
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .then(
+                    if (navState.page == AppPage.MAP) Modifier else Modifier.paperGrain(grain),
+                ),
         ) {
             // OPT-V12-01（CHG-57）：地图页（页面切换沿用原导航结构；MapView 生命周期问题另案登记）
             when (navState.page) {
@@ -287,16 +316,15 @@ private fun AppRoot(graph: AppGraph) {
                                 credentialGuideSkipped = true
                                 graph.settingsStore.writeBoolean(GUIDE_SKIP_COPERNICUS, true)
                             },
+                            // OPT-A-03：详情页与全局主题共用同一明暗解析（不再各自 isSystemInDarkTheme）
+                            darkTheme = darkTheme,
                         )
                     }
                 }
 
                 AppPage.SETTINGS -> SettingsPage(
                     state = settingsState.copy(copernicusConfigured = copernicusConfigured),
-                    onChange = { next ->
-                        persistSettings(graph, next)
-                        settingsState = next.copy(copernicusConfigured = copernicusConfigured)
-                    },
+                    onChange = onSettingsChange,
                     credentialSection = {
                         CopernicusCredentialSection(
                             configured = copernicusConfigured,
@@ -344,23 +372,23 @@ private fun DetailPage(
     showCredentialGuide: Boolean,
     onOpenCredentialSettings: () -> Unit,
     onSkipCredentialGuide: () -> Unit,
+    /** OPT-A-03：明暗轴解析结果（SYSTEM/LIGHT/DARK → Boolean），与全局主题同口径。 */
+    darkTheme: Boolean,
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(state.result?.fetchedAtMillis) {
         onFetched(state.result?.fetchedAtMillis?.values?.maxOrNull())
     }
-    // 手绘 A · 复古户外：详情页一屏试点皮肤（仅视觉，参数/回调/导航零改动）。
-    // 水体 / 明暗在此显式取一次，保证色板、纸纹 tile、装饰母题三者同口径。
+    // 手绘 A · 复古户外：详情页按点位水体再包一层同 skin 主题（仅换水体色板，不换皮肤）。
+    // 水体显式取一次，保证色板、纸纹 tile、装饰母题三者同口径。
     val waterBody = state.result?.effectiveWaterBody ?: spot.waterBody
     val inland = waterBody == WaterBodyType.INLAND_WATER
-    val dark = isSystemInDarkTheme()
-    VintageOutdoorTheme(waterBody = waterBody, darkTheme = dark) {
-        val grain = rememberPaperGrainBrush(dark)
+    VintageOutdoorTheme(waterBody = waterBody, darkTheme = darkTheme) {
+        // 纸纹由 AppRoot 外壳统一挂载（避免双层颗粒）；此处只铺本水体纸底 + 装饰母题
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .paperGrain(grain),
+                .background(MaterialTheme.colorScheme.background),
         ) {
             // 鱼群水印：A 版「把装饰元素替换成鱼形」的母题，纯绘制、不拦截触摸
             FishWatermark(
@@ -450,9 +478,12 @@ private fun SettingsPage(
         onDetailDaysChange = { days -> onChange(SettingsLogic.withDetailDays(state, days)) },
         onPrefetchChange = { enabled -> onChange(SettingsLogic.withPrefetch(state, enabled)) },
         onReverseGeoChange = { enabled -> onChange(SettingsLogic.withReverseGeo(state, enabled)) },
-        onApiKeyChange = { raw -> onChange(SettingsLogic.withApiKey(state, raw)) },
         // UX-19：地图样式三选（持久化 + 地图页即时生效）
         onMapStyleChange = { style -> onChange(SettingsLogic.withMapStyle(state, style)) },
+        // SKIN-3 / OPT-A-09：皮肤下拉（按名字选，只写 skinId）
+        onSkinChange = { id -> onChange(SettingsLogic.withSkinId(state, id)) },
+        // OPT-A-03：明暗三选（只写 themeMode，与皮肤正交）
+        onThemeModeChange = { mode -> onChange(SettingsLogic.withThemeMode(state, mode)) },
         modifier = Modifier.fillMaxSize(),
         credentialSection = credentialSection,
     )
@@ -465,8 +496,10 @@ private fun persistSettings(graph: AppGraph, next: SettingsState) {
     AppSettings.writeDetailDays(store, next.detailDays)
     AppSettings.writePrefetch(store, next.prefetchEnabled)
     AppSettings.writeReverseGeo(store, next.reverseGeoEnabled)
-    AppSettings.writeApiKey(store, next.apiKey)
     AppSettings.writeMapStyle(store, next.mapStyle)
+    // 三轴正交：皮肤与明暗各自写自己的键，互不覆盖
+    AppSettings.writeSkinId(store, next.skinId)
+    AppSettings.writeThemeMode(store, next.themeMode)
 }
 
 /**

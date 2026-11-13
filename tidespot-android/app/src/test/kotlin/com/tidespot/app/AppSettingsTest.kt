@@ -1,8 +1,10 @@
 package com.tidespot.app
 
+import com.tidespot.core.ui.theme.TideSpotSkins
 import com.tidespot.feature.settings.SettingsKeys
 import com.tidespot.feature.settings.SettingsState
 import com.tidespot.feature.settings.SettingsStore
+import com.tidespot.feature.settings.ThemeMode
 import com.tidespot.feature.settings.UnitSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,7 +34,6 @@ class AppSettingsTest {
         assertEquals(7, s.detailDays)
         assertEquals(true, s.prefetchEnabled)
         assertEquals(true, s.reverseGeoEnabled)
-        assertNull(s.apiKey)
         // UX-19：默认彩色 Voyager
         assertEquals(com.tidespot.feature.settings.MapStyle.VOYAGER, s.mapStyle)
     }
@@ -94,20 +95,68 @@ class AppSettingsTest {
         assertEquals(true, AppSettings.read(store).reverseGeoEnabled)
     }
 
+    // ── OPT-A-02：API Key 下线后的历史残留清理 ──
+
     @Test
-    fun apiKey空白清洗为null且null透传() {
+    fun 历史apiKey一次性清理() {
         val store = FakeStore()
-        AppSettings.writeApiKey(store, "  ")
-        assertNull(AppSettings.read(store).apiKey)
-        AppSettings.writeApiKey(store, " k123 ")
-        assertEquals("k123", AppSettings.read(store).apiKey)
-        AppSettings.writeApiKey(store, null)
-        assertNull(AppSettings.read(store).apiKey)
+        store.writeString("settings.apiKey", "legacy-secret")
+        AppSettings.clearLegacyApiKey(store)
+        assertNull(store.readString("settings.apiKey"))
+        // 幂等：重复清理不报错
+        AppSettings.clearLegacyApiKey(store)
+        assertNull(store.readString("settings.apiKey"))
     }
 
     @Test
     fun 兜底点位名固定Locale小数点() {
         assertEquals("点位 30.50000, 120.30000", AppSettings.fallbackSpotName(30.5, 120.3))
         assertEquals("点位 -0.50000, 179.99999", AppSettings.fallbackSpotName(-0.5, 179.99999))
+    }
+
+    // ── SKIN-3：皮肤持久化（未知 id 归一，冷启动不崩） ──
+
+    @Test
+    fun 皮肤id往返_未知id归一为默认() {
+        val store = FakeStore()
+        assertEquals(TideSpotSkins.default.id, AppSettings.read(store).skinId)
+        AppSettings.writeSkinId(store, "a-vintage")
+        assertEquals("a-vintage", AppSettings.read(store).skinId)
+        // 写入脏值 → 落盘即归一
+        AppSettings.writeSkinId(store, "ghost-skin")
+        assertEquals(TideSpotSkins.default.id, AppSettings.read(store).skinId)
+        // 存量脏值（旧版本/手改）→ 读侧同样归一
+        store.writeString(SettingsKeys.SKIN_ID, "ghost-skin")
+        assertEquals(TideSpotSkins.default.id, AppSettings.read(store).skinId)
+    }
+
+    // ── OPT-A-03：明暗持久化 ──
+
+    @Test
+    fun 明暗模式往返_脏值落跟随系统() {
+        val store = FakeStore()
+        assertEquals(ThemeMode.SYSTEM, AppSettings.read(store).themeMode)
+        AppSettings.writeThemeMode(store, ThemeMode.DARK)
+        assertEquals(ThemeMode.DARK, AppSettings.read(store).themeMode)
+        AppSettings.writeThemeMode(store, ThemeMode.LIGHT)
+        assertEquals(ThemeMode.LIGHT, AppSettings.read(store).themeMode)
+        store.writeString(SettingsKeys.THEME_MODE, "NOT_A_MODE")
+        assertEquals(ThemeMode.SYSTEM, AppSettings.read(store).themeMode)
+        assertEquals(ThemeMode.SYSTEM, AppSettings.parseThemeMode(null))
+    }
+
+    @Test
+    fun 三轴互不重置_切皮肤不动明暗_切明暗不动皮肤() {
+        val store = FakeStore()
+        AppSettings.writeSkinId(store, "a-vintage")
+        AppSettings.writeThemeMode(store, ThemeMode.DARK)
+        // 只写皮肤 → 明暗保持
+        AppSettings.writeSkinId(store, TideSpotSkins.default.id)
+        assertEquals(ThemeMode.DARK, AppSettings.read(store).themeMode)
+        // 只写明暗 → 皮肤保持
+        AppSettings.writeThemeMode(store, ThemeMode.LIGHT)
+        assertEquals("a-vintage", AppSettings.read(store).skinId)
+        // 地图样式也不被这两轴带走（水体是第三轴，由点位决定，不落设置）
+        assertEquals(com.tidespot.feature.settings.MapStyle.VOYAGER, AppSettings.read(store).mapStyle)
     }
 }

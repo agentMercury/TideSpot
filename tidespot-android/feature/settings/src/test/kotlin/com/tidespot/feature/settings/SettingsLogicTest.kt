@@ -1,5 +1,6 @@
 package com.tidespot.feature.settings
 
+import com.tidespot.core.ui.theme.TideSpotSkins
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -89,15 +90,6 @@ class SettingsLogicTest {
         assertTrue(s.prefetchEnabled); assertTrue(s.reverseGeoEnabled)
     }
 
-    // ── API Key 占位清洗 ──
-
-    @Test
-    fun `apiKey_trim与空白落null`() {
-        assertEquals("abc123", SettingsLogic.withApiKey(SettingsState(), "  abc123  ").apiKey)
-        assertNull(SettingsLogic.withApiKey(SettingsState(), "   ").apiKey)
-        assertNull(SettingsLogic.withApiKey(SettingsState(), null).apiKey)
-    }
-
     // ── 许可清单（HANDOVER §8-2：Copernicus/NASA/NOAA/USGS 需署名） ──
 
     @Test
@@ -170,15 +162,19 @@ class SettingsLogicTest {
         assertEquals("IMPERIAL", store.readString(SettingsKeys.UNIT_SYSTEM))
         assertFalse(store.readBoolean(SettingsKeys.PREFETCH_ENABLED, true))
         assertTrue(store.readBoolean(SettingsKeys.REVERSE_GEO_ENABLED, true)) // default 生效
-        store.writeString(SettingsKeys.API_KEY, null)
-        assertNull(store.readString(SettingsKeys.API_KEY))
+        store.writeString(SettingsKeys.MAP_STYLE, null)
+        assertNull(store.readString(SettingsKeys.MAP_STYLE))
     }
 
     @Test
-    fun `settingsKeys_六个键名非空`() {
-        listOf(SettingsKeys.UNIT_SYSTEM, SettingsKeys.DETAIL_DAYS, SettingsKeys.PREFETCH_ENABLED,
-            SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.API_KEY, SettingsKeys.MAP_STYLE)
-            .forEach { assertTrue(it.isNotBlank()) }
+    fun `settingsKeys_七个键名非空且互不相同`() {
+        val keys = listOf(
+            SettingsKeys.UNIT_SYSTEM, SettingsKeys.DETAIL_DAYS, SettingsKeys.PREFETCH_ENABLED,
+            SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.MAP_STYLE,
+            SettingsKeys.SKIN_ID, SettingsKeys.THEME_MODE,
+        )
+        keys.forEach { assertTrue(it.isNotBlank()) }
+        assertEquals(keys.size, keys.toSet().size)
     }
 
     // ── UX-19：地图样式三选 ──
@@ -199,6 +195,44 @@ class SettingsLogicTest {
         val urls = MapStyle.entries.map { it.url }
         assertEquals(3, urls.toSet().size)
         assertTrue(urls.all { it.startsWith("https://basemaps.cartocdn.com/gl/") })
+    }
+
+    // ── SKIN-3 / OPT-A-03：三轴正交（皮肤 + 明暗） ──
+
+    @Test
+    fun `withSkinId_已知id生效_未知id归一默认`() {
+        val base = SettingsState()
+        assertEquals(TideSpotSkins.default.id, base.skinId, "默认皮肤必须是 A")
+        assertEquals("a-vintage", SettingsLogic.withSkinId(base, "a-vintage").skinId)
+        assertEquals(TideSpotSkins.default.id, SettingsLogic.withSkinId(base, "ghost").skinId)
+        assertEquals(TideSpotSkins.default.id, base.skinId, "纯函数不改原状态")
+    }
+
+    @Test
+    fun `withSkinId与withThemeMode_互不重置`() {
+        val base = SettingsState()
+        val withSkin = SettingsLogic.withSkinId(base, "a-vintage")
+        assertEquals(ThemeMode.SYSTEM, withSkin.themeMode, "选皮肤不得改明暗")
+        val withDark = SettingsLogic.withThemeMode(base, ThemeMode.DARK)
+        assertEquals(TideSpotSkins.default.id, withDark.skinId, "选明暗不得改皮肤")
+        val both = SettingsLogic.withThemeMode(withSkin, ThemeMode.DARK)
+        assertEquals("a-vintage", both.skinId)
+        assertEquals(ThemeMode.DARK, both.themeMode)
+    }
+
+    @Test
+    fun `resolveDarkTheme_三选与系统解耦`() {
+        assertEquals(false, SettingsLogic.resolveDarkTheme(ThemeMode.SYSTEM, systemDark = false))
+        assertEquals(true, SettingsLogic.resolveDarkTheme(ThemeMode.SYSTEM, systemDark = true))
+        assertEquals(false, SettingsLogic.resolveDarkTheme(ThemeMode.LIGHT, systemDark = true))
+        assertEquals(true, SettingsLogic.resolveDarkTheme(ThemeMode.DARK, systemDark = false))
+    }
+
+    @Test
+    fun `skinAndThemeKeys_独立且非空`() {
+        assertTrue(SettingsKeys.SKIN_ID.isNotBlank())
+        assertTrue(SettingsKeys.THEME_MODE.isNotBlank())
+        assertTrue(SettingsKeys.SKIN_ID != SettingsKeys.THEME_MODE)
     }
 }
 

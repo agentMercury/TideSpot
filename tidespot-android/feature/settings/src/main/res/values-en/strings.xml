@@ -21,12 +21,6 @@
     <string name="ts_settings_reverse_geo">Reverse geocoding (RG-A BigDataCloud / RG-B Photon)</string>
     <string name="ts_settings_reverse_geo_note">Off = place names fall back to coordinate text; per-source payloads are listed under Privacy below</string>
     <string name="ts_settings_reverse_geo_toggle">Reverse geocoding master switch</string>
-    <string name="ts_settings_use_cases">Use cases · Species · Weights</string>
-    <string name="ts_settings_api_key">API Key (optional)</string>
-    <string name="ts_settings_api_key_optional">Optional API Key (no consumer yet; stored only)</string>
-    <string name="ts_settings_api_key_input">Optional API Key field</string>
-    <string name="ts_settings_api_key_empty">Blank = not set</string>
-    <string name="ts_settings_api_key_save">Save API Key</string>
     <string name="ts_settings_licenses">Open-source licenses &amp; data attribution</string>
     <string name="ts_settings_privacy">Privacy disclosure (per source)</string>
     <string name="ts_settings_privacy_sends">Sends: %1$s</string>
@@ -75,4 +69,13 @@
     <string name="ts_settings_copernicus_clear_desc">Clear saved Copernicus credentials</string>
     <string name="ts_settings_copernicus_password_hide">Hide password</string>
     <string name="ts_settings_copernicus_password_show">Show password</string>
+
+    <!-- Appearance · skin / dark mode (SKIN-3 / OPT-A-03; three orthogonal axes) -->
+    <string name="ts_settings_skin">Skin</string>
+    <string name="ts_settings_skin_note">Switching changes the look only; data and features are unaffected</string>
+    <string name="ts_settings_skin_desc">Current skin: %1$s. Tap to choose a skin</string>
+    <string name="ts_settings_theme_mode">Dark mode</string>
+    <string name="ts_settings_theme_system">System</string>
+    <string name="ts_settings_theme_light">Light</string>
+    <string name="ts_settings_theme_dark">Dark</string>
 </resources>

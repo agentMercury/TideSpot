@@ -19,7 +19,6 @@
     <string name="ts_top10_empty">当前范围内没有符合条件的最佳窗口</string>
     <string name="ts_window_bar">窗口</string>
     <string name="ts_record_high_tide">记录一次涨潮时刻</string>
-    <string name="ts_placeholder_v11">垂钓用例、物种预设与因子权重编辑入口于 v1.1 开放（当前沿收藏点预设生效）。</string>
     <string name="ts_offline">网络不可用，显示本地缓存数据</string>
     <string name="ts_stale">数据已过期 · 显示上次成功拉取结果</string>
     <!-- OPT-V115-01 #5：过期黄条 = ts_stale 通用句 + 具体数据时间（%1$s=通用句，%2$s=数据时间） -->

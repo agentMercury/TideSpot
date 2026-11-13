@@ -21,12 +21,6 @@
     <string name="ts_settings_reverse_geo">逆地理名称（RG-A BigDataCloud / RG-B Photon）</string>
     <string name="ts_settings_reverse_geo_note">关 = 位置名称回退坐标文本；逐源发送内容见下方「隐私披露」</string>
     <string name="ts_settings_reverse_geo_toggle">逆地理总开关</string>
-    <string name="ts_settings_use_cases">用例 · 物种 · 权重</string>
-    <string name="ts_settings_api_key">API Key（可选）</string>
-    <string name="ts_settings_api_key_optional">可选 API Key（当前无消费方，仅保存）</string>
-    <string name="ts_settings_api_key_input">可选 API Key 输入框</string>
-    <string name="ts_settings_api_key_empty">留空 = 未设置</string>
-    <string name="ts_settings_api_key_save">保存 API Key</string>
     <string name="ts_settings_licenses">开源许可与数据署名</string>
     <string name="ts_settings_privacy">隐私披露（逐源）</string>
     <string name="ts_settings_privacy_sends">发送内容：%1$s</string>
@@ -79,4 +73,13 @@
     <string name="ts_settings_copernicus_clear_desc">清除已保存的 Copernicus 凭据</string>
     <string name="ts_settings_copernicus_password_hide">隐藏密码</string>
     <string name="ts_settings_copernicus_password_show">显示密码</string>
+
+    <!-- 外观 · 皮肤 / 深色模式（SKIN-3 / OPT-A-03；三轴正交） -->
+    <string name="ts_settings_skin">皮肤</string>
+    <string name="ts_settings_skin_note">切换仅改变视觉，不影响数据与功能</string>
+    <string name="ts_settings_skin_desc">当前皮肤：%1$s，点击选择皮肤</string>
+    <string name="ts_settings_theme_mode">深色模式</string>
+    <string name="ts_settings_theme_system">跟随系统</string>
+    <string name="ts_settings_theme_light">浅色</string>
+    <string name="ts_settings_theme_dark">深色</string>
 </resources>

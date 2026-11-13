@@ -982,7 +982,9 @@ private fun StaleBanner(result: com.tidespot.core.data.repo.SpotDetailResult, zo
                 ageH,
                 result.fetchedAtMillis.values.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: Format.MISSING,
             ),
-            color = MaterialTheme.colorScheme.error,
+            // OPT-A-05：48h 最醒目档。A 的 error(#C15A3A) 在纸底仅 3.1–3.7:1，作文字色不达 4.5:1；
+            // 改用同色系更深的 onErrorContainer（浅色 5.4–6.4:1 / 深色 7.4–9.5:1），语义仍为「警示红」。
+            color = MaterialTheme.colorScheme.onErrorContainer,
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(horizontal = 12.dp)
                 .semantics { contentDescription = expiredDesc },
@@ -1000,7 +1002,9 @@ private fun StaleBanner(result: com.tidespot.core.data.repo.SpotDetailResult, zo
                     stringResource(UiR.string.ts_stale),
                     result.fetchedAtMillis.values.maxOrNull()?.let { Format.clockMillis(it, zone) } ?: Format.MISSING,
                 ),
-                color = MaterialTheme.colorScheme.error,
+                // OPT-A-05 四态分级：陈旧（3h/6h TTL）= 褐灰「弱提示」，必须弱于 48h 的暖红警示；
+                // 色值取皮肤 token，语义等级不随换肤改变（对比度靠 A 的 onSurfaceVariant 保证）。
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(horizontal = 12.dp)
                     .semantics { contentDescription = staleDesc },

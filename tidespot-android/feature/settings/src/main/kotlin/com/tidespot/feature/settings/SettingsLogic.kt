@@ -2,6 +2,7 @@ package com.tidespot.feature.settings
 
 import androidx.annotation.StringRes
 import com.tidespot.core.ui.selector.DaySelectorLogic
+import com.tidespot.core.ui.theme.TideSpotSkins
 
 /**
  * 设置页纯逻辑（CHG-16⑱；UI 逻辑先抽纯函数再进 Composable）：全 JVM 可测。
@@ -61,11 +62,25 @@ object SettingsLogic {
     fun withMapStyle(state: SettingsState, style: MapStyle): SettingsState =
         state.copy(mapStyle = style)
 
-    // ────────────── 可选 API Key 占位 ──────────────
+    // ────────────── 皮肤 / 明暗（三轴正交：SKIN-3 + OPT-A-03） ──────────────
 
-    /** API Key 清洗：trim；空白 → null（不存空白键）。 */
-    fun withApiKey(state: SettingsState, raw: String?): SettingsState =
-        state.copy(apiKey = raw?.trim()?.ifEmpty { null })
+    /** 选皮肤：只写 `skinId`，不碰明暗（互不重置）；未知 id 归一为默认皮肤，脏值不入库。 */
+    fun withSkinId(state: SettingsState, id: String): SettingsState =
+        state.copy(skinId = TideSpotSkins.byId(id).id)
+
+    /** 选明暗：只写 `themeMode`，不碰皮肤（互不重置）。 */
+    fun withThemeMode(state: SettingsState, mode: ThemeMode): SettingsState =
+        state.copy(themeMode = mode)
+
+    /**
+     * 明暗轴解析：`SYSTEM` 跟系统，`LIGHT` / `DARK` 与系统解耦（OPT-A-03 验收第 2 条）。
+     * 纯函数，JVM 可测；主题注入只认它的结果。
+     */
+    fun resolveDarkTheme(mode: ThemeMode, systemDark: Boolean): Boolean = when (mode) {
+        ThemeMode.SYSTEM -> systemDark
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
 
     // ────────────── 开源许可清单（HANDOVER §8-2：Copernicus/NASA/NOAA/USGS 需署名） ──────────────
 

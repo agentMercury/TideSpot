@@ -2,9 +2,17 @@ package com.tidespot.feature.settings
 
 import androidx.annotation.StringRes
 import com.tidespot.core.data.remote.TideSpotUrls
+import com.tidespot.core.ui.theme.TideSpotSkins
 
 /** 单位制（CHG-16⑱）：内部恒 SI（CONTRACT 冻结点 3），换算仅在 UI/设置层展示语义。 */
 enum class UnitSystem { SI, IMPERIAL }
+
+/**
+ * 明暗模式（OPT-A-03）：**与皮肤正交的独立轴**（SKIN-DESIGN-SPEC §1）。
+ * `SYSTEM` = 跟随系统；`LIGHT` / `DARK` = 应用内显式选择，与系统设置解耦。
+ * 持久化键 `settings.themeMode`；切换明暗不得重置皮肤，反之亦然。
+ */
+enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 /**
  * 地图底图样式（UX-19 / OPT-V11-19；D8 三选）。
@@ -30,12 +38,14 @@ data class SettingsState(
     val prefetchEnabled: Boolean = true,
     /** 逆地理总开关（RG-A BigDataCloud / RG-B Photon；关 → 全链落坐标文本兜底）。 */
     val reverseGeoEnabled: Boolean = true,
-    /** 可选 API Key 占位（null=未设置；当前无消费方，M6 仅存储展示）。 */
-    val apiKey: String? = null,
     /** CHG-25（P0-1）：Copernicus 凭据是否已配置（运行期由 :app 从凭据存储读取，不落本状态持久化）。 */
     val copernicusConfigured: Boolean = false,
     /** UX-19（OPT-V11-19）：地图底图样式（默认彩色 Voyager；系统深色不覆盖用户选择）。 */
     val mapStyle: MapStyle = MapStyle.VOYAGER,
+    /** SKIN-3：当前皮肤 id（默认 A；冷启动读回时未知 id 归一为默认，不崩）。 */
+    val skinId: String = TideSpotSkins.default.id,
+    /** OPT-A-03：应用内明暗三选（独立于皮肤与水体）。 */
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
 )
 
 /** 设置键名唯一清单（:app 批次 3 SharedPreferences 实现按此对齐）。 */
@@ -44,6 +54,9 @@ object SettingsKeys {
     const val DETAIL_DAYS = "settings.detailDays"
     const val PREFETCH_ENABLED = "settings.prefetchEnabled"
     const val REVERSE_GEO_ENABLED = "settings.reverseGeoEnabled"
-    const val API_KEY = "settings.apiKey"
     const val MAP_STYLE = "settings.mapStyle"
+
+    /** 三轴正交（SKIN-DESIGN-SPEC §1）：皮肤与明暗各自独立键，互不覆盖。 */
+    const val SKIN_ID = "settings.skinId"
+    const val THEME_MODE = "settings.themeMode"
 }

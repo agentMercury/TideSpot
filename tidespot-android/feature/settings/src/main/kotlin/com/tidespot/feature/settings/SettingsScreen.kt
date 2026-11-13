@@ -1,6 +1,7 @@
 package com.tidespot.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +15,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.strings.localTideSpotStrings
+import com.tidespot.core.ui.theme.TideSpotSkins
 
 /**
  * SettingsScreen（CHG-16⑱ 薄组装）：所有状态经 [SettingsState] 注入、交互回调上抛，
@@ -52,9 +54,12 @@ fun SettingsScreen(
     onDetailDaysChange: (Int) -> Unit,
     onPrefetchChange: (Boolean) -> Unit,
     onReverseGeoChange: (Boolean) -> Unit,
-    onApiKeyChange: (String?) -> Unit,
     /** UX-19（OPT-V11-19）：地图样式三选（彩色/素色/深色）。 */
     onMapStyleChange: (MapStyle) -> Unit,
+    /** SKIN-3 / OPT-A-09：选皮肤（只写 skinId，不动明暗）。 */
+    onSkinChange: (String) -> Unit,
+    /** OPT-A-03：明暗三选（只写 themeMode，不动皮肤）。 */
+    onThemeModeChange: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
     /** CHG-25（P0-1）：Copernicus 凭据版块槽位（:app 注入 [CopernicusCredentialSection]；null = 不渲染，零行为漂移）。 */
     credentialSection: (@Composable () -> Unit)? = null,
@@ -128,6 +133,30 @@ fun SettingsScreen(
                 )
             }
         }
+        // ── 外观 · 皮肤（SKIN-3 / OPT-A-09）：按皮肤名下拉选择 ──
+        Text(stringResource(R.string.ts_settings_skin), style = MaterialTheme.typography.titleSmall)
+        SkinDropdown(currentId = state.skinId, onSelect = onSkinChange)
+        Text(
+            stringResource(R.string.ts_settings_skin_note),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        // ── 深色模式（OPT-A-03）：跟随系统 / 浅色 / 深色，与皮肤正交 ──
+        Text(stringResource(R.string.ts_settings_theme_mode), style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            ThemeMode.entries.forEach { mode ->
+                val labelRes = when (mode) {
+                    ThemeMode.SYSTEM -> R.string.ts_settings_theme_system
+                    ThemeMode.LIGHT -> R.string.ts_settings_theme_light
+                    ThemeMode.DARK -> R.string.ts_settings_theme_dark
+                }
+                FilterChip(
+                    selected = state.themeMode == mode,
+                    onClick = { onThemeModeChange(mode) },
+                    label = { Text(stringResource(labelRes)) },
+                )
+            }
+        }
         SectionDivider()
 
         // ── 数据与网络 ──
@@ -154,30 +183,9 @@ fun SettingsScreen(
         credentialSection?.invoke()
         SectionDivider()
 
-        // ── 用例 / 物种 / 权重（占位） ──
-        SectionTitle(stringResource(R.string.ts_settings_use_cases))
-        Text(
-            stringResource(UiR.string.ts_placeholder_v11),
-            style = MaterialTheme.typography.bodySmall,
-        )
-        SectionDivider()
-
-        // ── 可选 API Key（占位） ──
-        SectionTitle(stringResource(R.string.ts_settings_api_key))
-        var apiKeyDraft by remember(state.apiKey) { mutableStateOf(state.apiKey ?: "") }
-        val apiKeyInputDesc = stringResource(R.string.ts_settings_api_key_input)
-        OutlinedTextField(
-            value = apiKeyDraft,
-            onValueChange = { apiKeyDraft = it },
-            label = { Text(stringResource(R.string.ts_settings_api_key_optional)) },
-            modifier = Modifier.fillMaxWidth()
-                .semantics { contentDescription = apiKeyInputDesc },
-            supportingText = { Text(stringResource(R.string.ts_settings_api_key_empty)) },
-        )
-        androidx.compose.material3.Button(onClick = { onApiKeyChange(apiKeyDraft) }) {
-            Text(stringResource(R.string.ts_settings_api_key_save))
-        }
-        SectionDivider()
+        // OPT-A-01 / OPT-A-02（2026-11-12 产品决策）：下线「用例·物种·权重」与「API Key」两块。
+        // 算法侧场景预设与 F-3.4 权重逻辑保持不变，仅移除用户可见/可改入口。
+        // 历史 Key 的一次性清理见 AppSettings.clearLegacyApiKey（启动时执行，不入库不上传）。
 
         // ── 开源许可 ──
         SectionTitle(stringResource(R.string.ts_settings_licenses))
@@ -278,5 +286,59 @@ private fun ToggleRow(
             onCheckedChange = onChange,
             modifier = Modifier.semantics { contentDescription = desc },
         )
+    }
+}
+
+/**
+ * 皮肤下拉（OPT-A-09 简化形态）：不做独立选择页，设置页内按**皮肤名**直接切换。
+ *
+ * - 显示名取 `skin.name`；唯一性由 [TideSpotSkins.validationErrors] 在类加载时校验，
+ *   重名会立即失败而不是让用户在两个同名项里瞎选；
+ * - 首版只有 A 一款，下拉里仅一项；加皮肤只往 `TideSpotSkins.all` 追加，本组件零改动；
+ * - 切换只写 `settings.skinId`，不碰明暗（三轴正交）。
+ */
+@Composable
+private fun SkinDropdown(currentId: String, onSelect: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val current = TideSpotSkins.byId(currentId)
+    val desc = stringResource(R.string.ts_settings_skin_desc, current.name)
+    Box(Modifier.fillMaxWidth()) {
+        Surface(
+            onClick = { expanded = true },
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { contentDescription = desc },
+        ) {
+            Row(
+                Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(current.name, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "▾",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            TideSpotSkins.all.forEach { skin ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            if (skin.id == current.id) "${skin.name}  ✓" else skin.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(skin.id)
+                    },
+                )
+            }
+        }
     }
 }

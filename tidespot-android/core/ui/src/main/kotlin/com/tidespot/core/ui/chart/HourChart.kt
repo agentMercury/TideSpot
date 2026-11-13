@@ -260,7 +260,8 @@ fun HourChart(
                     if (fits) {
                         drawText(
                             windowLabelLayout,
-                            color = Color.White,
+                            // 白字取档位自带的 onColor（ScoreBand 冻结单源），不写死 Color.White
+                            color = Color(ScoreBand.EXPLOSIVE.onArgb),
                             topLeft = Offset(
                                 x1 + (x2 - x1 - labelW) / 2f,
                                 2.dp.toPx() + (stripH - windowLabelLayout.size.height) / 2f,

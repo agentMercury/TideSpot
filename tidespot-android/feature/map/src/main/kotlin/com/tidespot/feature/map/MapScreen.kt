@@ -46,7 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -59,6 +58,7 @@ import com.tidespot.core.domain.model.NamedPlace
 import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.format.Format
+import com.tidespot.core.ui.theme.toHexRgb
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.feature.map.crosshair.CrosshairState
 import com.tidespot.feature.map.crosshair.CrosshairStateMachine
@@ -141,6 +141,11 @@ fun MapScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
 
+    // SKIN-2：地图 SymbolLayer 不读 Compose 主题——皮肤 token 必须显式转 hex 传入，
+    // 否则换肤后星标文字仍是写死的藏蓝/白（换肤漏屏，验收 §6.2 第 2 条）。
+    val starTextHex = MaterialTheme.colorScheme.primary.toHexRgb()
+    val starHaloHex = MaterialTheme.colorScheme.onPrimary.toHexRgb()
+
     val crosshair = remember { CrosshairStateMachine() }
     val crosshairState by crosshair.state.collectAsState()
 
@@ -194,8 +199,8 @@ fun MapScreen(
                     layer.setProperties(
                         PropertyFactory.textField(Expression.toString(Expression.get("name"))),
                         PropertyFactory.textSize(10.5f),
-                        PropertyFactory.textColor("#0D47A1"),
-                        PropertyFactory.textHaloColor("#FFFFFF"),
+                        PropertyFactory.textColor(starTextHex),
+                        PropertyFactory.textHaloColor(starHaloHex),
                         PropertyFactory.textHaloWidth(1.5f),
                         PropertyFactory.textOffset(arrayOf(0f, 1.1f)),
                         PropertyFactory.textAnchor("top"),
@@ -542,7 +547,7 @@ fun MapScreen(
             if (onOpenTop10 != null && top10Label.isNotEmpty()) {
                 Surface(
                     onClick = { onOpenTop10.invoke() },
-                    color = Color(0xFF0D47A1),
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
                 ) {
@@ -554,12 +559,12 @@ fun MapScreen(
                         Text(
                             top10Label,
                             style = MaterialTheme.typography.titleSmall,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                         Text(
                             "›",
                             style = MaterialTheme.typography.titleMedium,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }
@@ -647,7 +652,7 @@ private fun TopBarButton(icon: String, description: String, filled: Boolean, onC
 /** 十字准星覆盖层：固定于屏幕中心（地图中心对准式）；Preview 态变琥珀色。 */
 @Composable
 private fun CrosshairOverlay(preview: Boolean, modifier: Modifier = Modifier) {
-    val color = if (preview) Color(0xFFF59E0B) else MaterialTheme.colorScheme.primary
+    val color = if (preview) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
     Canvas(modifier = modifier) {
         val cx = size.width / 2f
         val cy = size.height / 2f

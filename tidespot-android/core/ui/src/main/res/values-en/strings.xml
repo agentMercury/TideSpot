@@ -16,7 +16,6 @@
     <string name="ts_top10_empty">No matching best windows in the current range</string>
     <string name="ts_window_bar">Window</string>
     <string name="ts_record_high_tide">Record a high-tide time</string>
-    <string name="ts_placeholder_v11">Fishing use-cases, species presets and factor weight editing open in v1.1 (currently following the favorite\'s preset).</string>
     <string name="ts_offline">Network unavailable; showing cached data</string>
     <string name="ts_stale">Data expired · showing last successful fetch</string>
     <!-- OPT-V115-01 #5: stale banner = generic sentence + concrete data time (%1$s=sentence, %2$s=time) -->
