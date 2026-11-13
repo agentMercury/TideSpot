@@ -3,7 +3,8 @@
 > **面向对象**：未来要**新增一套皮肤**或**修改现有皮肤**的 Agent / 工程师。
 > **与 `SKIN-DESIGN-SPEC.md` 的关系**：那份是**契约**（什么能换、什么绝不能换）；本文是**执行手册**（照着做就能产出一套合格皮肤）。
 > **一句话**：**皮肤 = 一组可替换的视觉 token；业务 Composable 零改动。**
-> **版本**：1.3 ｜ 2026-11-13 ｜ 基线皮肤：手绘 A · 复古户外（首版唯一内置）
+> **版本**：1.4 ｜ 2026-11-13 ｜ 基线皮肤：手绘 A · 复古户外 + D · 路亚图鉴（两款内置）
+> **v1.4 变更**：D 路亚图鉴工程落地——证明「4 套 ColorScheme + 1 个注册表实例 + Shapes/Typography」即可新增皮肤，资源可复用 A；补 §9 D 实录与对比度校准。
 > **v1.1 变更**：v1.0 是「设计假设 + 参考骨架（未编译）」；本版由 A 的**全屏落地结果反向校准**——字段、路径、持久化键、门禁命令、踩坑全部对应真实代码。凡与 v1.0 冲突处，以本版为准。
 > **v1.3 变更**：设置页样式改四选（`MapStyleChoice` 含「跟随主题」），更正 §4.4.1 的「chip 与生效值同口径」为「与用户表态同口径」。
 > **v1.2 变更**：补 §4.4.1「地图底图 = 第 4 个跟随轴」——底图不属于皮肤 token，但必须跟明暗走；记录 `mapStyleExplicit` 判定与迁移坑。反模式补 13/14。
@@ -37,10 +38,13 @@
 - [ ] 更新 `spec.json`（palette / 屏 SHA / `skin_system` 条目）、`index-full.html`、`README.md`
 - [ ] `selfcheck_full.py` 全绿
 
+> **探索稿例外（D 路亚图鉴）**：`idea-explorations/v3-fieldguide` 只交付 3 帧详情首屏探索稿，不是 30 屏。
+> 本轮工程皮肤只取其中的色板 / 形状 / 字阶，30 屏设计侧交付列为后续项；**工程侧已可切换、可验收**。
+
 ### 2.2 工程侧（**只有 3 个文件**）
 - [ ] `core/ui/theme/TideSpotSkin.kt`：新增 4 套 `ColorScheme` + 1 个 `TideSpotSkin` 实例
 - [ ] 同文件 `TideSpotSkins.all` 追加该实例（**唯一扩展点**）
-- [ ] `core/ui/src/main/res/drawable*`：鱼形 / 母题 / 纸纹资源（命名见 §5）
+- [ ] `core/ui/src/main/res/drawable*`：鱼形 / 母题 / 纸纹资源（命名见 §5）；**画风未变可直接复用现有资源**（D 复用 A 的 `ic_fish/wave/mount_vintage`，零新增）
 - [ ] **不改**任何 `feature:*` 屏、`TideSpotTheme`、`SettingsScreen`、`AppSettings`——它们在加皮肤时应当零改动
 
 ---
@@ -350,7 +354,7 @@ grep -rn "Color(0x" tidespot-android/feature tidespot-android/app \
 
 ---
 
-## 9. A 落地实录（2026-11-13）
+## 9. A / D 落地实录（2026-11-13）
 
 | 阶段 | 需求 | 实际改动 |
 |---|---|---|
@@ -364,6 +368,7 @@ grep -rn "Color(0x" tidespot-android/feature tidespot-android/app \
 | LAND-FAV/SET | 收藏/设置 | 继承全局纸底 + 纸纹 + 衬线字阶；设置页新增皮肤/明暗控件 |
 | LAND-STATE | 四态 | `StaleBanner` 陈旧改 `onSurfaceVariant`（弱于 48h 的 `error`）；离线/低置信沿用既有 token 与冻结徽标 |
 | LAND-DARK | 深色 | 由 4 套色板覆盖；真机逐屏已验（`device-compare/r2-换肤对拍.md`） |
+| **D 皮肤** | DES-SKIN2（第 2 款） | `d-fieldguide` 路亚图鉴：4 套 `ColorScheme` + `FieldGuideShapes(3/8/12/14/18)` + `FieldGuideTypography(SansSerif/Black，字号行高不变)` + 注册表追加；复用 A 的 drawable；设置页下拉自动出现，**零业务代码改动** |
 
 **真机对拍修复（r2，2026-11-13）**——这三条都是 token 层问题，换肤时必须一并检查：
 
@@ -380,6 +385,9 @@ grep -rn "Color(0x" tidespot-android/feature tidespot-android/app \
 - `skin.texture` 已被定义但尚未在 3 页细粒度消费（纸纹强度/母题仍走调用方参数）。
 - MapLibre 已有图层在换肤后不会自动重设属性（MapView 不重建）；本次只保证首次安装/冷启动正确。
 - 地图页不挂纸纹（刻意）。
+- **D 的设计侧**只交付 `idea-explorations/v3-fieldguide` 的 3 帧首屏探索稿，未做 30 屏；工程 token 已可切换、可验收。
+- **D 复用 A 的鱼形/母题资源**；若后续要「图鉴线稿鱼」，按 §5 新增 `ic_*_fieldguide`，业务组件零改动。
+- **D 的 `paperGrain=false` 尚未被外壳消费**（外壳当前固定挂 A 纸纹），切换后仍会看到纸颗粒；属 texture 消费待办，不是皮肤数据缺失。
 
 ---
 
