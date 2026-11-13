@@ -299,6 +299,204 @@ private val VintageTypography = Typography(
     labelSmall = TextStyle(fontFamily = FontFamily.Serif, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Normal),
 )
 
+// ══════════════════════════════════════════════════════════════════════════
+// 路亚图鉴（D · FIELD GUIDE）—— idea-explorations/v3-fieldguide 的工程化皮肤
+//
+// 设计语言：平涂纸底 + 近黑粗描边 + 硬投影贴纸 + 小圆角印章。
+// 与 A 的差异只在「长什么样」：色板 / 形状 / 字阶；结构、文案、Tab 序、五档六徽标全部共用。
+// 浅色四套源色取自 `screen.html` 的 CSS 变量（非编造）：
+//   海洋 --bg #E9F3FA / --ink #101820 / --soft #456A84 / --accent2 #1E6FA8 / --accent #E5644C
+//   内陆 --bg #E9F5EE / --ink #101820 / --soft #4A6B5E / --accent2 #2F7F6B / --accent #E9A13B
+// 深色两套为独立调色（设计稿未给深色），按「同色系压暗 + 保留贴纸强调色」推导，
+// 不是浅色的机械反转；对比度已按 WCAG ≥4.5:1 校验（见 SkinRegistryTest）。
+// ══════════════════════════════════════════════════════════════════════════
+
+// ── 路亚图鉴：浅色 · 海洋 / 近海（冷白纸 + 海蓝 + 珊瑚贴纸）──────────────
+private val FieldGuideSeaLight = lightColorScheme(
+    primary = Color(0xFF1E6FA8),
+    onPrimary = Color(0xFFFFFDF7),
+    primaryContainer = Color(0xFFB7DAEE),
+    onPrimaryContainer = Color(0xFF101820),
+    secondary = Color(0xFF33556B),
+    onSecondary = Color(0xFFFFFDF7),
+    secondaryContainer = Color(0xFFB7DAEE),
+    onSecondaryContainer = Color(0xFF101820),
+    tertiary = Color(0xFFE5644C),
+    onTertiary = Color(0xFF101820),
+    background = Color(0xFFE9F3FA),
+    onBackground = Color(0xFF101820),
+    surface = Color(0xFFFFFDF7),
+    onSurface = Color(0xFF101820),
+    surfaceVariant = Color(0xFFB7DAEE),
+    // 原设计 --soft #456A84 在 #B7DAEE 上仅 3.9:1，压深一档到 5.4:1
+    onSurfaceVariant = Color(0xFF33556B),
+    outline = Color(0xFF101820),
+    outlineVariant = Color(0xFF33556B),
+    error = Color(0xFFC23B2A),
+    onError = Color(0xFFFFFDF7),
+    scrim = Color(0xFF101820),
+    surfaceTint = Color(0xFF1E6FA8),
+    inverseSurface = Color(0xFF101820),
+    inverseOnSurface = Color(0xFFFFFDF7),
+    inversePrimary = Color(0xFF8AC1E3),
+    errorContainer = Color(0xFFF7D2CB),
+    onErrorContainer = Color(0xFF7A2318),
+    tertiaryContainer = Color(0xFFF7D9D2),
+    onTertiaryContainer = Color(0xFF6B1F14),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFFFFDF7),
+    surfaceContainer = Color(0xFFF2F8FC),
+    surfaceContainerHigh = Color(0xFFDCEBF5),
+    // Card 默认容器：设计稿是「白纸 + 黑描边」，不能比纸底更暗
+    surfaceContainerHighest = Color(0xFFFFFDF7),
+)
+
+// ── 路亚图鉴：浅色 · 内陆水体（薄荷纸 + 青绿 + 琥珀贴纸）────────────────
+private val FieldGuideInlandLight = lightColorScheme(
+    primary = Color(0xFF2F7F6B),
+    onPrimary = Color(0xFFFFFDF7),
+    primaryContainer = Color(0xFFB9E0CE),
+    onPrimaryContainer = Color(0xFF101820),
+    secondary = Color(0xFF3A5548),
+    onSecondary = Color(0xFFFFFDF7),
+    secondaryContainer = Color(0xFFB9E0CE),
+    onSecondaryContainer = Color(0xFF101820),
+    tertiary = Color(0xFFE9A13B),
+    onTertiary = Color(0xFF101820),
+    background = Color(0xFFE9F5EE),
+    onBackground = Color(0xFF101820),
+    surface = Color(0xFFFFFDF7),
+    onSurface = Color(0xFF101820),
+    surfaceVariant = Color(0xFFB9E0CE),
+    // 原设计 --soft #4A6B5E 在 #B9E0CE 上仅 4.1:1，压深一档到 5.7:1
+    onSurfaceVariant = Color(0xFF3A5548),
+    outline = Color(0xFF101820),
+    outlineVariant = Color(0xFF3A5548),
+    error = Color(0xFFC23B2A),
+    onError = Color(0xFFFFFDF7),
+    scrim = Color(0xFF101820),
+    surfaceTint = Color(0xFF2F7F6B),
+    inverseSurface = Color(0xFF101820),
+    inverseOnSurface = Color(0xFFFFFDF7),
+    inversePrimary = Color(0xFF8CCBB4),
+    errorContainer = Color(0xFFF7D2CB),
+    onErrorContainer = Color(0xFF7A2318),
+    tertiaryContainer = Color(0xFFF7DFB5),
+    onTertiaryContainer = Color(0xFF4A2B08),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFFFFDF7),
+    surfaceContainer = Color(0xFFF1FBF5),
+    surfaceContainerHigh = Color(0xFFDDF0E6),
+    surfaceContainerHighest = Color(0xFFFFFDF7),
+)
+
+// ── 路亚图鉴：深色 · 海洋 / 近海（深海墨底 + 亮海蓝 + 珊瑚）──────────────
+private val FieldGuideSeaDark = darkColorScheme(
+    primary = Color(0xFF6FB6E8),
+    onPrimary = Color(0xFF0B1620),
+    primaryContainer = Color(0xFF17394C),
+    onPrimaryContainer = Color(0xFFEAF2F7),
+    secondary = Color(0xFF9FB6C4),
+    onSecondary = Color(0xFF0B1620),
+    secondaryContainer = Color(0xFF245A73),
+    onSecondaryContainer = Color(0xFFEAF2F7),
+    tertiary = Color(0xFFFF8A70),
+    onTertiary = Color(0xFF2A0E08),
+    background = Color(0xFF0B1620),
+    onBackground = Color(0xFFF2EFE6),
+    surface = Color(0xFF12222E),
+    onSurface = Color(0xFFF2EFE6),
+    surfaceVariant = Color(0xFF17394C),
+    onSurfaceVariant = Color(0xFF9FB6C4),
+    // V3 的「近黑描边」在深色下反转为暖白描边，保持贴纸轮廓
+    outline = Color(0xFFF2EFE6),
+    outlineVariant = Color(0xFF3A4A54),
+    error = Color(0xFFFF8A70),
+    onError = Color(0xFF2A0E08),
+    scrim = Color(0xFF0B1620),
+    surfaceTint = Color(0xFF6FB6E8),
+    inverseSurface = Color(0xFFF2EFE6),
+    inverseOnSurface = Color(0xFF0B1620),
+    inversePrimary = Color(0xFF1E6FA8),
+    errorContainer = Color(0xFF3A1F1A),
+    onErrorContainer = Color(0xFFFFB4A2),
+    tertiaryContainer = Color(0xFF3A2A12),
+    onTertiaryContainer = Color(0xFFFFD9B0),
+    surfaceContainerLowest = Color(0xFF0B1620),
+    surfaceContainerLow = Color(0xFF0F1D28),
+    surfaceContainer = Color(0xFF12222E),
+    surfaceContainerHigh = Color(0xFF17394C),
+    surfaceContainerHighest = Color(0xFF12222E),
+)
+
+// ── 路亚图鉴：深色 · 内陆水体（深林墨底 + 亮青绿 + 琥珀）──────────────────
+private val FieldGuideInlandDark = darkColorScheme(
+    primary = Color(0xFF67C2A5),
+    onPrimary = Color(0xFF0C1A14),
+    primaryContainer = Color(0xFF16382A),
+    onPrimaryContainer = Color(0xFFEAF4EE),
+    secondary = Color(0xFF9DB8A8),
+    onSecondary = Color(0xFF0C1A14),
+    secondaryContainer = Color(0xFF1F5240),
+    onSecondaryContainer = Color(0xFFEAF4EE),
+    tertiary = Color(0xFFFFC15E),
+    onTertiary = Color(0xFF2A1A05),
+    background = Color(0xFF0C1A14),
+    onBackground = Color(0xFFF2EFE6),
+    surface = Color(0xFF12261C),
+    onSurface = Color(0xFFF2EFE6),
+    surfaceVariant = Color(0xFF16382A),
+    onSurfaceVariant = Color(0xFF9DB8A8),
+    outline = Color(0xFFF2EFE6),
+    outlineVariant = Color(0xFF34483C),
+    error = Color(0xFFFF8A70),
+    onError = Color(0xFF2A0E08),
+    scrim = Color(0xFF0C1A14),
+    surfaceTint = Color(0xFF67C2A5),
+    inverseSurface = Color(0xFFF2EFE6),
+    inverseOnSurface = Color(0xFF0C1A14),
+    inversePrimary = Color(0xFF2F7F6B),
+    errorContainer = Color(0xFF3A1F1A),
+    onErrorContainer = Color(0xFFFFB4A2),
+    tertiaryContainer = Color(0xFF3A2A12),
+    onTertiaryContainer = Color(0xFFFFE0AE),
+    surfaceContainerLowest = Color(0xFF0C1A14),
+    surfaceContainerLow = Color(0xFF0F2018),
+    surfaceContainer = Color(0xFF12261C),
+    surfaceContainerHigh = Color(0xFF16382A),
+    surfaceContainerHighest = Color(0xFF12261C),
+)
+
+/**
+ * 路亚图鉴的形状：小圆角印章感（3 / 8 / 12 / 14 / 18），
+ * 对应设计稿卡片 12px、Top10 条 8px、标签 20px 胶囊。
+ * 仍是矩形圆角，不引入任何组件高度变化。
+ */
+private val FieldGuideShapes = Shapes(
+    extraSmall = RoundedCornerShape(3.dp),
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(14.dp),
+    extraLarge = RoundedCornerShape(18.dp),
+)
+
+/**
+ * 路亚图鉴的字阶：字号 / 行高与 `TideSpotTypography` 逐项全等，只换字族与字重——
+ * 标题与标签用系统黑体更粗一档（Black / Bold），模拟设计稿的粗黑贴纸字；
+ * 正文保持 Normal。**不改字号与行高**，避免换行位置与卡片高度漂移。
+ */
+private val FieldGuideTypography = Typography(
+    titleLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Black),
+    titleMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Black),
+    titleSmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+    bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 15.sp, lineHeight = 22.sp, fontWeight = FontWeight.Normal),
+    bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Normal),
+    bodySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
+    labelLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Bold),
+    labelMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Bold),
+    labelSmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium),
+)
+
 /**
  * 皮肤注册表——**唯一扩展点**（SKIN-DEV-STANDARD §4.2）。
  *
@@ -347,8 +545,56 @@ object TideSpotSkins {
         texture = SkinTexture(),
     )
 
-    /** 全部内置皮肤（首版仅 A）；未来加皮肤只往这里追加。 */
-    val all: List<TideSpotSkin> = listOf(VintageOutdoor)
+    /**
+     * 路亚图鉴（D）：粗黑描边 + 硬投影贴纸 + 平涂纸底。
+     *
+     * 复用 A 的鱼形/母题 drawable（同一套单色可 tint 矢量），因此新增本皮肤**不需要**
+     * 新资源、不需要改 `SettingsScreen` / `AppSettings` / 任何 `feature:*` 屏。
+     * `paperGrain = false`：设计稿是干净平涂，不叠纸颗粒（消费点在后续铺开时接管）。
+     */
+    val FieldGuide = TideSpotSkin(
+        id = "d-fieldguide",
+        name = "路亚图鉴", // i18n-exempt: skin display name is data, not UI copy
+        nameEn = "LURE FIELD GUIDE",
+        palettes = SkinPalettes(
+            seaLight = SkinPalette(
+                scheme = FieldGuideSeaLight,
+                mapLand = Color(0xFFDDE9D5),
+                mapWater = Color(0xFFB7DAEE),
+                mapRoad = Color(0xFFFFFDF7),
+            ),
+            seaDark = SkinPalette(
+                scheme = FieldGuideSeaDark,
+                mapLand = Color(0xFF16303F),
+                mapWater = Color(0xFF17394C),
+                mapRoad = Color(0xFF2A4A5C),
+            ),
+            inlandLight = SkinPalette(
+                scheme = FieldGuideInlandLight,
+                mapLand = Color(0xFFD9E8D0),
+                mapWater = Color(0xFFB9E0CE),
+                mapRoad = Color(0xFFFFFDF7),
+            ),
+            inlandDark = SkinPalette(
+                scheme = FieldGuideInlandDark,
+                mapLand = Color(0xFF18382A),
+                mapWater = Color(0xFF16382A),
+                mapRoad = Color(0xFF26503E),
+            ),
+        ),
+        shapes = FieldGuideShapes,
+        typography = FieldGuideTypography,
+        texture = SkinTexture(
+            paperGrain = false,
+            grainStrength = 0.45f,
+            printMisregister = true,
+            handDrawnOutline = true,
+            tapeDecoration = false,
+        ),
+    )
+
+    /** 全部内置皮肤（A 复古户外 + D 路亚图鉴）；未来加皮肤只往这里追加。 */
+    val all: List<TideSpotSkin> = listOf(VintageOutdoor, FieldGuide)
 
     /** 缺省皮肤（`skinId` 缺失/非法时落回）。 */
     val default: TideSpotSkin = VintageOutdoor

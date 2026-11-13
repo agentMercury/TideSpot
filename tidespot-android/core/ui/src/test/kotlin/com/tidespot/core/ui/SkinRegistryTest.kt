@@ -1,8 +1,12 @@
 package com.tidespot.core.ui
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.theme.TideSpotSkins
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
@@ -43,6 +47,15 @@ class SkinRegistryTest {
         assertSame(TideSpotSkins.VintageOutdoor, TideSpotSkins.byId("does-not-exist"))
         assertSame(TideSpotSkins.VintageOutdoor, TideSpotSkins.byName("复古户外"))
         assertSame(TideSpotSkins.VintageOutdoor, TideSpotSkins.byName("不存在"))
+    }
+
+    @Test
+    fun fieldGuide_isRegisteredAndSelectable() {
+        assertEquals(2, TideSpotSkins.all.size)
+        assertSame(TideSpotSkins.FieldGuide, TideSpotSkins.byId("d-fieldguide"))
+        assertSame(TideSpotSkins.FieldGuide, TideSpotSkins.byName("路亚图鉴"))
+        // 新增皮肤不得改变缺省皮肤（冷启动缺省仍落 A）
+        assertSame(TideSpotSkins.VintageOutdoor, TideSpotSkins.default)
     }
 
     @Test
@@ -87,6 +100,90 @@ class SkinRegistryTest {
         assertEquals(0xFFD6C6A0.toInt(), p.seaLight.mapLand.toArgb())
         assertEquals(0xFF7FA98C.toInt(), p.inlandLight.mapWater.toArgb())
         assertEquals(0xFF123A55.toInt(), p.seaDark.mapWater.toArgb())
+    }
+
+    @Test
+    fun fieldGuidePalettes_keepDesignValues() {
+        val p = TideSpotSkins.FieldGuide.palettes
+        // 浅色海洋：冷白纸 + 海蓝 + 珊瑚贴纸
+        assertScheme(
+            p.seaLight, bg = 0xFFE9F3FA, primary = 0xFF1E6FA8, surface = 0xFFFFFDF7,
+            surfaceVariant = 0xFFB7DAEE, onSurfaceVariant = 0xFF33556B, outline = 0xFF101820,
+            outlineVariant = 0xFF33556B, error = 0xFFC23B2A, highest = 0xFFFFFDF7,
+        )
+        // 浅色内陆：薄荷纸 + 青绿 + 琥珀贴纸
+        assertScheme(
+            p.inlandLight, bg = 0xFFE9F5EE, primary = 0xFF2F7F6B, surface = 0xFFFFFDF7,
+            surfaceVariant = 0xFFB9E0CE, onSurfaceVariant = 0xFF3A5548, outline = 0xFF101820,
+            outlineVariant = 0xFF3A5548, error = 0xFFC23B2A, highest = 0xFFFFFDF7,
+        )
+        // 深色海洋 / 内陆：独立色板（非浅色机械反转）
+        assertScheme(
+            p.seaDark, bg = 0xFF0B1620, primary = 0xFF6FB6E8, surface = 0xFF12222E,
+            surfaceVariant = 0xFF17394C, onSurfaceVariant = 0xFF9FB6C4, outline = 0xFFF2EFE6,
+            outlineVariant = 0xFF3A4A54, error = 0xFFFF8A70, highest = 0xFF12222E,
+        )
+        assertScheme(
+            p.inlandDark, bg = 0xFF0C1A14, primary = 0xFF67C2A5, surface = 0xFF12261C,
+            surfaceVariant = 0xFF16382A, onSurfaceVariant = 0xFF9DB8A8, outline = 0xFFF2EFE6,
+            outlineVariant = 0xFF34483C, error = 0xFFFF8A70, highest = 0xFF12261C,
+        )
+        // V3 的珊瑚 / 琥珀强调色（贴纸色）不得被 M3 默认值覆盖
+        assertEquals(0xFFE5644C.toInt(), p.seaLight.scheme.tertiary.toArgb())
+        assertEquals(0xFFE9A13B.toInt(), p.inlandLight.scheme.tertiary.toArgb())
+        assertEquals(0xFFFFC15E.toInt(), p.inlandDark.scheme.tertiary.toArgb())
+    }
+
+    @Test
+    fun allSkins_textPairsMeetContrast() {
+        val pairs: List<Pair<String, (ColorScheme) -> Pair<Color, Color>>> = listOf(
+            "onBackground/background" to { s -> s.onBackground to s.background },
+            "onSurface/surface" to { s -> s.onSurface to s.surface },
+            "onSurfaceVariant/surfaceVariant" to { s -> s.onSurfaceVariant to s.surfaceVariant },
+            "onPrimary/primary" to { s -> s.onPrimary to s.primary },
+            "onPrimaryContainer/primaryContainer" to { s -> s.onPrimaryContainer to s.primaryContainer },
+            "onSecondary/secondary" to { s -> s.onSecondary to s.secondary },
+            "onSecondaryContainer/secondaryContainer" to { s -> s.onSecondaryContainer to s.secondaryContainer },
+            "onTertiary/tertiary" to { s -> s.onTertiary to s.tertiary },
+            "onTertiaryContainer/tertiaryContainer" to { s -> s.onTertiaryContainer to s.tertiaryContainer },
+            // `onError/error` 不在此列：A 的 error 是填充色（浅纸底文字对比 3.1–3.7），
+            // 标准 §4.8 明确它不作文本色，状态文字走 onErrorContainer（下方已锁）。
+            "onErrorContainer/errorContainer" to { s -> s.onErrorContainer to s.errorContainer },
+        )
+        TideSpotSkins.all.forEach { skin ->
+            skin.palettes.let { p ->
+                listOf(
+                    "sea-light" to p.seaLight,
+                    "sea-dark" to p.seaDark,
+                    "inland-light" to p.inlandLight,
+                    "inland-dark" to p.inlandDark,
+                ).forEach { (label, palette) ->
+                    pairs.forEach { (pairName, select) ->
+                        val (fg, bg) = select(palette.scheme)
+                        val ratio = contrastRatio(fg, bg)
+                        assertTrue(
+                            ratio >= 4.5,
+                            "${skin.id}/$label $pairName 对比度 ${"%.2f".format(ratio)} < 4.5",
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /** WCAG 2.1 相对亮度对比度（1..21）；Compose Color 的 red/green/blue 为 sRGB 分量。 */
+    private fun contrastRatio(fg: Color, bg: Color): Double {
+        val a = relativeLuminance(fg)
+        val b = relativeLuminance(bg)
+        return (max(a, b) + 0.05) / (min(a, b) + 0.05)
+    }
+
+    private fun relativeLuminance(color: Color): Double {
+        fun channel(value: Float): Double {
+            val v = value.toDouble()
+            return if (v <= 0.03928) v / 12.92 else Math.pow((v + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * channel(color.red) + 0.7152 * channel(color.green) + 0.0722 * channel(color.blue)
     }
 
     private fun assertScheme(
