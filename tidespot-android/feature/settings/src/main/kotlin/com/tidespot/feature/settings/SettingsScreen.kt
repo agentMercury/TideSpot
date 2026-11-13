@@ -1,9 +1,10 @@
 package com.tidespot.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,7 +57,8 @@ fun SettingsScreen(
     onPrefetchChange: (Boolean) -> Unit,
     onReverseGeoChange: (Boolean) -> Unit,
     /** UX-19（OPT-V11-19）：地图样式三选（彩色/素色/深色）。 */
-    onMapStyleChange: (MapStyle) -> Unit,
+    /** UX-19 / OPT-A-12：地图样式四选（跟随主题 / 彩色 / 素色 / 深色）。 */
+    onMapStyleChange: (MapStyleChoice) -> Unit,
     /** OPT-A-10：地图来源（OpenFreeMap / CARTO / 未来新增）。 */
     onMapProviderChange: (MapProvider) -> Unit,
     /** SKIN-3 / OPT-A-09：选皮肤（只写 skinId，不动明暗）。 */
@@ -128,27 +130,14 @@ fun SettingsScreen(
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        // UX-19（OPT-V11-19 / D8 + OPT-A-03）：地图样式三选。
-        // 未改过时高亮「跟明暗自动切」的那一项；点任意项即固定为显式选择。
+        // OPT-A-12：地图样式四选（跟随主题 / 彩色 / 素色 / 深色）。
+        // 「跟随主题」= 不表态（深色切深色板、浅色切彩色板）；点具体样式即固定，深色不再覆盖。
         Text(stringResource(R.string.ts_settings_map_style), style = MaterialTheme.typography.titleSmall)
-        val darkTheme = SettingsLogic.resolveDarkTheme(state.themeMode, isSystemInDarkTheme())
-        val activeMapStyle = SettingsLogic.mapStyleChipSelection(state, darkTheme)
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            MapStyle.entries.forEach { style ->
-                val label = stringResource(style.labelRes)
-                val styleDesc = stringResource(
-                    R.string.ts_settings_map_style_desc,
-                    label,
-                    state.mapProvider.displayName,
-                )
-                FilterChip(
-                    selected = activeMapStyle == style,
-                    onClick = { onMapStyleChange(style) },
-                    label = { Text(label) },
-                    modifier = Modifier.semantics { contentDescription = styleDesc },
-                )
-            }
-        }
+        MapStyleChips(
+            choice = SettingsLogic.mapStyleChoice(state),
+            providerName = state.mapProvider.displayName,
+            onSelect = onMapStyleChange,
+        )
         Text(
             stringResource(
                 if (state.mapStyleExplicit) {
@@ -343,6 +332,37 @@ private fun ToggleRow(
             onCheckedChange = onChange,
             modifier = Modifier.semantics { contentDescription = desc },
         )
+    }
+}
+
+/**
+ * 地图样式四选（OPT-A-12）：[MapStyleChoice] 遍历渲染，**新增选项只往枚举加一项**。
+ *
+ * 用 FlowRow 而非 Row：「跟随主题」比其余三项长，窄屏或大字体缩放下 Row 会把最后一个 chip 顶出屏幕
+ * （同类溢出此前在皮肤下拉上真机出现过，见 SKIN-DEV-STANDARD 反模式 12）。换行不影响语义分组。
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MapStyleChips(
+    choice: MapStyleChoice,
+    providerName: String,
+    onSelect: (MapStyleChoice) -> Unit,
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        MapStyleChoice.entries.forEach { item ->
+            val label = stringResource(item.labelRes)
+            val desc = stringResource(R.string.ts_settings_map_style_desc, label, providerName)
+            FilterChip(
+                selected = choice == item,
+                onClick = { onSelect(item) },
+                label = { Text(label) },
+                modifier = Modifier.semantics { contentDescription = desc },
+            )
+        }
     }
 }
 

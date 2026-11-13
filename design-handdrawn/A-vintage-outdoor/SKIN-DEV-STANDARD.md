@@ -3,8 +3,9 @@
 > **面向对象**：未来要**新增一套皮肤**或**修改现有皮肤**的 Agent / 工程师。
 > **与 `SKIN-DESIGN-SPEC.md` 的关系**：那份是**契约**（什么能换、什么绝不能换）；本文是**执行手册**（照着做就能产出一套合格皮肤）。
 > **一句话**：**皮肤 = 一组可替换的视觉 token；业务 Composable 零改动。**
-> **版本**：1.2 ｜ 2026-11-13 ｜ 基线皮肤：手绘 A · 复古户外（首版唯一内置）
+> **版本**：1.3 ｜ 2026-11-13 ｜ 基线皮肤：手绘 A · 复古户外（首版唯一内置）
 > **v1.1 变更**：v1.0 是「设计假设 + 参考骨架（未编译）」；本版由 A 的**全屏落地结果反向校准**——字段、路径、持久化键、门禁命令、踩坑全部对应真实代码。凡与 v1.0 冲突处，以本版为准。
+> **v1.3 变更**：设置页样式改四选（`MapStyleChoice` 含「跟随主题」），更正 §4.4.1 的「chip 与生效值同口径」为「与用户表态同口径」。
 > **v1.2 变更**：补 §4.4.1「地图底图 = 第 4 个跟随轴」——底图不属于皮肤 token，但必须跟明暗走；记录 `mapStyleExplicit` 判定与迁移坑。反模式补 13/14。
 
 ---
@@ -176,21 +177,29 @@ fun TideSpotTheme(
 
 ### 4.4.1 地图底图（第 4 个跟随轴，2026-11-13 裁决）
 
-底图不是皮肤 token（是 CARTO 远程样式），但它必须跟明暗一起走，否则「周边全深、底图仍浅」观感割裂。
+底图不是皮肤 token（是远程矢量样式：默认 OpenFreeMap，可切 CARTO），但它必须跟明暗一起走，否则「周边全深、底图仍浅」观感割裂。
 
 | 键 | 含义 |
 |---|---|
-| `settings.mapStyle` | 用户选的样式（`VOYAGER` / `POSITRON` / `DARK_MATTER`） |
+| `settings.mapStyle` | 用户选的**具体**样式（`VOYAGER` / `POSITRON` / `DARK_MATTER`） |
 | `settings.mapStyleExplicit` | 用户**是否动手选过**（决定自动切换是否生效） |
+| `settings.mapProvider` | 瓦片提供方（OPT-A-10；与样式正交，2 × 3） |
 
 ```kotlin
-// 唯一入口，业务侧禁止直接取 state.mapStyle.url
-val style = SettingsLogic.resolveMapStyle(state, darkTheme)
+// 唯一入口，业务侧禁止直接取样式 URL 或自拼
+val url = SettingsLogic.resolveBasemapUrl(state, darkTheme)   // provider × 生效样式
 ```
 
 - `mapStyleExplicit = false`（默认 / 全新安装）→ 深色 `DARK_MATTER`、浅色 `VOYAGER`，**自动切**；
-- `mapStyleExplicit = true`（用户点过任意一项）→ `mapStyle` 说了算，明暗不再覆盖（D8 用户选择优先）。
-- 设置页 chip 高亮用 `SettingsLogic.mapStyleChipSelection(state, darkTheme)`——**与地图生效值同口径**，否则会出现「高亮彩色、地图是深色」的矛盾；下方说明文字随 explicit 在 `ts_settings_map_style_auto` / `_pinned` 之间切换。
+- `mapStyleExplicit = true`（用户点过具体样式）→ `mapStyle` 说了算，明暗不再覆盖（D8 用户选择优先）。
+- **设置页是四选**（OPT-A-12）：`跟随主题` / `彩色` / `素色` / `深色`。
+  - `跟随主题` **不是一种 `MapStyle`**，它是「用户没表态」这个状态；因此单列 `MapStyleChoice(style: MapStyle?)` 枚举，
+    选中即写 `mapStyleExplicit = false`，其余三项走 `withMapStyle`（写样式 + explicit = true）。**不要**把 `FOLLOW_THEME` 塞进 `MapStyle`——
+    那会让一个没有 URL 的成员进 `entries`，`styleUrl()` 只能返 null 或抛异常，并污染 `settings.mapStyle` 既有语义。
+  - chip 高亮用 `SettingsLogic.mapStyleChoice(state)`（**与「用户表态」同口径，不与「生效样式」同口径**）：
+    手动选「彩色」后深色下生效的仍是彩色，高亮也必须停在「彩色」，否则 chip 与底图互相打脸。
+  - 四个 chip 用 `FlowRow` 而非 `Row`：`跟随主题` 比其余长，窄屏/大字体下 Row 会顶出屏幕。
+  - 说明文字随 explicit 在 `ts_settings_map_style_auto` / `_pinned` 之间切换。
 - 旧版本迁移：`settings.mapStyleExplicit` 缺失一律读作 `false`（未改过 → 自动切）。**不能拿「旧 `settings.mapStyle` 键存在」反推**——v1.16 的 `persistSettings` 全量写回，未改过样式的用户也会留下该键，据此判断会把绝大多数人误锁成「已选定」。
 - **样式热切换靠 `MapScreen` 的 `LaunchedEffect(styleUrl, mapLibre)`**：`setStyle` 会丢弃所有运行时图层，所以该效果内必须重跑 `installStarLayer(style)` 并强制首帧重绘——新增皮肤若动这块，务必保留这个顺序。
 

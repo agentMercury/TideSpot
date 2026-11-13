@@ -244,6 +244,7 @@ private fun AppRoot(
                     onSpotConfirmed = { confirmed -> pendingConfirm = confirmed },
                     // UX-19 + OPT-A-03 + OPT-A-10：底图 URL = 提供方 × 生效样式（唯一出口）
                     styleUrl = SettingsLogic.resolveBasemapUrl(settingsState, darkTheme),
+                    mapProviderName = settingsState.mapProvider.displayName,
                     // UX-18：返回地图 → 上一查看点 / lastViewed 最新（冷启动 null → 定位/世界视图）
                     initialCameraTarget = pendingMapTarget,
                     // OPT-V115-02 / S01：顶部工具浮层（定位/搜索/收藏/设置）+ 信息条上方 Top10 入口
@@ -484,7 +485,8 @@ private fun SettingsPage(
         onPrefetchChange = { enabled -> onChange(SettingsLogic.withPrefetch(state, enabled)) },
         onReverseGeoChange = { enabled -> onChange(SettingsLogic.withReverseGeo(state, enabled)) },
         // UX-19：地图样式三选（持久化 + 地图页即时生效）
-        onMapStyleChange = { style -> onChange(SettingsLogic.withMapStyle(state, style)) },
+        // OPT-A-12：地图样式四选（跟随主题 / 彩色 / 素色 / 深色）
+        onMapStyleChange = { choice -> onChange(SettingsLogic.withMapStyleChoice(state, choice)) },
         // OPT-A-10：地图来源（提供方）
         onMapProviderChange = { provider -> onChange(SettingsLogic.withMapProvider(state, provider)) },
         // SKIN-3 / OPT-A-09：皮肤下拉（按名字选，只写 skinId）

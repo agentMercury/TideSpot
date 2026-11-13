@@ -81,9 +81,29 @@ object SettingsLogic {
             MapStyle.VOYAGER
         }
 
-    /** 设置页 chip 高亮口径：与地图实际生效样式一致（未改过时高亮的是「跟明暗自动切」那一项）。 */
-    fun mapStyleChipSelection(state: SettingsState, darkTheme: Boolean): MapStyle =
-        resolveMapStyle(state, darkTheme)
+    /**
+     * 设置页 chip 高亮口径（OPT-A-12 四选）：
+     * 用户没表态 → 高亮 [MapStyleChoice.FOLLOW_THEME]；表过态 → 高亮他选的那一项。
+     *
+     * 注意与「生效样式」的区别：手动选「彩色」后，深色下**生效**的是彩色（用户选择优先），
+     * 高亮也必须停在「彩色」而不是「深色」——否则 chip 显示与实际底图不一致。
+     */
+    fun mapStyleChoice(state: SettingsState): MapStyleChoice =
+        if (!state.mapStyleExplicit) {
+            MapStyleChoice.FOLLOW_THEME
+        } else {
+            MapStyleChoice.entries.firstOrNull { it.style == state.mapStyle } ?: MapStyleChoice.COLOR
+        }
+
+    /**
+     * 选样式 chip（OPT-A-12）：[MapStyleChoice.FOLLOW_THEME] = 解绑显式选择（回到跟明暗自动切，
+     * 存量 `mapStyle` 保留作下次表态前的兜底值）；其余 = 固定为该样式（走 [withMapStyle] 单一写入点）。
+     */
+    fun withMapStyleChoice(state: SettingsState, choice: MapStyleChoice): SettingsState =
+        when (val style = choice.style) {
+            null -> state.copy(mapStyleExplicit = false)
+            else -> withMapStyle(state, style)
+        }
 
     /** OPT-A-10：选底图提供方（只改 provider，不碰样式与显式标记）。 */
     fun withMapProvider(state: SettingsState, provider: MapProvider): SettingsState =

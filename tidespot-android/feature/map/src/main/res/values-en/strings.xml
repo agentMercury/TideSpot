@@ -6,7 +6,7 @@
     <string name="ts_map_confirm">Confirm</string>
     <string name="ts_map_search_clear">Clear</string>
     <string name="ts_map_search_hint">Search a place (e.g. Wanlu Lake)</string>
-    <string name="ts_map_attribution">Map data: OpenStreetMap contributors · OpenFreeMap</string>
+    <string name="ts_map_attribution">Map data: OpenStreetMap contributors · %1$s</string>
     <string name="ts_map_source_line">Source update %1$s · Device fetch %2$s</string>
     <!-- OPT-V12-01: favorite star bubble -->
     <string name="ts_map_star_detail">View details</string>

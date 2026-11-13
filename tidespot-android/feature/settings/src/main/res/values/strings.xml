@@ -17,8 +17,8 @@
     <string name="ts_settings_map_source_note">底图空白时换一个来源试试；点位与数据不受影响</string>
     <string name="ts_settings_map_style">地图样式</string>
     <string name="ts_settings_map_style_desc">地图样式：%1$s（%2$s）</string>
-    <string name="ts_settings_map_style_auto">未改过时跟随深色模式自动切换底图</string>
-    <string name="ts_settings_map_style_pinned">已按你的选择固定，深色模式不再自动切换</string>
+    <string name="ts_settings_map_style_auto">跟随主题：浅色模式用彩色底图，深色模式用深色底图</string>
+    <string name="ts_settings_map_style_pinned">已固定为所选样式，不再随明暗切换</string>
     <string name="ts_settings_data_network">数据与网络</string>
     <string name="ts_settings_prefetch">后台预取</string>
     <string name="ts_settings_weather">天气</string>
@@ -31,6 +31,7 @@
     <string name="ts_settings_privacy_sends">发送内容：%1$s</string>
 
     <!-- MapStyle 展示名 -->
+    <string name="ts_settings_style_follow">跟随主题</string>
     <string name="ts_settings_style_color">彩色</string>
     <string name="ts_settings_style_plain">素色</string>
     <string name="ts_settings_style_dark">深色</string>

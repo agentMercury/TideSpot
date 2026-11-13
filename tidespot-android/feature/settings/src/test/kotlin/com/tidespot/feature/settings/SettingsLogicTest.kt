@@ -210,12 +210,53 @@ class SettingsLogicTest {
     }
 
     @Test
-    fun `mapStyleChipSelection_与生效样式同口径`() {
+    fun `mapStyleChoice_未表态高亮跟随主题_表态后停在所选`() {
         val untouched = SettingsState()
-        assertEquals(MapStyle.DARK_MATTER, SettingsLogic.mapStyleChipSelection(untouched, darkTheme = true))
-        assertEquals(MapStyle.VOYAGER, SettingsLogic.mapStyleChipSelection(untouched, darkTheme = false))
+        assertEquals(
+            MapStyleChoice.FOLLOW_THEME,
+            SettingsLogic.mapStyleChoice(untouched),
+            "从未改过 → 高亮「跟随主题」，而非按明暗漂移的具体样式",
+        )
+        // 手动选彩色后，深色下生效的仍是彩色 → 高亮必须也停在彩色（不能漂到「深色」）
         val pinned = SettingsLogic.withMapStyle(untouched, MapStyle.VOYAGER)
-        assertEquals(MapStyle.VOYAGER, SettingsLogic.mapStyleChipSelection(pinned, darkTheme = true))
+        assertEquals(MapStyleChoice.COLOR, SettingsLogic.mapStyleChoice(pinned))
+        assertEquals(
+            MapStyle.VOYAGER,
+            SettingsLogic.resolveMapStyle(pinned, darkTheme = true),
+            "chip 与生效样式同口径",
+        )
+        assertEquals(
+            MapStyleChoice.DARK,
+            SettingsLogic.mapStyleChoice(SettingsLogic.withMapStyle(untouched, MapStyle.DARK_MATTER)),
+        )
+    }
+
+    @Test
+    fun `withMapStyleChoice_选跟随主题即解绑且不碰明暗皮肤`() {
+        val pinned = SettingsLogic.withMapStyleChoice(SettingsState(), MapStyleChoice.PLAIN)
+        assertEquals(MapStyle.POSITRON, pinned.mapStyle)
+        assertTrue(pinned.mapStyleExplicit)
+
+        val backToAuto = SettingsLogic.withMapStyleChoice(pinned, MapStyleChoice.FOLLOW_THEME)
+        assertFalse(backToAuto.mapStyleExplicit, "选「跟随主题」= 回到跟明暗自动切")
+        // 解绑后深色立刻恢复自动切，且不重置明暗/皮肤/提供方
+        assertEquals(MapStyle.DARK_MATTER, SettingsLogic.resolveMapStyle(backToAuto, darkTheme = true))
+        assertEquals(MapStyle.VOYAGER, SettingsLogic.resolveMapStyle(backToAuto, darkTheme = false))
+        assertEquals(pinned.themeMode, backToAuto.themeMode)
+        assertEquals(pinned.skinId, backToAuto.skinId)
+        assertEquals(pinned.mapProvider, backToAuto.mapProvider)
+    }
+
+    @Test
+    fun `mapStyleChoice_四个选项覆盖三种样式且顺序固定`() {
+        assertEquals(4, MapStyleChoice.entries.size)
+        assertEquals(MapStyleChoice.FOLLOW_THEME, MapStyleChoice.entries.first(), "默认项排第一")
+        assertEquals(
+            MapStyle.entries.toSet(),
+            MapStyleChoice.entries.mapNotNull { it.style }.toSet(),
+            "三个具体样式与 MapStyle 一一对应，不重不漏",
+        )
+        assertEquals(4, MapStyleChoice.entries.map { it.style }.size, "无重复样式")
     }
 
     @Test

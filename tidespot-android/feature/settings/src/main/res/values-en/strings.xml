@@ -17,8 +17,8 @@
     <string name="ts_settings_map_source_note">If the basemap is blank, try another source; spots and data are unaffected</string>
     <string name="ts_settings_map_style">Map style</string>
     <string name="ts_settings_map_style_desc">Map style: %1$s (%2$s)</string>
-    <string name="ts_settings_map_style_auto">Follows dark mode automatically until you pick one</string>
-    <string name="ts_settings_map_style_pinned">Pinned to your choice; dark mode no longer switches it</string>
+    <string name="ts_settings_map_style_auto">Follows theme: color in light mode, dark in dark mode</string>
+    <string name="ts_settings_map_style_pinned">Pinned to the selected style; no longer follows light/dark</string>
     <string name="ts_settings_data_network">Data &amp; network</string>
     <string name="ts_settings_prefetch">Background prefetch</string>
     <string name="ts_settings_weather">Weather</string>
@@ -30,6 +30,7 @@
     <string name="ts_settings_privacy">Privacy disclosure (per source)</string>
     <string name="ts_settings_privacy_sends">Sends: %1$s</string>
 
+    <string name="ts_settings_style_follow">Follow theme</string>
     <string name="ts_settings_style_color">Color</string>
     <string name="ts_settings_style_plain">Plain</string>
     <string name="ts_settings_style_dark">Dark</string>

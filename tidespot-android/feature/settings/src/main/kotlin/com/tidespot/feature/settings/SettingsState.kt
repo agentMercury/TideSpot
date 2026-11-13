@@ -32,6 +32,23 @@ enum class MapStyle(@StringRes val labelRes: Int) {
 }
 
 /**
+ * 设置页「地图样式」的**四个选项**（OPT-A-12 新增第四项「跟随主题」）。
+ *
+ * 为什么不把 `FOLLOW_THEME` 直接塞进 [MapStyle]：`MapStyle` 是**持久化值 + URL 维度**
+ * （存 `name`、经 `MapProvider.styleUrl` 映射成瓦片样式）。「跟随主题」不是一种样式、没有 URL，
+ * 它是「用户没表态」这个状态；混进枚举会让 `entries` 出现一个无 URL 的成员，
+ * `styleUrl()` 只能返 null 或抛异常，且老值 `settings.mapStyle` 的语义被污染。
+ *
+ * 映射回持久化（[SettingsLogic.withMapStyleChoice]）：选 [FOLLOW_THEME] ⇔ `mapStyleExplicit = false`；选其余 ⇔ 写对应样式且 explicit = true。
+ */
+enum class MapStyleChoice(@StringRes val labelRes: Int, val style: MapStyle?) {
+    FOLLOW_THEME(R.string.ts_settings_style_follow, null),
+    COLOR(R.string.ts_settings_style_color, MapStyle.VOYAGER),
+    PLAIN(R.string.ts_settings_style_plain, MapStyle.POSITRON),
+    DARK(R.string.ts_settings_style_dark, MapStyle.DARK_MATTER),
+}
+
+/**
  * 地图**提供方**（2026-11-13 新增，OPT-A-10）——「瓦片从哪来」。
  *
  * 为什么要可切：CARTO（Fastly）在部分网络下 443 全超时 → 底图空白；OpenFreeMap 同数据同坐标系但可达。

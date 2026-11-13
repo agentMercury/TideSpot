@@ -147,6 +147,11 @@ fun MapScreen(
     onSpotConfirmed: (SpotConfirmed) -> Unit = {},
     /** UX-19（OPT-V11-19）：底图样式 URL（默认彩色；URL 单点在 TideSpotUrls）。 */
     styleUrl: String = DEFAULT_BASEMAP_STYLE_URL,
+    /**
+     * OPT-A-10：当前底图**提供方**名（OpenFreeMap / CARTO…），仅用于署名行。
+     * 署名必须随来源变——CARTO 的瓦片同样要求署名，写死一个提供方等于给错来源。
+     */
+    mapProviderName: String,
     /** UX-18（OPT-V11-18）：返回地图时的相机目标（上一查看点 / lastViewed 最新点；null = 世界视图）。 */
     initialCameraTarget: GeoPoint? = null,
     /** OPT-V115-02 / S01 C02：顶部工具浮层动作（收藏/设置/Top10 由 :app 注入；null = 不渲染）。 */
@@ -697,8 +702,9 @@ fun MapScreen(
             )
 
             // OPT-V115-02 / S01 C21：底图署名行（设计 y=818；与 Top10/信息条不重叠）
+            // OPT-A-10：署名随提供方切换（OSM 数据恒署名，瓦片提供方另署）
             Text(
-                stringResource(R.string.ts_map_attribution),
+                stringResource(R.string.ts_map_attribution, mapProviderName),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
