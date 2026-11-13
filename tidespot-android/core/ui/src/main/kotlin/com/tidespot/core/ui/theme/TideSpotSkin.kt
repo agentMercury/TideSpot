@@ -19,7 +19,7 @@ import com.tidespot.core.ui.R
  * 皮肤 token 抽象层（OPT-A-09 / SKIN-1）。
  *
  * 心智模型（三轴正交，见 SKIN-DESIGN-SPEC.md §1）：
- *  - **皮肤**：本文件的数据类，用户可选，首版仅 [TideSpotSkins.VintageOutdoor]；
+ *  - **皮肤**：本文件的数据类，用户可选，内置 [TideSpotSkins.VintageOutdoor] 与 [TideSpotSkins.FieldGuide]；
  *  - **水体**：由点位数据决定（海 / 内陆），用户不可切；
  *  - **明暗**：跟随系统 / 浅 / 深（OPT-A-03），与皮肤正交。
  *

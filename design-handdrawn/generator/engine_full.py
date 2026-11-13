@@ -22,12 +22,27 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import engine as E
 
-SID = "a-vintage"                 # 唯一风格：手绘 A 复古户外
-OUT = HERE.parent / "A-vintage-outdoor" / "sources_full"
+SID = "a-vintage"                 # 默认风格：手绘 A 复古户外
+SITE = HERE.parent / "A-vintage-outdoor"
+OUT = SITE / "sources_full"
 OUT.mkdir(parents=True, exist_ok=True)
 
 C = lambda water: E.pal(SID, water)
 H = E._h
+
+
+def configure(style_id, site_dir):
+    """切换到指定皮肤与站点目录。
+
+    所有渲染函数在调用时读全局 SID / OUT / C，因此只需在 build() 前调用一次；
+    默认不调用时保持 A-vintage 行为（`python engine_full.py` 零参数兼容旧命令）。
+    """
+    global SID, SITE, OUT, C
+    SID = style_id
+    SITE = Path(site_dir)
+    OUT = SITE / "sources_full"
+    OUT.mkdir(parents=True, exist_ok=True)
+    C = lambda water: E.pal(SID, water)
 
 
 # ---------------------------------------------------------------------------
@@ -38,7 +53,7 @@ def shell(body, water, title, bg_override=None):
     css = E.page_css(SID, water)
     if bg_override:
         css += f"\n.bgfill{{background:{bg_override}!important}}"
-    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · 复古户外 · {title}</title>
+    return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>TideSpot · {E.STYLES[SID]["name"]} · {title}</title>
 <style>{css}</style></head><body>
 {E.svg_defs(SID, water)}
 <div class="bgfill"></div>
@@ -721,10 +736,24 @@ DARK = {
                 map_land="1C3326", map_water="123C2E", map_road="2C4A38", band=["2E7D52","66BB6A","FDD835","FB8C00","E53935"]),
 }
 
+# D 路亚图鉴：深色独立调色（与工程 d-fieldguide 的 dark scheme 同源）
+DARK_D = {
+    "sea": dict(bg="0B1620", bg2="0F1D28", ink="F2EFE6", line="3A4A54", card="12222E", card2="17394C",
+                primary="6FB6E8", accent="FF8A70", accent2="9FB6C4", green="67C2A5", muted="9FB6C4", white="F2EFE6",
+                map_land="16303F", map_water="17394C", map_road="2A4A5C", band=["2E7D32","66BB6A","FDD835","FB8C00","EF5350"]),
+    "inland": dict(bg="0C1A14", bg2="0F2018", ink="F2EFE6", line="34483C", card="12261C", card2="16382A",
+                primary="67C2A5", accent="FFC15E", accent2="9DB8A8", green="67C2A5", muted="9DB8A8", white="F2EFE6",
+                map_land="18382A", map_water="16382A", map_road="26503E", band=["2E7D32","66BB6A","FDD835","FB8C00","EF5350"]),
+}
+
+
+def _dark_pal():
+    return DARK_D if SID == "d-guidebook" else DARK
+
 
 def render_dark(base_fn, water="sea", label="深色"):
     """临时注入深色 palette，复用现有渲染函数"""
-    P = DARK[water]
+    P = _dark_pal()[water]
     orig = E.STYLES[SID]["pal"][water]
     E.STYLES[SID]["pal"][water] = P
     try:
@@ -750,6 +779,7 @@ def revise_settings():
     h = E._h
     ink, line, primary, muted = h(p["ink"]), h(p["line"]), h(p["primary"]), h(p["muted"])
     accent2 = h(p["accent2"])
+    skin_name = f'{E.STYLES[SID]["no"]} · {E.STYLES[SID]["name"]}'
     target = OUT.parent / "sources" / "settings.html"
     html = target.read_text(encoding="utf-8")
     if "外观 · 皮肤" in html:
@@ -780,7 +810,7 @@ def revise_settings():
             <span class="tag" style="margin-left:auto;font-size:8px;background:{accent2};color:{ink}">OPT-A-09</span></div>
           <div class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1.2px dashed {line}40">
             <span class="bodyf" style="font-size:11.5px;color:{ink}">当前皮肤</span>
-            <span class="row" style="gap:4px">{swatches}<span class="bodyf" style="font-size:9.5px;color:{muted};margin-left:3px">手绘 A · 复古户外 ✓</span></span></div>
+            <span class="row" style="gap:4px">{swatches}<span class="bodyf" style="font-size:9.5px;color:{muted};margin-left:3px">{skin_name} ✓</span></span></div>
           <div class="row" style="gap:6px;margin-top:5px"><span class="bodyf mut" style="font-size:9px">切换仅改视觉，不影响数据</span>
             <span class="tag" style="margin-left:auto;font-size:8px;border-style:dashed;color:{muted}">更多皮肤 · 敬请期待</span></div></div>'''
 
@@ -867,11 +897,21 @@ def build():
     return made
 
 
-if __name__ == "__main__":
+def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    style_id = argv[0] if argv else "a-vintage"
+    site = Path(argv[1]) if len(argv) > 1 else HERE.parent / "A-vintage-outdoor"
+    configure(style_id, site)
     made = build()
     print(f"FULL_UI_HTML={len(made)}")
+    print(f"STYLE={style_id} SITE={site.name}")
     for m in made:
         print("  ", m)
+    return made
+
+
+if __name__ == "__main__":
+    main()
 
 
 

@@ -2,111 +2,373 @@
   "schema": "tidespot.handdrawn.version/1.0",
   "id": "D-field-guide",
   "no": "D",
-  "name": "手绘鱼种图鉴",
-  "name_en": "FIELD GUIDE",
-  "based_on": "工程 v1.16.0（versionCode 20）· 手绘视觉概念稿",
+  "name": "路亚图鉴",
+  "name_en": "LURE FIELD GUIDE",
+  "based_on": "工程 v1.17.0（versionCode 21）· 皮肤 d-fieldguide",
   "source_images": [
-    "图7 微信图片_20261112105651_7_163.jpg（路亚鱼种图鉴长图）"
+    "idea-explorations/v3-fieldguide（路亚鱼种图鉴探索稿）"
   ],
-  "visual_language": "淡蓝/淡绿纸底 + 粗黑描边 Q 版鱼 + 中英双语贴纸标签 + 胶带/图鉴卡 + 手写笔记 + 马克笔涂色",
-  "fish_motif": "图鉴卡通鱼：粗黑描边 + 背鳍棘刺 + 斑纹 + 大眼张嘴",
-  "best_for": "信息感强、趣味足；鱼种图鉴与「钓什么鱼」场景天然契合",
-  "tone": "手账拼贴 · 淡蓝/淡绿双水体",
+  "visual_language": "冷白/薄荷平涂纸底 + 近黑粗描边 + 硬投影贴纸 + 小圆角印章 + 海蓝/珊瑚（海）· 青绿/琥珀（陆）",
+  "fish_motif": "图鉴贴纸鱼：粗黑描边 + 硬投影 + 平涂",
+  "best_for": "信息感强、贴纸感足；与「钓什么鱼」的图鉴语义天然契合",
+  "tone": "冷白/薄荷平涂 路 海蓝/青绿双水体",
   "offline": true,
   "selfcontained": true,
+  "palette": {
+    "sea": {
+      "bg": "E9F3FA",
+      "bg2": "D7E9F6",
+      "ink": "101820",
+      "primary": "1E6FA8",
+      "accent": "E5644C",
+      "accent2": "175A86",
+      "green": "3E9E5A",
+      "card": "FFFDF7",
+      "card2": "F1F8FC",
+      "line": "101820",
+      "muted": "33556B",
+      "white": "FFFDF7",
+      "band": [
+        "1B5E20",
+        "43A047",
+        "FDD835",
+        "FB8C00",
+        "E53935"
+      ],
+      "map_land": "DDE9D5",
+      "map_water": "B7DAEE",
+      "map_road": "FFFDF7"
+    },
+    "inland": {
+      "bg": "E9F5EE",
+      "bg2": "D8EDE2",
+      "ink": "101820",
+      "primary": "2F7F6B",
+      "accent": "E9A13B",
+      "accent2": "1F6B58",
+      "green": "3E9E5A",
+      "card": "FFFDF7",
+      "card2": "F1FBF5",
+      "line": "101820",
+      "muted": "3A5548",
+      "white": "FFFDF7",
+      "band": [
+        "1B5E20",
+        "43A047",
+        "FDD835",
+        "FB8C00",
+        "E53935"
+      ],
+      "map_land": "D9E8D0",
+      "map_water": "B9E0CE",
+      "map_road": "FFFDF7"
+    }
+  },
   "screens": [
     {
       "key": "detail-sea",
-      "label": "详情页 · 海洋/近海",
+      "label": "详情 · 海洋/近海（base 骨架）",
       "png": "screens/detail-sea.png",
       "html": "sources/detail-sea.html",
-      "sha256": "af1366d52f19291e0afbab43e4cd297b33f65da9fe21e5a6af31cb08f59cc4bf"
+      "sha256": "03b0b4badcdb8cba98219b6b09704b4d5ce59ef17e7491bd07d383ecde7829f2",
+      "html_sha256": "e00d1d71848c3a6f1c0141793142d5d2c736663ba632905fb79b1c239804b4bb"
     },
     {
       "key": "detail-inland",
-      "label": "详情页 · 内陆/湖泊",
+      "label": "详情 · 内陆/湖泊（base 骨架）",
       "png": "screens/detail-inland.png",
       "html": "sources/detail-inland.html",
-      "sha256": "ebb14686dee4bb486c067c0b2d6372bfcf9ca33c866bba4a42258bda5d244b18"
+      "sha256": "08b7bfb0ddb0519fbf1b9896de79c468161a396a80707631cb96b394ab1a7103",
+      "html_sha256": "000442649ea5b1b2600469f97c1d6dadbadc87097e74e6c476c25b3e2644b0db"
     },
     {
       "key": "map-sea",
-      "label": "地图选点 · 海洋",
+      "label": "地图 · 海洋",
       "png": "screens/map-sea.png",
       "html": "sources/map-sea.html",
-      "sha256": "3505436fa7d14fdeecfdfb1387a23e5622e3ea1ff431e5dd505ef275fd84e32c"
+      "sha256": "4e07784dc130171109f902738814024c2808b4ef1d7a807e0ce0f34f28da9e2e",
+      "html_sha256": "f1bb7ec2c7b7a4e7ab2996910f6162e006eb6d8a73dc11e6328a09125f051ba6"
     },
     {
       "key": "map-inland",
-      "label": "地图选点 · 内陆",
+      "label": "地图 · 内陆",
       "png": "screens/map-inland.png",
       "html": "sources/map-inland.html",
-      "sha256": "1801243fe4768c9e8ee00534a5cf2fffe39066cf25465eec9faabb1832f28ccc"
+      "sha256": "3786ae3525235abdaa4d89ad6e37f45957dc1e6ba17dce542c13b696a0a1e040",
+      "html_sha256": "8fa90d67e8b58bd602e4b1d78d25919854d7aa5aa9c7a31dc4a5d750a85fbf41"
     },
     {
       "key": "favorites",
-      "label": "收藏页",
+      "label": "收藏",
       "png": "screens/favorites.png",
       "html": "sources/favorites.html",
-      "sha256": "a90158a2c3894da54e7dfaf28777f84ed8243d0727b56ab412b5808d7d769a4a"
+      "sha256": "aed6dd0166c53e8dac2d92f708fa620001fd4a1f83ff038679e6c4805d746bfa",
+      "html_sha256": "0c576c515e08cbc5c97a4d8cdf83e997f0cb43297dfdd9a8f522ae64b610d538"
     },
     {
       "key": "settings",
-      "label": "设置页",
+      "label": "设置（含外观·皮肤入口）",
       "png": "screens/settings.png",
       "html": "sources/settings.html",
-      "sha256": "777dea8e63e9bbff24fda5d1f22cf1310a897d8cf58ac9a8c9226fa41aa0f019"
+      "sha256": "d2c2ebace922c0f6b09d4c0afbbd6137c6b991b77dc2efd3a62df2abdf0606a7",
+      "html_sha256": "f80f805974117f355ac5a2bbc0738ef28432f5245a5f0c048631b3665ac67909"
     },
     {
       "key": "dark-detail",
-      "label": "详情页 · 深色",
+      "label": "深色详情",
       "png": "screens/dark-detail.png",
       "html": "sources/dark-detail.html",
-      "sha256": "afc305f77122cbaf3b087cb3fce82643f6929f6bf93d547e177c99671b64eaed"
+      "sha256": "c59880147fdccfda2ba6d8be15c276f8a44be71d6002322ce6aaa291e0c24d3c",
+      "html_sha256": "a69504575f5d84e3a20bd9b5409f35b9d74d3d5b60012e67dc4248c083bbe287"
     }
   ],
-  "frozen_contract": {
-    "tab_order_sea": [
-      "钓鱼指数",
-      "潮流",
-      "天气",
-      "水质",
-      "风浪"
-    ],
-    "tab_order_inland": [
-      "钓鱼指数",
-      "水位（无潮汐）",
-      "天气",
-      "水质",
-      "湖面风与水温"
-    ],
-    "disclaimer_items": 5,
-    "band_labels": [
-      "爆护窗口",
-      "很适合",
-      "可以",
-      "较差",
-      "别去"
-    ],
-    "badges": [
-      "实测",
-      "卫星",
-      "模型",
-      "估算",
-      "未校正",
-      "低置信"
-    ],
-    "day_selector": "52dp 两行",
-    "water_quality": "1 行 × 3 卡",
-    "note": "以上工程事实四版完全一致；手绘稿为视觉探索，落地时冻结语义色须回归 ScoreBands.kt / ConfidenceBadge.kt，档位恒带文字（N-7）"
+  "full_ui": {
+    "screen_count": 30,
+    "added_count": 23,
+    "added_screens": [
+      {
+        "key": "detail-tab-score-sea",
+        "label": "钓鱼指数 · 海",
+        "png": "screens_full/detail-tab-score-sea.png",
+        "html": "sources_full/detail-tab-score-sea.html",
+        "sha256_png": "d18beb42ae2c0b7badce945c00b4da7c6fc82a082c8fe9217fad53920fba12a1",
+        "sha256_html": "e8305d8c841e6d5484d10faf12a18e443bd8bac58804becaec833a0f9c9e234f"
+      },
+      {
+        "key": "detail-tab-score-inland",
+        "label": "钓鱼指数 · 内陆",
+        "png": "screens_full/detail-tab-score-inland.png",
+        "html": "sources_full/detail-tab-score-inland.html",
+        "sha256_png": "a861d193899a605f80adc198b0995afbf0129153f44bcf4a374c27986a4b7596",
+        "sha256_html": "61385bfd9cb258f77c3e11bd8ea6acbf214430d2e878a57ad823b87e7ec625ef"
+      },
+      {
+        "key": "detail-tab-tide-sea",
+        "label": "潮流 · 海",
+        "png": "screens_full/detail-tab-tide-sea.png",
+        "html": "sources_full/detail-tab-tide-sea.html",
+        "sha256_png": "3c042d1fa09971a34098d2ba79b9c2462d89a71ef96c4dafdaa1d1a2c5586bc9",
+        "sha256_html": "ad7e989a0850e9e7139cfcb47ba3a37754b1d51143794342161fc927dc7b44d3"
+      },
+      {
+        "key": "detail-tab-tide-inland",
+        "label": "水位 · 内陆",
+        "png": "screens_full/detail-tab-tide-inland.png",
+        "html": "sources_full/detail-tab-tide-inland.html",
+        "sha256_png": "94ae89843d7301b5730c274c60a0ee8fbf95eb39fdd563eb1f2ab31569f89aa9",
+        "sha256_html": "d955fa058e07f097be7a0124a27fc90188e2fe1df7decfb02fe57103680a52b6"
+      },
+      {
+        "key": "detail-tab-weather",
+        "label": "天气",
+        "png": "screens_full/detail-tab-weather.png",
+        "html": "sources_full/detail-tab-weather.html",
+        "sha256_png": "f5dc0e62372eafef2156a12adc88782dcda37e5e1dd5fc204a2c2b6ca3205da1",
+        "sha256_html": "636739bae18656c7408593ae14b96e38f18e52933bc5eb60419a65e6b803ab6f"
+      },
+      {
+        "key": "detail-tab-water",
+        "label": "水质 1×3",
+        "png": "screens_full/detail-tab-water.png",
+        "html": "sources_full/detail-tab-water.html",
+        "sha256_png": "2695ce81abd3b81feb5996dd2f6ac647333b92992318d5250c2ccd527d3cad50",
+        "sha256_html": "bc43dd5c594179de67ec8b2c88c430a2388b665ad23af480800bc5d65a1159ed"
+      },
+      {
+        "key": "detail-tab-wave-sea",
+        "label": "风浪 · 海",
+        "png": "screens_full/detail-tab-wave-sea.png",
+        "html": "sources_full/detail-tab-wave-sea.html",
+        "sha256_png": "d76b7276efbd6827f59870c5c60cddd051aac43c58fe7d03d822bcf281ef8f19",
+        "sha256_html": "07ddb674a30907bf473299afda6338c963483f0fabb2ecf55eca1790694a1032"
+      },
+      {
+        "key": "detail-tab-wave-inland",
+        "label": "湖面风 · 内陆",
+        "png": "screens_full/detail-tab-wave-inland.png",
+        "html": "sources_full/detail-tab-wave-inland.html",
+        "sha256_png": "4685001f31b236046f675a4231ece406858d48c0da14f06ca61ec77c9a9d2425",
+        "sha256_html": "d2c1799aa1fab5266d3aa7c9c9e3265f48fb111fae317dd183610659f2baeb90"
+      },
+      {
+        "key": "detail-breakdown",
+        "label": "因子分解",
+        "png": "screens_full/detail-breakdown.png",
+        "html": "sources_full/detail-breakdown.html",
+        "sha256_png": "5bc9c95ad52e8ff474ec90bb059b164a1ce69a6f49e7c806310a6aa9be265f75",
+        "sha256_html": "9cf604797d14f7106f929329f02318cfc0b78a81ff7aaf6cc48cd67519fbd836"
+      },
+      {
+        "key": "ov01-top10",
+        "label": "OV01 Top10",
+        "png": "screens_full/ov01-top10.png",
+        "html": "sources_full/ov01-top10.html",
+        "sha256_png": "24ab0f54bd6cbf963a9881dfde90359249d0eb14c060b7ea238ae9a3340d73fb",
+        "sha256_html": "ff0f9ba8be048521fdb8a1f25b07616647f5b8d8fdac9d24b93c695f665045e4"
+      },
+      {
+        "key": "ov02-disclaimer",
+        "label": "OV02 免责 5 条",
+        "png": "screens_full/ov02-disclaimer.png",
+        "html": "sources_full/ov02-disclaimer.html",
+        "sha256_png": "cf6ec2fc0ed91f0039059b3d1bfee2030452be32c603418fa0c11f0b1748b3de",
+        "sha256_html": "6b03dfcb79eb0d3deeb9cb3ea698567b5ab1968faa87814ef076e8ef3bab5256"
+      },
+      {
+        "key": "ov03-confirm-favorite",
+        "label": "OV03 收藏确认",
+        "png": "screens_full/ov03-confirm-favorite.png",
+        "html": "sources_full/ov03-confirm-favorite.html",
+        "sha256_png": "b145e941f6797bff1e6ccb83c7fe3ac4538bf2d6ad3129594c4d146cb348f395",
+        "sha256_html": "d0e13fd435484e5cd00d074addae832c88a83a356a4b0304218b7fb891dab43a"
+      },
+      {
+        "key": "ov04-water-entry",
+        "label": "OV04 水质录入",
+        "png": "screens_full/ov04-water-entry.png",
+        "html": "sources_full/ov04-water-entry.html",
+        "sha256_png": "c449a5500bc9c5752ca584f99e19d1e76713111a0a9285191320e9cea5ecb0f0",
+        "sha256_html": "c435aa6830c2cb41b1dfcf35081e68060098cfb511957f17830341ffbfab46bd"
+      },
+      {
+        "key": "ov05-star-bubble",
+        "label": "OV05 星标气泡",
+        "png": "screens_full/ov05-star-bubble.png",
+        "html": "sources_full/ov05-star-bubble.html",
+        "sha256_png": "bfe35169205beb4fa814f68db822aa9e29cbaf4fac5d4fec376401dafc76d9a5",
+        "sha256_html": "1ec46c9efb1b997c3bd46713cec2e63317d6566725eac11dac23c607cd38639a"
+      },
+      {
+        "key": "ov06-delete-confirm",
+        "label": "OV06 删除确认",
+        "png": "screens_full/ov06-delete-confirm.png",
+        "html": "sources_full/ov06-delete-confirm.html",
+        "sha256_png": "05b9d28fb8c90d6e3abaa702047e90bfb8ff8de48c7dd7e3e6a47e97234fc888",
+        "sha256_html": "db07d2a158fae7b164a570adff7a89254caaa1705d07651be0191dd66c12f21b"
+      },
+      {
+        "key": "state-offline",
+        "label": "状态 · 离线",
+        "png": "screens_full/state-offline.png",
+        "html": "sources_full/state-offline.html",
+        "sha256_png": "a97e375668d83ea1c2eb41bca8634cb00f2af15bd60bca23d93ee3bfa4d91c63",
+        "sha256_html": "e6bbf1bbd507b094dd419e51fb890af5ef7051c6a957c59c8cb2383d6d96c0ab"
+      },
+      {
+        "key": "state-stale",
+        "label": "状态 · 陈旧",
+        "png": "screens_full/state-stale.png",
+        "html": "sources_full/state-stale.html",
+        "sha256_png": "c89a015ddcdaf41ee2bf2d3641b8e4ff6f9300891c51d9f855c48cfed7e4ee1f",
+        "sha256_html": "889764419177e2225cc71b4e7dc5e09c70bad918ab16b18ab501f8ba5cc5d5bd"
+      },
+      {
+        "key": "state-unusable-48h",
+        "label": "状态 · 48h 不可用",
+        "png": "screens_full/state-unusable-48h.png",
+        "html": "sources_full/state-unusable-48h.html",
+        "sha256_png": "61b67880886aa5a391d0c74aa83e1eff39a36fe88fa5735d5dd683eec4a61d0f",
+        "sha256_html": "3f615711c0d43214d2a47c106a7e8d56871370ded0810cbbd09cb0eeee89e07f"
+      },
+      {
+        "key": "state-degraded",
+        "label": "状态 · 分维降级",
+        "png": "screens_full/state-degraded.png",
+        "html": "sources_full/state-degraded.html",
+        "sha256_png": "b27c832b50173bd217facbdeb0d21ef76162801069387c229a1b8bcdaffbb9ee",
+        "sha256_html": "a08706a6b1576908052c586c47ee0df436dd5f34f6df37b46aac3d4ca599c056"
+      },
+      {
+        "key": "favorites-empty",
+        "label": "收藏空态",
+        "png": "screens_full/favorites-empty.png",
+        "html": "sources_full/favorites-empty.html",
+        "sha256_png": "9f71324593ac7702eb72b13c9b0d1f6208f0cc81b9aebc47f7651363b4d3bae1",
+        "sha256_html": "0f9910b5051278b7d2abde49dc06e5eafc8d001193e0747ff0902319069c2753"
+      },
+      {
+        "key": "favorites-multiselect",
+        "label": "多选批量",
+        "png": "screens_full/favorites-multiselect.png",
+        "html": "sources_full/favorites-multiselect.html",
+        "sha256_png": "cad479cc9666c65dba187eb4255e2e575be23062bbc7650cef99d1fd30d5df70",
+        "sha256_html": "adbb5659e7085458a055d1cc932889ef146ef77510f1382fa4e5e2843d735e66"
+      },
+      {
+        "key": "dark-map",
+        "label": "深色地图",
+        "png": "screens_full/dark-map.png",
+        "html": "sources_full/dark-map.html",
+        "sha256_png": "43416088fd89f98f3caa99e651142959fa157375276a02660772e4f663fe071f",
+        "sha256_html": "1e748f7b40f07f877d49582752249c85a44ce18b471735bae792e10abdc9c211"
+      },
+      {
+        "key": "dark-favorites",
+        "label": "深色收藏",
+        "png": "screens_full/dark-favorites.png",
+        "html": "sources_full/dark-favorites.html",
+        "sha256_png": "8660690e52ac255f0e5129311e2ace8dd8aa8369c3097b0ca669268f3dd0d55b",
+        "sha256_html": "2b5a1e91f4443107182efaac35c8304411a16a7b62c441287224a38ab0782b32"
+      }
+    ]
   },
-  "water_differentiators": [
-    "顶部鱼形徽标（浪+贝+海鸟 ↔ 山+日+芦苇）",
-    "主色冷暖/蓝绿",
-    "鱼种（海鱼↔淡水鱼）",
-    "第二 Tab（潮流↔水位）",
-    "图表（潮高·潮流↔水位·无潮汐）",
-    "地点/坐标"
-  ],
-  "example_data_notice": "分数/时刻/点位为版式示意，非业务数据；源更新时间显示 —，未硬编码"
+  "skin_system": {
+    "requirement_ref": "OPT-A-09 / SKIN-1..3",
+    "spec": "../A-vintage-outdoor/SKIN-DESIGN-SPEC.md",
+    "definition": "皮肤 = 一组可替换的视觉 token，结构/文案/交互/冻结契约全部共用",
+    "three_orthogonal_axes": [
+      "皮肤 Skin（用户偏好）",
+      "水体 Water（点位数据决定，不可切）",
+      "明暗 Mode（跟随系统/浅/深）"
+    ],
+    "built_in_skins": [
+      {
+        "id": "a-vintage",
+        "name": "手绘 A · 复古户外",
+        "name_en": "VINTAGE OUTDOOR",
+        "status": "内置",
+        "palettes": [
+          "sea",
+          "inland"
+        ],
+        "screens": 30
+      },
+      {
+        "id": "d-fieldguide",
+        "name": "D · 路亚图鉴",
+        "name_en": "LURE FIELD GUIDE",
+        "status": "内置（工程已落地 v1.17.0）",
+        "palettes": [
+          "sea",
+          "inland"
+        ],
+        "screens": 30
+      }
+    ],
+    "skins_total": 2,
+    "selection_page": "已做：设置页「皮肤」下拉（SKIN-3 / OPT-A-09）；无独立选择页",
+    "excluded": "B 拟人鱼绅士 / C 水彩几何鱼 仍是独立探索稿，不并入；D 已皮肤化",
+    "entry_screen": "screens/settings.png（外观·皮肤入口卡）",
+    "mutable_tokens": [
+      "色板(sea/inland 两套)",
+      "字体",
+      "形状/圆角",
+      "纸张质感",
+      "鱼形装饰",
+      "深色 token"
+    ],
+    "frozen_not_in_skin": [
+      "Tab 渲染序",
+      "免责 5 条",
+      "五档/六徽标色",
+      "DaySelector 52dp",
+      "水质 1×3",
+      "无底部 NavigationBar",
+      "地图优先",
+      "准星唯一真源",
+      "双水体六重区分",
+      "全部文案"
+    ],
+    "new_skin_checklist": "../A-vintage-outdoor/SKIN-DEV-STANDARD.md §6（A1–A10）"
+  }
 }

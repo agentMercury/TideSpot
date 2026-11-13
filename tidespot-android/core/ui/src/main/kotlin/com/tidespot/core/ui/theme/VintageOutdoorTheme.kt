@@ -23,7 +23,8 @@ fun VintageOutdoorTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val skin = TideSpotSkins.VintageOutdoor
+    // 继承外壳当前皮肤（SKIN-2 后全局皮肤可能是 A 或 D），本函数只负责按点位水体换色板。
+    val skin = LocalSkin.current
     val palette = skin.palettes.pick(waterBody, darkTheme)
     CompositionLocalProvider(LocalSkin provides skin) {
         MaterialTheme(

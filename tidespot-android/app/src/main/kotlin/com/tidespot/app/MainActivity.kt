@@ -121,6 +121,8 @@ private fun AppRoot(
     onSettingsChange: (SettingsState) -> Unit,
 ) {
     var navState by remember { mutableStateOf(AppNavState()) }
+    // 外壳纸纹读 skin.texture；与主题注入同源同一 skinId（切皮肤即时更新）
+    val skin = TideSpotSkins.byId(settingsState.skinId)
     // 明暗轴：供详情页皮肤再包一层时复用同一解析结果（与全局主题同口径）
     val darkTheme = SettingsLogic.resolveDarkTheme(settingsState.themeMode, isSystemInDarkTheme())
     // CHG-25（P0-1）：Copernicus 凭据配置态（运行期读凭据存储；保存/清除即时刷新）
@@ -221,15 +223,16 @@ private fun AppRoot(
         // OPT-V115-02 / GAP-03：edge-to-edge 收口——insets 下沉到各屏自管（地图全屏、控件单独 pad）
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
-        // SKIN-2：纸纹统一挂在外壳——地图页跳过（底图是真实瓦片，颗粒会伤可读性），
-        // 收藏/设置/详情继承同一层颗粒；详情页不再各自叠加，避免双层颗粒把文字糊掉。
+        // SKIN-2 / SKIN-3：纸纹统一挂在外壳，强度与开关由当前皮肤 texture 决定。
+        // 地图页始终跳过（真实瓦片底图，颗粒伤可读性）；详情页不再各自叠加，避免双层颗粒。
         val grain = rememberPaperGrainBrush(darkTheme)
+        val showGrain = skin.texture.paperGrain && navState.page != AppPage.MAP
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .then(
-                    if (navState.page == AppPage.MAP) Modifier else Modifier.paperGrain(grain),
+                    if (showGrain) Modifier.paperGrain(grain, skin.texture.grainStrength) else Modifier,
                 ),
         ) {
             // OPT-V12-01（CHG-57）：地图页（页面切换沿用原导航结构；MapView 生命周期问题另案登记）

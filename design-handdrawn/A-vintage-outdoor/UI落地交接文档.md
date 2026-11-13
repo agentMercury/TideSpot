@@ -87,7 +87,7 @@ feature:* → :core:data → :core:domain（纯 Kotlin JVM，无 Compose 依赖�
 
 ### 3.1 三轴正交（不可破坏）
 `最终视觉 = 皮肤 token(水体) × 明暗模式`；三轴各自持久化，任一轴切换不重置另外两轴。
-- **皮肤**：用户偏好（首版仅 A）
+- **皮肤**：用户偏好（内置 A 复古户外 / D 路亚图鉴）
 - **水体**：点位数据决定（海/陆），用户不可切
 - **明暗**：跟随系统 / 浅 / 深
 
@@ -117,7 +117,7 @@ core/ui/theme/
 | **P1 · 全局注入 + 持久化** | `TideSpotTheme(skin, water, darkMode)` 全 App 生效；`skinId`/`themeMode` 落盘 | `TideSpotTheme.kt` 加参；`SettingsState`/`SettingsKeys`/`AppSettings` 加 `skinId`、`themeMode`；`MainActivity` 读取注入 | 切明暗/换皮肤全屏一致；冷启动回放；三轴互不重置 |
 | **P2 · 3 页铺开** | 地图 / 收藏 / 设置 换手绘 A（**去硬编码色**） | `feature:map/MapScreen.kt`、`feature:favorites/*Screen.kt`、`feature:settings/SettingsScreen.kt`：所有硬编码 `Color(...)` 改 `MaterialTheme.colorScheme.*` / `LocalSkin` | 逐屏走查无漏切；地图页保持 CARTO 真实瓦片 + 只换周边组件样式 |
 | **P3 · 叠层/状态/深色全套** | Top10/免责/确认收藏/水质录入/星标气泡/删除确认 + 四状态态 + 深色 detail/map/favorites | 对应 Sheet/Dialog/Banner 套 token；`StaleBanner` 扩 state 入参 | 叠层不遮挡 Tab/DaySelector；四态语义等级正确；深色对比度 ≥4.5:1 |
-| **P4 · 换肤选择页** | 设置「外观·皮肤」入口 + 选择页（首版仅 A + 敬请期待占位）+ 明暗三选 | `feature:settings` 新选择页；入口行；占位卡不可点 | 入口可达；仅 A 可选；占位不可误点；三轴正交可组合 |
+| **P4 · 换肤入口** | 设置「皮肤」下拉（A/D 两款）+ 明暗三选（**无独立选择页**） | `feature:settings` 皮肤下拉；`skinId` 持久化 | 入口可达；两款可选；切换即时生效；三轴正交 |
 
 > **P0 是硬前置**：不先抽象 token，直接改页面会导致「每加一个皮肤改一处页面」。详见 `SKIN-DEV-STANDARD.md`。
 
@@ -181,7 +181,7 @@ core/ui/theme/
 5. **pilot 越界**：`VintageOutdoorTheme` 只包详情子树；铺开时要改成全局 `TideSpotTheme(skin,...)`，别把 4 套色板硬塞进每页。
 6. **主题嵌套**：外层 `TideSpotTheme` + 内层皮肤主题同时存在时，注意「谁覆盖谁」；统一为单层 skin 派生最稳。
 7. **`/d/` 路径 & Windows Python**：生成器里用 `Path(__file__)` 解析，勿手写 `/d/...`（Windows Python 不认 `/d/`）。
-8. **不要动 B/C/D**：B 拟人鱼绅士 / C 水彩几何鱼 / D 手绘鱼种图鉴是独立风格探索，**不是皮肤、不并入**。详见 `SKIN-DEV-STANDARD.md` §7。
+8. **不要动 B/C**：B 拟人鱼绅士 / C 水彩几何鱼仍是独立风格探索，**不是皮肤、不并入**；D 手绘鱼种图鉴**已皮肤化**（`d-fieldguide`，设计 `D-field-guide/` 30 屏）。详见 `SKIN-DEV-STANDARD.md` §7。
 
 ---
 
@@ -212,6 +212,7 @@ cd ../../../tidespot-android && ./verify.ps1
 |---|---|
 | 皮肤契约（设计侧） | `SKIN-DESIGN-SPEC.md` |
 | 皮肤开发标准（执行版） | `SKIN-DEV-STANDARD.md` |
+| D 皮肤设计稿（30 屏） | `../D-field-guide/`（`screens/` + `screens_full/` + `spec.json` + `index-full.html`） |
 | 未开始需求 | `未开始需求清单.md` |
 | 功能需求 | `APP功能优化需求.md` / `feature-gaps.json` |
 | 试点与边界 | `device-compare/真机对拍报告.md` / `Compose试点落地说明.md` |

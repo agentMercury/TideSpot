@@ -126,7 +126,7 @@ html.append('''<div class="frozen"><b>冻结契约（本次完整 UI 未改动�
 4. DaySelector 两行 52dp · 水质 1×3（pH 已删） · 5. 地图优先、无底部 NavigationBar、准星唯一选点真源 F-1.3<br>
 6. 双水体六重区分：徽标 / 配色 / 鱼种 / 第二 Tab / 图表单位 / 地点 · 7. 示例数值非业务数据，源更新时间显示「—」<br>
 8. 换皮肤(OPT-A-09)只替换视觉 token，以上逐项不变；明暗(OPT-A-03)为与皮肤正交的独立轴 · 皮肤扩展规范见 SKIN-DESIGN-SPEC.md</div>
-<div class="foot">视觉概念稿（30 屏）+ 需求清单。详情页已做 Compose 试点（<b>VintageOutdoorTheme.kt</b> 等，工程 <b>tidespot-android/</b>），四态真机对拍见 <b>device-compare/真机对拍报告.md</b>，落地说明见 <b>Compose试点落地说明.md</b>；其余 3 页未换皮、换肤数据层未实现。逐条证据 / 验收 / 工程落点见 APP功能优化需求.md。<br>复现：generator/engine.py（早期 base 7 屏）→ engine_full.py（新稿 21 补齐屏 + 改版设置页）→ gen_full_index.py（本索引，含参照稿勘误）</div>
+<div class="foot">视觉概念稿（30 屏）+ 需求清单。详情页已做 Compose 试点（<b>VintageOutdoorTheme.kt</b> 等，工程 <b>tidespot-android/</b>），四态真机对拍见 <b>device-compare/真机对拍报告.md</b>，落地说明见 <b>Compose试点落地说明.md</b>；全 App 换肤已落地（<b>TideSpotSkin.kt</b>：A/D 两款内置，v1.17.0），皮肤入口=设置页下拉。逐条证据 / 验收 / 工程落点见 APP功能优化需求.md。<br>复现：generator/engine.py（早期 base 7 屏）→ engine_full.py（新稿 21 补齐屏 + 改版设置页）→ gen_full_index.py（本索引，含参照稿勘误）</div>
 </div></body></html>''')
 
 OUT.write_text("\n".join(html), encoding="utf-8")

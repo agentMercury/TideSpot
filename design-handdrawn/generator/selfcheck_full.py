@@ -99,11 +99,11 @@ ok("http://" not in ss and "https://" not in ss and "file://" not in ss, "设置
 
 # 5c. 皮肤设计规范 + spec skin_system
 skinspec = (A / "SKIN-DESIGN-SPEC.md").read_text(encoding="utf-8")
-for h in ["三轴正交", "皮肤 token", "冻结", "接入清单", "敬请期待", "B/C/D", "验收清单"]:
+for h in ["三轴正交", "皮肤 token", "冻结", "接入清单", "D 路亚图鉴", "B/C", "验收清单"]:
     ok(h in skinspec, f"皮肤规范含 {h}")
-ok("skin_system" in spec and spec["skin_system"]["skins_total"] == 1, "spec 含 skin_system 且首版 1 款")
-ok(spec["skin_system"]["built_in_skins"][0]["id"] == "a-vintage", "skin_system 内置 A")
-ok("selection_page" in spec["skin_system"] and "本轮未做" in spec["skin_system"]["selection_page"], "spec 标注选择页本轮未做")
+ok("skin_system" in spec and spec["skin_system"]["skins_total"] == 2, "spec 含 skin_system 且内置 2 款（A/D）")
+ok({"a-vintage", "d-fieldguide"} <= {s["id"] for s in spec["skin_system"]["built_in_skins"]}, "skin_system 内置 A + D")
+ok("selection_page" in spec["skin_system"] and "下拉" in spec["skin_system"]["selection_page"], "spec 标注选择入口=设置页下拉")
 
 # 6. 索引页 + README + spec
 idx = (A / "index-full.html").read_text(encoding="utf-8")

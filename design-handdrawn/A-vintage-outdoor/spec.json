@@ -303,7 +303,7 @@
         "id": "a-vintage",
         "name": "手绘 A · 复古户外",
         "name_en": "VINTAGE OUTDOOR",
-        "status": "使用中 / 首版唯一内置",
+        "status": "使用中 / 内置",
         "source_images": [
           "图5 MOUNTAIN ADVENTURE",
           "图6 ADVENTURE IS CALLING"
@@ -312,14 +312,28 @@
           "sea",
           "inland"
         ],
-        "screens": 28
+        "screens": 30
+      },
+      {
+        "id": "d-fieldguide",
+        "name": "D · 路亚图鉴",
+        "name_en": "LURE FIELD GUIDE",
+        "status": "内置（v1.17.0 工程已落地）",
+        "source_images": [
+          "idea-explorations/v3-fieldguide"
+        ],
+        "palettes": [
+          "sea",
+          "inland"
+        ],
+        "screens": 30
       }
     ],
-    "skins_total": 1,
-    "placeholder_slots": "设置页「外观·皮肤」入口内「更多皮肤 · 敬请期待」虚线占位；不可点击、不计为可选皮肤",
-    "excluded": "B 拟人鱼绅士 / C 水彩几何鱼 / D 手绘鱼种图鉴是独立风格探索稿，不作为皮肤、不并入、本轮不并入",
-    "entry_screen": "screens/settings.png（外观·皮肤入口卡，含五色色板 + 当前皮肤 + 敬请期待占位）",
-    "selection_page": "本轮未做（用户选「只做需求 + 入口」，对应 OPT-A-09 验收第 3 条）",
+    "skins_total": 2,
+    "placeholder_slots": "设置页「皮肤」下拉遍历内置皮肤（A / D）；不再用空卡占位",
+    "excluded": "B 拟人鱼绅士 / C 水彩几何鱼 是独立风格探索稿，不并入；D 手绘鱼种图鉴已皮肤化（d-fieldguide）",
+    "entry_screen": "screens/settings.png（外观·皮肤入口卡，含五色色板 + 当前皮肤）",
+    "selection_page": "已做：设置页「皮肤」下拉（SKIN-3 / OPT-A-09）；无独立选择页",
     "mutable_tokens": [
       "色板(sea/inland 两套)",
       "字体",
@@ -341,6 +355,6 @@
       "全部文案(TideSpotStrings.kt 单源)"
     ],
     "new_skin_checklist": "SKIN-DESIGN-SPEC.md §5（A1–A10，业务 Composable 零改动）",
-    "ui_scope_this_round": "仅设置页加「外观·皮肤」入口；不新增屏、不做换肤演示、不并入 B/C/D"
+    "ui_scope_this_round": "全 App 换肤已落地；皮肤入口=设置页下拉；D 路亚图鉴已内置（工程 d-fieldguide）"
   }
 }
