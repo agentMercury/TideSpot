@@ -324,7 +324,13 @@ private fun SkinDropdown(currentId: String, onSelect: (String) -> Unit) {
                 )
             }
         }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            // D3（真机对拍）：默认宽度只包内容，会把下方说明文字“切”掉一半露出右侧；
+            // 拉到接近整行，遮挡关系变成「整行被盖住」，视觉上更干净。
+            modifier = Modifier.fillMaxWidth(0.9f),
+        ) {
             TideSpotSkins.all.forEach { skin ->
                 DropdownMenuItem(
                     text = {

@@ -331,7 +331,18 @@ grep -rn "Color(0x" tidespot-android/feature tidespot-android/app \
 | LAND-MAP | 地图页 | 星标图层文字色 → `primary/onPrimary.toHexRgb()`；Top10 横幅 → `primary/onPrimary`；准星预览 → `tertiary` |
 | LAND-FAV/SET | 收藏/设置 | 继承全局纸底 + 纸纹 + 衬线字阶；设置页新增皮肤/明暗控件 |
 | LAND-STATE | 四态 | `StaleBanner` 陈旧改 `onSurfaceVariant`（弱于 48h 的 `error`）；离线/低置信沿用既有 token 与冻结徽标 |
-| LAND-DARK | 深色 | 由 4 套色板覆盖；逐屏真机验收待 USB 恢复 |
+| LAND-DARK | 深色 | 由 4 套色板覆盖；真机逐屏已验（`device-compare/r2-换肤对拍.md`） |
+
+**真机对拍修复（r2，2026-11-13）**——这三条都是 token 层问题，换肤时必须一并检查：
+
+| ID | 现象 | 修复 |
+|---|---|---|
+| D1 | 卡片比纸底**更深**，像脏斑 | M3 `Card` 用 `surfaceContainerHighest`；浅色该槽位必须≥surface 亮度（A 改为 `#F2EAD4`） |
+| D2 | chip 选中态不可辨 | `secondaryContainer` 不能≈`background`；A 改为 `#D8C9A5`（深一档） |
+| D3 | 皮肤下拉切出下方说明残片 | `DropdownMenu(modifier = Modifier.fillMaxWidth(0.9f))` |
+
+> **换肤通用教训**：M3 的容器层级假设（越高越深）与「纸叠纸」设计相反，浅色皮肤的
+> `surfaceContainerHighest` / `secondaryContainer` 必须单独校一遍，别照 M3 默认语义填。
 
 **已知限制**：
 - `skin.texture` 已被定义但尚未在 3 页细粒度消费（纸纹强度/母题仍走调用方参数）。

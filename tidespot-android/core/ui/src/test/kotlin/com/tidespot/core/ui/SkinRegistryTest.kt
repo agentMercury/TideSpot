@@ -64,13 +64,13 @@ class SkinRegistryTest {
         assertScheme(
             p.seaLight, bg = 0xFFE4D9BC, primary = 0xFF1B3A5C, surface = 0xFFF2EAD4,
             surfaceVariant = 0xFFE8DDBE, onSurfaceVariant = 0xFF5C5540, outline = 0xFF16324F,
-            outlineVariant = 0xFF8A7C60, error = 0xFFC15A3A, highest = 0xFFCBB98E,
+            outlineVariant = 0xFF8A7C60, error = 0xFFC15A3A, highest = 0xFFF2EAD4,
         )
         // 浅色内陆：苔绿纸 + 墨绿
         assertScheme(
             p.inlandLight, bg = 0xFFDCE2C4, primary = 0xFF2E5A48, surface = 0xFFF1EED8,
             surfaceVariant = 0xFFE4E6C6, onSurfaceVariant = 0xFF556045, outline = 0xFF213D2A,
-            outlineVariant = 0xFF78815C, error = 0xFFC15A3A, highest = 0xFFBFC99E,
+            outlineVariant = 0xFF78815C, error = 0xFFC15A3A, highest = 0xFFF1EED8,
         )
         // 深色海洋 / 内陆：独立色板（非浅色机械反转）
         assertScheme(

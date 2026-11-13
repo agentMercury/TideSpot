@@ -119,7 +119,9 @@ private val VintageSeaLight = lightColorScheme(
     onPrimaryContainer = Color(0xFF16324F),
     secondary = Color(0xFF2E6E7E),
     onSecondary = Color(0xFFF7F1DE),
-    secondaryContainer = Color(0xFFE8DDBE),
+    // D2（真机对拍 2026-11-13）：M3 FilterChip 选中底走 secondaryContainer；
+    // 原 #E8DDBE 与纸底 #E4D9BC 几乎同色，选中态不可辨。改深一档到 bg2。
+    secondaryContainer = Color(0xFFD8C9A5),
     onSecondaryContainer = Color(0xFF16324F),
     tertiary = Color(0xFFD9A734),
     onTertiary = Color(0xFF16324F),
@@ -146,7 +148,9 @@ private val VintageSeaLight = lightColorScheme(
     surfaceContainerLow = Color(0xFFF2EAD4),
     surfaceContainer = Color(0xFFE8DDBE),
     surfaceContainerHigh = Color(0xFFD8C9A5),
-    surfaceContainerHighest = Color(0xFFCBB98E),
+    // D1（真机对拍 2026-11-13）：M3 Card 默认容器 = surfaceContainerHighest；
+    // 原 #CBB98E 比纸底更深，卡片看起来像一块脏斑。设计稿是「浅纸贴米纸」，改为纸白。
+    surfaceContainerHighest = Color(0xFFF2EAD4),
 )
 
 // ── 手绘 A：浅色 · 内陆水体（墨绿 + 苔绿纸）────────────────────────────────
@@ -157,7 +161,8 @@ private val VintageInlandLight = lightColorScheme(
     onPrimaryContainer = Color(0xFF213D2A),
     secondary = Color(0xFF3E7A54),
     onSecondary = Color(0xFFF7F4E2),
-    secondaryContainer = Color(0xFFE4E6C6),
+    // D2：同上，选中底深一档（原 #E4E6C6 与苔绿纸底太近）
+    secondaryContainer = Color(0xFFCDD6B0),
     onSecondaryContainer = Color(0xFF213D2A),
     tertiary = Color(0xFFD9A734),
     onTertiary = Color(0xFF213D2A),
@@ -184,7 +189,8 @@ private val VintageInlandLight = lightColorScheme(
     surfaceContainerLow = Color(0xFFF1EED8),
     surfaceContainer = Color(0xFFE4E6C6),
     surfaceContainerHigh = Color(0xFFCDD6B0),
-    surfaceContainerHighest = Color(0xFFBFC99E),
+    // D1：同 seaLight，Card 底改纸白
+    surfaceContainerHighest = Color(0xFFF1EED8),
 )
 
 // ── 手绘 A：深色 · 海洋 / 近海（独立调色，非浅色机械反转）───────────────────
