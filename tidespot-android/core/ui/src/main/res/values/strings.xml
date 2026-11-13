@@ -15,7 +15,7 @@
     <string name="ts_favorite_dialog_title">收藏该点位</string>
     <string name="ts_favorite_name_hint">留空则使用坐标作为名称</string>
     <string name="ts_top10_this_spot">本点最佳窗口</string>
-    <string name="ts_top10_all">全部收藏 Top10</string>
+    <string name="ts_top10_all">全部收藏 Top10 · 最佳窗口</string>
     <string name="ts_top10_empty">当前范围内没有符合条件的最佳窗口</string>
     <string name="ts_window_bar">窗口</string>
     <string name="ts_record_high_tide">记录一次涨潮时刻</string>

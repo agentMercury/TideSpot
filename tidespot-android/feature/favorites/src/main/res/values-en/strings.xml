@@ -112,4 +112,19 @@
     <!-- OPT-V12-07: tag presets -->
     <string name="ts_fav_tag_presets">Common tags</string>
     <string name="ts_fav_tag_preset_desc">Common tag: %1$s</string>
+    <string name="ts_fav_top10_title">Top 10 across favorites · time filter</string>
+    <string name="ts_fav_filter_all">All</string>
+    <string name="ts_fav_filter_next24h">Next 24h</string>
+    <string name="ts_fav_filter_weekend">This weekend</string>
+    <string name="ts_fav_filter_custom">Custom</string>
+    <string name="ts_fav_top10_empty">No windows scoring 60+ in this range — nothing is padded; try another range</string>
+    <string name="ts_fav_filter_custom_title">Custom time range</string>
+    <string name="ts_fav_filter_custom_date">Date (yyyy-MM-dd)</string>
+    <string name="ts_fav_filter_custom_start">Start (HH:mm)</string>
+    <string name="ts_fav_filter_custom_end">End (HH:mm)</string>
+    <string name="ts_fav_filter_apply">Apply</string>
+    <string name="ts_fav_filter_cancel">Cancel</string>
+    <string name="ts_fav_filter_err_date">Date must be yyyy-MM-dd</string>
+    <string name="ts_fav_filter_err_time">Time must be HH:mm</string>
+    <string name="ts_fav_filter_err_order">End must be after start</string>
 </resources>

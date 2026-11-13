@@ -57,6 +57,8 @@ fun SettingsScreen(
     onReverseGeoChange: (Boolean) -> Unit,
     /** UX-19（OPT-V11-19）：地图样式三选（彩色/素色/深色）。 */
     onMapStyleChange: (MapStyle) -> Unit,
+    /** OPT-A-10：地图来源（OpenFreeMap / CARTO / 未来新增）。 */
+    onMapProviderChange: (MapProvider) -> Unit,
     /** SKIN-3 / OPT-A-09：选皮肤（只写 skinId，不动明暗）。 */
     onSkinChange: (String) -> Unit,
     /** OPT-A-03：明暗三选（只写 themeMode，不动皮肤）。 */
@@ -64,6 +66,8 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     /** CHG-25（P0-1）：Copernicus 凭据版块槽位（:app 注入 [CopernicusCredentialSection]；null = 不渲染，零行为漂移）。 */
     credentialSection: (@Composable () -> Unit)? = null,
+    /** OPT-A-06：请求日志入口点击（null = 不渲染该行；实现与数据源由 :app 注入）。 */
+    onOpenFetchLog: (() -> Unit)? = null,
 ) {
     val screenDesc = stringResource(R.string.ts_settings_content_desc)
     Column(
@@ -116,6 +120,14 @@ fun SettingsScreen(
                 )
             }
         }
+        // OPT-A-10：地图来源（提供方可切；未来新增源自动出现在下拉里）
+        Text(stringResource(R.string.ts_settings_map_source), style = MaterialTheme.typography.titleSmall)
+        MapProviderDropdown(current = state.mapProvider, onSelect = onMapProviderChange)
+        Text(
+            stringResource(R.string.ts_settings_map_source_note),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         // UX-19（OPT-V11-19 / D8 + OPT-A-03）：地图样式三选。
         // 未改过时高亮「跟明暗自动切」的那一项；点任意项即固定为显式选择。
         Text(stringResource(R.string.ts_settings_map_style), style = MaterialTheme.typography.titleSmall)
@@ -127,7 +139,7 @@ fun SettingsScreen(
                 val styleDesc = stringResource(
                     R.string.ts_settings_map_style_desc,
                     label,
-                    style.description,
+                    state.mapProvider.displayName,
                 )
                 FilterChip(
                     selected = activeMapStyle == style,
@@ -196,6 +208,36 @@ fun SettingsScreen(
             desc = reverseGeoDesc,
         )
         credentialSection?.invoke()
+        // OPT-A-06：请求日志入口（源/时刻/状态/是否命中频控；不泄露密钥，仅有 URL hash）
+        if (onOpenFetchLog != null) {
+            val fetchLogDesc = stringResource(R.string.ts_settings_fetch_log_desc)
+            Surface(
+                onClick = onOpenFetchLog,
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth().semantics { contentDescription = fetchLogDesc },
+            ) {
+                Row(
+                    Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.ts_settings_fetch_log), style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            stringResource(R.string.ts_settings_fetch_log_note),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Text(
+                        "›",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
         SectionDivider()
 
         // OPT-A-01 / OPT-A-02（2026-11-12 产品决策）：下线「用例·物种·权重」与「API Key」两块。
@@ -301,6 +343,62 @@ private fun ToggleRow(
             onCheckedChange = onChange,
             modifier = Modifier.semantics { contentDescription = desc },
         )
+    }
+}
+
+/**
+ * 地图来源下拉（OPT-A-10）：按**提供方名**切换底图瓦片来源。
+ *
+ * - 遍历 [MapProvider.entries]，**新增提供方只往枚举里加一项**，本组件零改动；
+ * - 切换只写 `settings.mapProvider`，不碰样式与明暗（三个维度各自独立）；
+ * - 现有两项：OpenFreeMap（默认，实测可达）/ CARTO（海外或恢复后使用）。
+ */
+@Composable
+private fun MapProviderDropdown(current: MapProvider, onSelect: (MapProvider) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val desc = stringResource(R.string.ts_settings_map_source_desc, current.displayName)
+    Box(Modifier.fillMaxWidth()) {
+        Surface(
+            onClick = { expanded = true },
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { contentDescription = desc },
+        ) {
+            Row(
+                Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(current.displayName, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "▾",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.9f),
+        ) {
+            MapProvider.entries.forEach { provider ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            if (provider == current) "${provider.displayName}  ✓" else provider.displayName,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(provider)
+                    },
+                )
+            }
+        }
     }
 }
 

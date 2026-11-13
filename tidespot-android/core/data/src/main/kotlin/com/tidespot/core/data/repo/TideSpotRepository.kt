@@ -378,6 +378,12 @@ class TideSpotRepository(
     /** fetch_log 可查（F-4.6 / N-6 设置页频控可视化）。 */
     suspend fun fetchLogs(spotId: Long): List<FetchLogEntity> = fetchLogDao.forSpot(spotId)
 
+    /** OPT-A-06：设置页「请求日志」——全局最近 N 条（跨点位倒序；只读，含 429 频控命中）。 */
+    suspend fun recentFetchLogs(limit: Int = 50): List<FetchLogEntity> = fetchLogDao.recent(limit)
+
+    /** OPT-A-06：清空本地访问日志（仅删日志行；业务缓存/TTL 不再有日志基准，下次进入按需重拉）。 */
+    suspend fun clearFetchLogs() = fetchLogDao.deleteAll()
+
     /**
      * OPT-V11-11（P1）：逐源最近一次成功拉取时刻（epoch 毫秒；0 = 无记录）。
      *

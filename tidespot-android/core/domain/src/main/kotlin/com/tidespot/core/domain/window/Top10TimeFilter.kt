@@ -1,4 +1,4 @@
-package com.tidespot.feature.detail.detail
+package com.tidespot.core.domain.window
 
 import java.time.DayOfWeek
 import java.time.Instant
@@ -72,4 +72,14 @@ object Top10TimeFilter {
         val endEpoch = date.atTime(end).atZone(zone).toEpochSecond()
         return CustomParse(TimeRange(startEpoch, endEpoch), null)
     }
+
+    /**
+     * 窗口与筛选时段是否相交（跨点 Top10 的**输出过滤**口径）。
+     *
+     * 与 detail 的差异：detail 把 [TimeRange] 传入 [BestWindowFinder.find] 重算候选；
+     * 跨点 Top10 的窗口已算好（各点 topWindows），只能后过滤，故用半开区间相交判定。
+     * [range] 为 null（ALL）时恒 true，零行为漂移。
+     */
+    fun intersects(range: TimeRange?, windowStartSec: Long, windowEndSec: Long): Boolean =
+        range == null || (windowStartSec < range.endEpochSec && windowEndSec > range.startEpochSec)
 }

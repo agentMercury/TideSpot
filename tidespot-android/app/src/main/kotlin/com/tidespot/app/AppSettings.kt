@@ -1,6 +1,7 @@
 package com.tidespot.app
 
 import com.tidespot.core.ui.theme.TideSpotSkins
+import com.tidespot.feature.settings.MapProvider
 import com.tidespot.feature.settings.MapStyle
 import com.tidespot.feature.settings.SettingsKeys
 import com.tidespot.feature.settings.SettingsLogic
@@ -45,6 +46,14 @@ object AppSettings {
         store.writeBoolean(SettingsKeys.MAP_STYLE_EXPLICIT, explicit)
     }
 
+    /** OPT-A-10：底图提供方（非法/缺失 → OpenFreeMap，实测可达的默认）。 */
+    fun parseMapProvider(raw: String?): MapProvider =
+        MapProvider.entries.firstOrNull { it.name == raw } ?: MapProvider.OPENFREEMAP
+
+    fun writeMapProvider(store: SettingsStore, provider: MapProvider) {
+        store.writeString(SettingsKeys.MAP_PROVIDER, provider.name)
+    }
+
     // ────────────── 三轴正交：皮肤 / 明暗（SKIN-3 + OPT-A-03） ──────────────
 
     /** 明暗序列化：非法/缺失一律落 `SYSTEM`（跟系统是最保守的默认）。 */
@@ -75,6 +84,7 @@ object AppSettings {
         // 也会留下该键（改任何设置都会写），据此推断会把绝大多数人误判为「已锁定」，
         // 他们就永远拿不到自动跟随深色。老用户若真选过，重新点一次即恢复锁定。
         mapStyleExplicit = store.readBoolean(SettingsKeys.MAP_STYLE_EXPLICIT, default = false),
+        mapProvider = parseMapProvider(store.readString(SettingsKeys.MAP_PROVIDER)),
         // 冷启动分别回放：任一轴缺失/非法只落该轴默认，不影响另外两轴
         skinId = TideSpotSkins.byId(store.readString(SettingsKeys.SKIN_ID)).id,
         themeMode = parseThemeMode(store.readString(SettingsKeys.THEME_MODE)),

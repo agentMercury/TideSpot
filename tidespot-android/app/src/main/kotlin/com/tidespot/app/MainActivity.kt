@@ -242,8 +242,8 @@ private fun AppRoot(
                     // N16：逆地理总开关（关 → MapScreen 内短路走 RG-D 兜底文案）
                     reverseGeoEnabled = settingsState.reverseGeoEnabled,
                     onSpotConfirmed = { confirmed -> pendingConfirm = confirmed },
-                    // UX-19 + OPT-A-03：底图样式（未改过 → 跟明暗自动切；改过 → 用户选择优先）
-                    styleUrl = SettingsLogic.resolveMapStyle(settingsState, darkTheme).url,
+                    // UX-19 + OPT-A-03 + OPT-A-10：底图 URL = 提供方 × 生效样式（唯一出口）
+                    styleUrl = SettingsLogic.resolveBasemapUrl(settingsState, darkTheme),
                     // UX-18：返回地图 → 上一查看点 / lastViewed 最新（冷启动 null → 定位/世界视图）
                     initialCameraTarget = pendingMapTarget,
                     // OPT-V115-02 / S01：顶部工具浮层（定位/搜索/收藏/设置）+ 信息条上方 Top10 入口
@@ -325,6 +325,8 @@ private fun AppRoot(
                 AppPage.SETTINGS -> SettingsPage(
                     state = settingsState.copy(copernicusConfigured = copernicusConfigured),
                     onChange = onSettingsChange,
+                    // OPT-A-06：请求日志（fetch_log 只读视图）
+                    repository = graph.repository,
                     credentialSection = {
                         CopernicusCredentialSection(
                             configured = copernicusConfigured,
@@ -470,8 +472,11 @@ private fun FishWatermark(inland: Boolean, modifier: Modifier = Modifier) {
 private fun SettingsPage(
     state: SettingsState,
     onChange: (SettingsState) -> Unit,
+    repository: com.tidespot.core.data.repo.TideSpotRepository,
     credentialSection: (@Composable () -> Unit)? = null,
 ) {
+    // OPT-A-06：请求日志弹层（数据由 repository 只读拉取，设置模块不依赖 core:data 实现）
+    var showFetchLog by remember { mutableStateOf(false) }
     SettingsScreen(
         state = state,
         onUnitSystemChange = { unit -> onChange(SettingsLogic.withUnitSystem(state, unit)) },
@@ -480,13 +485,19 @@ private fun SettingsPage(
         onReverseGeoChange = { enabled -> onChange(SettingsLogic.withReverseGeo(state, enabled)) },
         // UX-19：地图样式三选（持久化 + 地图页即时生效）
         onMapStyleChange = { style -> onChange(SettingsLogic.withMapStyle(state, style)) },
+        // OPT-A-10：地图来源（提供方）
+        onMapProviderChange = { provider -> onChange(SettingsLogic.withMapProvider(state, provider)) },
         // SKIN-3 / OPT-A-09：皮肤下拉（按名字选，只写 skinId）
         onSkinChange = { id -> onChange(SettingsLogic.withSkinId(state, id)) },
         // OPT-A-03：明暗三选（只写 themeMode，与皮肤正交）
         onThemeModeChange = { mode -> onChange(SettingsLogic.withThemeMode(state, mode)) },
         modifier = Modifier.fillMaxSize(),
         credentialSection = credentialSection,
+        onOpenFetchLog = { showFetchLog = true },
     )
+    if (showFetchLog) {
+        FetchLogDialog(repository = repository, onDismiss = { showFetchLog = false })
+    }
 }
 
 /** 设置写回：store 持久化（键名/清洗经 AppSettings 单源），UI 状态由调用方更新。 */
@@ -498,6 +509,7 @@ private fun persistSettings(graph: AppGraph, next: SettingsState) {
     AppSettings.writeReverseGeo(store, next.reverseGeoEnabled)
     AppSettings.writeMapStyle(store, next.mapStyle)
     AppSettings.writeMapStyleExplicit(store, next.mapStyleExplicit)
+    AppSettings.writeMapProvider(store, next.mapProvider)
     // 三轴正交：皮肤与明暗各自写自己的键，互不覆盖
     AppSettings.writeSkinId(store, next.skinId)
     AppSettings.writeThemeMode(store, next.themeMode)

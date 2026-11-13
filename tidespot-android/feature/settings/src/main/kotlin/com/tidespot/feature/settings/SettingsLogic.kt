@@ -85,6 +85,17 @@ object SettingsLogic {
     fun mapStyleChipSelection(state: SettingsState, darkTheme: Boolean): MapStyle =
         resolveMapStyle(state, darkTheme)
 
+    /** OPT-A-10：选底图提供方（只改 provider，不碰样式与显式标记）。 */
+    fun withMapProvider(state: SettingsState, provider: MapProvider): SettingsState =
+        state.copy(mapProvider = provider)
+
+    /**
+     * 底图 URL 唯一出口（OPT-A-10）：`provider × 生效样式`。
+     * 业务侧禁止自行拼 URL 或直接读 `mapStyle.url`（后者已随 provider 维度移除）。
+     */
+    fun resolveBasemapUrl(state: SettingsState, darkTheme: Boolean): String =
+        state.mapProvider.styleUrl(resolveMapStyle(state, darkTheme))
+
     // ────────────── 皮肤 / 明暗（三轴正交：SKIN-3 + OPT-A-03） ──────────────
 
     /** 选皮肤：只写 `skinId`，不碰明暗（互不重置）；未知 id 归一为默认皮肤，脏值不入库。 */

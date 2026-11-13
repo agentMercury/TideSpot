@@ -13,4 +13,12 @@
     <string name="ts_app_water_body">Water body: %1$s</string>
     <string name="ts_app_save_failed">Save failed; please retry</string>
     <string name="ts_app_saving">Saving…</string>
+    <string name="ts_fetch_log_title">Request log</string>
+    <string name="ts_fetch_log_loading">Loading…</string>
+    <string name="ts_fetch_log_empty">No requests yet — fetch a spot detail first</string>
+    <string name="ts_fetch_log_close">Close</string>
+    <string name="ts_fetch_log_clear">Clear</string>
+    <string name="ts_fetch_log_network_error">Network error</string>
+    <string name="ts_fetch_log_throttled">Rate-limited</string>
+    <string name="ts_fetch_log_cost">%1$d ms · %2$d B</string>
 </resources>

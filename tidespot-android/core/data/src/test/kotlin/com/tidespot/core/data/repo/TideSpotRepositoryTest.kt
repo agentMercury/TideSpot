@@ -388,6 +388,14 @@ class TideSpotRepositoryTest {
         assertEquals(2, logs.size)
         assertTrue(logs.all { it.httpStatus == 200 && it.bytes != null && it.costMs >= 0 })
 
+        // OPT-A-06：全局最近日志（跨点位倒序）+ 清空
+        val recent = repo.recentFetchLogs(limit = 10)
+        assertEquals(2, recent.size)
+        assertEquals(recent.map { it.fetchedAt }, recent.map { it.fetchedAt }.sortedDescending())
+        repo.clearFetchLogs()
+        assertTrue(repo.recentFetchLogs().isEmpty(), "清空后不得残留日志行")
+        assertTrue(repo.fetchLogs(s.id).isEmpty(), "清空是全局的，按点位查也应为空")
+
         // 编辑 / 删除
         repo.upsertFavorite(s.copy(name = "青岛外海(改)"))
         assertEquals("青岛外海(改)", spotDao.rows[s.id]!!.name)

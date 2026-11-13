@@ -113,4 +113,19 @@
     <!-- OPT-V12-07：标签预设 -->
     <string name="ts_fav_tag_presets">常用标签</string>
     <string name="ts_fav_tag_preset_desc">常用标签：%1$s</string>
+    <string name="ts_fav_top10_title">全部收藏 Top10 · 时段筛选</string>
+    <string name="ts_fav_filter_all">全部</string>
+    <string name="ts_fav_filter_next24h">接下来 24h</string>
+    <string name="ts_fav_filter_weekend">本周末</string>
+    <string name="ts_fav_filter_custom">自选时段</string>
+    <string name="ts_fav_top10_empty">当前时段暂无 ≥60 分的窗口——不凑数，换个时段看看</string>
+    <string name="ts_fav_filter_custom_title">自选时段</string>
+    <string name="ts_fav_filter_custom_date">日期（yyyy-MM-dd）</string>
+    <string name="ts_fav_filter_custom_start">开始（HH:mm）</string>
+    <string name="ts_fav_filter_custom_end">结束（HH:mm）</string>
+    <string name="ts_fav_filter_apply">应用</string>
+    <string name="ts_fav_filter_cancel">取消</string>
+    <string name="ts_fav_filter_err_date">日期格式应为 yyyy-MM-dd</string>
+    <string name="ts_fav_filter_err_time">时间格式应为 HH:mm</string>
+    <string name="ts_fav_filter_err_order">结束时间需晚于开始时间</string>
 </resources>

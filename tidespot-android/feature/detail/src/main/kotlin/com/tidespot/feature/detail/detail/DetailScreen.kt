@@ -58,6 +58,7 @@ import com.tidespot.core.data.repo.DataSource
 import com.tidespot.core.data.repo.SourceMetaRegistry
 import com.tidespot.core.data.repo.Ttl
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.domain.window.Top10TimeFilter
 import com.tidespot.core.ui.badge.ConfidenceBadge
 import com.tidespot.core.ui.badge.Kind
 import com.tidespot.core.ui.banner.OfflineBanner
@@ -827,7 +828,9 @@ private fun CustomTimeRangeDialog(
         confirmButton = {
             Button(onClick = {
                 val parsed = Top10TimeFilter.parseCustom(dateText, startText, endText, zone)
-                if (parsed.range == null) error = parsed.error else onApply(parsed.range)
+                // 跨模块属性不做 smart cast：先取本地 val 再判空
+                val applied = parsed.range
+                if (applied == null) error = parsed.error else onApply(applied)
             }) { Text(stringResource(R.string.ts_detail_apply)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.ts_cancel)) } },

@@ -12,6 +12,9 @@
     <string name="ts_settings_detail_days">详情页天数</string>
     <string name="ts_settings_days">%1$d 天</string>
     <string name="ts_settings_days_desc">详情页天数：%1$d 天</string>
+    <string name="ts_settings_map_source">地图来源</string>
+    <string name="ts_settings_map_source_desc">地图来源：%1$s</string>
+    <string name="ts_settings_map_source_note">底图空白时换一个来源试试；点位与数据不受影响</string>
     <string name="ts_settings_map_style">地图样式</string>
     <string name="ts_settings_map_style_desc">地图样式：%1$s（%2$s）</string>
     <string name="ts_settings_map_style_auto">未改过时跟随深色模式自动切换底图</string>
@@ -84,4 +87,7 @@
     <string name="ts_settings_theme_system">跟随系统</string>
     <string name="ts_settings_theme_light">浅色</string>
     <string name="ts_settings_theme_dark">深色</string>
+    <string name="ts_settings_fetch_log">请求日志</string>
+    <string name="ts_settings_fetch_log_note">查看最近请求与频控命中（不含密钥）</string>
+    <string name="ts_settings_fetch_log_desc">请求日志入口</string>
 </resources>

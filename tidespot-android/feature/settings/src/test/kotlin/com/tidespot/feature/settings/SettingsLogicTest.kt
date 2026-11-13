@@ -167,11 +167,11 @@ class SettingsLogicTest {
     }
 
     @Test
-    fun `settingsKeys_八个键名非空且互不相同`() {
+    fun `settingsKeys_九个键名非空且互不相同`() {
         val keys = listOf(
             SettingsKeys.UNIT_SYSTEM, SettingsKeys.DETAIL_DAYS, SettingsKeys.PREFETCH_ENABLED,
             SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.MAP_STYLE, SettingsKeys.MAP_STYLE_EXPLICIT,
-            SettingsKeys.SKIN_ID, SettingsKeys.THEME_MODE,
+            SettingsKeys.MAP_PROVIDER, SettingsKeys.SKIN_ID, SettingsKeys.THEME_MODE,
         )
         keys.forEach { assertTrue(it.isNotBlank()) }
         assertEquals(keys.size, keys.toSet().size)
@@ -219,11 +219,46 @@ class SettingsLogicTest {
     }
 
     @Test
-    fun `mapStyleUrl_三样式URL各不相同且均为OpenFreeMap`() {
-        val urls = MapStyle.entries.map { it.url }
-        assertEquals(3, urls.toSet().size)
-        // 2026-11-13：CARTO（*.cartocdn.com）在实测网络 443 全超时，底图空白 → 切 OpenFreeMap（OSM/WGS84 无偏移）
-        assertTrue(urls.all { it.startsWith("https://tiles.openfreemap.org/styles/") })
+    fun `resolveBasemapUrl_两个提供方各自三样式URL互不相同`() {
+        // 默认 OpenFreeMap：三样式 URL 互不相同且同域
+        val ofmUrls = MapStyle.entries.map { MapProvider.OPENFREEMAP.styleUrl(it) }
+        assertEquals(3, ofmUrls.toSet().size)
+        assertTrue(ofmUrls.all { it.startsWith("https://tiles.openfreemap.org/styles/") })
+        // CARTO 保留为可选项（海外/恢复后）
+        val cartoUrls = MapStyle.entries.map { MapProvider.CARTO.styleUrl(it) }
+        assertEquals(3, cartoUrls.toSet().size)
+        assertTrue(cartoUrls.all { it.startsWith("https://basemaps.cartocdn.com/gl/") })
+        // 两个提供方不共用任何 URL
+        assertTrue(ofmUrls.intersect(cartoUrls.toSet()).isEmpty())
+    }
+
+    @Test
+    fun `resolveBasemapUrl_按提供方取URL且与样式正交`() {
+        val base = SettingsState()
+        assertEquals(
+            com.tidespot.core.data.remote.TideSpotUrls.OPENFREEMAP_COLOR_STYLE_URL,
+            SettingsLogic.resolveBasemapUrl(base, darkTheme = false),
+        )
+        assertEquals(
+            com.tidespot.core.data.remote.TideSpotUrls.OPENFREEMAP_DARK_STYLE_URL,
+            SettingsLogic.resolveBasemapUrl(base, darkTheme = true),
+        )
+        val carto = SettingsLogic.withMapProvider(base, MapProvider.CARTO)
+        assertEquals(
+            com.tidespot.core.data.remote.TideSpotUrls.CARTO_COLOR_STYLE_URL,
+            SettingsLogic.resolveBasemapUrl(carto, darkTheme = false),
+        )
+        assertEquals(MapStyle.VOYAGER, carto.mapStyle, "换提供方不得改样式")
+    }
+
+    @Test
+    fun `withMapProvider_只改提供方不碰样式与明暗`() {
+        val base = SettingsLogic.withMapStyle(SettingsState(), MapStyle.POSITRON)
+        val carto = SettingsLogic.withMapProvider(base, MapProvider.CARTO)
+        assertEquals(MapProvider.CARTO, carto.mapProvider)
+        assertEquals(MapStyle.POSITRON, carto.mapStyle, "换来源不改样式")
+        assertTrue(carto.mapStyleExplicit, "显式标记不被重置")
+        assertEquals(base.themeMode, carto.themeMode)
     }
 
     // ── SKIN-3 / OPT-A-03：三轴正交（皮肤 + 明暗） ──

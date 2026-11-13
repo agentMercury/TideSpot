@@ -12,7 +12,7 @@
     <string name="ts_favorite_dialog_title">Save this spot</string>
     <string name="ts_favorite_name_hint">Leave blank to use coordinates as the name</string>
     <string name="ts_top10_this_spot">Best windows for this spot</string>
-    <string name="ts_top10_all">Top 10 across all favorites</string>
+    <string name="ts_top10_all">Top 10 across favorites · best windows</string>
     <string name="ts_top10_empty">No matching best windows in the current range</string>
     <string name="ts_window_bar">Window</string>
     <string name="ts_record_high_tide">Record a high-tide time</string>

@@ -13,4 +13,12 @@
     <string name="ts_app_water_body">水体：%1$s</string>
     <string name="ts_app_save_failed">保存失败，请重试</string>
     <string name="ts_app_saving">保存中…</string>
+    <string name="ts_fetch_log_title">请求日志</string>
+    <string name="ts_fetch_log_loading">读取中…</string>
+    <string name="ts_fetch_log_empty">暂无请求记录——进入详情页拉取数据后会出现</string>
+    <string name="ts_fetch_log_close">关闭</string>
+    <string name="ts_fetch_log_clear">清空</string>
+    <string name="ts_fetch_log_network_error">网络异常</string>
+    <string name="ts_fetch_log_throttled">频控命中</string>
+    <string name="ts_fetch_log_cost">%1$d ms · %2$d B</string>
 </resources>

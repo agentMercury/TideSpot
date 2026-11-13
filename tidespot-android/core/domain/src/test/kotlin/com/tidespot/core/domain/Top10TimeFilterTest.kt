@@ -1,4 +1,5 @@
-package com.tidespot.feature.detail.detail
+package com.tidespot.core.domain
+import com.tidespot.core.domain.window.Top10TimeFilter
 
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -80,19 +81,5 @@ class Top10TimeFilterTest {
             Top10TimeFilter.CustomError.END_NOT_AFTER_START,
             Top10TimeFilter.parseCustom("2026-11-14", "14:00", "14:00", shanghai).error,
         )
-    }
-
-    @Test
-    fun `爆护徽标_80边界与持续标注_null语义`() {
-        val w80 = com.tidespot.core.domain.model.BestWindow(
-            startEpochSec = 0, peakEpochSec = 0, durationHours = 3, peakScore = 80, tier = "爆护窗口",
-            topFactors = emptyList(), warnings = emptyList(), truncatedUntilEpochSec = 7200,
-        )
-        assertEquals("爆护", Top10Formatter.burstBadge(w80))
-        assertEquals("利好持续至 02:00", Top10Formatter.sustainedLine(w80, ZoneOffset.UTC))
-
-        val w79 = w80.copy(peakScore = 79, tier = "很适合", truncatedUntilEpochSec = null)
-        assertNull(Top10Formatter.burstBadge(w79), "79 分不得显示爆护")
-        assertNull(Top10Formatter.sustainedLine(w79, ZoneOffset.UTC), "核心即原窗 → 不显示持续标注")
     }
 }

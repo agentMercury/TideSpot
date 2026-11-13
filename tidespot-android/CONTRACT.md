@@ -414,13 +414,20 @@ interface CopernicusCredentialActions {
 样式 JSON 尚可命中缓存，但矢量瓦片与 sprite 全失败 → **底图整片空白，定位/潮汐/收藏等于瓦片无关的功能正常**。
 同网络 `tiles.openfreemap.org` 1.5s 可达、HTTP 200。
 
-**变更**：`TideSpotUrls` 三个样式常量改指 OpenFreeMap（OpenStreetMap 数据、WGS84 与定位同坐标、免费无 Key）：
+**变更（分两步）**：
 
-| 常量 | 值 |
-|---|---|
-| `BASEMAP_COLOR_STYLE_URL` | `https://tiles.openfreemap.org/styles/liberty` |
-| `BASEMAP_PLAIN_STYLE_URL` | `https://tiles.openfreemap.org/styles/positron` |
-| `BASEMAP_DARK_STYLE_URL` | `https://tiles.openfreemap.org/styles/dark` |
+1. **应急**：三个样式常量改指 OpenFreeMap，立刻恢复底图。
+2. **OPT-A-10（同日）**：升维为「2 提供方 × 3 样式」，设置页加「地图来源」下拉，用户可自选。
+
+`TideSpotUrls` 现在有 6 个常量（字面量仍只允许出现在该文件）：
+
+| 提供方 | 彩色 | 素色 | 深色 |
+|---|---|---|---|
+| OpenFreeMap（默认） | `OPENFREEMAP_COLOR_STYLE_URL` | `OPENFREEMAP_PLAIN_STYLE_URL` | `OPENFREEMAP_DARK_STYLE_URL` |
+| CARTO | `CARTO_COLOR_STYLE_URL` | `CARTO_PLAIN_STYLE_URL` | `CARTO_DARK_STYLE_URL` |
+
+取值唯一出口：`SettingsLogic.resolveBasemapUrl(state, darkTheme)` = `state.mapProvider.styleUrl(resolveMapStyle(...))`。
+**新增提供方** = `MapProvider` 加一项 + `styleUrl` 补三条 + `TideSpotUrls` 补三个常量，业务屏零改动。
 
 **不变（红线）**：
 - `MapStyle` 三个**枚举名**（`VOYAGER` / `POSITRON` / `DARK_MATTER`）是持久化值（`settings.mapStyle` 存 `name`），
@@ -430,4 +437,7 @@ interface CopernicusCredentialActions {
 
 **署名**：`ts_map_attribution` 改为「OpenStreetMap 贡献者 · OpenFreeMap」。
 
-**回滚**：只把三个常量改回 CARTO URL 即可，枚举与所有调用方零改动。
+**回滚**：把 `MapProvider` 默认值改回 `CARTO`，或直接在设置页让用户切；常量与调用方零改动。
+
+**OPT-A-11**：`MapScreen` 在 `setStyle` 后 1.5s 探活样式源（6s 超时），失败显示「底图加载失败 + 重试」提示条；
+探活不阻塞首帧，不影响任何数据链路。

@@ -75,6 +75,17 @@ class AppSettingsTest {
     }
 
     @Test
+    fun 地图提供方往返与非法值回落开放式源() {
+        val store = FakeStore()
+        assertEquals(com.tidespot.feature.settings.MapProvider.OPENFREEMAP, AppSettings.read(store).mapProvider)
+        AppSettings.writeMapProvider(store, com.tidespot.feature.settings.MapProvider.CARTO)
+        assertEquals(com.tidespot.feature.settings.MapProvider.CARTO, AppSettings.read(store).mapProvider)
+        // 脏值 → OpenFreeMap（实测可达的默认）
+        store.writeString(SettingsKeys.MAP_PROVIDER, "BING")
+        assertEquals(com.tidespot.feature.settings.MapProvider.OPENFREEMAP, AppSettings.read(store).mapProvider)
+    }
+
+    @Test
     fun 单位制序列化往返() {
         val store = FakeStore()
         AppSettings.writeUnit(store, UnitSystem.IMPERIAL)

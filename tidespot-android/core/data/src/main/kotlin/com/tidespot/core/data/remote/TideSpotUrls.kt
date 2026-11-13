@@ -190,16 +190,21 @@ object TideSpotUrls {
             .build()
     }
     /**
-     * UX-19 / D8 底图源：**OpenFreeMap**（OpenStreetMap 数据，WGS84，与定位坐标系一致、无偏移；
-     * 免费、无 Key、attribution 由样式自带）。
+     * UX-19 / D8 底图样式 URL：**两个提供方 × 三种样式**（2026-11-13 起用户可在设置页切换提供方）。
      *
-     * 2026-11-13 由 CARTO 切换：`*.cartocdn.com`（Fastly）在实测网络下 TCP 443 全部 10s 超时，
-     * 底图整片空白（定位与数据正常）；同网络的 `tiles.openfreemap.org` 1.5s 可达。
-     * 三选语义不变（彩色/素色/深色），仅换提供方。
+     * 提供方差异（实测）：
+     * - OpenFreeMap：`tiles.openfreemap.org`，OSM 数据、WGS84、免费无 Key；国内网络 1.5s 可达（默认）。
+     * - CARTO：`*.cartocdn.com`（Fastly），2026-11-13 实测 TCP 443 全部 10s 超时 → 底图空白。
+     *   保留可选，供海外网络或 CARTO 恢复后使用；选它就要接受可能的加载失败提示。
+     *
+     * **红线**：URL 字面量只允许出现在本文件（core:data 唯一 URL 构造器），
+     * feature 层通过 `MapProvider.styleUrl(style)` 取用。
      */
-    const val BASEMAP_COLOR_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
+    const val OPENFREEMAP_COLOR_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
+    const val OPENFREEMAP_PLAIN_STYLE_URL = "https://tiles.openfreemap.org/styles/positron"
+    const val OPENFREEMAP_DARK_STYLE_URL = "https://tiles.openfreemap.org/styles/dark"
 
-    const val BASEMAP_PLAIN_STYLE_URL = "https://tiles.openfreemap.org/styles/positron"
-
-    const val BASEMAP_DARK_STYLE_URL = "https://tiles.openfreemap.org/styles/dark"
+    const val CARTO_COLOR_STYLE_URL = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+    const val CARTO_PLAIN_STYLE_URL = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+    const val CARTO_DARK_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 }

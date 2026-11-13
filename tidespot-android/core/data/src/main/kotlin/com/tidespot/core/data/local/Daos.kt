@@ -112,6 +112,17 @@ interface FetchLogDao {
     @Query("SELECT * FROM fetch_log WHERE spotId = :spotId ORDER BY fetchedAt DESC")
     suspend fun forSpot(spotId: Long): List<FetchLogEntity>
 
+    /**
+     * OPT-A-06（设置页「请求日志」）：全局最近 [limit] 条，跨点位按时刻倒序。
+     * 只取既有列（无 URL，仅有 urlHash），天然不含密钥。
+     */
+    @Query("SELECT * FROM fetch_log ORDER BY fetchedAt DESC LIMIT :limit")
+    suspend fun recent(limit: Int): List<FetchLogEntity>
+
+    /** OPT-A-06：清空本地访问日志（不影响任何业务缓存/TTL 判定基准的既有记录语义——清空即视为无记录）。 */
+    @Query("DELETE FROM fetch_log")
+    suspend fun deleteAll()
+
     /** OPT-V11-12（P2/CHG-37）：删除收藏点时级联清理访问日志（事务由仓储包裹）。 */
     @Query("DELETE FROM fetch_log WHERE spotId IN (:spotIds)")
     suspend fun deleteForSpots(spotIds: List<Long>)

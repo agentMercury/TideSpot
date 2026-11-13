@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.domain.window.Top10TimeFilter
 import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.banner.OfflineBanner
 import com.tidespot.core.ui.format.Format
@@ -49,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.feature.favorites.R
 import com.tidespot.core.ui.zone.SpotZones
+import java.time.ZoneId
 
 /**
  * FavoritesScreen（SRS F-2.1~F-2.6 + v1.1 P2）：
@@ -920,7 +922,13 @@ private fun BatchGroupDialog(
     )
 }
 
-/** F-2.6 Top10 列表内容（OPT-M5-03：逐条目按归属点时区渲染；Sheet 内单层 LazyColumn 独立滚动）。 */
+/**
+ * F-2.6 Top10 列表内容（OPT-M5-03：逐条目按归属点时区渲染；Sheet 内单层 LazyColumn 独立滚动）。
+ *
+ * OPT-A-04（2026-11-13）：补设计稿 OV01 的**时段筛选 + ≥60 分门槛 + 空态**——
+ * 标题「全部收藏 Top10 · 时段筛选」、四 Chip（全部/接下来 24h/本周末/自选）、
+ * 无合格窗口时明确显示空态（禁止兜底造假）。
+ */
 @Composable
 private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
     val strings = localTideSpotStrings()
@@ -929,17 +937,72 @@ private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
             style = MaterialTheme.typography.bodyMedium)
         return
     }
+    // 时段筛选状态：custom != null 表示「自选」（优先于 preset）；preset 三选与设计稿一致
+    var preset by remember { mutableStateOf(Top10TimeFilter.Preset.ALL) }
+    var customRange by remember { mutableStateOf<Top10TimeFilter.TimeRange?>(null) }
+    var showCustomDialog by remember { mutableStateOf(false) }
+    val zone = ZoneId.systemDefault()
+    val nowSec = remember { System.currentTimeMillis() / 1000L }
+    val range = customRange ?: Top10TimeFilter.presetRange(preset, nowSec, zone)
+    val shown = CrossTop10Filter.filter(top10, range)
+
     // 口径注明：任一条目时区未回写 → 按本机时区渲染并注明（SpotZones 口径）
     val deviceZoneUsed = top10.any { it.usesDeviceZone }
     Column(Modifier.padding(horizontal = 12.dp)) {
+        Text(
+            stringResource(R.string.ts_fav_top10_title),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Top10FilterChip(
+                label = stringResource(R.string.ts_fav_filter_all),
+                selected = preset == Top10TimeFilter.Preset.ALL && customRange == null,
+                onClick = {
+                    customRange = null
+                    preset = Top10TimeFilter.Preset.ALL
+                },
+            )
+            Top10FilterChip(
+                label = stringResource(R.string.ts_fav_filter_next24h),
+                selected = preset == Top10TimeFilter.Preset.NEXT_24H && customRange == null,
+                onClick = {
+                    customRange = null
+                    preset = Top10TimeFilter.Preset.NEXT_24H
+                },
+            )
+            Top10FilterChip(
+                label = stringResource(R.string.ts_fav_filter_weekend),
+                selected = preset == Top10TimeFilter.Preset.THIS_WEEKEND && customRange == null,
+                onClick = {
+                    customRange = null
+                    preset = Top10TimeFilter.Preset.THIS_WEEKEND
+                },
+            )
+            Top10FilterChip(
+                label = stringResource(R.string.ts_fav_filter_custom),
+                selected = customRange != null,
+                onClick = { showCustomDialog = true },
+            )
+        }
         if (deviceZoneUsed) {
             Text(stringResource(R.string.ts_fav_zone_note, strings.deviceZoneNote),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.padding(vertical = 4.dp))
         }
+        if (shown.isEmpty()) {
+            // 设计稿红线：无 ≥60 分窗口时显示空态，禁止兜底造假
+            Text(
+                stringResource(R.string.ts_fav_top10_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 16.dp),
+            )
+            return@Column
+        }
         LazyColumn(Modifier.padding(bottom = 24.dp)) {
-            items(top10.size) { i ->
-                val entry = top10[i]
+            items(shown.size) { i ->
+                val entry = shown[i]
                 val w = entry.window
                 val startText = FavoritesSummaryFormatter.time(w.startEpochSec, entry.zone, strings)
                 val peakText = FavoritesSummaryFormatter.time(w.peakEpochSec, entry.zone, strings)
@@ -956,16 +1019,26 @@ private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
                         .semantics { contentDescription = rankDesc },
                 ) {
                     Column(Modifier.padding(12.dp)) {
-                        Text("#${i + 1} ${entry.spotName}", style = MaterialTheme.typography.titleSmall)
-                        Text(
-                            stringResource(
-                                R.string.ts_fav_window_start,
-                                startText,
-                                peakText,
-                                w.durationHours,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text("#${i + 1} ${entry.spotName}", style = MaterialTheme.typography.titleSmall)
+                                Text(
+                                    stringResource(
+                                        R.string.ts_fav_window_start,
+                                        startText,
+                                        peakText,
+                                        w.durationHours,
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                            // 设计稿：右侧大号分数（Top10 的核心可比信息）
+                            Text(
+                                w.peakScore.toString(),
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
                         Text(
                             stringResource(R.string.ts_fav_window_peak, w.peakScore, w.tier),
                             style = MaterialTheme.typography.bodySmall,
@@ -990,4 +1063,88 @@ private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
             }
         }
     }
+
+    if (showCustomDialog) {
+        CustomTop10RangeDialog(
+            zone = zone,
+            onDismiss = { showCustomDialog = false },
+            onApply = { applied ->
+                customRange = applied
+                preset = Top10TimeFilter.Preset.ALL
+                showCustomDialog = false
+            },
+        )
+    }
+}
+
+/** OPT-A-04：Top10 时段 Chip（带无障碍描述）。 */
+@Composable
+private fun Top10FilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    FilterChip(selected = selected, onClick = onClick, label = { Text(label) })
+}
+
+/** OPT-A-04：自选时段对话框（复用 core:domain 的解析与错误码，不重造校验）。 */
+@Composable
+private fun CustomTop10RangeDialog(
+    zone: ZoneId,
+    onDismiss: () -> Unit,
+    onApply: (Top10TimeFilter.TimeRange) -> Unit,
+) {
+    var dateText by remember { mutableStateOf(java.time.LocalDate.now(zone).toString()) }
+    var startText by remember { mutableStateOf("06:00") }
+    var endText by remember { mutableStateOf("20:00") }
+    var error by remember { mutableStateOf<Top10TimeFilter.CustomError?>(null) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.ts_fav_filter_custom_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                OutlinedTextField(
+                    value = dateText,
+                    onValueChange = { dateText = it },
+                    label = { Text(stringResource(R.string.ts_fav_filter_custom_date)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = startText,
+                    onValueChange = { startText = it },
+                    label = { Text(stringResource(R.string.ts_fav_filter_custom_start)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = endText,
+                    onValueChange = { endText = it },
+                    label = { Text(stringResource(R.string.ts_fav_filter_custom_end)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                error?.let {
+                    Text(
+                        when (it) {
+                            Top10TimeFilter.CustomError.BAD_DATE ->
+                                stringResource(R.string.ts_fav_filter_err_date)
+                            Top10TimeFilter.CustomError.BAD_TIME ->
+                                stringResource(R.string.ts_fav_filter_err_time)
+                            Top10TimeFilter.CustomError.END_NOT_AFTER_START ->
+                                stringResource(R.string.ts_fav_filter_err_order)
+                        },
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val parsed = Top10TimeFilter.parseCustom(dateText, startText, endText, zone)
+                val applied = parsed.range
+                if (applied != null) onApply(applied) else error = parsed.error
+            }) { Text(stringResource(R.string.ts_fav_filter_apply)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.ts_fav_filter_cancel)) }
+        },
+    )
 }

@@ -12,6 +12,9 @@
     <string name="ts_settings_detail_days">Detail days</string>
     <string name="ts_settings_days">%1$d days</string>
     <string name="ts_settings_days_desc">Detail days: %1$d</string>
+    <string name="ts_settings_map_source">Map source</string>
+    <string name="ts_settings_map_source_desc">Map source: %1$s</string>
+    <string name="ts_settings_map_source_note">If the basemap is blank, try another source; spots and data are unaffected</string>
     <string name="ts_settings_map_style">Map style</string>
     <string name="ts_settings_map_style_desc">Map style: %1$s (%2$s)</string>
     <string name="ts_settings_map_style_auto">Follows dark mode automatically until you pick one</string>
@@ -80,4 +83,7 @@
     <string name="ts_settings_theme_system">System</string>
     <string name="ts_settings_theme_light">Light</string>
     <string name="ts_settings_theme_dark">Dark</string>
+    <string name="ts_settings_fetch_log">Request log</string>
+    <string name="ts_settings_fetch_log_note">Recent requests and rate-limit hits (no keys)</string>
+    <string name="ts_settings_fetch_log_desc">Open request log</string>
 </resources>

@@ -77,7 +77,9 @@ import com.tidespot.feature.map.model.SpotConfirmed
 import com.tidespot.feature.map.search.SearchPanel
 import com.tidespot.feature.map.stars.FavoriteStar
 import com.tidespot.feature.map.stars.FavoriteStarLayer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -88,9 +90,36 @@ import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
+import java.net.HttpURLConnection
+import java.net.URL
 
-/** 默认底图样式 URL 的模块内别名（真实值单点在 [com.tidespot.core.data.remote.TideSpotUrls]）。 */
-const val DEFAULT_BASEMAP_STYLE_URL = com.tidespot.core.data.remote.TideSpotUrls.BASEMAP_COLOR_STYLE_URL
+/**
+ * OPT-A-11：底图样式源探活（6s 超时，IO 线程）。
+ *
+ * 只取样式 JSON（不下载瓦片），能拿到 2xx/3xx 就认为底图源可达。
+ * 目的不是精确判定渲染结果，而是**避免「一片白却什么都不说」**：源不可达时给用户
+ * 一个明确提示 + 重试入口（2026-11-13 CARTO 事故场景）。
+ *
+ * 失败一律吞掉异常返回 false——探测绝不能影响地图本身。
+ */
+private suspend fun probeBasemapStyle(url: String): Boolean = withContext(Dispatchers.IO) {
+    runCatching {
+        val conn = (URL(url).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 6_000
+            readTimeout = 6_000
+            requestMethod = "GET"
+            instanceFollowRedirects = true
+        }
+        try {
+            conn.responseCode in 200..399
+        } finally {
+            conn.disconnect()
+        }
+    }.getOrDefault(false)
+}
+
+/** 默认底图样式 URL（OpenFreeMap 彩色；真实值单点在 [com.tidespot.core.data.remote.TideSpotUrls]，由 :app 经 SettingsLogic 注入）。 */
+const val DEFAULT_BASEMAP_STYLE_URL = com.tidespot.core.data.remote.TideSpotUrls.OPENFREEMAP_COLOR_STYLE_URL
 
 /**
  * M3 地图首屏：MapLibre 底图 + 中心准星 + 信息条 + 搜索 + 定位。
@@ -161,6 +190,13 @@ fun MapScreen(
     var pendingElevation by remember { mutableStateOf<Double?>(null) }
     /** UX-19：当前已生效的样式 URL（切换时重建 style；防重复 setStyle）。 */
     var appliedStyleUrl by remember { mutableStateOf<String?>(null) }
+    /**
+     * OPT-A-11：底图源是否不可达（探活失败 → 顶部提示 + 重试）。
+     * 与点位/潮汐/收藏等数据链路**完全无关**：瓦片拿不到不影响任何业务功能。
+     */
+    var basemapUnreachable by remember { mutableStateOf(false) }
+    /** OPT-A-11：重试计数（自增即触发重新探活并强制重设样式）。 */
+    var basemapRetryTick by remember { mutableStateOf(0) }
     /** UX-18：程序驱动相机移动（冷启动定位/返回定位）时抑制 idle → 准星状态机（F-1.4 唯一真源不受影响）。 */
     var suppressNextIdle by remember { mutableStateOf(false) }
     /** CHG-35：最近一次相机移动是否来自用户手势（决定 Idle 是否进入 Preview）。 */
@@ -341,8 +377,10 @@ fun MapScreen(
     // UX-19（OPT-V11-19）：样式切换即刻生效（重进地图同样生效；attribution 由 MapLibre 默认控件保持）
     // OPT-V12-01：**唯一样式应用入口**——首次建图与切换样式都走这里（带回调安装星标图层），
     // 避免"建图时 setStyle + 该效果再 setStyle"的竞态（第二次 setStyle 会丢弃星标图层）。
-    LaunchedEffect(styleUrl, mapLibre) {
+    LaunchedEffect(styleUrl, mapLibre, basemapRetryTick) {
         val map = mapLibre ?: return@LaunchedEffect
+        basemapUnreachable = false
+        if (basemapRetryTick > 0) appliedStyleUrl = null
         if (appliedStyleUrl != styleUrl) {
             // §12 红线：底图样式自带 attribution，由 MapLibre 默认控件渲染，禁止关闭或遮挡
             map.setStyle(Style.Builder().fromUri(styleUrl)) { style ->
@@ -354,6 +392,13 @@ fun MapScreen(
                 }
             }
             appliedStyleUrl = styleUrl
+        }
+        // OPT-A-11：**先让地图起步再探活**（探测有 6s 超时，绝不能挡首帧）。
+        // 判据取「样式源探活」，与瓦片渲染无耦合：源不可达时用户看到的就是空白，
+        // 提示只是把"为什么白"讲清楚，并给一个重试动作。
+        kotlinx.coroutines.delay(1_500)
+        if (!probeBasemapStyle(styleUrl)) {
+            basemapUnreachable = true
         }
     }
 
@@ -538,6 +583,38 @@ fun MapScreen(
                     is PermissionUiState.Denied ->
                         TopHint(stringResource(UiR.string.ts_location_denied), isError = ps.permanent)
                     else -> {}
+                }
+                // OPT-A-11：底图源不可达 → 明确告知 + 一键重试（不给用户看无名白屏）
+                if (basemapUnreachable) {
+                    val failText = stringResource(R.string.ts_map_basemap_failed)
+                    val retryText = stringResource(R.string.ts_map_basemap_retry)
+                    Surface(
+                        onClick = { basemapRetryTick += 1 },
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .semantics { contentDescription = "$failText $retryText" },
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                failText,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Text(
+                                retryText,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                            )
+                        }
+                    }
                 }
             }
 

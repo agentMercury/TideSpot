@@ -12,4 +12,6 @@
     <string name="ts_map_star_detail">View details</string>
     <string name="ts_map_star_close">Close</string>
     <string name="ts_map_star_no_summary">No window summary yet</string>
+    <string name="ts_map_basemap_failed">Basemap failed to load; spots and data are unaffected</string>
+    <string name="ts_map_basemap_retry">Retry</string>
 </resources>

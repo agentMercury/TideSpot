@@ -127,6 +127,15 @@ class FakeFetchLogDao : FetchLogDao {
     override suspend fun deleteForSpots(spotIds: List<Long>) {
         rows.removeAll { it.spotId in spotIds }
     }
+
+    // ── OPT-A-06：设置页请求日志 ──
+
+    override suspend fun recent(limit: Int): List<FetchLogEntity> =
+        rows.sortedByDescending { it.fetchedAt }.take(limit)
+
+    override suspend fun deleteAll() {
+        rows.clear()
+    }
 }
 
 // ────────────────────────────── M3 新增（CONTRACT M3 子契约） ──────────────────────────────
