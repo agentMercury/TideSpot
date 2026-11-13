@@ -29,6 +29,7 @@
 | 有意偏离设计稿（色值 / 布局 / 结构） | 本文件 §5「已知偏离」+ `device-compare/` 对拍报告（附量化对比度） |
 | 一批需求做完 | `design-handdrawn/A-vintage-outdoor/未开始需求清单.md`（状态 + **落地结果指向真实文件与行号**） |
 | 每个提交 | `jj describe` 写清「改了什么 / 为什么 / 门禁结果」；建 change 后 `git update-ref refs/heads/main <commit>` |
+| 多会话 / 多人并行 | 见 §0.7：**各自开 `jj workspace`**，禁止两个会话共用一个工作副本 |
 | 会话结束 | `.workbuddy/memory/YYYY-MM-DD.md` 追加当天决策与踩坑（不记临时路径、工具报错） |
 
 ### 0.3 文档地图（谁管什么、谁权威）
@@ -84,9 +85,34 @@
 3. 更新本文件 §1 基线表的版本号（或 §0.5 标注差异）+ `PROGRESS_TRACKER.md` 台账 + 相关需求清单状态；
 4. `jj describe` 写清版本号变化（`chore(release): vX.Y.Z`）+ 门禁结果 → `git update-ref refs/heads/main`。
 
+### 0.7 并行会话隔离（长期方案，客户 2026-11-13 选定）
 
+> **事故背景**：2026-11-13 发 `v1.17.0` 时，jj 把**另一个并行会话**的在途代码（`TideSpotSkin.kt` /
+> `SkinRegistryTest.kt`，即 D 皮肤）一起快照进了 release 提交。根因不是误操作，而是**两个会话共用同一个工作副本**：
+> jj 的提交粒度是**整个工作副本**，不是「我改的那几个文件」。当天靠 `jj split` 拆出并正名，文件指纹未变。
+
+**规则：并行任务必须各自开工作副本，禁止两个会话共用 `D:\workspace\weatherfishcheck`。**
+
+```bash
+# 主线（已有）：D:\workspace\weatherfishcheck
+jj workspace add ../wf-skin --name skin   # 新建副本，自带独立的 @ 提交
+cd ../wf-skin && jj status                # 只看得到本副本的改动
+```
+
+| 要点 | 说明 |
+|---|---|
+| 独立 `@` | 每个 workspace 有自己的 working-copy commit，提交互不吞并 |
+| 共用历史 | 副本共享同一个 `.jj` 仓库，`jj log` 看到全部提交，无需 fetch |
+| 合回主线 | 在主线 `jj rebase -s <你的 change> -d main`（或先 `jj new main` 再 rebase） |
+| **git 同步** | colocated 的 git 只在 **default 副本**自动跟随；其它副本提交后回 default 执行 `git update-ref refs/heads/main <commit>` |
+| 副本位置 | 放到仓库**外**（`../wf-*`）；放仓库内会被快照进主线，等于没隔离 |
+| 用完清理 | `jj workspace forget <name>` + 删目录，否则 `jj log` 会留游离工作副本 |
+
+**临时兜底（还没开副本就撞上并行改动时）**：提交前先 `jj status` 逐项确认文件来源；不属于本次任务的文件
+**只能做 `jj split` 拆分与正名，不得删改对方内容**；提交描述里注明「并行会话产出」。
 
 ---
+
 
 ## 1. 当前基线（2026-11-11 收官时）
 
