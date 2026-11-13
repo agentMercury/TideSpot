@@ -40,7 +40,7 @@ import com.tidespot.core.ui.R
  * 无法由十几个源色线性派生（深色的 surfaceContainer 梯度方向与浅色相反），
  * 因此这里直接持有成品 scheme，保证与试点期像素级一致。
  *
- * [mapLand] / [mapWater] / [mapRoad] 是设计稿的地图三色（CARTO 底图不重画，
+ * [mapLand] / [mapWater] / [mapRoad] 是设计稿的地图三色（真实瓦片底图不重画，
  * 仅用于地图周边装饰与缩略图等需要「呼应地图色」的地方）。
  * 取值来源：`design-handdrawn/generator/engine.py` 的 PALETTE（非编造值）。
  */

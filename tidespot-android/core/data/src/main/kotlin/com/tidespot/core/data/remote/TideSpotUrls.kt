@@ -189,12 +189,17 @@ object TideSpotUrls {
             .addQueryParameter("INFOFORMAT", "application/json")
             .build()
     }
-    /** §7.1 CARTO Positron 免费矢量底图样式（M6/CHG-12⑤ URL 单点收敛：MapScreen 引用本常量；已验证 200，无 Key）。 */
-    const val CARTO_POSITRON_STYLE_URL = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+    /**
+     * UX-19 / D8 底图源：**OpenFreeMap**（OpenStreetMap 数据，WGS84，与定位坐标系一致、无偏移；
+     * 免费、无 Key、attribution 由样式自带）。
+     *
+     * 2026-11-13 由 CARTO 切换：`*.cartocdn.com`（Fastly）在实测网络下 TCP 443 全部 10s 超时，
+     * 底图整片空白（定位与数据正常）；同网络的 `tiles.openfreemap.org` 1.5s 可达。
+     * 三选语义不变（彩色/素色/深色），仅换提供方。
+     */
+    const val BASEMAP_COLOR_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
 
-    /** UX-19（OPT-V11-19 / D8）：CARTO Voyager 彩色底图（默认样式；同域免费、attribution 不变）。 */
-    const val CARTO_VOYAGER_STYLE_URL = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+    const val BASEMAP_PLAIN_STYLE_URL = "https://tiles.openfreemap.org/styles/positron"
 
-    /** UX-19：CARTO Dark Matter 深色底图（设置三选之一）。 */
-    const val CARTO_DARK_MATTER_STYLE_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+    const val BASEMAP_DARK_STYLE_URL = "https://tiles.openfreemap.org/styles/dark"
 }

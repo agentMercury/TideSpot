@@ -221,7 +221,7 @@ private fun AppRoot(
         // OPT-V115-02 / GAP-03：edge-to-edge 收口——insets 下沉到各屏自管（地图全屏、控件单独 pad）
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
-        // SKIN-2：纸纹统一挂在外壳——地图页跳过（底图是 CARTO 真实瓦片，颗粒会伤可读性），
+        // SKIN-2：纸纹统一挂在外壳——地图页跳过（底图是真实瓦片，颗粒会伤可读性），
         // 收藏/设置/详情继承同一层颗粒；详情页不再各自叠加，避免双层颗粒把文字糊掉。
         val grain = rememberPaperGrainBrush(darkTheme)
         Column(

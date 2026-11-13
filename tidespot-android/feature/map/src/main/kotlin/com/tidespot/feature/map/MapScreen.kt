@@ -89,8 +89,8 @@ import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 
-/** §7.1：CARTO Positron 免费矢量样式（已验证 200），无任何 Key。 */
-const val CARTO_POSITRON_STYLE_URL = com.tidespot.core.data.remote.TideSpotUrls.CARTO_POSITRON_STYLE_URL
+/** 默认底图样式 URL 的模块内别名（真实值单点在 [com.tidespot.core.data.remote.TideSpotUrls]）。 */
+const val DEFAULT_BASEMAP_STYLE_URL = com.tidespot.core.data.remote.TideSpotUrls.BASEMAP_COLOR_STYLE_URL
 
 /**
  * M3 地图首屏：MapLibre 底图 + 中心准星 + 信息条 + 搜索 + 定位。
@@ -116,8 +116,8 @@ fun MapScreen(
     waterBodyResolver: WaterBodyResolver? = null,
     reverseGeoEnabled: Boolean = true,
     onSpotConfirmed: (SpotConfirmed) -> Unit = {},
-    /** UX-19（OPT-V11-19）：底图样式 URL（默认 Voyager 彩色；URL 单点在 TideSpotUrls）。 */
-    styleUrl: String = com.tidespot.core.data.remote.TideSpotUrls.CARTO_VOYAGER_STYLE_URL,
+    /** UX-19（OPT-V11-19）：底图样式 URL（默认彩色；URL 单点在 TideSpotUrls）。 */
+    styleUrl: String = DEFAULT_BASEMAP_STYLE_URL,
     /** UX-18（OPT-V11-18）：返回地图时的相机目标（上一查看点 / lastViewed 最新点；null = 世界视图）。 */
     initialCameraTarget: GeoPoint? = null,
     /** OPT-V115-02 / S01 C02：顶部工具浮层动作（收藏/设置/Top10 由 :app 注入；null = 不渲染）。 */

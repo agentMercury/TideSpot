@@ -26,9 +26,9 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
  * OPT-V11-13：展示名走资源（[labelRes]），[description] 为产品名（跨语言不变）。
  */
 enum class MapStyle(@StringRes val labelRes: Int, val description: String, val url: String) {
-    VOYAGER(R.string.ts_settings_style_color, "CARTO Voyager", TideSpotUrls.CARTO_VOYAGER_STYLE_URL),
-    POSITRON(R.string.ts_settings_style_plain, "CARTO Positron", TideSpotUrls.CARTO_POSITRON_STYLE_URL),
-    DARK_MATTER(R.string.ts_settings_style_dark, "CARTO Dark Matter", TideSpotUrls.CARTO_DARK_MATTER_STYLE_URL),
+    VOYAGER(R.string.ts_settings_style_color, "OpenFreeMap Liberty", TideSpotUrls.BASEMAP_COLOR_STYLE_URL),
+    POSITRON(R.string.ts_settings_style_plain, "OpenFreeMap Positron", TideSpotUrls.BASEMAP_PLAIN_STYLE_URL),
+    DARK_MATTER(R.string.ts_settings_style_dark, "OpenFreeMap Dark", TideSpotUrls.BASEMAP_DARK_STYLE_URL),
 }
 
 /**

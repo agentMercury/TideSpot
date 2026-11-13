@@ -7,7 +7,7 @@
     <string name="ts_map_search_clear">清空</string>
     <string name="ts_map_search_hint">搜索地点（如：万绿湖）</string>
     <!-- OPT-V115-02 / S01 C21：底图署名行 -->
-    <string name="ts_map_attribution">底图：OpenStreetMap 贡献者 · CARTO</string>
+    <string name="ts_map_attribution">底图：OpenStreetMap 贡献者 · OpenFreeMap</string>
     <string name="ts_map_source_line">源更新 %1$s · 本机拉取 %2$s</string>
     <!-- OPT-V12-01：收藏星标气泡卡 -->
     <string name="ts_map_star_detail">查看详情</string>

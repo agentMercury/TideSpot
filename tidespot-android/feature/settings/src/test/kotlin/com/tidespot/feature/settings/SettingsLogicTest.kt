@@ -219,10 +219,11 @@ class SettingsLogicTest {
     }
 
     @Test
-    fun `mapStyleUrl_三样式URL各不相同且均为CARTO`() {
+    fun `mapStyleUrl_三样式URL各不相同且均为OpenFreeMap`() {
         val urls = MapStyle.entries.map { it.url }
         assertEquals(3, urls.toSet().size)
-        assertTrue(urls.all { it.startsWith("https://basemaps.cartocdn.com/gl/") })
+        // 2026-11-13：CARTO（*.cartocdn.com）在实测网络 443 全超时，底图空白 → 切 OpenFreeMap（OSM/WGS84 无偏移）
+        assertTrue(urls.all { it.startsWith("https://tiles.openfreemap.org/styles/") })
     }
 
     // ── SKIN-3 / OPT-A-03：三轴正交（皮肤 + 明暗） ──

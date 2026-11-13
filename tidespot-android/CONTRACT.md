@@ -405,3 +405,29 @@ interface CopernicusCredentialActions {
    - **不改**既有手势契约：点击星标只消费命中（命中时返回 true），**不移动准星、不发起选点请求**；
      长按（F-1.4）与拖动 idle 逻辑零改动。
 6. 版本：`versionCode=20 / versionName=1.16.0`（APK `潮点TideSpot-v1.16.0.apk`）。
+
+---
+
+## 底图源变更（2026-11-13，CHG-91，应急切换）
+
+**背景**：CARTO（`basemaps.cartocdn.com` / `tiles.basemaps.cartocdn.com`，Fastly）在实测网络下 TCP 443 全部 10s 超时；
+样式 JSON 尚可命中缓存，但矢量瓦片与 sprite 全失败 → **底图整片空白，定位/潮汐/收藏等于瓦片无关的功能正常**。
+同网络 `tiles.openfreemap.org` 1.5s 可达、HTTP 200。
+
+**变更**：`TideSpotUrls` 三个样式常量改指 OpenFreeMap（OpenStreetMap 数据、WGS84 与定位同坐标、免费无 Key）：
+
+| 常量 | 值 |
+|---|---|
+| `BASEMAP_COLOR_STYLE_URL` | `https://tiles.openfreemap.org/styles/liberty` |
+| `BASEMAP_PLAIN_STYLE_URL` | `https://tiles.openfreemap.org/styles/positron` |
+| `BASEMAP_DARK_STYLE_URL` | `https://tiles.openfreemap.org/styles/dark` |
+
+**不变（红线）**：
+- `MapStyle` 三个**枚举名**（`VOYAGER` / `POSITRON` / `DARK_MATTER`）是持久化值（`settings.mapStyle` 存 `name`），
+  **禁止改名**，否则老用户配置失配回落默认；
+- 三选语义、「未改过跟随明暗自动切、改过则用户选择优先」的 `resolveMapStyle` 逻辑、attribution 控件行为均不变；
+- 坐标系仍 WGS84（OpenFreeMap 为 OSM 数据，无 GCJ-02 偏移，鱼情点位不漂移）。
+
+**署名**：`ts_map_attribution` 改为「OpenStreetMap 贡献者 · OpenFreeMap」。
+
+**回滚**：只把三个常量改回 CARTO URL 即可，枚举与所有调用方零改动。
