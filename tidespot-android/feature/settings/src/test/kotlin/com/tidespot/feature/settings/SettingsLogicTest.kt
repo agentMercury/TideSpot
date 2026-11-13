@@ -167,17 +167,17 @@ class SettingsLogicTest {
     }
 
     @Test
-    fun `settingsKeys_七个键名非空且互不相同`() {
+    fun `settingsKeys_八个键名非空且互不相同`() {
         val keys = listOf(
             SettingsKeys.UNIT_SYSTEM, SettingsKeys.DETAIL_DAYS, SettingsKeys.PREFETCH_ENABLED,
-            SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.MAP_STYLE,
+            SettingsKeys.REVERSE_GEO_ENABLED, SettingsKeys.MAP_STYLE, SettingsKeys.MAP_STYLE_EXPLICIT,
             SettingsKeys.SKIN_ID, SettingsKeys.THEME_MODE,
         )
         keys.forEach { assertTrue(it.isNotBlank()) }
         assertEquals(keys.size, keys.toSet().size)
     }
 
-    // ── UX-19：地图样式三选 ──
+    // ── UX-19 / OPT-A-03：地图样式三选 + 未改过时跟随明暗 ──
 
     @Test
     fun `withMapStyle_三选且不改原状态`() {
@@ -188,6 +188,34 @@ class SettingsLogicTest {
         assertEquals(MapStyle.VOYAGER, base.mapStyle)
         assertEquals(MapStyle.VOYAGER, SettingsLogic.withMapStyle(base, MapStyle.VOYAGER).mapStyle)
         assertEquals(MapStyle.POSITRON, SettingsLogic.withMapStyle(base, MapStyle.POSITRON).mapStyle)
+    }
+
+    @Test
+    fun `withMapStyle_一旦动手选择即标记为显式`() {
+        val base = SettingsState()
+        assertFalse(base.mapStyleExplicit, "默认未改过 → 底图可跟随明暗自动切")
+        assertTrue(SettingsLogic.withMapStyle(base, MapStyle.POSITRON).mapStyleExplicit)
+    }
+
+    @Test
+    fun `resolveMapStyle_未改过跟随明暗_改过则用户选择优先`() {
+        val untouched = SettingsState()
+        assertEquals(MapStyle.VOYAGER, SettingsLogic.resolveMapStyle(untouched, darkTheme = false))
+        assertEquals(MapStyle.DARK_MATTER, SettingsLogic.resolveMapStyle(untouched, darkTheme = true))
+
+        // 用户选了素色：浅/深都保持素色，不被明暗覆盖（D8 用户显式选择优先）
+        val pinned = SettingsLogic.withMapStyle(untouched, MapStyle.POSITRON)
+        assertEquals(MapStyle.POSITRON, SettingsLogic.resolveMapStyle(pinned, darkTheme = false))
+        assertEquals(MapStyle.POSITRON, SettingsLogic.resolveMapStyle(pinned, darkTheme = true))
+    }
+
+    @Test
+    fun `mapStyleChipSelection_与生效样式同口径`() {
+        val untouched = SettingsState()
+        assertEquals(MapStyle.DARK_MATTER, SettingsLogic.mapStyleChipSelection(untouched, darkTheme = true))
+        assertEquals(MapStyle.VOYAGER, SettingsLogic.mapStyleChipSelection(untouched, darkTheme = false))
+        val pinned = SettingsLogic.withMapStyle(untouched, MapStyle.VOYAGER)
+        assertEquals(MapStyle.VOYAGER, SettingsLogic.mapStyleChipSelection(pinned, darkTheme = true))
     }
 
     @Test

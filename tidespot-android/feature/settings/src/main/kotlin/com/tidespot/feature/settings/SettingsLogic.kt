@@ -58,9 +58,32 @@ object SettingsLogic {
     fun withReverseGeo(state: SettingsState, enabled: Boolean): SettingsState =
         state.copy(reverseGeoEnabled = enabled)
 
-    /** UX-19：地图样式三选（片刻生效；深色系统不覆盖用户显式选择）。 */
+    /**
+     * UX-19：地图样式三选（片刻生效）。
+     * 一旦用户动手选，即标记 [SettingsState.mapStyleExplicit]——此后明暗切换不再覆盖用户选择（D8）。
+     */
     fun withMapStyle(state: SettingsState, style: MapStyle): SettingsState =
-        state.copy(mapStyle = style)
+        state.copy(mapStyle = style, mapStyleExplicit = true)
+
+    /**
+     * 地图样式解析（唯一切样式入口）：
+     * 用户改过 → 用他选的；没改过 → 跟随明暗轴（深色 [MapStyle.DARK_MATTER] / 浅色 [MapStyle.VOYAGER]）。
+     *
+     * 这是 OPT-A-03「底图随深色切 Dark Matter」与 D8/UX-19「用户显式选择优先」的收口：
+     * 两者并不冲突——**自动切换只发生在用户没表态时**。纯函数，JVM 可测。
+     */
+    fun resolveMapStyle(state: SettingsState, darkTheme: Boolean): MapStyle =
+        if (state.mapStyleExplicit) {
+            state.mapStyle
+        } else if (darkTheme) {
+            MapStyle.DARK_MATTER
+        } else {
+            MapStyle.VOYAGER
+        }
+
+    /** 设置页 chip 高亮口径：与地图实际生效样式一致（未改过时高亮的是「跟明暗自动切」那一项）。 */
+    fun mapStyleChipSelection(state: SettingsState, darkTheme: Boolean): MapStyle =
+        resolveMapStyle(state, darkTheme)
 
     // ────────────── 皮肤 / 明暗（三轴正交：SKIN-3 + OPT-A-03） ──────────────
 

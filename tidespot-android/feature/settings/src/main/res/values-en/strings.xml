@@ -14,6 +14,8 @@
     <string name="ts_settings_days_desc">Detail days: %1$d</string>
     <string name="ts_settings_map_style">Map style</string>
     <string name="ts_settings_map_style_desc">Map style: %1$s (%2$s)</string>
+    <string name="ts_settings_map_style_auto">Follows dark mode automatically until you pick one</string>
+    <string name="ts_settings_map_style_pinned">Pinned to your choice; dark mode no longer switches it</string>
     <string name="ts_settings_data_network">Data &amp; network</string>
     <string name="ts_settings_prefetch">Background prefetch</string>
     <string name="ts_settings_weather">Weather</string>

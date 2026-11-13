@@ -40,6 +40,11 @@ object AppSettings {
         store.writeString(SettingsKeys.MAP_STYLE, style.name)
     }
 
+    /** 「用户是否显式改过地图样式」：决定底图跟明暗自动切，还是用户选择优先。 */
+    fun writeMapStyleExplicit(store: SettingsStore, explicit: Boolean) {
+        store.writeBoolean(SettingsKeys.MAP_STYLE_EXPLICIT, explicit)
+    }
+
     // ────────────── 三轴正交：皮肤 / 明暗（SKIN-3 + OPT-A-03） ──────────────
 
     /** 明暗序列化：非法/缺失一律落 `SYSTEM`（跟系统是最保守的默认）。 */
@@ -65,6 +70,11 @@ object AppSettings {
         prefetchEnabled = store.readBoolean(SettingsKeys.PREFETCH_ENABLED, default = true),
         reverseGeoEnabled = store.readBoolean(SettingsKeys.REVERSE_GEO_ENABLED, default = true),
         mapStyle = parseMapStyle(store.readString(SettingsKeys.MAP_STYLE)),
+        // 只在「用户动手选过」时才为 true，因此默认 false。
+        // 不拿「MAP_STYLE 键是否存在」推断：v1.16 的 persistSettings 全量写回，未改过样式的用户
+        // 也会留下该键（改任何设置都会写），据此推断会把绝大多数人误判为「已锁定」，
+        // 他们就永远拿不到自动跟随深色。老用户若真选过，重新点一次即恢复锁定。
+        mapStyleExplicit = store.readBoolean(SettingsKeys.MAP_STYLE_EXPLICIT, default = false),
         // 冷启动分别回放：任一轴缺失/非法只落该轴默认，不影响另外两轴
         skinId = TideSpotSkins.byId(store.readString(SettingsKeys.SKIN_ID)).id,
         themeMode = parseThemeMode(store.readString(SettingsKeys.THEME_MODE)),

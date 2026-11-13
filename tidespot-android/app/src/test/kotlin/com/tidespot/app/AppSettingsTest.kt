@@ -8,7 +8,9 @@ import com.tidespot.feature.settings.ThemeMode
 import com.tidespot.feature.settings.UnitSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * 设置键值 ↔ SettingsState 映射锁测试（M6 批次 3）：纯函数 + 内存 fake store（JVM）。
@@ -50,6 +52,26 @@ class AppSettingsTest {
         // 脏值 → Voyager（保守默认，不 crash）
         store.writeString(SettingsKeys.MAP_STYLE, "NOT_A_STYLE")
         assertEquals(com.tidespot.feature.settings.MapStyle.VOYAGER, AppSettings.read(store).mapStyle)
+    }
+
+    @Test
+    fun 地图样式显式标志往返() {
+        // 全新安装：无任何键 → 未改过（底图跟随明暗自动切）
+        assertFalse(AppSettings.read(FakeStore()).mapStyleExplicit)
+
+        val store = FakeStore()
+        AppSettings.writeMapStyle(store, com.tidespot.feature.settings.MapStyle.POSITRON)
+        AppSettings.writeMapStyleExplicit(store, true)
+        assertTrue(AppSettings.read(store).mapStyleExplicit)
+
+        // 只有旧 MAP_STYLE 键、无显式标志键 → 仍视为未改过（v1.16 全量写回会留下该键，不可据此锁定）
+        val legacy = FakeStore()
+        legacy.writeString(SettingsKeys.MAP_STYLE, "POSITRON")
+        assertFalse(AppSettings.read(legacy).mapStyleExplicit)
+
+        // 显式标志可覆盖为 false（回到跟随明暗）
+        AppSettings.writeMapStyleExplicit(store, false)
+        assertFalse(AppSettings.read(store).mapStyleExplicit)
     }
 
     @Test

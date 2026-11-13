@@ -71,7 +71,7 @@ feature:* → :core:data → :core:domain（纯 Kotlin JVM，无 Compose 依赖�
 | 详情页换手绘 A（浅/深 × 海/陆 4 套色板 + 非对称圆角 + 衬线字族 + 纸张/鱼形质感） | ✅ 已试点（`VintageOutdoorTheme`） |
 | 地图 / 收藏 / 设置 换手绘 A | 🟡 代码已铺开（继承全局皮肤），真机待验 |
 | 皮肤抽象层（`TideSpotSkin` + 注册表 + `LocalSkin`） | ✅ 已落地（`core/ui/theme/TideSpotSkin.kt`、`LocalSkin.kt`） |
-| 应用内明暗三选（OPT-A-03） | ✅ 已落地（设置页「深色模式」三选，`ThemeMode` 持久化） |
+| 应用内明暗三选（OPT-A-03） | ✅ 已落地（设置页「深色模式」三选，`ThemeMode` 持久化；底图在用户未改过样式时随深色自动切 Dark Matter） |
 | 换肤入口（OPT-A-09） | ✅ 已落地为**设置页「皮肤」下拉**（按名字选，无独立选择页） |
 | 叠层（Top10/免责/确认收藏/水质录入/星标气泡/删除确认） | 🟡 已随 `MaterialTheme` 继承皮肤，真机待验 |
 | 四状态态视觉分级（OPT-A-05） | ✅ 已实现（离线 `secondaryContainer` / 陈旧 `onSurfaceVariant` / 48h `error` / 低置信冻结徽标） |

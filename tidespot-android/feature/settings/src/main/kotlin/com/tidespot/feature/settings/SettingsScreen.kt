@@ -1,6 +1,7 @@
 package com.tidespot.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -115,8 +116,11 @@ fun SettingsScreen(
                 )
             }
         }
-        // UX-19（OPT-V11-19 / D8）：地图样式三选（默认彩色；深色系统不覆盖用户选择）
+        // UX-19（OPT-V11-19 / D8 + OPT-A-03）：地图样式三选。
+        // 未改过时高亮「跟明暗自动切」的那一项；点任意项即固定为显式选择。
         Text(stringResource(R.string.ts_settings_map_style), style = MaterialTheme.typography.titleSmall)
+        val darkTheme = SettingsLogic.resolveDarkTheme(state.themeMode, isSystemInDarkTheme())
+        val activeMapStyle = SettingsLogic.mapStyleChipSelection(state, darkTheme)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             MapStyle.entries.forEach { style ->
                 val label = stringResource(style.labelRes)
@@ -126,13 +130,24 @@ fun SettingsScreen(
                     style.description,
                 )
                 FilterChip(
-                    selected = state.mapStyle == style,
+                    selected = activeMapStyle == style,
                     onClick = { onMapStyleChange(style) },
                     label = { Text(label) },
                     modifier = Modifier.semantics { contentDescription = styleDesc },
                 )
             }
         }
+        Text(
+            stringResource(
+                if (state.mapStyleExplicit) {
+                    R.string.ts_settings_map_style_pinned
+                } else {
+                    R.string.ts_settings_map_style_auto
+                },
+            ),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         // ── 外观 · 皮肤（SKIN-3 / OPT-A-09）：按皮肤名下拉选择 ──
         Text(stringResource(R.string.ts_settings_skin), style = MaterialTheme.typography.titleSmall)
         SkinDropdown(currentId = state.skinId, onSelect = onSkinChange)

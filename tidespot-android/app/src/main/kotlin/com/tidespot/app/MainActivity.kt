@@ -242,8 +242,8 @@ private fun AppRoot(
                     // N16：逆地理总开关（关 → MapScreen 内短路走 RG-D 兜底文案）
                     reverseGeoEnabled = settingsState.reverseGeoEnabled,
                     onSpotConfirmed = { confirmed -> pendingConfirm = confirmed },
-                    // UX-19：底图样式（默认 Voyager；设置三选持久化）
-                    styleUrl = settingsState.mapStyle.url,
+                    // UX-19 + OPT-A-03：底图样式（未改过 → 跟明暗自动切；改过 → 用户选择优先）
+                    styleUrl = SettingsLogic.resolveMapStyle(settingsState, darkTheme).url,
                     // UX-18：返回地图 → 上一查看点 / lastViewed 最新（冷启动 null → 定位/世界视图）
                     initialCameraTarget = pendingMapTarget,
                     // OPT-V115-02 / S01：顶部工具浮层（定位/搜索/收藏/设置）+ 信息条上方 Top10 入口
@@ -497,6 +497,7 @@ private fun persistSettings(graph: AppGraph, next: SettingsState) {
     AppSettings.writePrefetch(store, next.prefetchEnabled)
     AppSettings.writeReverseGeo(store, next.reverseGeoEnabled)
     AppSettings.writeMapStyle(store, next.mapStyle)
+    AppSettings.writeMapStyleExplicit(store, next.mapStyleExplicit)
     // 三轴正交：皮肤与明暗各自写自己的键，互不覆盖
     AppSettings.writeSkinId(store, next.skinId)
     AppSettings.writeThemeMode(store, next.themeMode)

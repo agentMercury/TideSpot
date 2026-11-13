@@ -14,6 +14,8 @@
     <string name="ts_settings_days_desc">详情页天数：%1$d 天</string>
     <string name="ts_settings_map_style">地图样式</string>
     <string name="ts_settings_map_style_desc">地图样式：%1$s（%2$s）</string>
+    <string name="ts_settings_map_style_auto">未改过时跟随深色模式自动切换底图</string>
+    <string name="ts_settings_map_style_pinned">已按你的选择固定，深色模式不再自动切换</string>
     <string name="ts_settings_data_network">数据与网络</string>
     <string name="ts_settings_prefetch">后台预取</string>
     <string name="ts_settings_weather">天气</string>

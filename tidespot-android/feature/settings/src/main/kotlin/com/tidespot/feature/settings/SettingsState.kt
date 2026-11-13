@@ -16,8 +16,12 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 /**
  * 地图底图样式（UX-19 / OPT-V11-19；D8 三选）。
- * URL 全部收敛在 [TideSpotUrls]（不得回退点 3）；默认 [VOYAGER]；
- * **深色系统模式不覆盖用户选择**（用户显式选择优先，无自动切样式逻辑）。
+ * URL 全部收敛在 [TideSpotUrls]（不得回退点 3）。
+ *
+ * 取值规则（2026-11-13 产品决策，OPT-A-03 与 D8 的冲突收口）：
+ * - **用户从未改过**（`mapStyleExplicit = false`）：跟随明暗轴——深色 [DARK_MATTER]、浅色 [VOYAGER]；
+ * - **用户改过**（`mapStyleExplicit = true`）：**用户显式选择优先**，明暗切换不再覆盖。
+ * 解析唯一入口 [SettingsLogic.resolveMapStyle]（纯函数，JVM 可测）。
  *
  * OPT-V11-13：展示名走资源（[labelRes]），[description] 为产品名（跨语言不变）。
  */
@@ -40,8 +44,14 @@ data class SettingsState(
     val reverseGeoEnabled: Boolean = true,
     /** CHG-25（P0-1）：Copernicus 凭据是否已配置（运行期由 :app 从凭据存储读取，不落本状态持久化）。 */
     val copernicusConfigured: Boolean = false,
-    /** UX-19（OPT-V11-19）：地图底图样式（默认彩色 Voyager；系统深色不覆盖用户选择）。 */
+    /** UX-19（OPT-V11-19）：地图底图样式；是否生效见 [mapStyleExplicit]。 */
     val mapStyle: MapStyle = MapStyle.VOYAGER,
+    /**
+     * 用户是否**显式改过**地图样式（持久化键 `settings.mapStyleExplicit`）。
+     * `false` = 未改过 → 底图跟随明暗轴自动切（深色 Dark Matter / 浅色 Voyager）；
+     * `true` = 改过 → [mapStyle] 说了算，明暗切换不覆盖（D8 用户选择优先）。
+     */
+    val mapStyleExplicit: Boolean = false,
     /** SKIN-3：当前皮肤 id（默认 A；冷启动读回时未知 id 归一为默认，不崩）。 */
     val skinId: String = TideSpotSkins.default.id,
     /** OPT-A-03：应用内明暗三选（独立于皮肤与水体）。 */
@@ -55,6 +65,9 @@ object SettingsKeys {
     const val PREFETCH_ENABLED = "settings.prefetchEnabled"
     const val REVERSE_GEO_ENABLED = "settings.reverseGeoEnabled"
     const val MAP_STYLE = "settings.mapStyle"
+
+    /** 是否显式改过地图样式（决定「跟随明暗自动切」还是「用户选择优先」）。 */
+    const val MAP_STYLE_EXPLICIT = "settings.mapStyleExplicit"
 
     /** 三轴正交（SKIN-DESIGN-SPEC §1）：皮肤与明暗各自独立键，互不覆盖。 */
     const val SKIN_ID = "settings.skinId"
