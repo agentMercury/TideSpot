@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>V3 路亚图鉴 · 详情页示例（仅现有功能）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #101820; }
+  body { font-family: "Microsoft YaHei", sans-serif; display: flex; flex-direction: column; align-items: center; padding: 26px 0 30px; }
+  .caption { width: 862px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; color: #FFFDF7; }
+  .caption h2 { font-family: "KaiTi", serif; font-size: 24px; letter-spacing: 2px; font-weight: 400; }
+  .caption h2 small { display: block; font-family: Georgia, serif; font-size: 10px; letter-spacing: 4px; opacity: .6; margin-top: 3px; }
+  .chips { display: flex; gap: 14px; align-items: flex-end; }
+  .chips div { text-align: center; font-size: 9px; letter-spacing: 1.5px; opacity: .62; }
+  .chips div .set { display: flex; gap: 5px; margin-bottom: 4px; }
+  .chips i { width: 18px; height: 18px; border-radius: 50%; display: block; border: 1px solid #ffffff22; }
+  .stage { display: flex; gap: 26px; }
+
+  .phone { width: 390px; height: 844px; position: relative; overflow: hidden; padding: 0 18px; color: var(--ink); background: var(--bg); isolation: isolate; }
+  .phone[data-v="inland"] { --bg:#E9F5EE; --paper:#FFFDF7; --ink:#101820; --soft:#4A6B5E; --accent:#E9A13B; --accent2:#2F7F6B; --water:#B9E0CE; --water2:#8CCBB4; }
+  .phone[data-v="ocean"]  { --bg:#E9F3FA; --paper:#FFFDF7; --ink:#101820; --soft:#456A84; --accent:#E5644C; --accent2:#1E6FA8; --water:#B7DAEE; --water2:#8AC1E3; }
+
+  .grain { position: absolute; inset: 0; pointer-events: none; z-index: 30; opacity: .22; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='170'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='170' height='170' filter='url(%23n)' opacity='0.4'/></svg>"); }
+  .watermark { position: absolute; left: 0; top: 0; width: 390px; height: 844px; z-index: 0; }
+
+  .status { height: 26px; display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; letter-spacing: .6px; position: relative; z-index: 2; }
+  .topbar { display: flex; align-items: center; gap: 10px; height: 50px; position: relative; z-index: 2; }
+  .back { width: 30px; height: 30px; flex: 0 0 30px; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; transform: rotate(-3deg); box-shadow: 2px 2px 0 var(--ink); }
+  .topbar .name { flex: 1; min-width: 0; }
+  .topbar h1 { font-size: 19px; font-weight: 800; letter-spacing: .4px; white-space: nowrap; font-family: "KaiTi", serif; }
+  .topbar p { font-size: 9px; color: var(--soft); margin-top: 2px; letter-spacing: .4px; }
+
+  /* 主卡：分数 + 档位 + 五段图例 */
+  .hero { position: relative; height: 148px; margin-top: 4px; z-index: 2; }
+  .hero .tag { display: inline-flex; align-items: center; gap: 5px; background: var(--ink); color: var(--paper); font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; padding: 4px 9px 4px 7px; transform: rotate(-1.6deg); }
+  .hero .tag svg { width: 12px; height: 12px; }
+  .cap { font-size: 9px; color: var(--soft); letter-spacing: 2px; margin-top: 9px; }
+  .scoreline { display: flex; align-items: flex-end; gap: 10px; margin-top: 2px; }
+  .score { font-size: 84px; font-weight: 800; line-height: .95; letter-spacing: -4px; -webkit-text-stroke: 2.5px var(--ink); color: var(--paper); text-shadow: 4px 4px 0 var(--accent); }
+  .sticker { background: var(--accent); color: var(--ink); border: 2px solid var(--ink); border-radius: 4px; font-family: "KaiTi", serif; font-size: 13px; letter-spacing: 1.2px; padding: 3px 8px 4px; transform: rotate(2deg); margin-bottom: 12px; box-shadow: 3px 3px 0 var(--ink); white-space: nowrap; }
+  .legend { display: flex; gap: 4px; margin-top: 10px; padding-right: 2px; }
+  .legend .seg { flex: 1; }
+  .legend .sw { height: 8px; border: 1.4px solid var(--ink); border-radius: 2px; }
+  .legend .tg { font-size: 7px; letter-spacing: .1px; color: var(--soft); margin-top: 3px; text-align: center; white-space: nowrap; }
+
+  .tabs { display: flex; gap: 5px; margin-top: 8px; height: 32px; align-items: center; position: relative; z-index: 2; }
+  .tab { font-size: 10.5px; font-weight: 700; letter-spacing: .1px; border: 1.8px solid var(--ink); border-radius: 20px; padding: 4px 7px 5px; background: var(--paper); white-space: nowrap; color: var(--ink); }
+  .tab.on { background: var(--ink); color: var(--paper); box-shadow: 2px 2px 0 var(--accent); }
+
+  .card { margin-top: 10px; background: var(--paper); border: 2px solid var(--ink); border-radius: 12px; padding: 9px 11px 13px; box-shadow: 4px 4px 0 var(--ink); position: relative; z-index: 2; }
+  .chead { display: flex; align-items: center; justify-content: space-between; }
+  .chead b { font-size: 12px; letter-spacing: 1px; font-family: "KaiTi", serif; }
+  .switch { display: flex; gap: 3px; border: 1.6px solid var(--ink); border-radius: 14px; padding: 2px; }
+  .switch .opt { font-size: 8.5px; font-weight: 700; padding: 2px 7px 3px; border-radius: 10px; color: var(--soft); }
+  .switch .opt.on { background: var(--ink); color: var(--paper); }
+
+  .plot { position: relative; height: 84px; margin-top: 17px; display: flex; align-items: flex-end; gap: 2px; }
+  .plot .windowbar { position: absolute; left: 37.5%; width: 12.5%; top: -9px; height: 8px; background: var(--accent); border: 1.4px solid var(--ink); font-size: 6.6px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .bw { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+  .bar { width: 100%; background: var(--accent2); border: 1.6px solid var(--ink); border-bottom: none; border-radius: 2px 2px 0 0; opacity: .85; }
+  .bar.hot { background: var(--accent); opacity: 1; }
+  .xaxis { display: flex; justify-content: space-between; margin-top: 3px; font-size: 7px; color: var(--soft); }
+  .summary { margin-top: 8px; font-size: 9.5px; letter-spacing: .1px; }
+  .fdiv { margin-top: 8px; padding-top: 6px; border-top: 1.5px dashed rgba(16,24,32,.4); }
+  .fhead { display: flex; justify-content: space-between; align-items: baseline; font-family: "KaiTi", serif; font-size: 10.5px; letter-spacing: 1px; }
+  .fhead em { font-style: normal; font-size: 7px; color: var(--soft); letter-spacing: 1px; }
+  .frow { display: flex; align-items: center; gap: 6px; padding: 4px 0 3px; font-size: 9px; }
+  .frow span { width: 26px; color: var(--soft); }
+  .frow .track { flex: 1; height: 5px; border: 1.2px solid var(--ink); border-radius: 3px; overflow: hidden; }
+  .frow .track i { display: block; height: 100%; background: var(--accent2); }
+  .frow b { width: 26px; text-align: right; font-size: 9.5px; }
+  .frow em { width: 34px; text-align: right; font-style: normal; font-size: 7px; color: var(--soft); }
+  .pv { display: flex; justify-content: space-between; font-size: 7.5px; color: var(--soft); margin-top: 3px; }
+
+  .top10 { position: absolute; left: 18px; right: 18px; bottom: 70px; height: 40px; background: var(--paper); border: 2px solid var(--ink); border-radius: 8px; box-shadow: 3px 3px 0 var(--ink); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12.5px; font-weight: 700; letter-spacing: .6px; z-index: 3; }
+  .top10 em { font-style: normal; font-size: 13px; }
+
+  .discbar { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 6px 18px 10px; border-top: 2px solid var(--ink); background: var(--paper); z-index: 3; }
+  .discbar b { font-family: "KaiTi", serif; font-size: 13px; letter-spacing: 1px; font-weight: 400; }
+  .discbar span { font-size: 15px; font-weight: 700; }
+
+  .seabed { position: absolute; left: 0; right: 0; bottom: 56px; height: 60px; z-index: 0; }
+
+  body.single { padding: 0; background: #101820; align-items: flex-start; }
+  body.single .caption { display: none; }
+  body.single .stage { gap: 0; margin: 0; }
+  body.single #f-inland, body.single #f-ocean { display: none; }
+  body.single.v-inland #f-inland { display: block; }
+  body.single.v-ocean #f-ocean { display: block; }
+</style>
+</head>
+<body>
+
+<div class="caption">
+  <h2>V3 路亚图鉴<small>LURE FIELD GUIDE · SCORE TAB</small></h2>
+  <div class="chips">
+    <div><div class="set"><i style="background:#E9F5EE"></i><i style="background:#E9A13B"></i><i style="background:#2F7F6B"></i></div>内陆 INLAND</div>
+    <div><div class="set"><i style="background:#E9F3FA"></i><i style="background:#E5644C"></i><i style="background:#1E6FA8"></i></div>近海 NEARSHORE</div>
+  </div>
+</div>
+
+<div class="stage">
+
+  <!-- ============ 内陆 ============ -->
+  <div class="phone" id="f-inland" data-v="inland">
+    <svg class="watermark" viewBox="0 0 390 844" fill="none">
+      <circle cx="352" cy="120" r="92" fill="var(--water)" opacity=".5"/>
+      <g fill="var(--water2)" opacity=".22">
+        <path d="M300 236 l16 -9 -3 9 3 9 z"/><ellipse cx="286" cy="236" rx="16" ry="8"/>
+        <path d="M330 272 l13 -7 -2 7 2 7 z"/><ellipse cx="318" cy="272" rx="13" ry="6.5"/>
+      </g>
+    </svg>
+
+    <div class="status"><span>9:41</span><span>5G · 86%</span></div>
+
+    <div class="topbar">
+      <div class="back">‹</div>
+      <div class="name">
+        <h1>千岛湖 · 排岭半岛</h1>
+        <p>29.605°N, 119.043°E</p>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12 q5 -6 10 0 t10 0"/><path d="M2 17 q5 -6 10 0 t10 0"/></svg>
+        内陆水体
+      </div>
+      <div class="cap">TODAY · 钓鱼指数</div>
+      <div class="scoreline">
+        <div class="score">87</div>
+        <div class="sticker">爆护窗口</div>
+      </div>
+      <div class="legend">
+        <div class="seg"><div class="sw" style="background:#1B5E20"></div><div class="tg">爆护窗口</div></div>
+        <div class="seg"><div class="sw" style="background:#43A047"></div><div class="tg">很适合</div></div>
+        <div class="seg"><div class="sw" style="background:#FDD835"></div><div class="tg">可以</div></div>
+        <div class="seg"><div class="sw" style="background:#FB8C00"></div><div class="tg">较差</div></div>
+        <div class="seg"><div class="sw" style="background:#E53935"></div><div class="tg">别去</div></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on">钓鱼指数</div>
+      <div class="tab">水位</div>
+      <div class="tab">天气</div>
+      <div class="tab">水质</div>
+      <div class="tab">风与水温</div>
+    </div>
+
+    <div class="card">
+      <div class="chead">
+        <b>逐时指数 24H</b>
+        <div class="switch"><div class="opt on">图表</div><div class="opt">数值表</div></div>
+      </div>
+      <div class="plot">
+        <div class="windowbar">窗口</div>
+        <div class="bw"><div class="bar" style="height:32%"></div></div>
+        <div class="bw"><div class="bar" style="height:29%"></div></div>
+        <div class="bw"><div class="bar" style="height:27%"></div></div>
+        <div class="bw"><div class="bar" style="height:26%"></div></div>
+        <div class="bw"><div class="bar" style="height:28%"></div></div>
+        <div class="bw"><div class="bar" style="height:31%"></div></div>
+        <div class="bw"><div class="bar" style="height:38%"></div></div>
+        <div class="bw"><div class="bar" style="height:46%"></div></div>
+        <div class="bw"><div class="bar" style="height:58%"></div></div>
+        <div class="bw"><div class="bar hot" style="height:71%"></div></div>
+        <div class="bw"><div class="bar hot" style="height:87%"></div></div>
+        <div class="bw"><div class="bar hot" style="height:84%"></div></div>
+        <div class="bw"><div class="bar" style="height:76%"></div></div>
+        <div class="bw"><div class="bar" style="height:68%"></div></div>
+        <div class="bw"><div class="bar" style="height:60%"></div></div>
+        <div class="bw"><div class="bar" style="height:54%"></div></div>
+        <div class="bw"><div class="bar" style="height:49%"></div></div>
+        <div class="bw"><div class="bar" style="height:44%"></div></div>
+        <div class="bw"><div class="bar" style="height:40%"></div></div>
+        <div class="bw"><div class="bar" style="height:37%"></div></div>
+        <div class="bw"><div class="bar" style="height:34%"></div></div>
+        <div class="bw"><div class="bar" style="height:32%"></div></div>
+        <div class="bw"><div class="bar" style="height:30%"></div></div>
+        <div class="bw"><div class="bar" style="height:29%"></div></div>
+      </div>
+      <div class="xaxis"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+      <div class="summary">当日摘要：最高 87（10:00）/ 最低 26（03:00）</div>
+      <div class="fdiv">
+        <div class="fhead">因子分解 · 10:00<em>FACTOR</em></div>
+        <div class="frow"><span>时段</span><div class="track"><i style="width:92%"></i></div><b>0.92</b><em>w .30</em></div>
+        <div class="frow"><span>溶氧</span><div class="track"><i style="width:88%"></i></div><b>0.88</b><em>w .25</em></div>
+        <div class="frow"><span>气压</span><div class="track"><i style="width:81%"></i></div><b>0.81</b><em>w .15</em></div>
+        <div class="pv"><span>衰减 ΠV</span><span>0.94</span></div>
+      </div>
+    </div>
+
+    <div class="seabed">
+      <svg viewBox="0 0 390 60" preserveAspectRatio="none" style="width:100%;height:60px">
+        <path d="M0 22 C 44 10, 88 34, 140 20 C 192 8, 234 32, 286 18 C 336 6, 362 26, 390 14 L390 60 L0 60 Z" fill="var(--water)" opacity=".9"/>
+        <path d="M0 38 C 46 26, 92 50, 144 36 C 196 24, 240 46, 292 34 C 342 24, 366 40, 390 32 L390 60 L0 60 Z" fill="var(--water2)" opacity=".45"/>
+      </svg>
+    </div>
+
+    <div class="top10">最佳窗口 Top10 <em>&#8250;</em></div>
+    <div class="discbar"><b>免责声明</b><span>&#8250;</span></div>
+
+    <div class="grain"></div>
+  </div>
+
+  <!-- ============ 近海 ============ -->
+  <div class="phone" id="f-ocean" data-v="ocean">
+    <svg class="watermark" viewBox="0 0 390 844" fill="none">
+      <circle cx="352" cy="120" r="92" fill="var(--water)" opacity=".55"/>
+      <g fill="var(--water2)" opacity=".26">
+        <path d="M300 236 l16 -9 -3 9 3 9 z"/><ellipse cx="286" cy="236" rx="16" ry="8"/>
+        <path d="M330 272 l13 -7 -2 7 2 7 z"/><ellipse cx="318" cy="272" rx="13" ry="6.5"/>
+        <path d="M276 304 l13 -7 -2 7 2 7 z"/><ellipse cx="264" cy="304" rx="13" ry="6.5"/>
+      </g>
+    </svg>
+
+    <div class="status"><span>9:41</span><span>5G · 86%</span></div>
+
+    <div class="topbar">
+      <div class="back">‹</div>
+      <div class="name">
+        <h1>嵊泗 · 泗礁岛东岸礁区</h1>
+        <p>30.730°N, 122.450°E</p>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 10 q4 -5 8 0 t8 0 t6 -2"/><path d="M2 16 q4 -5 8 0 t8 0 t6 -2"/></svg>
+        近海礁区
+      </div>
+      <div class="cap">TODAY · 钓鱼指数</div>
+      <div class="scoreline">
+        <div class="score">74</div>
+        <div class="sticker">很适合</div>
+      </div>
+      <div class="legend">
+        <div class="seg"><div class="sw" style="background:#1B5E20"></div><div class="tg">爆护窗口</div></div>
+        <div class="seg"><div class="sw" style="background:#43A047"></div><div class="tg">很适合</div></div>
+        <div class="seg"><div class="sw" style="background:#FDD835"></div><div class="tg">可以</div></div>
+        <div class="seg"><div class="sw" style="background:#FB8C00"></div><div class="tg">较差</div></div>
+        <div class="seg"><div class="sw" style="background:#E53935"></div><div class="tg">别去</div></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on">钓鱼指数</div>
+      <div class="tab">潮流</div>
+      <div class="tab">天气</div>
+      <div class="tab">水质</div>
+      <div class="tab">风浪</div>
+    </div>
+
+    <div class="card">
+      <div class="chead">
+        <b>逐时指数 24H</b>
+        <div class="switch"><div class="opt on">图表</div><div class="opt">数值表</div></div>
+      </div>
+      <div class="plot">
+        <div class="bw"><div class="bar" style="height:36%"></div></div>
+        <div class="bw"><div class="bar" style="height:33%"></div></div>
+        <div class="bw"><div class="bar" style="height:31%"></div></div>
+        <div class="bw"><div class="bar" style="height:32%"></div></div>
+        <div class="bw"><div class="bar" style="height:35%"></div></div>
+        <div class="bw"><div class="bar" style="height:40%"></div></div>
+        <div class="bw"><div class="bar" style="height:47%"></div></div>
+        <div class="bw"><div class="bar" style="height:55%"></div></div>
+        <div class="bw"><div class="bar" style="height:64%"></div></div>
+        <div class="bw"><div class="bar" style="height:70%"></div></div>
+        <div class="bw"><div class="bar" style="height:74%"></div></div>
+        <div class="bw"><div class="bar" style="height:73%"></div></div>
+        <div class="bw"><div class="bar" style="height:68%"></div></div>
+        <div class="bw"><div class="bar" style="height:62%"></div></div>
+        <div class="bw"><div class="bar" style="height:57%"></div></div>
+        <div class="bw"><div class="bar" style="height:52%"></div></div>
+        <div class="bw"><div class="bar" style="height:48%"></div></div>
+        <div class="bw"><div class="bar" style="height:45%"></div></div>
+        <div class="bw"><div class="bar" style="height:42%"></div></div>
+        <div class="bw"><div class="bar" style="height:39%"></div></div>
+        <div class="bw"><div class="bar" style="height:37%"></div></div>
+        <div class="bw"><div class="bar" style="height:35%"></div></div>
+        <div class="bw"><div class="bar" style="height:34%"></div></div>
+        <div class="bw"><div class="bar" style="height:33%"></div></div>
+      </div>
+      <div class="xaxis"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+      <div class="summary">当日摘要：最高 74（10:00）/ 最低 31（04:00）</div>
+      <div class="fdiv">
+        <div class="fhead">因子分解 · 10:00<em>FACTOR</em></div>
+        <div class="frow"><span>潮流</span><div class="track"><i style="width:86%"></i></div><b>0.86</b><em>w .28</em></div>
+        <div class="frow"><span>溶氧</span><div class="track"><i style="width:79%"></i></div><b>0.79</b><em>w .18</em></div>
+        <div class="frow"><span>气压</span><div class="track"><i style="width:90%"></i></div><b>0.90</b><em>w .15</em></div>
+        <div class="pv"><span>衰减 ΠV</span><span>0.91</span></div>
+      </div>
+    </div>
+
+    <div class="seabed">
+      <svg viewBox="0 0 390 60" preserveAspectRatio="none" style="width:100%;height:60px">
+        <path d="M0 20 C 48 8, 92 32, 146 18 C 198 6, 240 30, 292 16 C 340 4, 364 24, 390 12 L390 60 L0 60 Z" fill="var(--water)" opacity=".95"/>
+        <path d="M0 36 C 50 24, 96 48, 150 34 C 202 22, 246 44, 298 32 C 348 22, 370 38, 390 30 L390 60 L0 60 Z" fill="var(--water2)" opacity=".5"/>
+      </svg>
+    </div>
+
+    <div class="top10">最佳窗口 Top10 <em>&#8250;</em></div>
+    <div class="discbar"><b>免责声明</b><span>&#8250;</span></div>
+
+    <div class="grain"></div>
+  </div>
+
+</div>
+
+<script>
+  var h = location.hash.replace('#', '');
+  if (h === 'inland' || h === 'ocean') document.body.classList.add('single', 'v-' + h);
+</script>
+</body>
+</html>

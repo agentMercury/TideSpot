@@ -59,7 +59,8 @@
 
 设计稿之外，工程侧已按「**只做美化、不动功能**」在**详情页一屏**落地：
 
-- `tidespot-android/core/ui/.../theme/VintageOutdoorTheme.kt` — 4 套色板（海/陆 × 浅/深）+ 非对称圆角 + 衬线字阶
+- `tidespot-android/core/ui/.../theme/TideSpotSkin.kt` — **皮肤 token 抽象层**（`SkinPalettes` 海/陆 × 浅/深 4 件套 + 注册表 `TideSpotSkins` + `LocalSkin`）；4 套 `ColorScheme`、非对称圆角、衬线字阶均在此定义
+- `VintageOutdoorTheme.kt` — 已退役为 **36 行薄封装**（只按水体 + 明暗选色板，供详情页兼容调用；新代码用 `TideSpotTheme`）
 - `tidespot-android/core/ui/.../theme/HandDrawn.kt` 与 `core/ui/src/main/res/drawable*` — D5 纸纹颗粒 / 鱼形装饰 / 套印错位 / 手绘描边
 - `generator/gen_android_assets.py` — 上述质感资源的可复现生成脚本（重跑 SHA 一致）
 - 完整改动清单 / token 映射 / 验收：`Compose试点落地说明.md`

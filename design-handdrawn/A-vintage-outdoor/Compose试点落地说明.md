@@ -3,6 +3,7 @@
 > 试点日期：2026-11-12 ｜ 工程基线：`93d3c19`（v1.16.0 + BOM/日志清理后）
 > 设计来源：本目录 `spec.json` / `SKIN-DESIGN-SPEC.md` / 30 屏效果图
 > 口径：**只做美化，不动功能**；先详情页一屏试点，验证链路后再决定是否铺开
+> **状态更新（2026-11-13，#89/#94）**：本文描述的是**试点期结构**——4 套 `ColorScheme` 写死在 `VintageOutdoorTheme.kt` 内、只覆盖详情页一屏。该结构已被 **SKIN-1/2/3 取代**：token 迁到 `core/ui/theme/TideSpotSkin.kt` + 注册表 `TideSpotSkins`，`VintageOutdoorTheme` 退化为薄封装，全 App 由 `TideSpotTheme(skin, water, darkTheme)` 注入，设置页可按名字切皮肤/明暗。**本文仅作历史记录**，勿据其判断当前架构。
 
 > **参照稿勘误（2026-11-12）**：本试点的**配色 token / 卡片骨架参照 `screens_full/detail-tab-*`（82/苔绿纸底新稿）+ 工程既有 `DetailScreen` 骨架**，
 > **不是** `screens/detail-inland.png`（78/白底细边早期 base 旧稿）。手绘 A 存在这两套并存稿，此前把旧稿标"设计稿"与真机并排称"对齐"属参照错位。

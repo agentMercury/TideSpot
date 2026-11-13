@@ -38,7 +38,10 @@
 
 ## 2. 工程现状（真实代码，截至 v1.16.0）
 
-> 结论先行：**详情页已试点换皮（唯一）**，其余全部是基础 Material 3 主题。
+> ⚠️ **本节是 2026-11-13 开工前的基线快照**（用于记录「改造前长什么样」）。其中「仅详情页换皮 / 无皮肤抽象 / 无 skinId 与 themeMode」等断言**已被 #89 之后的实现取代**。
+> 当前架构请看 §2.5 状态表 + `core/ui/theme/TideSpotSkin.kt`、`TideSpotTheme.kt`、`SKIN-DEV-STANDARD.md` v1.3；不要用本节判断现有代码。
+
+> 结论先行（**开工前**）：详情页已试点换皮（唯一），其余全部是基础 Material 3 主题。
 
 ### 2.1 模块与依赖方向（`CONTRACT.md` §模块与依赖方向）
 ```
@@ -61,7 +64,7 @@ feature:* → :core:data → :core:domain（纯 Kotlin JVM，无 Compose 依赖�
 - `app/.../MainActivity.kt:357`：`VintageOutdoorTheme(waterBody = waterBody, darkTheme = dark) { ... }` **只包详情页**。
 
 ### 2.4 设置与持久化现状
-- `SettingsKeys`（`feature/settings/.../SettingsState.kt`）只有 `UNIT_SYSTEM / API_KEY / MAP_STYLE`，**无 `skinId` / `themeMode`**。
+- **（开工前）** `SettingsKeys` 只有 `UNIT_SYSTEM / API_KEY / MAP_STYLE`，无 `skinId` / `themeMode`；**现已落地** `SKIN_ID` / `THEME_MODE`（`SettingsState.kt:124/125`），且 `API_KEY` 已按 OPT-A-02 下线。
 - `SettingsScreen.kt:157` 仍有「用例 / 物种 / 权重」占位；`:165` 仍有「API Key（占位）」；**无「外观 · 皮肤」入口**；深色只有地图样式三选（`:113`），**无应用内明暗三选**。
 - `AppSettings.kt`：纯函数映射 `SettingsState` ↔ SharedPreferences；新字段照此模式加。
 
