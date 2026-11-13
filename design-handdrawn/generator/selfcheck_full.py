@@ -124,6 +124,7 @@ ok("完整性提示" in idx and "30 屏全为新稿骨架" in idx, "索引页含
 ok("钓鱼指数 SCORE 首 Tab 此前缺失，本次已补" in idx and "5 Tab + 因子分解" in idx, "索引页标注 SCORE 首 Tab 已补、②组 5 Tab")
 ok("〔旧稿" in idx and "〔新稿〕" in idx, "索引页逐屏标稿源(旧稿/新稿)")
 ok("仅剩第①组 详情·海洋/内陆 保留为早期 base 旧稿" in idx, "索引页交代仅剩早期 base 旧稿两屏")
+ok("历史旧稿" in idx and "非落地目标" in idx and idx.count("tile old") == 2, "索引页给 detail-sea/inland 加「历史旧稿·非落地目标」水印")
 ok("地图底图保留手绘原稿" in idx, "索引页标注地图底图保留手绘")
 for cf in ["make_compare_v3.py", "make_compare_v4.py"]:
     ct = (Path(__file__).resolve().parent / cf).read_text(encoding="utf-8")
