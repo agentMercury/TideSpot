@@ -11,6 +11,10 @@
     <string name="ts_app_spot_name">Favorite name</string>
     <string name="ts_app_coordinate">Coordinates %1$s, %2$s</string>
     <string name="ts_app_water_body">Water body: %1$s</string>
+    <string name="ts_app_reclassify_water_body">Re-check</string>
+    <string name="ts_app_reclassifying">Checking…</string>
+    <string name="ts_app_reclassify_failed">Re-check failed; check your connection and retry</string>
+    <string name="ts_app_water_body_unknown_hint">No reliable lake/land source yet; it may stay unresolved. Retry after connecting or adding credentials</string>
     <string name="ts_app_save_failed">Save failed; please retry</string>
     <string name="ts_app_saving">Saving…</string>
     <string name="ts_fetch_log_title">Request log</string>

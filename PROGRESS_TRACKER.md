@@ -5,7 +5,8 @@
 > ⚠️ **本文件的状态数字可能滞后**（§1 仍停在 v1.1 P1 待开工）。权威顺序：**代码 > `HANDOVER_V115.md` §0 > 本文件**。
 > 文档更新规则（改代码时必须同批更新哪些文档）见 `HANDOVER_V115.md` **§0 文档维护契约**。
 >
-> **最新批次（2026-11-13，v1.17.0）**：手绘 A 全屏换肤（SKIN-1/2/3 + 设置页皮肤下拉）、地图来源下拉（OPT-A-10）、底图加载失败提示（OPT-A-11）、地图样式四选含「跟随主题」（OPT-A-12）、Top10 语义与时段筛选（OPT-A-04）、请求日志（OPT-A-06）。
+> **最新批次（2026-11-14，v1.19.0 / CHG-92）**：水体类型判定止错——修 `OstiaLakeProbe` 恒 true 解析 bug（真实响应 `value:null` + numeric `lat`/`lon`）、无掩膜值改判 `UNKNOWN`、`marine` 状态未知时不采信 SST 正值、判定缓存键升 v3、确认收藏对话框加「重新判定」按钮。湖/陆仍判不出（客户裁决「只止错 + 重新判定」，不换数据源、不做人工指定）；双端文案/版本差异已登记 `CONTRACT.md` 的 `PARITY_GAP-WEB-I18N-01` / `-VER-01`。
+> **上一批次（2026-11-13，v1.17.0）**：手绘 A 全屏换肤（SKIN-1/2/3 + 设置页皮肤下拉）、地图来源下拉（OPT-A-10）、底图加载失败提示（OPT-A-11）、地图样式四选含「跟随主题」（OPT-A-12）、Top10 语义与时段筛选（OPT-A-04）、请求日志（OPT-A-06）。
 > 详见 `design-handdrawn/A-vintage-outdoor/未开始需求清单.md`（含「落地结果」）与 `jj log`（#89–#94）。**本节以下的里程碑表为历史台账，未逐行回填。**
 
 ## 1. 状态总览
@@ -208,7 +209,7 @@
 
 | 项 | 状态 | 说明 |
 |---|---|---|
-| Bug A：海域显示「水位（无潮汐）」 | ✅ 已修 | 根因＝用全球 SST 当湖泊掩膜 + 确认时从不传真实海况；改：`probeMarineHasValue`（true→NEARSHORE，false→OSTIA，失败→UNKNOWN）+ 判定缓存 v2 |
+| Bug A：海域显示「水位（无潮汐）」 | ✅ 已修 | 根因＝用全球 SST 当湖泊掩膜 + 确认时从不传真实海况；改：`probeMarineHasValue`（true→NEARSHORE，false→OSTIA，失败→UNKNOWN）+ 判定缓存 v2〔2026-11-14 补注：CHG-92 起升 v3、OSTIA 只止错，见 `CONTRACT.md`〕 |
 | Bug B：拖动地图信息条不更新 | ✅ 已修 | `onMapMoved` Idle + 用户手势 → Preview；MapScreen 以 `REASON_API_GESTURE` 区分手势/程序动画 |
 | 存量自愈 | ✅ | 详情刷新把 `INLAND/UNKNOWN`（海洋有值）回写 `NEARSHORE`；`effectiveWaterBody` 首屏纠正标题与潮汛 chip |
 | 版本 | v1.1.1 | `versionCode=3` / `versionName=1.1.1`；APK 51,618,176 B 已分发 `E:\Trans`（SHA256 与构建产物一致） |

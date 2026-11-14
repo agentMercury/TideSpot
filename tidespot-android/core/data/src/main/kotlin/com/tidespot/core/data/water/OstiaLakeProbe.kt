@@ -20,7 +20,7 @@ import okhttp3.HttpUrl
  * 实现方约定：**任何失败/超时返回 null，绝不抛异常**（图层故障不得阻塞选点，M3.0 A6-r4）。
  */
 interface InlandWaterProbe {
-    /** true = 掩膜内有有效分析值（内陆水体）；false = 无值；null = 查询失败（降级）。 */
+    /** true = 掩膜内有有效分析值（内陆水体）；false = 确认无值；null = 查询失败 **或无结论**（降级 UNKNOWN）。 */
     suspend fun hasLakeValue(lat: Double, lon: Double): Boolean?
 }
 
@@ -32,6 +32,11 @@ interface InlandWaterProbe {
  * `TILEMATRIXSET=EPSG:3857`、z=7（Web Mercator 常规公式计算瓦片号与 256px 内像素）、
  * `INFOFORMAT=application/json`；请求携带 [CopernicusAuthClient] 签发的 Bearer token。
  * 解析响应 JSON 中的数值字段判定「湖泊掩膜内是否有值」。
+ *
+ * CHG-92（2026-11-14）：实测该图层是**全球 SST**，`value` 在湖 / 陆 / 海三点均为 null，
+ * 不具备湖/陆区分能力；旧解析会把 numeric `lat`/`lon` 当成掩膜值而恒判有湖。
+ * 现只止错：无有效数值 → null（UNKNOWN 待判定），**不落 LAND**；湖/陆仍判不出，
+ * 待换用经验证的湖泊掩膜图层（届时按 §0.2 升 `JUDGE_VERSION`）。
  * 查询低频：仅显式选点 + 30 d/点缓存（§12），不会触碰频控（M3.0 结论）。
  */
 class OstiaLakeProbe(
@@ -68,10 +73,22 @@ class OstiaLakeProbe(
         com.tidespot.core.data.remote.TideSpotUrls.ostiaFeatureInfo(wmtsBase, lat, lon, zoom)
 
     /**
-     * 判定响应中是否存在有效数值字段：
-     * - 优先图层变量 `analysed_sst`（有数值 → 掩膜内有值）；
-     * - 其余 properties 数值字段或顶层 `values` 数组（部分响应壳）同样视为有值；
-     * - 200 但无数值 = 掩膜无值 → false；JSON 解析失败 → null。
+     * CHG-92（2026-11-14 止错）：判定响应中是否存在有效数值字段。
+     *
+     * **真实响应形状**（本轮实测，湖 / 陆 / 海三点一致）：
+     * ```
+     * {"features":[{"properties":{"lat":29.52,"lon":118.97,"variableId":"analysed_sst",
+     *   "value":null,"units":"kelvin"}}]}
+     * ```
+     * 即：数值字段叫 `value`（旧称 `analysed_sst`），**没有** `analysed_sst` 键；`lat`/`lon` 也是数值。
+     *
+     * 旧实现的兜底「properties 任一数值即 true」会被 `lat`/`lon` 命中 → **只要 HTTP 200 就恒判 true**，
+     * 导致所有非海点（含陆地、乃至海况探测失败的海点）被误判 `INLAND_WATER` 并缓存 30 d。
+     * 本轮删除该兜底，只认 `value` / `analysed_sst` 两个真值字段。
+     *
+     * **无值一律返回 null（降级 UNKNOWN）而不是 false**：该图层是**全球 SST 不是湖泊掩膜**
+     * （CHG-35），实测三点 `value` 全为 null；「查不到掩膜值」不等于「确认是陆地」。
+     * 200 但无有效数值 = 探针无结论，交上层按 §6.9 第 4 级「待判定」处理。
      */
     private fun extractHasValue(body: String): Boolean? = try {
         val root: JsonObject = json.parseToJsonElement(body).jsonObject
@@ -79,11 +96,11 @@ class OstiaLakeProbe(
             ?.firstOrNull()
             ?.let { (it as? JsonObject)?.get("properties") }
             ?.let { it as? JsonObject }
+        val realValue = props?.get("value") ?: props?.get("analysed_sst")
         when {
-            props != null && props["analysed_sst"].isNumber() -> true
-            props?.values?.any { it.isNumber() } == true -> true
+            realValue.isNumber() -> true
             (root["values"] as? JsonArray)?.any { it.isNumber() } == true -> true
-            else -> false
+            else -> null
         }
     } catch (_: Exception) {
         null

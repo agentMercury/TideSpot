@@ -59,6 +59,7 @@ import com.tidespot.core.ui.zone.SpotZones
 import com.tidespot.feature.detail.detail.DetailScreen
 import com.tidespot.feature.detail.detail.DetailViewModel
 import com.tidespot.feature.detail.detail.InlandCredentialGuideCard
+import com.tidespot.feature.favorites.favorites.FavoritesInfoCardLogic
 import com.tidespot.feature.favorites.favorites.FavoritesSaveRules
 import com.tidespot.feature.favorites.favorites.FavoritesScreen
 import com.tidespot.feature.favorites.favorites.FavoritesSummaryFormatter
@@ -351,6 +352,8 @@ private fun AppRoot(
             confirmed = confirmed,
             repository = graph.repository,
             favoritesVm = favoritesVm,
+            // CHG-92：跳过判定缓存重跑一次（凭据/网络恢复后不必等 24h TTL）
+            onReclassify = { p -> graph.reclassifyWaterBody(p.lat, p.lon) },
             onSaved = { saved ->
                 pendingConfirm = null
                 lastViewedSpot = saved
@@ -527,17 +530,22 @@ private fun persistSettings(graph: AppGraph, next: SettingsState) {
  * - 保存链：upsertFavorite（真实 lat/lon）→ updateSpotWaterBody 回写确认选点流水线的
  *   waterBody（elevation/tzOffsetSec 传 null=保持原值，tzOffsetSec 由详情 refresh 回写）→
  *   收藏列表刷新 → OpenDetail 进详情页。
+ * - CHG-92：水体类型显示本地化文案而非枚举名；「重新判定」按钮走 [onReclassify]
+ *   （force 跳过缓存）即时刷新；UNKNOWN 时给出「数据源暂不可用」说明，避免像卡死。
  */
 @Composable
 private fun ConfirmFavoriteDialog(
     confirmed: SpotConfirmed,
     repository: TideSpotRepository,
     favoritesVm: FavoritesViewModel,
+    onReclassify: suspend (GeoPoint) -> WaterBodyType,
     onSaved: (FavoriteSpot) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val point = confirmed.point
     val scope = rememberCoroutineScope()
+    var waterBody by remember(confirmed) { mutableStateOf(confirmed.waterBody) }
+    var reclassifying by remember(confirmed) { mutableStateOf(false) }
     var name by remember(confirmed) {
         mutableStateOf(confirmed.place?.displayName?.trim().takeUnless { it.isNullOrEmpty() }
             ?: AppSettings.fallbackSpotName(point.lat, point.lon))
@@ -546,6 +554,10 @@ private fun ConfirmFavoriteDialog(
     var error by remember(confirmed) { mutableStateOf<String?>(null) }
     val spotNameDesc = stringResource(R.string.ts_app_spot_name)
     val saveFailed = stringResource(R.string.ts_app_save_failed)
+    val reclassifyFailed = stringResource(R.string.ts_app_reclassify_failed)
+    val reclassifyLabel = stringResource(R.string.ts_app_reclassify_water_body)
+    val reclassifyingLabel = stringResource(R.string.ts_app_reclassifying)
+    val waterBodyLabel = FavoritesInfoCardLogic.waterBodyLabel(waterBody, localTideSpotStrings())
     val coord1 = String.format(java.util.Locale.US, "%.5f", point.lat)
     val coord2 = String.format(java.util.Locale.US, "%.5f", point.lon)
 
@@ -571,10 +583,38 @@ private fun ConfirmFavoriteDialog(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 6.dp),
                 )
-                Text(
-                    stringResource(R.string.ts_app_water_body, confirmed.waterBody.name),
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.ts_app_water_body, waterBodyLabel),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    TextButton(
+                        enabled = !saving && !reclassifying,
+                        onClick = {
+                            reclassifying = true
+                            scope.launch {
+                                try {
+                                    waterBody = onReclassify(point)
+                                    error = null
+                                } catch (e: Exception) {
+                                    error = reclassifyFailed
+                                } finally {
+                                    reclassifying = false
+                                }
+                            }
+                        },
+                    ) {
+                        Text(if (reclassifying) reclassifyingLabel else reclassifyLabel)
+                    }
+                }
+                if (waterBody == WaterBodyType.UNKNOWN) {
+                    Text(
+                        stringResource(R.string.ts_app_water_body_unknown_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 error?.let {
                     Text(
                         it,
@@ -608,9 +648,9 @@ private fun ConfirmFavoriteDialog(
                             )
                             val id = repository.upsertFavorite(draft)
                             // waterBody 走确认选点流水线回写；elevation/tzOffsetSec 传 null=保持原值（tzOffsetSec 由详情 refresh 回写）
-                            repository.updateSpotWaterBody(id, confirmed.waterBody, elevation = null, tzOffsetSec = null)
+                            repository.updateSpotWaterBody(id, waterBody, elevation = null, tzOffsetSec = null)
                             favoritesVm.load()
-                            onSaved(draft.copy(id = id, waterBody = confirmed.waterBody))
+                            onSaved(draft.copy(id = id, waterBody = waterBody))
                         } catch (e: Exception) {
                             error = e.message ?: saveFailed
                         } finally {

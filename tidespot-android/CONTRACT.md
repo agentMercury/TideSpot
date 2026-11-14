@@ -443,3 +443,85 @@ interface CopernicusCredentialActions {
 
 **OPT-A-11**：`MapScreen` 在 `setStyle` 后 1.5s 探活样式源（6s 超时），失败显示「底图加载失败 + 重试」提示条；
 探活不阻塞首帧，不影响任何数据链路。
+
+---
+
+## 跨端适配契约（2026-11-13 起生效，Web 版并行开发）
+
+> **客户要求**：以后如果有新增需求，**Android 与 Web 两端都要一起适配**。
+> 权威条款：`../WEB_PROJECT_PLAN.md` §7；Web 侧执行：`../web/README.md`。
+> 本条自 Web 版立项（M0）起生效，不回溯既有需求。
+
+### 条款（与 WEB_PROJECT_PLAN §7 同源）
+
+| # | 条款 | Android 侧执行 |
+|---|---|---|
+| N-1 | 每条新需求登记 `platforms: android \| web \| both`，**默认 both** | `REQUIREMENTS_REGISTER.md` 登记时填写；未标视为 both |
+| N-2 | `both` 需求**两端同批交付**；不能同批必须登记 `PARITY_GAP` | 提审前核对台账，不允许静默缺失 |
+| N-3 | 单一真相源在本仓库 | 文案 `res/values{,-en}/strings.xml`；URL/数据源 `core/data/remote/TideSpotUrls.kt`；视觉 `../design-handoff/tokens/*` |
+| N-4 | 评分口径锁定 `../FISHSCORE.md` | 改算法/阈值/否决码 → 同批更新 fixture 并跑 Web 对拍（`diff=0`） |
+| N-5 | 文案改动先在本仓库落地 | 新增/修改 key → 同批生成 Web `i18n/{zh,en}.json`（`check_parity` 通过） |
+| N-6 | 平台差异白名单（允许不对齐） | 系统通知/WorkManager、APK 签名与分发、PWA/SW、PC 快捷键与右键、分享 Intent、系统返回键、`safe-area` |
+| N-7 | 版本号语义对齐 | `app/build.gradle.kts` 的 `versionName` 与 Web `APP_VERSION` 同批一致 |
+| N-8 | 迁移期红线 | Web M0–M7 期间**本仓库零改动**；Web 侧问题只登记 `PARITY_GAP`，不得倒逼改本仓库 |
+
+### 必须同批同步的改动点（清单）
+
+1. `core/domain/**` 评分/派生/窗口逻辑；
+2. `core/data/remote/TideSpotUrls.kt` 的任何常量或查询参数；
+3. 任一 `res/values{,-en}/strings.xml` 的新增/删除/改名；
+4. 任一页面（S01–S09）的交互语义（长按/点击/手势/刷新入口）；
+5. 设置键（`SettingsKeys` / `AppSettings`）的新增与默认值；
+6. 皮肤 token 与 `ScoreBands` / `ConfidenceBadge` 的语义色。
+
+### PARITY_GAP 台账（初始）
+
+| 编号 | 内容 | 状态 | 补齐版本 |
+|---|---|---|---|
+| `PARITY_GAP-WEB-01` | Web 版整体尚未落地（M0–M7 执行中） | 进行中 | Web v1.0 |
+| `PARITY_GAP-WEB-ADP-01` | Web 环境自适应（PC/移动/平板）在 Android 无等价实现（Android 目前仅手机布局） | **客户已裁决 2026-11-13：一期不做**；后续若要求，Android +6~8 人日 | 未排期 |
+| `PARITY_GAP-WEB-02` | Web 无系统级离线/后台刷新（无 WorkManager 等价物） | 已列入白名单 | — |
+| `PARITY_GAP-WEB-I18N-01` | CHG-92 新增 4 个 app 文案 key（`ts_app_reclassify_water_body` / `ts_app_reclassifying` / `ts_app_reclassify_failed` / `ts_app_water_body_unknown_hint`）尚未同步 Web `src/i18n/{zh,en}.json` | **已关闭**：客户 2026-11-14 裁决「本批只改 Android」，Web 会话随后自行执行 `gen:i18n` 补齐，复查 `check_parity` **PASS**（zh/en 各 576 key） | 2026-11-14 |
+| `PARITY_GAP-WEB-VER-01` | Android `versionName` 本批升 `1.19.0`（`versionCode=24`），Web `APP_VERSION` 仍为 `1.18.2` | 同上裁决：本批不动 `web/`；Web 会话下批对齐后关闭 | Web 下批 |
+
+### 红线
+
+- Web 工程（`../web/`）**不得修改本仓库任何文件**（源码/资源/构建脚本/Gradle）；
+- 本仓库**不得**把 `web/` 加入 `settings.gradle.kts`；
+- 提交前自检：`git status --porcelain | Select-String "tidespot-android"` 在 Web 工程内必须为空。
+
+---
+
+## CHG-92 · 水体判定止错与重新判定（2026-11-14）
+
+> 客户现场现象：非海域点一直显示「水体类型待判定」。调查结论：**接线完整，但二级判据不可用 + 解析 bug + 缓存固化**。
+> 本批按客户裁决「只止错 + 重新判定」执行，**不新增数据源、不做人工指定水体类型**；湖/陆仍判不出，按 §6.9 第 4 级 `UNKNOWN` 显示。
+
+### 公共签名变更（`:core:data`）
+
+| 位置 | 变更 | 兼容 |
+|---|---|---|
+| `WaterBodyClassifier.classify` | 尾增 `force: Boolean = false`：`true` 跳过判定缓存读并覆盖写（`upsert` 同键替换） | 默认 `false`，既有调用零改动 |
+| `WaterBodyClassifier.JUDGE_VERSION` | `2 → 3`（缓存键 `spotKey#vN`） | 旧 v2 行自然失效，**不需要清库 / 不需 Room 迁移** |
+| `WaterBodyClassifier.classify` 判定口径 | `marineHasValue == null` 时**不采信探针正值**（OSTIA 是全球 SST，海域也可能有值） | 仅收紧误判路径 |
+| `OstiaLakeProbe.extractHasValue` | 删除「properties 任一数值即 true」兜底（被真实响应的 `lat`/`lon` 命中 → 恒 true）；改认 `value` / 旧字段 `analysed_sst`；**无有效值返回 `null`（UNKNOWN）而非 `false`（LAND）** | `InlandWaterProbe` 接口签名未变 |
+| `InlandWaterProbe.hasLakeValue` KDoc | `null` 语义补「无结论」 | 仅注释 |
+
+### `:app` 侧
+
+- `AppGraph.reclassifyWaterBody(lat, lon)`：与 `waterBodyResolver` 同判据，唯一差异是 `force = true`；供「重新判定」按钮使用。
+- `ConfirmFavoriteDialog`：水体文案改为本地化徽标文案（不再显示枚举名）；新增「重新判定」按钮即时刷新；`UNKNOWN` 时显示「数据源暂不可用」说明；保存时用刷新后的水体类型回写。
+- 新增 4 个 `ts_app_*` 文案 key（`values` + `values-en` 双语）。
+
+### 回滚方式
+
+1. `JUDGE_VERSION` 改回 `2` 会**重新启用旧的错误缓存**（不推荐）；正确回滚是整体 revert 本提交并把版本号改回 `3` 之上再 +1。
+2. 删除「重新判定」按钮只需移除 `ConfirmFavoriteDialog` 的 `onReclassify` 参数与 `AppGraph.reclassifyWaterBody`；`classify(force=...)` 默认 `false` 不影响其它调用。
+3. 判定语义回退到「marine 未知仍走探针」：删 `classify` 中 `marineHasValue == null` 分支；但会恢复「海况探测失败时海点被判内陆」的旧缺陷，不建议。
+
+### 门禁
+
+- `core:data` 全量单测（含新增 4 条 OSTIA 真实响应回归 + `force` 重判）通过；
+- 八模块单测 / `i18n_scan` / `contrast_check` / `assembleRelease` 见本批提交说明；
+- 双端 `check_parity` 初检 FAIL（4 个新 key 缺失）→ Web 会话自行 `gen:i18n` 后复查 **PASS**；
+  仅剩 `PARITY_GAP-WEB-VER-01`（Web `APP_VERSION=1.18.2` 未对齐 Android `1.19.0`），按客户裁决留 Web 会话下批处理。

@@ -17,6 +17,7 @@ import com.tidespot.core.data.water.FileCopernicusCredentialStore
 import com.tidespot.core.data.water.InlandWaterProbe
 import com.tidespot.core.data.water.OstiaLakeProbe
 import com.tidespot.core.data.water.WaterBodyClassifier
+import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.feature.map.geo.DataGeocoder
 import com.tidespot.feature.map.geo.DataPlaceResolver
 import com.tidespot.feature.map.geo.DataWaterBodyResolver
@@ -36,8 +37,8 @@ import java.io.File
  *   （hourlyScoreDao/manualObservationDao/manualTideFitDao 为 M4/M6 必注入项，null 语义仅测试路径）；
  * - OkHttp：各 Client 内部经 `HttpCommon.tideSpotHttpClient` 自建（UA=`TideSpotUserAgent`、
  *   超时、重试、节流全部内置且冻结不可动），无构造注入点——:app 不另建实例、不重复组装；
- * - Copernicus 凭据：构建期经 BuildConfig 从本机 local-secrets.properties 注入
- *   （缺文件→空串→探针禁用→UNKNOWN 降级 CHG-09；禁硬编码）；
+ * - Copernicus 凭据：**不再从 BuildConfig 注入**；CHG-25 起由设置页手填并落
+ *   `filesDir/copernicus.properties`，运行期 `setProbe` 切换（未配置 → 水体判定 UNKNOWN 降级）；
  * - 逆地理：RG 节流 ≤1 req/2s 由 [ReverseGeocoder] 内置（RU 口径不动）。
  */
 class AppGraph(context: Context) {
@@ -150,6 +151,22 @@ class AppGraph(context: Context) {
             // CHG-35：§6.9 主判据——确认选点时先探真实海况（true→近岸，false→交由 OSTIA 分湖/陆）
             repository.probeMarineHasValue(lat, lon)
         }
+
+    /**
+     * CHG-92：确认收藏对话框「重新判定」入口。
+     *
+     * 与 [waterBodyResolver] 同一判据（真实海况主判 + classifier 内部探针/缓存），唯一差异是
+     * `force = true` **跳过判定缓存并覆盖写**——用户刚配好凭据或网络恢复后，不必等 24 h/30 d TTL。
+     * 注意：湖/陆目前仍无可用湖掩膜数据源，重判结果可能依旧是 UNKNOWN（§6.9 第 4 级，不是失败）。
+     */
+    suspend fun reclassifyWaterBody(lat: Double, lon: Double): WaterBodyType =
+        waterBodyClassifier.classify(
+            lat = lat,
+            lon = lon,
+            marineHasValue = repository.probeMarineHasValue(lat, lon),
+            elevation = null,
+            force = true,
+        )
 
     val locationController: LocationController = LocationController(appContext)
 

@@ -59,10 +59,13 @@
 | §2 第 1 条 | 「必须用 `T:` 盘构建（`subst T:`）」 | **已废弃**：2026-11-11 移除 `subst T:` 与 `android.overridePathCheck`，`verify.ps1` 直接用真实路径 |
 | §9 台账表 | 只到 `CHG-57` | `CHG-58` 之后以 `jj log` 与 `PROGRESS_TRACKER.md` 为准 |
 | `PROGRESS_TRACKER.md` §1 | 「v1.1 P0 完成 → P1 待开工」 | 与现状（v1.16.0、手绘 A 全屏换肤已落地）不符，属未回填 |
+| `HANDOVER_V11.md` Bug A 条 / 台账「判定缓存键 v2」 | `JUDGE_VERSION = 2` | **已升 3**（CHG-92，2026-11-14）；旧 v2 缓存行自然失效，变更与回滚见 `CONTRACT.md`「CHG-92」 |
+| `DATA_SOURCE_PROBE.md` A6-r3/A6-r4 | 「OSTIA lake mask 替代路径成立」「千岛湖掩膜待取值验证」 | 2026-11-14 实测：该图层是**全球 SST**，`value` 在湖/陆/海三点全为 null，**不能作湖泊掩膜**；湖/陆判定按 §6.9 第 4 级 `UNKNOWN` 显示，待换数据源（客户本批裁决「只止错」，不换源） |
+| `AMAP_FEASIBILITY.md` / `PROGRESS_TRACKER.md` | 「水体判定 = marine 实测 + OSTIA 探针 + 缓存」 | 探针只止错、不再产出湖/陆结论；marine 有值 → `NEARSHORE`，其余 `UNKNOWN`（细节见 `CONTRACT.md` CHG-92） |
 
 ### 0.6 发版与版本号（每次发版必改，客户 2026-11-13 明确要求）
 
-**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `20` / `1.16.0`）。
+**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `24` / `1.19.0`）。
 
 | 改动性质 | 怎么加 | 例子 |
 |---|---|---|
@@ -119,7 +122,7 @@ cd ../wf-skin && jj status                # 只看得到本副本的改动
 | 项 | 值 |
 |---|---|
 | 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated（每次提交后手动 `git update-ref refs/heads/main <commit>`） |
-| 版本 | **`versionCode=21` / `versionName=1.17.0`**（2026-11-13 回填；发版规则见 §0.6） |
+| 版本 | **`versionCode=24` / `versionName=1.19.0`**（2026-11-14 回填；发版规则见 §0.6） |
 | APK | **`E:\Trans\潮点TideSpot-v1.15.14.apk`**（51,933,996 B；SHA-256 `40e59f66a644694d9c09f498ab9d2a5ddd5b43463ffffa95316ba07a1c8c0d3d`；自签名，已装 AAK-AN00） |
 | 测试 | 八模块 `gradlew test` **EXIT=0**（每次批次均跑） |
 | i18n | `.tools/i18n_scan.mjs` **FAIL=0**（豁免 12）；`values` / `values-en` 241/241 |

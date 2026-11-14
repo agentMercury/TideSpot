@@ -128,7 +128,7 @@ class WaterBodyClassifierTest {
         assertEquals(
             "NEARSHORE",
             dao.rows["$key#v${WaterBodyClassifier.JUDGE_VERSION}"]!!.waterBodyType,
-            "新判定写入 v2 键；旧 v1 行保留但不再被读取",
+            "新判定写入 v${WaterBodyClassifier.JUDGE_VERSION} 键；旧 v1 行保留但不再被读取",
         )
     }
 
@@ -206,23 +206,54 @@ class WaterBodyClassifierTest {
     }
 
     @Test
-    fun `classify_marine未知走探针路径_海洋有值不触探针`() = runTest {
+    fun `classify_marine未知不采信探针_海洋有值不触探针`() = runTest {
+        // CHG-92：marineHasValue = null（限流/离线/失败）时，OSTIA 是全球 SST，
+        // 海域也可能返回正值；采信它会复现 v1「海点被判 INLAND_WATER 并缓存 30d」。
         val probe = FakeProbe(result = true)
         val dao = FakeWaterBodyCacheDao()
         val classifier = newClassifier(probe, vNow = 0L, dao = dao)
 
-        // M3 接线口径：marineHasValue = null（未知）→ 走探针路径
         assertEquals(
-            WaterBodyType.INLAND_WATER,
+            WaterBodyType.UNKNOWN,
             classifier.classify(29.6, 119.0, marineHasValue = null, elevation = 99.0),
         )
-        assertEquals(1, probe.calls)
+        assertEquals(0, probe.calls, "marine 状态未知 → 不查 OSTIA")
 
         // 海洋有值 → 主判据成立，不查 OSTIA
         assertEquals(
             WaterBodyType.NEARSHORE,
             classifier.classify(36.06, 120.38, marineHasValue = true, elevation = 285.0),
         )
-        assertEquals(1, probe.calls, "海洋有值即主判据，不查 OSTIA")
+        assertEquals(0, probe.calls, "海洋有值即主判据，不查 OSTIA")
+    }
+
+    @Test
+    fun `classify_force重判跳过缓存并覆盖写`() = runTest {
+        // CHG-92：UI「重新判定」——不等 24h/30d TTL，重新探海况并覆盖缓存行。
+        val probe = FakeProbe(result = null)
+        val dao = FakeWaterBodyCacheDao()
+        val classifier = newClassifier(probe, vNow = 0L, dao = dao)
+
+        assertEquals(WaterBodyType.UNKNOWN, classifier.classify(29.55, 118.95, false, 99.0))
+        assertEquals(1, probe.calls)
+        assertEquals(
+            WaterBodyType.UNKNOWN,
+            classifier.classify(29.55, 118.95, false, 99.0),
+            "默认仍命中 24h 短 TTL 缓存",
+        )
+        assertEquals(1, probe.calls)
+
+        probe.result = true
+        assertEquals(
+            WaterBodyType.INLAND_WATER,
+            classifier.classify(29.55, 118.95, false, 99.0, force = true),
+            "force=true 跳过缓存，按当前探针结果重算",
+        )
+        assertEquals(2, probe.calls)
+        assertEquals(
+            "INLAND_WATER",
+            dao.rows["${CacheKeys.spotKey(29.55, 118.95)}#v${WaterBodyClassifier.JUDGE_VERSION}"]!!.waterBodyType,
+            "重判结果覆盖同一缓存键（不产生第二行）",
+        )
     }
 }

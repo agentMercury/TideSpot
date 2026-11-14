@@ -11,6 +11,10 @@
     <string name="ts_app_spot_name">收藏点名称</string>
     <string name="ts_app_coordinate">坐标 %1$s, %2$s</string>
     <string name="ts_app_water_body">水体：%1$s</string>
+    <string name="ts_app_reclassify_water_body">重新判定</string>
+    <string name="ts_app_reclassifying">判定中…</string>
+    <string name="ts_app_reclassify_failed">重新判定失败，请检查网络后重试</string>
+    <string name="ts_app_water_body_unknown_hint">湖/陆暂无可靠判定数据源，可能仍显示待判定；联网或配置凭据后可重试</string>
     <string name="ts_app_save_failed">保存失败，请重试</string>
     <string name="ts_app_saving">保存中…</string>
     <string name="ts_fetch_log_title">请求日志</string>

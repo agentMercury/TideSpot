@@ -56,27 +56,38 @@ class WaterBodyClassifier(
      *     M4 接入真实 marine 序列后，调用方改为透传真实布尔值并补全本 KDoc。
      * @param elevation Open-Meteo 海拔 m（§6.9 辅助判据；B5：近岸可能取到陆地格点，仅作参考。
      *   CHG-09② 后不再参与决策，仅为调用方透出/未来判据保留）。
+     * @param force CHG-92：UI「重新判定」入口传 true，**跳过缓存读并覆盖写**（upsert 同键替换）。
+     *   默认 false 保持既有调用零改动；用于凭据/网络恢复后不等 24h/30d TTL 立即重判。
      */
     suspend fun classify(
         lat: Double,
         lon: Double,
         marineHasValue: Boolean?,
         elevation: Double?,
+        force: Boolean = false,
     ): WaterBodyType {
         val key = "${CacheKeys.spotKey(lat, lon)}#v$JUDGE_VERSION"
-        waterBodyCacheDao.getByKey(key)?.let { e ->
-            if (clock() - e.judgedAtEpochMs <= ttlMillisFor(e.waterBodyType)) {
-                return WaterBodyType.valueOf(e.waterBodyType)
+        if (!force) {
+            waterBodyCacheDao.getByKey(key)?.let { e ->
+                if (clock() - e.judgedAtEpochMs <= ttlMillisFor(e.waterBodyType)) {
+                    return WaterBodyType.valueOf(e.waterBodyType)
+                }
             }
         }
-        // 探针发起条件：海洋「未知或全 null」时查询 OSTIA（海洋有值即主判据，无需探针）。
+        // 探针发起条件：海洋「明确无海况」时才查 OSTIA（海洋有值即主判据，无需探针）。
         // CHG-09②：低海拔不再跳过探针（原 ≤3m 捷径已删除，SRS §6.9 无此规则）。
+        // CHG-92：marineHasValue == null（探测失败/限流/离线）时**不采信探针正值**——
+        //   该图层是全球 SST，海域同样可能有值，旧链路会把海点误判 INLAND_WATER 并缓存 30 d。
         // CHG-25：探针读单次快照（设置页运行期切换与判定并发安全）。
         val currentProbe = probeRef
         val lakeProbe: Boolean? = when {
             marineHasValue == true -> null
             currentProbe == null -> {
                 onWarn("WaterBodyClassifier: probe not injected, lat=$lat lon=$lon -> UNKNOWN")
+                null
+            }
+            marineHasValue == null -> {
+                onWarn("WaterBodyClassifier: marine status unknown, probe ignored, lat=$lat lon=$lon -> UNKNOWN")
                 null
             }
             else -> currentProbe.hasLakeValue(lat, lon)
@@ -94,8 +105,12 @@ class WaterBodyClassifier(
          * → 海域被误判 `INLAND_WATER`（浪潮 Tab 显示「水位（无潮汐）」）并按 30 d 缓存。
          * v2 起主判据改为调用方透传的真实 `marineHasValue`（`probeMarineHasValue`），
          * 键升级使旧错误缓存自然失效（不删表、不迁移）。
+         * v3（CHG-92，2026-11-14）：① 修正 `OstiaLakeProbe` 恒 true 的解析 bug；
+         * ② 无掩膜值由 false（LAND）改判 null（UNKNOWN）；③ marine 状态未知时不再采信探针。
+         * 升 v3 让 v2 下的错误 `INLAND_WATER`（30 d TTL）与 `UNKNOWN`（24 h）全部自然失效，
+         * 无需清库、无需 Room 迁移。
          */
-        const val JUDGE_VERSION = 2
+        const val JUDGE_VERSION = 3
 
         /** §6.9：成功判定结果缓存 30 d/点。 */
         const val TTL_MILLIS = 30L * 24 * 3600 * 1000

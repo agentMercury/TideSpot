@@ -17,13 +17,18 @@ import kotlin.test.assertTrue
 /**
  * OSTIA WMTS GetFeatureInfo 探针（CHG-06）：有值/无值/失败三分支 + URL 参数防回归
  * （DATA_SOURCE_PROBE A6-r3/A6-r4 核实过的拼写）。
+ *
+ * CHG-92（2026-11-14）：fixture 改为**真实响应形状**——数值字段是 `value`，
+ * 且 `lat`/`lon` 同为数值。旧 fixture 用虚构的 `analysed_sst` / `{"label":"no-data"}`，
+ * 从未覆盖「properties 里有数值但不是掩膜值」的情形，导致恒 true 的解析 bug 长期假绿。
  */
 class OstiaLakeProbeTest {
 
     private lateinit var server: MockWebServer
     private val recorded = mutableListOf<RecordedRequest>()
+    /** 真实响应壳：value 有数值（掩膜有值）。 */
     private var wmtsResponder: (RecordedRequest) -> MockResponse = {
-        ok("""{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"analysed_sst":291.5,"time":"2026-11-05"}}]}""")
+        ok(REAL_RESPONSE.replace("\"value\":null", "\"value\":291.5"))
     }
     private var tokenCount = 0
 
@@ -68,14 +73,28 @@ class OstiaLakeProbeTest {
     )
 
     @Test
-    fun `掩膜内有有效数值_true`() = runTest {
+    fun `真实响应_value有数值_true`() = runTest {
         assertEquals(true, newProbe().hasLakeValue(29.55, 118.95))
     }
 
     @Test
-    fun `200但无数值字段_false_掩膜外无值是正常态`() = runTest {
+    fun `真实响应_value为null但latLon是数值_降级null不得判有湖`() = runTest {
+        // CHG-92 回归：2026-11-14 实测湖/陆/海三点均返回 value:null，
+        // 旧实现「properties 任一数值即 true」被 lat/lon 命中 → 恒 true → 全判 INLAND_WATER。
+        wmtsResponder = { ok(REAL_RESPONSE) }
+        assertEquals(null, newProbe().hasLakeValue(29.55, 118.95))
+    }
+
+    @Test
+    fun `200但无有效数值字段_降级null而非false`() = runTest {
         wmtsResponder = { ok("""{"type":"FeatureCollection","features":[{"properties":{"label":"no-data"}}]}""") }
-        assertEquals(false, newProbe().hasLakeValue(29.55, 118.95))
+        assertEquals(null, newProbe().hasLakeValue(29.55, 118.95), "无掩膜结论 ≠ 确认是陆地（不落 LAND）")
+    }
+
+    @Test
+    fun `旧字段analysed_sst仍兼容_true`() = runTest {
+        wmtsResponder = { ok("""{"features":[{"properties":{"analysed_sst":291.5,"time":"2026-11-05"}}]}""") }
+        assertEquals(true, newProbe().hasLakeValue(29.55, 118.95))
     }
 
     @Test
@@ -126,5 +145,10 @@ class OstiaLakeProbeTest {
         assertTrue(url.queryParameter("J")!!.toInt() in 0..255, "像素行在瓦片内")
         assertTrue(req.getHeader("Authorization")!!.startsWith("Bearer tok-"))
         assertEquals(TideSpotUserAgent.VALUE, req.getHeader("User-Agent"))
+    }
+
+    private companion object {
+        /** 2026-11-14 实测响应（千岛湖；北京陆地、青岛近海除坐标外完全一致，value 均 null）。 */
+        const val REAL_RESPONSE = """{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[29.52499949928786,118.97500403481467]},"properties":{"lat":29.52499949928786,"lon":118.97500403481467,"variableId":"analysed_sst","datasetId":"SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001/METOFFICE-GLO-SST-L4-NRT-OBS-SST-V2","value":null,"units":"kelvin"}}]}"""
     }
 }

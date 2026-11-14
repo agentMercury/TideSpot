@@ -30,7 +30,7 @@
 - **细节与口径**：见 `PROGRESS_TRACKER.md` §7、`REQUIREMENTS_REGISTER.md` CHG-28、`tidespot-android/CONTRACT.md`「v1.1 子契约 P1」、本文件 §9 末尾「P1 落地要点」
 
 ### v1.1.1 缺陷修复（CHG-35，2026-11-10，客户真机报障两例）
-- **Bug A｜海域点显示「水位（无潮汐）」且无潮汛 chip**：根因＝确认选点恒传 `marineHasValue=null` → OSTIA（**全球 SST，海洋必然有值**）被当湖泊掩膜 → 误判 `INLAND_WATER` 并 30d 缓存落库。修复：`TideSpotRepository.probeMarineHasValue`（有海况→`NEARSHORE`，无→OSTIA 分湖/陆，失败→`UNKNOWN`）+ 判定缓存键 **v2**（旧错误判定失效）。
+- **Bug A｜海域点显示「水位（无潮汐）」且无潮汛 chip**：根因＝确认选点恒传 `marineHasValue=null` → OSTIA（**全球 SST，海洋必然有值**）被当湖泊掩膜 → 误判 `INLAND_WATER` 并 30d 缓存落库。修复：`TideSpotRepository.probeMarineHasValue`（有海况→`NEARSHORE`，无→OSTIA 分湖/陆，失败→`UNKNOWN`）+ 判定缓存键 v2（旧错误判定失效）。**〔2026-11-14 补注〕该项为 v1.1.1 历史快照：CHG-92 起判定缓存键已升 v3，OSTIA 探针只止错、不再产出湖/陆结论，现状以 `tidespot-android/CONTRACT.md`「CHG-92」为准。**
 - **Bug B｜地图拖动信息条恒「未命名水域」**：根因＝`CrosshairStateMachine.onMapMoved` 忽略 `Idle`。修复：`Idle + 用户手势 → Preview`（`fromUserGesture`；`MapScreen` 用 `REASON_API_GESTURE` 区分手势/程序动画）。
 - **存量自愈**：详情刷新若「海洋有值」且 spot 为 `INLAND/UNKNOWN` → 回写 `NEARSHORE`，并透出 `SpotDetailResult.effectiveWaterBody`（契约尾增）；`DetailScreen` 以此取标题与潮汛 chip → 老收藏点首屏即恢复。
 - **版本/验证**：`versionCode=3`、`versionName=1.1.1`；八模块 **716/0/0**；`潮点TideSpot-v1.1.1.apk`（SHA256 `D66A3F18…3E77E`）已分发 `E:\Trans`；寄存器 CHG-35。
