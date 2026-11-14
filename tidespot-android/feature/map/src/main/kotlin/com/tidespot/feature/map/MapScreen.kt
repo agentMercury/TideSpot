@@ -1,4 +1,7 @@
 package com.tidespot.feature.map
+import com.tidespot.core.ui.theme.vintageCard
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
 
 import android.Manifest
 import android.app.Activity
@@ -629,24 +632,33 @@ fun MapScreen(
             if (onOpenTop10 != null && top10Label.isNotEmpty()) {
                 Surface(
                     onClick = { onOpenTop10.invoke() },
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    shape = MaterialTheme.shapes.medium,
+                    // CHG-93 / 路径 B：深蓝实心横幅 → 双线白纸信息卡（保留真实瓦片，S3 不碰）
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp).vintageCard(),
                 ) {
                     Row(
-                        Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 12.dp),
+                        Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
+                        Icon(
+                            painter = painterResource(UiR.drawable.ic_fish_vintage),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(width = 24.dp, height = 13.dp),
+                        )
                         Text(
                             top10Label,
+                            Modifier.padding(start = 8.dp).weight(1f),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
                             "›",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }

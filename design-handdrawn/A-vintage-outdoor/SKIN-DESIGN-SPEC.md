@@ -134,3 +134,20 @@
 - **当前状态**：设计侧产出 A 复古户外 + D 路亚图鉴两款视觉（各 30 屏）；设置页「皮肤」下拉已落地（A/D 两款），全 App 换肤已实现（v1.17.0/v1.18.0），**无独立选择页**。
 - **不含**：Compose 代码、可编译 res、B/C 皮肤化（D 已皮肤化）、任何伪造的可切换样式。
 - **关联文件**：`APP功能优化需求.md`（OPT-A-03 / OPT-A-09）、`feature-gaps.json`、`spec.json`、`generator/engine.py`（`STYLES` 参数化是可变 token 的设计侧落地范例）。
+
+
+---
+
+## 8. 结构层口径（路径 B，2026-11-15 / CHG-93）
+
+- 客户裁决：A 稿结构提升为**全局共用骨架**（票据卡 / 虚线 / 小鱼标题 / 页头），
+  `TideSpotSkin` **不新增 layout 字段**；皮肤仍 = 色板 + 形状 + 字阶 + 质感装饰（§2.1 不变）。
+  实现见 `core/ui/.../VintageCard.kt` 与 `spec.json:authoritative_design`。
+- 骨架的颜色一律取 `MaterialTheme.colorScheme`，描边/套印开关取 `LocalSkin.current.texture`，
+  因此 D 皮肤在同一骨架下仍保留自己的视觉语言；新增皮肤无需改业务 Composable（§5 接入清单不变）。
+- 结构层改动边界：**纯视觉重排**（S2a）可独立发版；**控件形态替换**（S2b）改交互语义，
+  按 `tidespot-android/CONTRACT.md` N-4 需 Android / Web 同批。
+- 判定口径：`check_entries_v4.py` 豁免纯装饰节点，但「入口零减少 / 可交互节点数一致 /
+  Top10 bounds 四态零位移 / Tab 与免责完整」不变（36 项）。
+- 视觉 token 单源见 `spec.json:visual_tokens`，防漂移断言 `design-handdrawn/generator/visual_quant.py --tokens`；
+  逐页对拍与验收阈值见 `SKIN-DEV-STANDARD.md` §10 与 `device-compare/UI差异逐页对拍-2026-11-15.md`。

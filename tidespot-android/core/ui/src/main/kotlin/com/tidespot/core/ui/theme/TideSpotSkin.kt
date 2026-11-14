@@ -8,6 +8,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -228,7 +229,8 @@ private val VintageSeaDark = darkColorScheme(
     surfaceContainerLow = Color(0xFF132538),
     surfaceContainer = Color(0xFF17293B),
     surfaceContainerHigh = Color(0xFF1E344A),
-    surfaceContainerHighest = Color(0xFF26405A),
+    // CHG-93：深色卡改深底（对齐 dark-favorites.png #122334 系），层次由 vintageCard 亮描边提供
+    surfaceContainerHighest = Color(0xFF16283A),
 )
 
 // ── 手绘 A：深色 · 内陆水体 ────────────────────────────────────────────────
@@ -266,7 +268,8 @@ private val VintageInlandDark = darkColorScheme(
     surfaceContainerLow = Color(0xFF162A20),
     surfaceContainer = Color(0xFF172B21),
     surfaceContainerHigh = Color(0xFF1E372A),
-    surfaceContainerHighest = Color(0xFF2A4736),
+    // CHG-93：深色卡改深底，不再用亮实心块
+    surfaceContainerHighest = Color(0xFF172A20),
 )
 
 /**
@@ -282,21 +285,26 @@ private val VintageShapes = Shapes(
 )
 
 /**
- * 字阶与基础 `TideSpotTypography` 逐项一致（字号 / 行高 / 字重全等），仅把字族换为系统衬线，
- * 避免字体缺失导致行高或换行位置变化。中文回退系统 serif（设计稿 KaiTi → serif 同样回退）。
+ * CHG-93：A 皮肤中文衬线字族。设计稿 `engine.py` 用 KaiTi/STKaiti + Georgia，
+ * 而 `FontFamily.Serif` 在 Android 对中文一律回落到无衬线 CJK——这是「不像设计稿」的主因之一。
+ * 现改用 Noto Serif SC（SIL OFL 1.1）的 645 KB 子集，由 `gen_font_subset.py` 从工程真实字符生成；
+ * 可变轴固定到 wght=400，Bold/Medium 由系统合成，不改变任何字号/行高/字重。
  *
  * **不要为了「更像手绘」调字号或行高**——会破坏所有屏的换行与卡片高度。
+ * D 皮肤保持自己的字族，不受影响（换肤仍只换 token）。
  */
+private val VintageFontFamily = FontFamily(Font(R.font.noto_serif_sc_subset))
+
 private val VintageTypography = Typography(
-    titleLarge = TextStyle(fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold),
-    titleMedium = TextStyle(fontFamily = FontFamily.Serif, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold),
-    titleSmall = TextStyle(fontFamily = FontFamily.Serif, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
-    bodyLarge = TextStyle(fontFamily = FontFamily.Serif, fontSize = 15.sp, lineHeight = 22.sp, fontWeight = FontWeight.Normal),
-    bodyMedium = TextStyle(fontFamily = FontFamily.Serif, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Normal),
-    bodySmall = TextStyle(fontFamily = FontFamily.Serif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
-    labelLarge = TextStyle(fontFamily = FontFamily.Serif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
-    labelMedium = TextStyle(fontFamily = FontFamily.Serif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
-    labelSmall = TextStyle(fontFamily = FontFamily.Serif, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Normal),
+    titleLarge = TextStyle(fontFamily = VintageFontFamily, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold),
+    titleMedium = TextStyle(fontFamily = VintageFontFamily, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold),
+    titleSmall = TextStyle(fontFamily = VintageFontFamily, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+    bodyLarge = TextStyle(fontFamily = VintageFontFamily, fontSize = 15.sp, lineHeight = 22.sp, fontWeight = FontWeight.Normal),
+    bodyMedium = TextStyle(fontFamily = VintageFontFamily, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Normal),
+    bodySmall = TextStyle(fontFamily = VintageFontFamily, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
+    labelLarge = TextStyle(fontFamily = VintageFontFamily, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    labelMedium = TextStyle(fontFamily = VintageFontFamily, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    labelSmall = TextStyle(fontFamily = VintageFontFamily, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Normal),
 )
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -542,7 +550,8 @@ object TideSpotSkins {
         ),
         shapes = VintageShapes,
         typography = VintageTypography,
-        texture = SkinTexture(),
+        // CHG-93：收敛纸纹强度（设计稿是高频细噪，旧 1f 在真机形成可见网格）
+        texture = SkinTexture(grainStrength = 0.5f),
     )
 
     /**

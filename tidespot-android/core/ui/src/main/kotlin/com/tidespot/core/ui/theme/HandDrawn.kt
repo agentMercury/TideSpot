@@ -58,12 +58,14 @@ fun rememberPaperGrainBrush(darkTheme: Boolean): ShaderBrush {
 }
 
 /**
- * 全屏纸张颗粒：在内容绘制完成之后再叠一层，接近设计稿的独立 mix-blend 颗粒层。
- * 颗粒 alpha 上限仅 0.16（设计稿 grain），不会糊住文字；纯绘制节点不拦截触摸。
+ * 全屏纸张颗粒（CHG-93）：画在**内容之下**，而非盖在所有内容之上。
+ * 旧实现用 drawWithContent 把颗粒覆盖卡片与文字，导致文字发糊、实心卡片被压灰
+ * （SKIN-DEV-STANDARD 反模式 #11 同源问题）。改 drawBehind 后颗粒只作用于纸底，
+ * 卡片与文字保持清晰；颗粒 alpha 上限 0.16，运行时再由 grainStrength 收敛。
+ * 纯绘制节点不拦截触摸、不消费 pointer input、不改变测量尺寸。
  */
 fun Modifier.paperGrain(brush: ShaderBrush, strength: Float = 1f): Modifier =
-    this.drawWithContent {
-        drawContent()
+    this.drawBehind {
         drawRect(brush = brush, alpha = strength)
     }
 

@@ -1,4 +1,6 @@
 package com.tidespot.feature.detail.detail
+import com.tidespot.core.ui.theme.vintageCard
+import com.tidespot.core.ui.theme.VintageDashedDivider
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
@@ -1129,10 +1131,10 @@ private fun ScoreMainCard(
         modifier = Modifier
             .fillMaxWidth()
             // 套印错位块画在含 padding 的外层区域，主体盖上后四边露出一点错位边
-            .printMisregister(MaterialTheme.colorScheme.tertiary)
             .padding(horizontal = 12.dp, vertical = 4.dp)
             .height(152.dp)
-            .handDrawnOutline(MaterialTheme.colorScheme.onPrimaryContainer),
+            // CHG-93 / 路径 B：改走全局统一骨架，避免与外壳描边叠成双层
+            .vintageCard(),
     ) {
         Box(Modifier.fillMaxSize()) {
             // 版画鱼角标：纯装饰、不参与测量、不消费触摸
@@ -1150,11 +1152,19 @@ private fun ScoreMainCard(
             Column(Modifier.fillMaxSize().padding(16.dp)) {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Column {
-                        Text(
-                            score?.toString() ?: Format.MISSING,
-                            style = MaterialTheme.typography.titleLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
+                            Text(
+                                score?.toString() ?: Format.MISSING,
+                                style = MaterialTheme.typography.titleLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Text(
+                                "/100",
+                                Modifier.padding(bottom = 8.dp, start = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                            )
+                        }
                         if (bandLabel == null) {
                             Text(
                                 stringResource(R.string.ts_detail_summary_empty),
@@ -1188,6 +1198,7 @@ private fun ScoreMainCard(
                     }
                     androidx.compose.foundation.layout.Spacer(Modifier.height(2.dp))
                 }
+                VintageDashedDivider(Modifier.fillMaxWidth().padding(bottom = 2.dp))
                 // 五档色带：档位 = 鱼数（好→差 5→1），恒带档位文字（N-7）；
                 // 色值 / onColor 仍取 ScoreBand 冻结单源，选中档由当前分数档位高亮。
                 Row(

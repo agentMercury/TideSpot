@@ -482,7 +482,7 @@ interface CopernicusCredentialActions {
 | `PARITY_GAP-WEB-ADP-01` | Web 环境自适应（PC/移动/平板）在 Android 无等价实现（Android 目前仅手机布局） | **客户已裁决 2026-11-13：一期不做**；后续若要求，Android +6~8 人日 | 未排期 |
 | `PARITY_GAP-WEB-02` | Web 无系统级离线/后台刷新（无 WorkManager 等价物） | 已列入白名单 | — |
 | `PARITY_GAP-WEB-I18N-01` | CHG-92 新增 4 个 app 文案 key（`ts_app_reclassify_water_body` / `ts_app_reclassifying` / `ts_app_reclassify_failed` / `ts_app_water_body_unknown_hint`）尚未同步 Web `src/i18n/{zh,en}.json` | **已关闭**：客户 2026-11-14 裁决「本批只改 Android」，Web 会话随后自行执行 `gen:i18n` 补齐，复查 `check_parity` **PASS**（zh/en 各 576 key） | 2026-11-14 |
-| `PARITY_GAP-WEB-VER-01` | Android `versionName` 本批升 `1.19.0`（`versionCode=24`），Web `APP_VERSION` 仍为 `1.18.2` | 同上裁决：本批不动 `web/`；Web 会话下批对齐后关闭 | Web 下批 |
+| `PARITY_GAP-WEB-VER-01` | Android `versionName` 已升 `1.20.0`（`versionCode=25`），Web `APP_VERSION` 仍为 `1.18.2` | CHG-93 本批只改 Android 代码与 `web/src/i18n` **自动生成物**（N-5 要求）；版本号仍待 Web 会话对齐后关闭 | Web 下批 |
 
 ### 红线
 
@@ -525,3 +525,57 @@ interface CopernicusCredentialActions {
 - 八模块单测 / `i18n_scan` / `contrast_check` / `assembleRelease` 见本批提交说明；
 - 双端 `check_parity` 初检 FAIL（4 个新 key 缺失）→ Web 会话自行 `gen:i18n` 后复查 **PASS**；
   仅剩 `PARITY_GAP-WEB-VER-01`（Web `APP_VERSION=1.18.2` 未对齐 Android `1.19.0`），按客户裁决留 Web 会话下批处理。
+
+
+## CHG-93 · 复古户外 A 视觉对齐（路径 B / S0+S1+S2a，2026-11-15）
+
+> 客户三项裁决（2026-11-15）：① **路径 B**——A 稿结构提升为全局共用骨架，换肤仍只换 token；
+> ② **S2b 稍后再讨论**——本批只做纯视觉重排，控件形态（FilterChip/Switch → 下拉）不动；
+> ③ **豁免纯装饰节点**——入口红线改语义判定。**S3（地图底图风格化）排到最后**，
+> 本批地图页只改浮层/信息卡，底图保持真实瓦片。
+
+### 设计侧（S0）
+- `spec.json` 新增 `authoritative_design`：唯一权威详情稿 = `screens_full/detail-tab-score-{sea,inland}.png`；
+  `screens/detail-{sea,inland}.png` 标「历史旧稿·非落地目标」；稿内不一致 / 缺深色稿 / 示例假数据登记为 `known_gaps`。
+- `spec.json` 新增 `visual_tokens`（单源 `engine.py STYLES['a-vintage']`）：字体 / 纸张 / 描边 / 圆角 / 四色板；
+  `design-handdrawn/generator/visual_quant.py --tokens` 做设计↔工程防漂移断言（7 项）。
+- 未重渲 30 屏（渲染管线依赖本机浏览器，且本批无真机复拍）；修 SCORE Tab 图表不一致与补深色稿留后续。
+  `selfcheck_full.py` 仍 **276 PASS / 0 FAIL**。
+
+### 工程侧（S1 + S2a）
+| 位置 | 变更 | 兼容 |
+|---|---|---|
+| `gen_android_assets.py` | tile 96→64，删 96px 低频正余弦，改高频同色细噪；颗粒色 `(205,197,168)/(30,47,64)` | 资源重生成，SHA 变更 |
+| `HandDrawn.kt:paperGrain` | `drawWithContent` → `drawBehind`，颗粒不再盖文字/卡片 | 签名不变 |
+| `TideSpotSkin.kt` | A `grainStrength 1f→0.5f`；`VintageTypography` 改 `FontFamily(Font(R.font.noto_serif_sc_subset))`；深色 `surfaceContainerHighest` 改深底 `#16283A/#172A20` | 字号/行高/字重全等；D 皮肤不受影响 |
+| 新增 `core/ui/.../VintageCard.kt` | `Modifier.vintageCard()` / `VintageSectionCard` / `VintageSectionTitle` / `VintageDashedDivider` / `VintagePageHeader`；颜色取 ColorScheme，开关取 `LocalSkin.texture` | 纯绘制，零交互 |
+| `SettingsScreen.kt` | 一张大卡 → 6 张独立票据卡 + 页头副标题 + 小鱼标题 + 虚线 | 入口/文案/回调零变化 |
+| `FavoritesScreen.kt` | 补页头；卡片挂骨架 + 小鱼 + 虚线；Top10 卡挂骨架 | 同上 |
+| `DetailScreen.kt` | 主卡改走全局骨架（去重复描边）；补 `/100` + 虚线 | 同上 |
+| `MapScreen.kt` | Top10 深蓝横幅 → 双线纸卡 + 鱼形（保留真实瓦片） | 同上 |
+| `feature/favorites/.../values{,-en}/strings.xml` | 新增 `ts_fav_page_title`（我的收藏 / Favorites） | N-5 同批 `gen:i18n`，`check_parity PASS`（577/577） |
+
+### 字体许可（随附声明）
+`core/ui/src/main/res/font/noto_serif_sc_subset.ttf` 由 `design-handdrawn/generator/gen_font_subset.py`
+从 `Noto Serif SC Variable`（Adobe / Google，字体 nameID 13 声明 **SIL Open Font License 1.1**）实例化到
+`wght=400` 并按工程真实字符子集化（1523 字符 / 645 KB / 1939 字形）。OFL 允许商用与随应用再分发，
+条件是随附许可声明且不得单独售卖字体本身；本条即为随附声明，生成脚本保留 nameID 1/2/4/6/13/14。
+
+### 门禁与验收
+- 八模块单测 + `assembleRelease` **BUILD SUCCESSFUL**；`SkinRegistryTest` 同步深色槽位期望并新增 `grainStrength` 断言。
+- `selfcheck_full.py` 276 PASS / 0 FAIL；`i18n_scan FAIL=0`；`contrast_check FAIL=0 / 29`；
+  `check_entries_v4.py` **36 PASS / 0 FAIL**（新口径）；`visual_quant.py --tokens` **7 PASS / 0 FAIL**；`check_parity PASS`。
+- `versionCode 24→25` / `versionName 1.19.0→1.20.0`（有功能修改，按 `HANDOVER_V115.md` §0.6 升中位）；
+  APK `E://Trans//潮点TideSpot-v1.20.0.apk`（52,449,413 B）。
+- **真机复拍待 USB**：`visual_quant.py <design> <device> --strict` 阈值（std ≤ 设计×2、ΔRGB ≤8、颜色数 ≤设计×3）
+  尚未对新包验证；旧 r2 截图 `--strict` 预期 FAIL（收藏页下部 std×7.4）。
+
+### 回滚
+`jj revert` 本提交即可。字体为新增资源、纸纹为资源重生成、`TideSpotSkin` 仅改 token 值，
+无 schema / 持久化变更，不需数据迁移；`visual_tokens` / `authoritative_design` 为 spec.json 追加节点，删除即可。
+
+### 未完成（客户已知）
+- S2b 控件形态替换（改交互语义，触发 N-4 双端同批）——稍后讨论。
+- S3 地图底图风格化——排最后。
+- 设计稿修 SCORE Tab 图表不一致、补深色设置页/叠层稿——需重渲 30 屏。
+- 真机四态复拍 + `--strict` 量化验收。

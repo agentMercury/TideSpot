@@ -15,7 +15,9 @@
 
 约束：
   - 所有资源单色/可 tint，不写死任何皮肤配色，交由 MaterialTheme 决定海/陆 × 浅/深
-  - tile 为周期性噪声，平铺无接缝；alpha 上限对齐设计稿 grain=0.16
+  - tile 为高频细噪，平铺无接缝；alpha 上限对齐设计稿 grain=0.16
+  - CHG-93：旧版 96px 低频正余弦 + 高对比墨色颗粒在真机形成可见规则网格并压灰纸底，
+    现改为「高频同色细噪 + 内容之下叠加」，量化基线见 device-compare/UI差异逐页对拍-2026-11-15.md §2
   - 本脚本只写 res 资源，不改任何 Kotlin 源码
 
 复现：python design-handdrawn/generator/gen_android_assets.py
@@ -23,7 +25,6 @@
 from __future__ import annotations
 
 import hashlib
-import math
 import random
 from pathlib import Path
 
@@ -35,38 +36,43 @@ RES = ROOT / "tidespot-android" / "core" / "ui" / "src" / "main" / "res"
 NODPI = RES / "drawable-nodpi"
 DRAWABLE = RES / "drawable"
 
-# 设计稿 svg_defs 的 feTurbulence seed=11 / fractalNoise numOctaves=3
+# 设计稿 svg_defs 的 feTurbulence seed=11 / fractalNoise numOctaves=3 / baseFreq 0.82
+# CHG-93：旧实现的 96px 低频项在 nodpi 平铺时形成肉眼可见的规则网格，
+# 高对比墨绿/暖白颗粒又整体压暗去饱和（真机灰度方差 7~16 倍于设计稿）。
 SEED = 11
-TILE = 96
+TILE = 64
 # design-handdrawn/generator/engine.py: STYLES['a-vintage']['paper']['grain'] == 0.16
 GRAIN = 0.16
-ALPHA_LIGHT = round(255 * GRAIN)        # 41
-ALPHA_DARK = round(255 * GRAIN * 0.82)  # 33（深色下颗粒略收，避免发灰）
+ALPHA_LIGHT = round(255 * GRAIN)        # 41（运行时再由 grainStrength 收敛）
+ALPHA_DARK = round(255 * GRAIN * 0.82)  # 33
 
-# A 版墨色 / 暖白，仅用于 tile 本身的像素；运行时仍会被 ShaderBrush 原样绘制
-INK_LIGHT = (28, 34, 27)
-INK_DARK = (247, 241, 222)
+# 颗粒色改「纸底同色系 ±5%」：浅色取海 #E4D9BC 与内陆 #DCE2C4 的中值，
+# 深色取 #122334 系。只产生极轻微明暗起伏，不改变底色色相与饱和度。
+INK_LIGHT = (205, 197, 168)
+INK_DARK = (30, 47, 64)
 
 
 def grain_tile(dark: bool) -> Image.Image:
-    """周期性分形噪声 tile：高频白噪 + 低频正余弦斑驳，保证上下左右平铺无缝。"""
+    """高频同色细噪 tile（CHG-93）：逐像素独立随机 + 多尺度邻域相关，平铺无缝。
+
+    对齐设计稿 `feTurbulence fractalNoise baseFrequency=0.82`（特征尺度 1~2px），
+    不叠加任何低频正余弦项。邻域索引取模保证 tile 上下左右无缝。
+    """
     rnd = random.Random(SEED)
     ink = INK_DARK if dark else INK_LIGHT
     max_a = ALPHA_DARK if dark else ALPHA_LIGHT
+    noise = [[rnd.random() for _ in range(TILE)] for _ in range(TILE)]
     img = Image.new("RGBA", (TILE, TILE))
     px = img.load()
-    two_pi = 2.0 * math.pi
     for y in range(TILE):
         for x in range(TILE):
-            high = rnd.random()
-            # 低频项全部以 TILE 为周期 → 边界连续
-            low = (
-                0.50
-                + 0.24 * math.sin(two_pi * x / TILE) * math.cos(two_pi * y / TILE)
-                + 0.14 * math.sin(2 * two_pi * y / TILE + 1.3)
-                + 0.10 * math.cos(2 * two_pi * x / TILE + 0.7)
-            )
-            v = 0.58 * high + 0.42 * low
+            # 3 阶分形近似：本像素为主，叠加 2×2 / 3×3 邻域均值
+            n0 = noise[y][x]
+            n1 = sum(noise[(y + dy) % TILE][(x + dx) % TILE]
+                     for dy in (0, 1) for dx in (0, 1)) / 4.0
+            n2 = sum(noise[(y + dy) % TILE][(x + dx) % TILE]
+                     for dy in (0, 2) for dx in (0, 2)) / 4.0
+            v = 0.70 * n0 + 0.22 * n1 + 0.08 * n2
             a = int(max(0.0, min(1.0, v)) * max_a)
             px[x, y] = (ink[0], ink[1], ink[2], a)
     return img

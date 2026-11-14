@@ -1,4 +1,11 @@
 package com.tidespot.feature.favorites.favorites
+import com.tidespot.core.ui.theme.vintageCard
+import com.tidespot.core.ui.theme.VintagePageHeader
+import com.tidespot.core.ui.theme.VintageDashedDivider
+import com.tidespot.core.ui.theme.LocalSkin
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -117,6 +124,12 @@ fun FavoritesScreen(
                 .semantics { contentDescription = screenDesc },
         ) {
         // OPT-V115-01 #4（ts_offline）：离线横幅（不阻断离线数据，仅提示）
+        item {
+            VintagePageHeader(
+                title = stringResource(R.string.ts_fav_page_title),
+                subtitle = "TideSpot · ${LocalSkin.current.nameEn}",
+            )
+        }
         item { OfflineBanner() }
         item {
             // OPT-V11-10（P1）：搜索框（名称/备注实时过滤）+ 标签/预设 chips（先筛后排）
@@ -601,6 +614,8 @@ private fun FavoriteCard(
     val deleteDesc = stringResource(R.string.ts_fav_delete_item_desc, spot.name)
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+            // CHG-93 / 路径 B：统一票据卡骨架（描边 + 套印 + 非对称圆角）
+            .vintageCard()
             // OPT-V11-11：陈旧/已过期整项降透明度
             .alpha(if (stale.level == StaleLevel.NONE) 1f else FavoritesStaleLogic.ALPHA_STALE)
             // OPT-V11-12：长按 = 进入多选（D16）；单点点击 = 多选态切换选择 / 非多选态进详情
@@ -615,6 +630,12 @@ private fun FavoriteCard(
                 if (selecting) {
                     Checkbox(checked = selected, onCheckedChange = { onLongPress() })
                 }
+                Icon(
+                    painter = painterResource(UiR.drawable.ic_fish_vintage),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(width = 22.dp, height = 12.dp),
+                )
                 Text(spot.name, style = MaterialTheme.typography.titleMedium)
                 // OPT-V115-02 / S08：水体类型行（设计：名称下方）
                 Text(
@@ -640,6 +661,7 @@ private fun FavoriteCard(
                     }
                 }
             }
+            VintageDashedDivider(Modifier.fillMaxWidth().padding(vertical = 2.dp))
             Text(
                 "${Format.coordinate(spot.lat)}, ${Format.coordinate(spot.lon)}",
                 style = MaterialTheme.typography.bodySmall,
@@ -1015,7 +1037,7 @@ private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
                     startText,
                 )
                 Card(
-                    Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    Modifier.fillMaxWidth().padding(vertical = 4.dp).vintageCard()
                         .semantics { contentDescription = rankDesc },
                 ) {
                     Column(Modifier.padding(12.dp)) {

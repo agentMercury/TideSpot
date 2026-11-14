@@ -89,12 +89,14 @@ class SkinRegistryTest {
         assertScheme(
             p.seaDark, bg = 0xFF0E1C2B, primary = 0xFF90CAF9, surface = 0xFF17293B,
             surfaceVariant = 0xFF1E344A, onSurfaceVariant = 0xFF9FB0C0, outline = 0xFF3A4C5E,
-            outlineVariant = 0xFF3A4C5E, error = 0xFFFF8A65, highest = 0xFF26405A,
+            // CHG-93：深色卡改「深底 + 亮描边」，与 dark-favorites.png 一致
+            outlineVariant = 0xFF3A4C5E, error = 0xFFFF8A65, highest = 0xFF16283A,
         )
         assertScheme(
             p.inlandDark, bg = 0xFF101D18, primary = 0xFFA5D6A7, surface = 0xFF172B21,
             surfaceVariant = 0xFF1E372A, onSurfaceVariant = 0xFF9DB8A8, outline = 0xFF3A5346,
-            outlineVariant = 0xFF3A5346, error = 0xFFFFAB91, highest = 0xFF2A4736,
+            // CHG-93：同上，内陆深色卡不再用亮实心块
+            outlineVariant = 0xFF3A5346, error = 0xFFFFAB91, highest = 0xFF172A20,
         )
         // 地图三色（engine.py PALETTE 真值，非编造）
         assertEquals(0xFFD6C6A0.toInt(), p.seaLight.mapLand.toArgb())
@@ -216,5 +218,7 @@ class SkinRegistryTest {
         assertEquals(texture.waveMotifRes, texture.motifFor(WaterBodyType.OCEAN))
         assertEquals(texture.mountMotifRes, texture.motifFor(WaterBodyType.INLAND_WATER))
         assertTrue(texture.grainStrength in 0f..1f)
+        // CHG-93：纸纹强度与 spec.json visual_tokens 声明一致（防漂移）
+        assertEquals(0.5f, texture.grainStrength)
     }
 }

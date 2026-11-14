@@ -356,5 +356,61 @@
     ],
     "new_skin_checklist": "SKIN-DESIGN-SPEC.md §5（A1–A10，业务 Composable 零改动）",
     "ui_scope_this_round": "全 App 换肤已落地；皮肤入口=设置页下拉；D 路亚图鉴已内置（工程 d-fieldguide）"
+  },
+  "authoritative_design": {
+  "decided_on": "2026-11-15",
+  "decision": "路径 B：A 稿结构提升为全局共用骨架；换肤仍只换 token",
+  "authoritative_detail": [
+    "screens_full/detail-tab-score-sea.png",
+    "screens_full/detail-tab-score-inland.png"
+  ],
+  "historical_not_target": [
+    "screens/detail-sea.png",
+    "screens/detail-inland.png"
+  ],
+  "historical_note": "早期 base 旧稿（78 分 / 白底 / 潮高潮流折线），仅作勘误演示，禁止当对齐证据",
+  "known_gaps": [
+    "detail-tab-score-sea.png 文件名是 SCORE 但图内为 TIDE 折线（稿内不一致，工程以钓鱼指数柱为准）",
+    "30 屏缺深色设置页稿与深色 Top10 叠层稿，深色只能靠 token 推断",
+    "设计稿示例分数 78/86/92 非业务值，不作为布局验收依据"
+  ],
+  "map_basemap": "S3 排期放最后；S2 阶段地图页只改浮层/信息卡，底图保持真实瓦片"
+},
+  "visual_tokens": {
+  "source": "design-handdrawn/generator/engine.py STYLES['a-vintage']",
+  "font": {
+    "display": "Georgia, Times New Roman, serif",
+    "body": "KaiTi, STKaiti, serif",
+    "android_body": "Noto Serif SC subset (OFL 1.1, wght 400)",
+    "track": "0.14em"
+  },
+  "paper": {
+    "grain": 0.16,
+    "base_freq": "0.82",
+    "android_grain_strength": 0.5,
+    "android_tile": "64px 高频同色细噪，内容之下叠加"
+  },
+  "ink": "1B3A5C",
+  "sketch_scale": 2.2,
+  "radius": "16px 20px 15px 19px / 19px 15px 20px 16px",
+  "card": {
+    "outline_width_px": 2.2,
+    "misregister": "2px / 3px",
+    "divider": "dashed"
+  },
+  "pal": {
+    "sea": {
+      "bg": "E4D9BC",
+      "card": "F2EAD4",
+      "line": "16324F",
+      "primary": "1B3A5C"
+    },
+    "inland": {
+      "bg": "DCE2C4",
+      "card": "F1EED8",
+      "line": "213D2A",
+      "primary": "2E5A48"
+    }
   }
+}
 }

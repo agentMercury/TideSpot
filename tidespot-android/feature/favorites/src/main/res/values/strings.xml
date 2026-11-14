@@ -128,4 +128,5 @@
     <string name="ts_fav_filter_err_date">日期格式应为 yyyy-MM-dd</string>
     <string name="ts_fav_filter_err_time">时间格式应为 HH:mm</string>
     <string name="ts_fav_filter_err_order">结束时间需晚于开始时间</string>
+    <string name="ts_fav_page_title">我的收藏</string>
 </resources>

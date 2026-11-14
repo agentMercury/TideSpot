@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +35,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tidespot.core.ui.strings.localTideSpotStrings
+import com.tidespot.core.ui.theme.LocalSkin
 import com.tidespot.core.ui.theme.TideSpotSkins
+import com.tidespot.core.ui.theme.VintageDashedDivider
+import com.tidespot.core.ui.theme.VintagePageHeader
+import com.tidespot.core.ui.theme.VintageSectionCard
 
 /**
  * SettingsScreen（CHG-16⑱ 薄组装）：所有状态经 [SettingsState] 注入、交互回调上抛，
@@ -72,6 +74,10 @@ fun SettingsScreen(
     onOpenFetchLog: (() -> Unit)? = null,
 ) {
     val screenDesc = stringResource(R.string.ts_settings_content_desc)
+    // CHG-93：副标题取皮肤英文名（数据值，非 UI 文案，不触发 i18n / 双端契约 N-5）
+    val headerSubtitle = "TideSpot · ${LocalSkin.current.nameEn}"
+    // 隐私行同时被「数据与网络」和「隐私逐源披露」两张卡消费，故提到卡片之外
+    val privacyLines = SettingsLogic.privacyLines(state.reverseGeoEnabled, state.prefetchEnabled)
     Column(
         modifier = modifier.fillMaxSize()
             .statusBarsPadding()
@@ -79,19 +85,13 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .semantics { contentDescription = screenDesc }
             .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Text(
-            stringResource(R.string.ts_settings_title),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
+        VintagePageHeader(stringResource(R.string.ts_settings_title), headerSubtitle)
 
-        // OPT-V115-02 / S09 C16：六版块收进一张卡片（设计 366×700 rx16）
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // CHG-93 / 路径 B：六版块拆成六张独立票据卡（原为一张大卡包全部，对齐 settings.png）
+        VintageSectionCard(stringResource(R.string.ts_settings_display)) {
         // ── 显示 ──
-        SectionTitle(stringResource(R.string.ts_settings_display))
         Text(stringResource(R.string.ts_settings_unit), style = MaterialTheme.typography.titleSmall)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             val siDesc = stringResource(R.string.ts_settings_unit_si_desc)
@@ -122,6 +122,8 @@ fun SettingsScreen(
                 )
             }
         }
+        }
+        VintageSectionCard(stringResource(R.string.ts_settings_map_source)) {
         // OPT-A-10：地图来源（提供方可切；未来新增源自动出现在下拉里）
         Text(stringResource(R.string.ts_settings_map_source), style = MaterialTheme.typography.titleSmall)
         MapProviderDropdown(current = state.mapProvider, onSelect = onMapProviderChange)
@@ -149,6 +151,8 @@ fun SettingsScreen(
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        }
+        VintageSectionCard(stringResource(R.string.ts_settings_skin)) {
         // ── 外观 · 皮肤（SKIN-3 / OPT-A-09）：按皮肤名下拉选择 ──
         Text(stringResource(R.string.ts_settings_skin), style = MaterialTheme.typography.titleSmall)
         SkinDropdown(currentId = state.skinId, onSelect = onSkinChange)
@@ -173,11 +177,9 @@ fun SettingsScreen(
                 )
             }
         }
-        SectionDivider()
-
+        }
+        VintageSectionCard(stringResource(R.string.ts_settings_data_network)) {
         // ── 数据与网络 ──
-        SectionTitle(stringResource(R.string.ts_settings_data_network))
-        val privacyLines = SettingsLogic.privacyLines(state.reverseGeoEnabled, state.prefetchEnabled)
         val prefetchDesc = stringResource(R.string.ts_settings_prefetch_toggle)
         val reverseGeoDesc = stringResource(R.string.ts_settings_reverse_geo_toggle)
         ToggleRow(
@@ -227,14 +229,9 @@ fun SettingsScreen(
                 }
             }
         }
-        SectionDivider()
-
-        // OPT-A-01 / OPT-A-02（2026-11-12 产品决策）：下线「用例·物种·权重」与「API Key」两块。
-        // 算法侧场景预设与 F-3.4 权重逻辑保持不变，仅移除用户可见/可改入口。
-        // 历史 Key 的一次性清理见 AppSettings.clearLegacyApiKey（启动时执行，不入库不上传）。
-
+        }
+        VintageSectionCard(stringResource(R.string.ts_settings_licenses)) {
         // ── 开源许可 ──
-        SectionTitle(stringResource(R.string.ts_settings_licenses))
         SettingsLogic.LICENSES.forEach { lic ->
             Text(lic.name, style = MaterialTheme.typography.titleSmall)
             Text(
@@ -243,10 +240,9 @@ fun SettingsScreen(
             )
             Text(lic.attribution, style = MaterialTheme.typography.labelSmall)
         }
-        SectionDivider()
-
+        }
+        VintageSectionCard(stringResource(R.string.ts_settings_privacy)) {
         // ── 隐私逐源披露 ──
-        SectionTitle(stringResource(R.string.ts_settings_privacy))
         privacyLines.forEach { line ->
             Text(stringResource(line.sourceRes), style = MaterialTheme.typography.titleSmall)
             Text(
@@ -255,9 +251,8 @@ fun SettingsScreen(
             )
             Text(stringResource(line.toggleNoteRes), style = MaterialTheme.typography.labelSmall)
         }
-
-            }
         }
+
         // OPT-V115-02 / S09 C06：底部常驻免责入口条（设计 366×56，与详情页同形态）
         SectionDivider()
         var showDisclaimer by remember { mutableStateOf(false) }
@@ -297,17 +292,12 @@ fun SettingsScreen(
                 }
             }
         }
-    }
 }
-
-@Composable
-private fun SectionTitle(text: String) {
-    Text(text, style = MaterialTheme.typography.titleMedium)
 }
 
 @Composable
 private fun SectionDivider() {
-    HorizontalDivider(Modifier.padding(vertical = 4.dp))
+    VintageDashedDivider(Modifier.fillMaxWidth().padding(vertical = 4.dp))
 }
 
 @Composable
