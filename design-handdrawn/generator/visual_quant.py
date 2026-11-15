@@ -9,13 +9,14 @@
    与 Android / 生成器里的真实常量，防止设计源改了、工程没跟（或反之）。
 
 2) 纯色区对拍（需要真机截图）:
-       python design-handdrawn/generator/visual_quant.py <design.png> <device.jpg> [--strict]
-   在「本应纯色」的相对坐标区域采样 RGB 中位数、灰度标准差、颜色种类数。
+       python design-handdrawn/generator/visual_quant.py <design.png> <device.png> [--strict] [--region=左]
+   在「本应纯色」的左右边距窄条采样 RGB 中位数、灰度标准差、颜色种类数。
    `--strict` 时按 UI差异逐页对拍-2026-11-15.md §5 S1 的阈值判定：
        - 灰度 std ≤ 设计稿 × 2
        - RGB 中位每通道差 ≤ 8
        - 颜色种类数 ≤ 设计稿 × 3
-   旧真机截图（r2 期）跑 --strict 预期 FAIL；接入 USB 复拍后再用它把关。
+   r6（v1.20.1）真机复拍后已用原始 PNG 校准：请传 PNG 而非 760px JPG，
+   JPEG 块效应会让颜色种类数虚高 3~5 倍。`--region=左/右` 可只判定一侧。
 
 依赖：Pillow。
 """
@@ -33,11 +34,14 @@ SKIN = ROOT / "tidespot-android" / "core" / "ui" / "src" / "main" / "kotlin" / "
 GEN = ROOT / "design-handdrawn" / "generator" / "gen_android_assets.py"
 FONT = ROOT / "tidespot-android" / "core" / "ui" / "src" / "main" / "res" / "font" / "noto_serif_sc_subset.ttf"
 
-# 相对坐标 (x0, y0, x1, y1)，取自对拍报告 §2；只保留「本应纯色」的背景区。
-# 顶部区域含标题文字，std 天然很高，不纳入阈值判定。
+# 相对坐标 (x0, y0, x1, y1)。r6 真机复拍校准：
+# 旧口径「收藏页下部大留白」在 S2a 后已被卡片填满，采样会撞上内容并产生假的 FAIL
+# （实测 std 25.5 / 7191 色全是文字与卡片边缘）。改取**左右边距窄条**——
+# 两版设计稿与真机在这些坐标上都是纯纸底，不受卡片数量、滚动位置、列表长度影响。
+# 建议直接对原始 PNG 采样（JPG 压缩会人为放大颜色种类数）。
 SAMPLES = {
-    "设置页左侧纸底": (0.005, 0.30, 0.035, 0.70),
-    "收藏页下部背景": (0.06, 0.72, 0.42, 0.92),
+    "纸底左边距": (0.004, 0.35, 0.022, 0.72),
+    "纸底右边距": (0.978, 0.35, 0.996, 0.72),
 }
 
 
@@ -59,10 +63,12 @@ def sample(path: Path, box: tuple[float, float, float, float]) -> dict:
             "colors": len(set(px)), "size": im.size}
 
 
-def compare(design: Path, device: Path, strict: bool) -> int:
+def compare(design: Path, device: Path, strict: bool, region: str = "") -> int:
     fails = 0
     print(f"DESIGN {design.name}   DEVICE {device.name}")
     for name, box in SAMPLES.items():
+        if region and region not in name:
+            continue
         a, b = sample(design, box), sample(device, box)
         diff = tuple(abs(x - y) for x, y in zip(a["median"], b["median"]))
         ratio = b["std"] / a["std"] if a["std"] else 0.0
@@ -125,7 +131,8 @@ def main() -> None:
         print(__doc__)
         raise SystemExit(0)
     strict = "--strict" in args
-    raise SystemExit(1 if compare(Path(args[0]), Path(args[1]), strict) else 0)
+    region = next((a.split("=", 1)[1] for a in args if a.startswith("--region=")), "")
+    raise SystemExit(1 if compare(Path(args[0]), Path(args[1]), strict, region) else 0)
 
 
 if __name__ == "__main__":

@@ -372,7 +372,8 @@
   "known_gaps": [
     "detail-tab-score-sea.png 文件名是 SCORE 但图内为 TIDE 折线（稿内不一致，工程以钓鱼指数柱为准）",
     "30 屏缺深色设置页稿与深色 Top10 叠层稿，深色只能靠 token 推断",
-    "设计稿示例分数 78/86/92 非业务值，不作为布局验收依据"
+    "设计稿示例分数 78/86/92 非业务值，不作为布局验收依据",
+    "同一皮肤不同屏纸底不一致：settings.png #DFD4B8，favorites.png / detail-tab-score-sea.png #DACDAE；工程用单一 background token，r6 实测收藏/详情浅色底色差 16~20/通道，需设计侧定稿统一"
   ],
   "map_basemap": "S3 排期放最后；S2 阶段地图页只改浮层/信息卡，底图保持真实瓦片"
 },

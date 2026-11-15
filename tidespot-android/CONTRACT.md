@@ -482,7 +482,7 @@ interface CopernicusCredentialActions {
 | `PARITY_GAP-WEB-ADP-01` | Web 环境自适应（PC/移动/平板）在 Android 无等价实现（Android 目前仅手机布局） | **客户已裁决 2026-11-13：一期不做**；后续若要求，Android +6~8 人日 | 未排期 |
 | `PARITY_GAP-WEB-02` | Web 无系统级离线/后台刷新（无 WorkManager 等价物） | 已列入白名单 | — |
 | `PARITY_GAP-WEB-I18N-01` | CHG-92 新增 4 个 app 文案 key（`ts_app_reclassify_water_body` / `ts_app_reclassifying` / `ts_app_reclassify_failed` / `ts_app_water_body_unknown_hint`）尚未同步 Web `src/i18n/{zh,en}.json` | **已关闭**：客户 2026-11-14 裁决「本批只改 Android」，Web 会话随后自行执行 `gen:i18n` 补齐，复查 `check_parity` **PASS**（zh/en 各 576 key） | 2026-11-14 |
-| `PARITY_GAP-WEB-VER-01` | Android `versionName` 已升 `1.20.0`（`versionCode=25`），Web `APP_VERSION` 仍为 `1.18.2` | CHG-93 本批只改 Android 代码与 `web/src/i18n` **自动生成物**（N-5 要求）；版本号仍待 Web 会话对齐后关闭 | Web 下批 |
+| `PARITY_GAP-WEB-VER-01` | Android `versionName` 已升 `1.20.1`（`versionCode=26`），Web `APP_VERSION` 仍为 `1.18.2` | CHG-93 本批只改 Android 代码与 `web/src/i18n` **自动生成物**（N-5 要求）；版本号仍待 Web 会话对齐后关闭 | Web 下批 |
 
 ### 红线
 
@@ -566,9 +566,10 @@ interface CopernicusCredentialActions {
 - `selfcheck_full.py` 276 PASS / 0 FAIL；`i18n_scan FAIL=0`；`contrast_check FAIL=0 / 29`；
   `check_entries_v4.py` **36 PASS / 0 FAIL**（新口径）；`visual_quant.py --tokens` **7 PASS / 0 FAIL**；`check_parity PASS`。
 - `versionCode 24→25` / `versionName 1.19.0→1.20.0`（有功能修改，按 `HANDOVER_V115.md` §0.6 升中位）；
-  APK `E://Trans//潮点TideSpot-v1.20.0.apk`（52,449,413 B）。
-- **真机复拍待 USB**：`visual_quant.py <design> <device> --strict` 阈值（std ≤ 设计×2、ΔRGB ≤8、颜色数 ≤设计×3）
-  尚未对新包验证；旧 r2 截图 `--strict` 预期 FAIL（收藏页下部 std×7.4）。
+  APK `E://Trans//潮点TideSpot-v1.20.0.apk` → r6 修页头后重发 **`v1.20.1`（`versionCode=26`）**。
+- **真机复拍已完成（r6，2026-11-15）**：AAK-AN00 / Android 16，4 主屏 × 明暗 + Top10 叠层共 10 张并排证据。
+  量化（原始 PNG、左右边距窄条）确认设置浅 / 收藏深全 PASS，纸底颗粒与偏色消除；
+  收藏/详情浅色底色差 FAIL 的根因是设计稿自身纸底不统一，非实现回归。详见 `device-compare/r6-真机复拍验证记录.md`。
 
 ### 回滚
 `jj revert` 本提交即可。字体为新增资源、纸纹为资源重生成、`TideSpotSkin` 仅改 token 值，
@@ -578,4 +579,17 @@ interface CopernicusCredentialActions {
 - S2b 控件形态替换（改交互语义，触发 N-4 双端同批）——稍后讨论。
 - S3 地图底图风格化——排最后。
 - 设计稿修 SCORE Tab 图表不一致、补深色设置页/叠层稿——需重渲 30 屏。
-- 真机四态复拍 + `--strict` 量化验收。
+- 真机「四态 dump 逐像素 bounds 比对」、详情 5 Tab 变体 / 4 状态态 / OV02–OV06 叠层（r6 已覆盖 4 主屏 × 明暗 + Top10）。
+
+### r6 真机复拍追加（2026-11-15，v1.20.1）
+
+- **修复**：收藏页 `VintagePageHeader` 在 `LazyColumn` item 中缺水平 padding，首字「我」被屏幕左边缘裁切
+  （`pairs-r6/05`、`06` 可见）。`FavoritesScreen.kt` 加 `Modifier.padding(horizontal = 12.dp)`；
+  按 §0.6 升 `versionCode 26 / versionName 1.20.1` 重新出包、覆盖安装、复拍 `pairs-r6/10` 通过。
+- **工具校准**：`design-handdrawn/generator/visual_quant.py` 的采样区由「收藏页下部大留白」改为**左右边距窄条**
+  （S2a 后下部已被卡片填满，旧区会把文字/卡片边缘当纸底，产生假 FAIL）；新增 `--region=左/右`；
+  明确必须传原始 PNG（760px JPG 的 JPEG 块效应让颜色数虚高 3~5 倍）。
+- **新登记的设计侧问题**：`spec.json:authoritative_design.known_gaps` 第 4 条——同一皮肤不同屏纸底不一致
+  （`settings.png` #DFD4B8 vs `favorites.png` #DACDAE），工程单一 `background` token 只能对齐一屏，
+  需 S0 定稿统一后复验收藏/详情浅色底色差。
+- 原始真机 PNG 单张最大 2.2 MB（超 jj 快照上限），已加 `.gitignore`，仓库只留 760px JPG 与并排图。

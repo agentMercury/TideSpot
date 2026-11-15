@@ -4,6 +4,8 @@
 > **与 `SKIN-DESIGN-SPEC.md` 的关系**：那份是**契约**（什么能换、什么绝不能换）；本文是**执行手册**（照着做就能产出一套合格皮肤）。
 > **一句话**：**皮肤 = 一组可替换的视觉 token；业务 Composable 零改动。**
 > **版本**：1.5 ｜ 2026-11-15 ｜ 基线皮肤：手绘 A · 复古户外 + D · 路亚图鉴（两款内置）
+> **v1.5.1 变更**：r6 真机复拍校准——采样区改左右边距窄条（旧「下部留白」区会被卡片顶到）、
+> 必须传原始 PNG（760px JPG 会让颜色数虚高 3~5 倍）；补实测结论与设计稿纸底不一致这一新损耗点。
 > **v1.5 变更**：CHG-93 视觉对齐实战——设计稿定稿红线、设计源→工程四个高频损耗点、
 > 结构层授权边界（路径 B）、纯装饰节点豁免口径、量化验收工具链写进 §10；反模式补 15–18。
 > **v1.4 变更**：D 路亚图鉴设计 + 工程双落地——30 屏设计稿（`engine.py STYLES` 参数化，`build_style.py` 一键复现）+ 工程 `d-fieldguide`（4 套 ColorScheme + Shapes/Typography，业务零改动）；补 §9 D 实录与对比度校准。
@@ -417,7 +419,8 @@ cd design-handdrawn/generator && python3 engine_full.py && python3 gen_full_inde
 > 结论先写在最前：**token 对齐 ≠ 视觉对齐**。只换 ColorScheme 而不处理「质感叠加层 / 字族回落 /
 > 卡片容器形态 / 结构层授权」，成品会与稿差出一大截。
 > 分析证据：`device-compare/UI差异逐页对拍-2026-11-15.md` + `device-compare/pairs/*.jpg`；
-> 效果验收仍待真机复拍（USB 未连），本节记录的是**方法与已落地口径**。
+> **效果验收已于 2026-11-15 USB 真机复拍完成**（v1.20.0 → 修复页头后 v1.20.1），
+> 逐页结论与量化数字见 `device-compare/r6-真机复拍验证记录.md`；本节记录方法与长期口径。
 
 ### 10.1 先定稿，再对齐（红线）
 - 新旧稿**不得混挂**：`screens/detail-*.png` 是早期 base 旧稿（78 分 / 白底 / 潮高·潮流折线），
@@ -434,6 +437,7 @@ cd design-handdrawn/generator && python3 engine_full.py && python3 gen_full_inde
 | `KaiTi/STKaiti` 中文衬线 | `FontFamily.Serif` 对中文回落**无衬线 CJK** | 打包可商用中文衬线字体子集（OFL 许可随附声明），字号/行高/字重**禁止改** |
 | CSS 双线描边 + 偏移阴影 + 虚线 | 原生 M3 `Card` 无描边、无阴影、实线分隔；只铺了详情页 3 处 | 抽公共 `Modifier.vintageCard()`，四页统一挂载，颜色取 ColorScheme、开关取 `LocalSkin.texture` |
 | 静态示例布局 | 30 屏各写一套渲染函数 / 工程各页各写一套骨架 | `STYLES` 参数化 + 共享渲染函数；工程侧同理由 token 驱动，业务 Composable 零改动 |
+| 设计稿各屏纸底手写色值 | r6 实测 `settings.png` #DFD4B8 与 `favorites.png` #DACDAE 不同，工程单一 `background` token 只能对齐一屏 | 定稿时把纸底收敛为**一个 token 值**，逐屏比对前先确认设计源自身一致 |
 
 ### 10.3 结构层授权的边界（路径 B）
 - 客户 2026-11-15 选**路径 B**：A 稿结构提升为**全局共用骨架**，所有皮肤共用；
@@ -456,9 +460,12 @@ cd design-handdrawn/generator && python3 engine_full.py && python3 gen_full_inde
   → `check_entries_v4.py`（入口红线）→ `selfcheck_full.py`（设计侧 276 项）
   → 八模块单测 / `i18n_scan` / `contrast_check` / `assembleRelease` / `check_parity`。
 - 每次换肤或改皮肤后重跑并**人工逐页签字**；`visual_tokens` 写进 `spec.json` 并加防漂移断言。
+- **r6 两条实测坑**：① 采样区必须选「左右边距窄条」这类恒定纯色区，别用「页面下部留白」——布局一改就会被卡片顶到；
+  ② 必须传原始 PNG，760px JPG 的 JPEG 块效应会让颜色种类数虚高 3~5 倍，制造假 FAIL。
 
 ### 10.6 反模式补充（15–18）
 15. ❌ 把旧稿挂左列称「对齐」——两个设计版本没有可比性。
+15b. ❌ 用会被内容顶到的固定坐标做量化采样，或拿 JPG 压缩图跑颜色数阈值——两者都会产生假 FAIL。
 16. ❌ 用 `drawWithContent` 把颗粒盖在文字之上——文字发糊、卡片被压灰（同源见反模式 #11）。
 17. ❌ 为了「更像手绘」改字号/行高/字重，或整包塞 24 MB 可变字体——前者破坏换行，后者撑爆 APK。
 18. ❌ 结构层 1:1 时顺手换控件形态——那已跨到 S2b，必须走双端同批与全页回归。

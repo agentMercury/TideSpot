@@ -128,6 +128,9 @@ fun FavoritesScreen(
             VintagePageHeader(
                 title = stringResource(R.string.ts_fav_page_title),
                 subtitle = "TideSpot · ${LocalSkin.current.nameEn}",
+                // CHG-93 r6 真机复拍：LazyColumn 的 item 没有水平 padding，
+                // 页头曾贴边导致首字被裁；与卡片保持同一 12dp 左右边距
+                modifier = Modifier.padding(horizontal = 12.dp),
             )
         }
         item { OfflineBanner() }
