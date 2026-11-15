@@ -66,7 +66,7 @@
 
 ### 0.6 发版与版本号（每次发版必改，客户 2026-11-13 明确要求）
 
-**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `28` / `1.21.0`）。
+**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `29` / `1.21.1`）。
 
 | 改动性质 | 怎么加 | 例子 |
 |---|---|---|

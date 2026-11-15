@@ -716,5 +716,35 @@ APK `E:\Trans\潮点TideSpot-v1.21.0.apk`（52,467,221 B）。**本批未接 USB
 无持久化键 / schema / 数据模型变更，不需数据迁移。
 
 ### 未完成（客户已知）
-真机复拍 v1.21.0（USB 未连）、四态 dump bounds 重拍与已知例外判读、深色设置页设计稿、
-OV03–OV06 叠层与 4 状态态主动触发、多分辨率 / TalkBack。
+四态 dump bounds 重拍与已知例外判读、深色设置页设计稿、OV03–OV06 叠层与 4 状态态主动触发、
+多分辨率 / TalkBack。（真机复拍已于 r8 完成，见下）
+
+
+### r8 真机复拍追加（2026-11-15 夜，v1.21.0 → **v1.21.1**）
+
+- 设备 AAK-AN00 / Android 16，覆盖安装 `v1.21.0`（code 28）；进场已是 A 复古户外，无需切皮肤。
+- **S2b 十项逐项通过**：设置页零改动（M3 chip/Switch 全部在）；收藏 2 下拉（排序 4 选项可达、点选后
+  `排序方式：综合推荐` 生效、分组下拉「全部分组 / 未分组」）；紧凑票据卡（圆形圈空心→实心、大号分数 +
+  档位 + 小鱼、入口全留）；长按多选 `已选 1 项`；Top10 鱼形横幅；详情双圆「实测/模型」徽标
+  （当前 `Kind.MODEL` → 模型实心）；冻结 Tab / 图表⇄数值表 / `/100` / 免责全在；
+  浅色真实瓦片 + 深色跟随主题切深瓦片均正常出图（S3 放弃口径）。
+- **发现并修复一个真缺陷**：五 Tab 的「整条描边容器」生效，但**选中下划线在 v1.21.0 真机上完全没有上屏**
+  （浅/深 Tab 栏放大 2× 后均无横线，排除颜色太浅：`tertiary` 浅 `#D9A734` / 深 `#80CBC4`）。
+  根因是 `Modifier.drawBehind` 挂在 M3 `Surface` 外层，被 Surface 自身 `clip/background` 绘制链盖掉。
+  修法：`DetailScreen.kt` Tab 的 `Column` 内 `Text` 之后加显式纯绘制 `Box(32dp × 2.5dp)`，
+  `background(if (selected) tabUnderline else Color.Transparent)`；Surface modifier 去掉 `drawBehind` 并删未用
+  `Offset` import。Box 无文字、不可点击、不消费触摸，颜色仍取 `colorScheme.tertiary`。
+- **复验（v1.21.1）**：浅色「钓鱼指数」下芥末黄短横线、深色亮青；切「潮流」后横线移到潮流下方、
+  钓鱼指数下方消失；下方内容无位移。
+- **量化**：`visual_quant.py --strict` 5 组 × 2 采样区 **10 区全 PASS**（设置浅 / 收藏浅 / 收藏深 /
+  详情浅 / 详情深，详情与设置浅用 1.21.1 复拍图）；ΔRGB 最大 (3,5,7)，与 r7 的 5/5 一致，无底色回归。
+- **红线**：`check_entries_v4.py` 未改、仍 36 PASS（只比对详情页四态静态 dump）。r8 收藏 dump 显示
+  chip→下拉后节点数 / 标签确有变化，按客户裁决登记为已知例外；入口零减少已逐项抽查。
+- **门禁与版本**：八模块单测 + `assembleRelease` BUILD SUCCESSFUL（428 tasks）；i18n FAIL=0、
+  contrast 0/29、selfcheck 276、tokens 7、红线 36、check_parity PASS。按 §0.6「修 bug = 小版本」
+  升 `versionCode 28→29` / `versionName 1.21.0→1.21.1`（**第一位未动**），
+  APK `E:\Trans\潮点TideSpot-v1.21.1.apk`。
+- **证据**：`device-compare/r8/`（23 张 760px JPG + 14 份 dump + Tab 栏放大图）、`pairs-r8/`（6 张并排图）、
+  `device-compare/make_pairs_r8.py`（一键复现）、`device-compare/r8-真机复拍验证记录.md`；原始 PNG 已加 `.gitignore`。
+- **仍未完成**：四态 dump 逐像素 bounds 比对（需造可用点位）、OV03–OV06 叠层、4 状态态主动触发、
+  多分辨率 / 字体缩放 / TalkBack、深色设置页设计稿。

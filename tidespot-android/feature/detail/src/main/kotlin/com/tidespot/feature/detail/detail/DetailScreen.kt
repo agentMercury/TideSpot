@@ -28,7 +28,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -262,18 +261,6 @@ fun DetailScreen(
                                 shape = RoundedCornerShape(10.dp),
                                 color = Color.Transparent,
                                 modifier = Modifier.fillMaxHeight()
-                                    .drawBehind {
-                                        // 选中下划线：纯绘制，不新增节点、不参与测量
-                                        if (selected) {
-                                            val y = size.height - 2.dp.toPx()
-                                            drawLine(
-                                                color = tabUnderline,
-                                                start = Offset(size.width * 0.2f, y),
-                                                end = Offset(size.width * 0.8f, y),
-                                                strokeWidth = 2.5.dp.toPx(),
-                                            )
-                                        }
-                                    }
                                     .semantics { contentDescription = tabDesc },
                             ) {
                                 Column(
@@ -294,6 +281,15 @@ fun DetailScreen(
                                         color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
                                         modifier = Modifier.padding(horizontal = 8.dp),
+                                    )
+                                    // CHG-95 r8 修复：选中下划线改为显式纯绘制 Box（不可点击、无文字）。
+                                    // 旧实现把 drawBehind 挂在 Surface 外层，被 Surface 自身 clip/background
+                                    // 绘制链盖掉，真机浅/深放大图均看不到线；改布局节点后必定上屏。
+                                    Box(
+                                        Modifier.padding(top = 2.dp)
+                                            .width(32.dp)
+                                            .height(2.5.dp)
+                                            .background(if (selected) tabUnderline else Color.Transparent),
                                     )
                                 }
                             }
