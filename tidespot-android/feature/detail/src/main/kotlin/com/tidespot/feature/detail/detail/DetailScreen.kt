@@ -1,4 +1,8 @@
 package com.tidespot.feature.detail.detail
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.draw.drawBehind
 import com.tidespot.core.ui.theme.vintageCard
 import com.tidespot.core.ui.theme.VintageDashedDivider
 
@@ -591,6 +595,8 @@ fun DetailScreen(
                     onClick = { showDisclaimer = true },
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp)
+                        // CHG-94：免责胶囊改走全局票据卡骨架（纯绘制，不改入口语义）
+                        .vintageCard()
                         .semantics { contentDescription = disclaimerDesc },
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.surfaceVariant,
@@ -1138,16 +1144,29 @@ private fun ScoreMainCard(
     ) {
         Box(Modifier.fillMaxSize()) {
             // 版画鱼角标：纯装饰、不参与测量、不消费触摸
+            // CHG-94：设计稿主卡右上是「虚线圆角框 + 版画鱼」。
+            // 透明度改由 tint 承担（旧 graphicsLayer 会把 drawBehind 一起压淡），
+            // 虚线框用 drawBehind 画在鱼之下，纯绘制不参与测量。
+            val fishFrameColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.42f)
             Icon(
                 painter = painterResource(UiR.drawable.ic_fish_vintage),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.14f),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = 14.dp, end = 14.dp)
                     .width(64.dp)
                     .height(34.dp)
-                    .graphicsLayer(alpha = 0.14f),
+                    .drawBehind {
+                        drawRoundRect(
+                            color = fishFrameColor,
+                            style = Stroke(
+                                width = 1.6.dp.toPx(),
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(9f, 7f)),
+                            ),
+                            cornerRadius = CornerRadius(12.dp.toPx()),
+                        )
+                    },
             )
             Column(Modifier.fillMaxSize().padding(16.dp)) {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {

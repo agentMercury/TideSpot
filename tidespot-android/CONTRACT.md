@@ -482,7 +482,7 @@ interface CopernicusCredentialActions {
 | `PARITY_GAP-WEB-ADP-01` | Web 环境自适应（PC/移动/平板）在 Android 无等价实现（Android 目前仅手机布局） | **客户已裁决 2026-11-13：一期不做**；后续若要求，Android +6~8 人日 | 未排期 |
 | `PARITY_GAP-WEB-02` | Web 无系统级离线/后台刷新（无 WorkManager 等价物） | 已列入白名单 | — |
 | `PARITY_GAP-WEB-I18N-01` | CHG-92 新增 4 个 app 文案 key（`ts_app_reclassify_water_body` / `ts_app_reclassifying` / `ts_app_reclassify_failed` / `ts_app_water_body_unknown_hint`）尚未同步 Web `src/i18n/{zh,en}.json` | **已关闭**：客户 2026-11-14 裁决「本批只改 Android」，Web 会话随后自行执行 `gen:i18n` 补齐，复查 `check_parity` **PASS**（zh/en 各 576 key） | 2026-11-14 |
-| `PARITY_GAP-WEB-VER-01` | Android `versionName` 已升 `1.20.1`（`versionCode=26`），Web `APP_VERSION` 仍为 `1.18.2` | CHG-93 本批只改 Android 代码与 `web/src/i18n` **自动生成物**（N-5 要求）；版本号仍待 Web 会话对齐后关闭 | Web 下批 |
+| `PARITY_GAP-WEB-VER-01` | Android `versionName` 已升 `1.20.2`（`versionCode=27`），Web `APP_VERSION` 仍为 `1.18.2` | CHG-93 本批只改 Android 代码与 `web/src/i18n` **自动生成物**（N-5 要求）；版本号仍待 Web 会话对齐后关闭 | Web 下批 |
 
 ### 红线
 
@@ -593,3 +593,47 @@ interface CopernicusCredentialActions {
   （`settings.png` #DFD4B8 vs `favorites.png` #DACDAE），工程单一 `background` token 只能对齐一屏，
   需 S0 定稿统一后复验收藏/详情浅色底色差。
 - 原始真机 PNG 单张最大 2.2 MB（超 jj 快照上限），已加 `.gitignore`，仓库只留 760px JPG 与并排图。
+
+
+## CHG-94 · S0 定稿闭环 + 纯绘制装饰（2026-11-15，v1.20.2）
+
+> 客户「这版开始有点意思了，你继续吧」。USB 在本批开始前断开，故优先做**不依赖设备、且能用 r6 真机原始 PNG 离线量化验证**的部分。
+> 沿用 CHG-93 的三项裁决：路径 B / S2b 后议 / S3 排最后。本批**不改任何交互语义、不改纸底 token**。
+
+### 设计侧
+| 位置 | 变更 | 原因 |
+|---|---|---|
+| `design-handdrawn/generator/engine.py:page_css` | A 版**浅色**纸底由 `linear-gradient(bg→bg2)` 收敛为单色 `#E4D9BC`；深色保留 DARK 调色板渐变；其余风格不变 | r6 实测 `settings.png` #DFD4B8 与 `favorites.png`/详情稿 #DACDAE 不一致，工程单一 `background` token 只能对齐一屏 |
+| `design-handdrawn/generator/engine_full.py:score_body` | SCORE 首 Tab 的潮高折线 → **24h 钓鱼指数柱**（`mini_chart(mode='bar')`），标题「24 小时钓鱼指数」 | 修「文件名 SCORE、图内 TIDE」稿内不一致，与工程实现一致；TIDE Tab 的折线不动 |
+| `engine_full.py:revise_settings` | `skin_name` 补「手绘 」前缀 | 生成器非幂等：重跑 `build_html` 会把「手绘 A · 复古户外」冲成「A · 复古户外」，selfcheck 掉到 275 PASS |
+| `generator/sync_spec_assets.py`（新增） | 重渲后只替换 spec 的 30 屏哈希与 index 的 30 张缩略图 | **`build_style.build_spec()` 会整体重写 spec.json**，抹掉 `authoritative_design` / `visual_tokens` 等定稿节点；本工具做字符串级替换，保留 CRLF 与全部手写字段 |
+| `screens/`、`screens_full/` 共 30 张 PNG + `sources*/` HTML | 全部重渲（Edge headless 780×1688） | 纸底与图表改动需全量同步，`spec.json` 哈希与 `index-full.html` 缩略图已同步 |
+| `screens_extra/dark-ov01-top10.png`（新增附录） | 深色 Top10 叠层稿 | 30 屏缺深色叠层；因 `selfcheck_full.py` 固定校验 30 屏计数，附录放独立目录不进清单。**深色设置页设计稿仍缺**，已如实留在 `spec.json:known_gaps` |
+
+### 工程侧（三项均为纯绘制 / Modifier，零测量改动、零新增节点、零交互语义变化）
+| 位置 | 变更 |
+|---|---|
+| `core/ui/.../VintageCard.kt` | `VintageSectionCard` 新增 `highlight: Boolean = false`，用 `Modifier.border` 画 2.5dp 芥末黄外框（取 `colorScheme.tertiary`） |
+| `feature/settings/.../SettingsScreen.kt` | 当前皮肤卡传 `highlight = true` |
+| `feature/detail/.../DetailScreen.kt` | 底部常驻免责入口条挂 `vintageCard()`；主卡鱼角标补虚线圆角框（`drawBehind` + `PathEffect.dashPathEffect`），并把透明度从 `graphicsLayer` 移到 `tint`，避免把 `drawBehind` 一起压淡 |
+
+### 验收（离线，用 r6 真机原始 PNG）
+`visual_quant.py <design> <device> --strict` 四组 **4/4 PASS**：设置浅 / 收藏浅 / 收藏深 / 详情浅。
+原 r6 §3 的两处底色差 FAIL（收藏/详情浅色 ΔRGB 16~20）已消除；深色维持 `#102030/std0.84` → `#121D2B/std0.43`。
+
+**中途纠正**：首次把深色纸底也抹成单色，设计稿纯净到 std 0.12 / 4 色，真机正常颗粒 std 0.43 / 13 色
+被相对阈值判 FAIL。这是设计稿过纯的**假 FAIL**，不是实现回归；改为「浅色统一、深色保留渐变」，
+**未放松任何阈值**。
+
+门禁：`selfcheck_full 276 PASS`、`check_entries_v4 36 PASS`、`visual_quant --tokens 7 PASS`、
+`i18n FAIL=0 / 29`、`contrast FAIL=0 / 29`、`check_parity PASS`、八模块单测 + `assembleRelease` **BUILD SUCCESSFUL**。
+`versionCode 26→27` / `versionName 1.20.1→1.20.2`（纯视觉、无功能变化 → 按 §0.6 只动末位）；
+APK `E://Trans//潮点TideSpot-v1.20.2.apk`（52,449,413 B）。
+
+### 回滚
+`jj revert` 本提交。设计侧为源码 + 30 屏资源重生成（`sync_spec_assets.py` 可再跑一次对接），
+工程侧为三个 Modifier 级改动；无持久化 / schema / 文案 key 变更，不需数据迁移。
+
+### 未完成（客户已知）
+真机复拍 v1.20.2（USB 断，本批三项装饰尚未目视验证）、深色设置页设计稿、S2b 控件形态替换、S3 地图底图风格化、
+四态 dump bounds 比对与 5 Tab / 4 状态态 / OV02–OV06 补拍。`PARITY_GAP-WEB-VER-01` 仍挂（Web `APP_VERSION=1.18.2`）。

@@ -339,12 +339,22 @@ def fish_icon(style_id, water, color=None, w=34):
 # ---------------------------------------------------------------------------
 def page_css(style_id, water):
     s = STYLES[style_id]; p = pal(style_id, water); f = s["font"]
+    # CHG-94 / S0 定稿：A 版浅色纸底收敛为**单一 token 值**。
+    # 旧版用 160deg 渐变（bg → bg2），r6 实测同一皮肤不同屏采样出 #DFD4B8 与 #DACDAE，
+    # 而工程只有一个 background token，无法同时对齐；其余风格保持渐变不变。
+    bg = _h(p["bg"]); bg2 = _h(p["bg2"])
+    lum = 0.299 * int(bg[1:3], 16) + 0.587 * int(bg[3:5], 16) + 0.114 * int(bg[5:7], 16)
+    # 浅色纸收敛为单色 token；深色保留渐变：DARK 是独立调色板、各屏本就一致，
+    # 且渐变提供深色层次。若连深色一起抹平，设计稿会纯净到 std≈0.12，
+    # 真机正常颗粒（std≈0.43）反而被「std ≤ 设计×2」误判为 FAIL（CHG-94 实测）。
+    flat = style_id == "a-vintage" and lum >= 128
+    bgfill = bg if flat else f"linear-gradient(160deg,{bg} 0%,{bg2} 100%)"
     return f"""
 *{{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}}
 html,body{{width:390px;height:844px;overflow:hidden}}
 body{{position:relative;font-family:{f['body']};color:{_h(p['ink'])};
   background:{_h(p['bg'])};}}
-.bgfill{{position:absolute;inset:0;background:linear-gradient(160deg,{_h(p['bg'])} 0%,{_h(p['bg2'])} 100%);z-index:0}}
+.bgfill{{position:absolute;inset:0;background:{bgfill};z-index:0}}
 .grain{{position:absolute;inset:0;z-index:60;pointer-events:none;mix-blend-mode:multiply;opacity:{0.9 if s['paper']['tint'] else 0.55}}}
 .screen{{position:relative;z-index:2;width:390px;height:844px;overflow:hidden}}
 .statusbar{{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:{f['num']};font-size:14px;font-weight:700;color:{_h(p['ink'])};position:relative;z-index:5}}

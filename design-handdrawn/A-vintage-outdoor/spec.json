@@ -21,14 +21,14 @@
       "label": "详情页 · 海洋/近海",
       "png": "screens/detail-sea.png",
       "html": "sources/detail-sea.html",
-      "sha256": "15740799473977599e2c057055b5b7793b1cd9837b09771bff2d76a995df4277"
+      "sha256": "c2351c483ff995dbe62af510eb6b1aa45d0b20569cc86e218df0b6fbea270336"
     },
     {
       "key": "detail-inland",
       "label": "详情页 · 内陆/湖泊",
       "png": "screens/detail-inland.png",
       "html": "sources/detail-inland.html",
-      "sha256": "8cf7f7d8f0b3646ff256f5f44f0588b0b69c7db5a5007046f80aec51329c1e4d"
+      "sha256": "15dac01c1bb9f3502ed4d7a2791aa0a96e9305826b9a242911671e726b6f86da"
     },
     {
       "key": "map-sea",
@@ -49,7 +49,7 @@
       "label": "收藏页",
       "png": "screens/favorites.png",
       "html": "sources/favorites.html",
-      "sha256": "7b6c337c12184d137fcd29f3c35aa6c25897646293228bbf40a2bbb0d83fa4f9"
+      "sha256": "eff84f267361f08ae48dd40cb820d230dfc69b86a7251534b1540bfd8527908d"
     },
     {
       "key": "settings",
@@ -58,14 +58,14 @@
       "html": "sources/settings.html",
       "sha256": "16046ead5381d779fd355456fd24a199faee30ae3b849838c7b2e68ca0d271b1",
       "revised": "2026-11-12：删「用例·物种·权重」「API Key」两版块，新增「外观·皮肤」入口（外观选择页本轮未做）",
-      "html_sha256": "641edc9f8980d819d7526b266a9a74cd4a68df42288d75455115612c8100606f"
+      "html_sha256": "f912ac864015a797feb6d9c766979599af8777f9c20e4d52ec51a399bbc4a33e"
     },
     {
       "key": "dark-detail",
       "label": "详情页 · 深色",
       "png": "screens/dark-detail.png",
       "html": "sources/dark-detail.html",
-      "sha256": "a8fb891374a7eca82e0fc9e099af77f1e9fc90b27321c9216ebb18ccd6d36d87"
+      "sha256": "5c4e223a2af5961f52c9cda5bdae8b67a838520815a79d95b9c5e20be49bc1b6"
     }
   ],
   "frozen_contract": {
@@ -122,63 +122,63 @@
         "label": "详情·潮流 Tab（海洋）",
         "png": "screens_full/detail-tab-tide-sea.png",
         "html": "sources_full/detail-tab-tide-sea.html",
-        "sha256_png": "6c8f71c1327fa151a89c609f08ea0b91436d1b1ff0632b34591667ac5ae826ad"
+        "sha256_png": "30f84448135b987e7fb421187b00d2cc576c10c46c9edf2925e521a12a6efb4f"
       },
       {
         "key": "detail-tab-tide-inland",
         "label": "详情·水位 Tab（内陆无潮汐）",
         "png": "screens_full/detail-tab-tide-inland.png",
         "html": "sources_full/detail-tab-tide-inland.html",
-        "sha256_png": "2ba0668a5d6e08663163132d851431bec2ecf9ad672b3c4b3b4b7a5b30fd2f93"
+        "sha256_png": "c88706a4c6166e6ea9540765f4983560482bc4577486d40711329cdfd620232c"
       },
       {
         "key": "detail-tab-weather",
         "label": "详情·天气 Tab",
         "png": "screens_full/detail-tab-weather.png",
         "html": "sources_full/detail-tab-weather.html",
-        "sha256_png": "9d6007fdd0a62d28d79df296f5fad4e4dc03e8d3e964ed51dec65a13bbec851e"
+        "sha256_png": "16b9b48a234b388c6aebb85f8879aa3f747b4e7f52720ca0bd6d65eb5082bd7c"
       },
       {
         "key": "detail-tab-water",
         "label": "详情·水质 Tab（1×3）",
         "png": "screens_full/detail-tab-water.png",
         "html": "sources_full/detail-tab-water.html",
-        "sha256_png": "a53ee04902b188891fdfa83a45adcae82650293fbcbd5ae113f6544be249c7ca"
+        "sha256_png": "85bf0cadf90ea2684c0f5aa54a9fd2c797e307ea8710249c49407612f721defd"
       },
       {
         "key": "detail-tab-wave-sea",
         "label": "详情·风浪 Tab（海洋）",
         "png": "screens_full/detail-tab-wave-sea.png",
         "html": "sources_full/detail-tab-wave-sea.html",
-        "sha256_png": "f0329b6da5af0f9bc895958e83bed6ecc8c716eed9ce148b6096cfb48eb024e5"
+        "sha256_png": "660b36e2698b2de28a18edb2902344a1df6481062cfca27c434cb7fb2dcb7cd9"
       },
       {
         "key": "detail-tab-wave-inland",
         "label": "详情·湖面风与水温 Tab（内陆）",
         "png": "screens_full/detail-tab-wave-inland.png",
         "html": "sources_full/detail-tab-wave-inland.html",
-        "sha256_png": "e6ac18a22829f479f1b501bb17eb133e82a72a3f3f2cdfa455c833ea5432c7fe"
+        "sha256_png": "cc7237949704d21d0ebc87442a90eb4b2b7fe62203605c6995acc94fa63e8fd3"
       },
       {
         "key": "detail-breakdown",
         "label": "因子分解展开态",
         "png": "screens_full/detail-breakdown.png",
         "html": "sources_full/detail-breakdown.html",
-        "sha256_png": "786a2b0994721d4610b8e03e438d61a8df1a51004537f6f6d68a1d4cdfc62a05"
+        "sha256_png": "2ab67fd2ca850256e2c873aded59faa2c053364c275a9fcc3a658f3da4e6572c"
       },
       {
         "key": "ov01-top10",
         "label": "OV01 Top10 时段筛选",
         "png": "screens_full/ov01-top10.png",
         "html": "sources_full/ov01-top10.html",
-        "sha256_png": "782c8b895139845882d5e2f946d5b3121fda2d4ca70b54478aec6eab8a281859"
+        "sha256_png": "d95f700787b2d00f5a4ec353fd002bfddf8ddbf642a5cfab1fa7ea1c2fbbaa4d"
       },
       {
         "key": "ov02-disclaimer",
         "label": "OV02 免责声明 5 条",
         "png": "screens_full/ov02-disclaimer.png",
         "html": "sources_full/ov02-disclaimer.html",
-        "sha256_png": "1827eb12e99a0c66a98e0233076c2294cecac9e2a5f9bac146731b3a0cae42a4"
+        "sha256_png": "3baceb19bb37c4de3cfe0d3fa72fc7f7e02a6998d378a93e8a590b0c7b0419f5"
       },
       {
         "key": "ov03-confirm-favorite",
@@ -192,7 +192,7 @@
         "label": "OV04 水质实测录入",
         "png": "screens_full/ov04-water-entry.png",
         "html": "sources_full/ov04-water-entry.html",
-        "sha256_png": "580e5f655cb7bbb90419d658967cb2afe5dd5f666bda40857641fedf1e3b5ab1"
+        "sha256_png": "fa2de4dd30359574cbe5b4ea05915551cb737ccff954e0b0647b1a6c417cd457"
       },
       {
         "key": "ov05-star-bubble",
@@ -206,49 +206,49 @@
         "label": "OV06 删除二次确认",
         "png": "screens_full/ov06-delete-confirm.png",
         "html": "sources_full/ov06-delete-confirm.html",
-        "sha256_png": "8a06a3be068dc9613254b5d343f4f85b6e83193141b9fb8651103703f49c5a7b"
+        "sha256_png": "222c997ebe030ca7e0c174b47dd4268416758643617bf47d40afb78a87e28d55"
       },
       {
         "key": "state-offline",
         "label": "状态·离线",
         "png": "screens_full/state-offline.png",
         "html": "sources_full/state-offline.html",
-        "sha256_png": "c73f2fd794ece25ae6c86215128b777592d5c125b75cdc5613cba5e13e189e97"
+        "sha256_png": "7d7bfc97868eb5d09ddf592282453b152974ad14fb1e6437f12d4f894a575687"
       },
       {
         "key": "state-stale",
         "label": "状态·陈旧",
         "png": "screens_full/state-stale.png",
         "html": "sources_full/state-stale.html",
-        "sha256_png": "3b5e890a8ca9fda6a7d46e0d34c6b960cb4fc0bab443e75fcac724917b9e922f"
+        "sha256_png": "cc96dc2c3f1bdf6fe824c755f32f4977f46f581c607199704c7c303b5ce43ca6"
       },
       {
         "key": "state-unusable-48h",
         "label": "状态·48h 不可用",
         "png": "screens_full/state-unusable-48h.png",
         "html": "sources_full/state-unusable-48h.html",
-        "sha256_png": "aca2681636e9e987085ce6c12d3ee6653a24919effe17c72d3ac3c001c212c7e"
+        "sha256_png": "ff9388c277748458f6b873b292a538a96fe519c2a10c532f2de7948728602edb"
       },
       {
         "key": "state-degraded",
         "label": "状态·分维降级",
         "png": "screens_full/state-degraded.png",
         "html": "sources_full/state-degraded.html",
-        "sha256_png": "c922af6865aa534477131fd9b3f11504b1d0e4a4b31a20df598577c67858456c"
+        "sha256_png": "48c9f360555eebac7a01b9c158744b13981814b1864a33b82b08d379e7ceb3fd"
       },
       {
         "key": "favorites-empty",
         "label": "收藏空态",
         "png": "screens_full/favorites-empty.png",
         "html": "sources_full/favorites-empty.html",
-        "sha256_png": "501620d8bc82cfc99b23cdb0402dade2cf0b50efc20aa97f65146e05dad960f9"
+        "sha256_png": "d6476f569dfd08fb3b7b4abe998103f90a7d4b99c51511f7db1c5d7c234e33c3"
       },
       {
         "key": "favorites-multiselect",
         "label": "收藏多选批量",
         "png": "screens_full/favorites-multiselect.png",
         "html": "sources_full/favorites-multiselect.html",
-        "sha256_png": "85a4fab2c97ae5caefc71d8948e9e9f05de4f528d9bdf216184d7794f240474e"
+        "sha256_png": "5918e9d0b969d41b654401081d5e29353a32680cc625faa2dec75e1391b0d74a"
       },
       {
         "key": "dark-map",
@@ -269,14 +269,14 @@
         "label": "详情·钓鱼指数 Tab（海洋）",
         "png": "screens_full/detail-tab-score-sea.png",
         "html": "sources_full/detail-tab-score-sea.html",
-        "sha256_png": "d3f2495029c46921929fcf0fab5223895a636b6cd4d83b59ae0e3272bc872410"
+        "sha256_png": "51a849fa6ff57fb6fc787dc03b3af38c3ac8172548987319abc3c3aae9fa79d1"
       },
       {
         "key": "detail-tab-score-inland",
         "label": "详情·钓鱼指数 Tab（内陆）",
         "png": "screens_full/detail-tab-score-inland.png",
         "html": "sources_full/detail-tab-score-inland.html",
-        "sha256_png": "8a28c370ebe567e9968bb04e2cdac9274fdb7a233eea10231d7d6cf46721ee9d"
+        "sha256_png": "1123b00a0546966bcbd8fe90e08ef4c874fb2e952dce3e0afc80a15008c10f56"
       }
     ],
     "index": "index-full.html",
@@ -370,10 +370,10 @@
   ],
   "historical_note": "早期 base 旧稿（78 分 / 白底 / 潮高潮流折线），仅作勘误演示，禁止当对齐证据",
   "known_gaps": [
-    "detail-tab-score-sea.png 文件名是 SCORE 但图内为 TIDE 折线（稿内不一致，工程以钓鱼指数柱为准）",
-    "30 屏缺深色设置页稿与深色 Top10 叠层稿，深色只能靠 token 推断",
+    "detail-tab-score-sea.png 曾出现 SCORE/TIDE 图表类型不一致，CHG-94 已改为 24h 钓鱼指数柱并与工程对齐",
+    "30 屏仍缺深色设置页稿；深色 Top10 叠层稿已补为附录 screens_extra/dark-ov01-top10.png（selfcheck 固定 30 屏计数，附录不进清单）",
     "设计稿示例分数 78/86/92 非业务值，不作为布局验收依据",
-    "同一皮肤不同屏纸底不一致：settings.png #DFD4B8，favorites.png / detail-tab-score-sea.png #DACDAE；工程用单一 background token，r6 实测收藏/详情浅色底色差 16~20/通道，需设计侧定稿统一"
+    "纸底不一致 CHG-94 已修：浅色收敛为单色 #E4D9BC，深色保留 DARK 渐变；用 r6 真机原始 PNG 离线复验 --strict 四组 4/4 PASS"
   ],
   "map_basemap": "S3 排期放最后；S2 阶段地图页只改浮层/信息卡，底图保持真实瓦片"
 },

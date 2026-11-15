@@ -350,12 +350,13 @@ def score_body(p, water):
     body += f"""<div style="margin:9px 16px 0;position:relative;z-index:4">
       <div class="row" style="gap:4px">{bandfish}</div>
       <div class="bodyf mut" style="font-size:9.5px;margin-top:4px;text-align:center">五档 · 档位恒带文字 · 鱼多者优</div></div>"""
-    # 潮高 / 水位曲线
-    body += sec_title(p, wc['chart'], "模型估算")
+    # CHG-94 / S0 定稿：SCORE 首 Tab 画「24 小时钓鱼指数柱」，与工程实现一致。
+    # 旧稿在此处画潮高/水位折线（属 TIDE Tab 内容），造成「文件名 SCORE、图内 TIDE」的稿内不一致。
+    body += sec_title(p, "24 小时钓鱼指数", "模型估算 · 逐小时")
     body += mkcard(p, f"""
-      <div class="row" style="justify-content:space-between"><span class="disp" style="font-size:12px;color:{primary}">{wc['chart']}</span>{badge(p,'模型',p['line'])}</div>
-      {mini_chart(p, water, 'line', [30,46,72,88,70,44,30,52,78], 88)}
-      <div class="bodyf mut" style="font-size:9px;margin-top:2px">{wc['hi']} 14:20 · {wc['lo']} 08:10 · 源更新 —</div>""")
+      <div class="row" style="justify-content:space-between"><span class="disp" style="font-size:12px;color:{primary}">逐小时评分 / 100</span>{badge(p,'模型',p['line'])}</div>
+      {mini_chart(p, water, 'bar', [42,55,68,74,62,86,79,58,46], 88)}
+      <div class="bodyf mut" style="font-size:9px;margin-top:2px">柱高＝该小时综合分 · 高峰 14:00 · 源更新 —</div>""")
     # 水质 1×3（水温/溶解氧/浊度，pH 已删）
     cards = []
     for lab, val, unit, bd, tone in [("水温","19.6","℃","估算","8A6D2E"),("溶解氧","7.2","mg/L","模型",p['line']),("浊度","3.1","NTU","估算","8A6D2E")]:
@@ -780,6 +781,11 @@ def revise_settings():
     ink, line, primary, muted = h(p["ink"]), h(p["line"]), h(p["primary"]), h(p["muted"])
     accent2 = h(p["accent2"])
     skin_name = f'{E.STYLES[SID]["no"]} · {E.STYLES[SID]["name"]}'
+    # CHG-94：历史手写稿与 selfcheck_full.py 用「手绘 A · 复古户外」。
+    # 旧生成器只拼 no/name 得到「A · 复古户外」，重跑一遍就会把文案冲掉（生成管线非幂等）。
+    # 这里补齐前缀，使 `build_style.build_html` 可从源码完整重建且自检保持 276 PASS。
+    if SID == "a-vintage":
+        skin_name = "手绘 " + skin_name
     target = OUT.parent / "sources" / "settings.html"
     html = target.read_text(encoding="utf-8")
     if "外观 · 皮肤" in html:

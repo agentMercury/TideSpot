@@ -1,6 +1,7 @@
 package com.tidespot.core.ui.theme
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -100,11 +101,18 @@ fun VintageSectionTitle(text: String, modifier: Modifier = Modifier) {
 fun VintageSectionCard(
     title: String?,
     modifier: Modifier = Modifier,
+    highlight: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // CHG-94：设计稿「当前皮肤」卡外有芥末黄高亮框。用 Modifier.border 画在卡片尺寸内，
+    // 纯绘制、不改变测量、不新增节点，因此不影响入口红线与布局回归。
+    val shape = MaterialTheme.shapes.medium
+    val cardModifier = modifier.fillMaxWidth().vintageCard().let {
+        if (highlight) it.border(2.5.dp, MaterialTheme.colorScheme.tertiary, shape) else it
+    }
     Surface(
-        modifier = modifier.fillMaxWidth().vintageCard(),
-        shape = MaterialTheme.shapes.medium,
+        modifier = cardModifier,
+        shape = shape,
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {

@@ -66,7 +66,7 @@
 
 ### 0.6 发版与版本号（每次发版必改，客户 2026-11-13 明确要求）
 
-**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `26` / `1.20.1`）。
+**落点**：`tidespot-android/app/build.gradle.kts` 的 `versionCode` 与 `versionName`（当前 `27` / `1.20.2`）。
 
 | 改动性质 | 怎么加 | 例子 |
 |---|---|---|
@@ -123,7 +123,7 @@ cd ../wf-skin && jj status                # 只看得到本副本的改动
 | 项 | 值 |
 |---|---|
 | 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated（每次提交后手动 `git update-ref refs/heads/main <commit>`） |
-| 版本 | **`versionCode=26` / `versionName=1.20.1`**（2026-11-15 回填；CHG-93 视觉对齐 + r6 真机复拍修页头，发版规则见 §0.6） |
+| 版本 | **`versionCode=27` / `versionName=1.20.2`**（2026-11-15 回填；CHG-94 设计侧定稿闭环 + 三项纯绘制装饰，发版规则见 §0.6） |
 | APK | **`E:\Trans\潮点TideSpot-v1.15.14.apk`**（51,933,996 B；SHA-256 `40e59f66a644694d9c09f498ab9d2a5ddd5b43463ffffa95316ba07a1c8c0d3d`；自签名，已装 AAK-AN00） |
 | 测试 | 八模块 `gradlew test` **EXIT=0**（每次批次均跑） |
 | i18n | `.tools/i18n_scan.mjs` **FAIL=0**（豁免 12）；`values` / `values-en` 241/241 |
