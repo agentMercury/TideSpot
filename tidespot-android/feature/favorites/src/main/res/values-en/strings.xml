@@ -25,6 +25,10 @@
     <string name="ts_fav_batch_delete">Batch delete</string>
     <string name="ts_fav_batch_delete_desc">Confirm batch delete</string>
     <string name="ts_fav_sort_desc">Sort by: %1$s</string>
+    <!-- CHG-95 / S2b: group dropdown and Top10 banner subtitle -->
+    <string name="ts_fav_group_all">All groups</string>
+    <string name="ts_fav_group_filter_desc">Group filter: %1$s</string>
+    <string name="ts_fav_top10_subtitle">Cross-spot best windows · time filter</string>
     <string name="ts_fav_group_desc">Group %1$s, %2$d spots,</string>
     <string name="ts_fav_collapsed">collapsed, tap to expand</string>
     <string name="ts_fav_expand">tap to collapse</string>

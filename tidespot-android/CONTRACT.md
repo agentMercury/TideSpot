@@ -576,8 +576,8 @@ interface CopernicusCredentialActions {
 无 schema / 持久化变更，不需数据迁移；`visual_tokens` / `authoritative_design` 为 spec.json 追加节点，删除即可。
 
 ### 未完成（客户已知）
-- S2b 控件形态替换（改交互语义，触发 N-4 双端同批）——稍后讨论。
-- S3 地图底图风格化——排最后。
+- S2b 控件形态替换（改交互语义，触发 N-4 双端同批）——**历史状态：稍后讨论**；CHG-95 已落地收藏 / 详情、设置页明确不动。
+- S3 地图底图风格化——**历史状态：排最后**；客户 2026-11-15 夜裁决**放弃**（见 CHG-95）。
 - 设计稿修 SCORE Tab 图表不一致、补深色设置页/叠层稿——需重渲 30 屏。
 - 真机「四态 dump 逐像素 bounds 比对」、详情 5 Tab 变体 / 4 状态态 / OV02–OV06 叠层（r6 已覆盖 4 主屏 × 明暗 + Top10）。
 
@@ -637,6 +637,8 @@ APK `E://Trans//潮点TideSpot-v1.20.2.apk`（52,449,413 B）。
 ### 未完成（客户已知）
 真机复拍 v1.20.2（USB 断，本批三项装饰尚未目视验证）、深色设置页设计稿、S2b 控件形态替换、S3 地图底图风格化、
 四态 dump bounds 比对与 5 Tab / 4 状态态 / OV02–OV06 补拍。`PARITY_GAP-WEB-VER-01` 仍挂（Web `APP_VERSION=1.18.2`）。
+> ⚠️ 上面是 **CHG-94 当时的未完成清单（历史快照）**：真机复拍已由 r7 完成，S2b 已由 CHG-95 落地（设置页不动），
+> **S3 已由客户裁决放弃**。请以 CHG-95 的「未完成」清单为准。
 
 
 ### r7 真机复拍追加（2026-11-15 晚，v1.20.2）
@@ -653,3 +655,66 @@ APK `E://Trans//潮点TideSpot-v1.20.2.apk`（52,449,413 B）。
 - 原始 PNG 单张最大 1.5 MB（地图页），已加 `.gitignore`，仓库只留 760px JPG 与并排图。
 - **未改工程代码、未升版本号**（本批为纯验收）。剩余未完成项见 `r7-真机复拍验证记录.md` §5：
   四态 dump bounds 比对、OV03–OV06 叠层、4 状态态主动触发、多分辨率 / TalkBack、深色设置页设计稿。
+
+
+## CHG-95 · S2b 控件形态替换（收藏 / 详情）与 S3 放弃（2026-11-15 夜，v1.21.0）
+
+> 客户裁决链：「S2b 做吧，S3 放弃不做了」→「**设置页也不动，其他页面按计划执行吧**」。
+> 选项确认：① 红线脚本 `check_entries_v4.py` **不动**；② S2b 全套照做；③ chip→下拉产生的节点数 / 标签差异
+> **登记为已知例外**；④ 双端按 §0.7 隔离，**只改 Android** 并登记 `PARITY_GAP`。
+> **S3 地图底图风格化：客户裁决放弃**，不再排期，真实矢量瓦片保持（推翻 CHG-93/94 的「S3 排最后」）。
+> 施工在独立 `jj workspace`（`D:\workspace\wf-s2b`，见 `HANDOVER_V115.md` §0.7），避免卷入并行 Web 会话的在途改动。
+
+### 范围裁决（必须记住）
+| 页面 | 本批 | 说明 |
+|---|---|---|
+| 设置页 | **零改动** | 仍是 M3 FilterChip / Switch + 6 张票据卡；属**有意偏离设计稿**，已写进 `HANDOVER_V115.md` §5 第 7 条 |
+| 收藏页 | ✅ S2b | 2 个下拉 + 紧凑票据卡 + Top10 鱼形横幅 |
+| 详情页 | ✅ S2b | Tab 描边容器 + 选中下划线、主卡「实测 / 模型」双圆徽标 |
+| 地图页 | 不动 | S2a 的双线纸卡 Top10 横幅保留；S3 放弃 |
+
+### 工程侧
+| 位置 | 变更 |
+|---|---|
+| `feature/favorites/.../FavoritesScreen.kt:229,593` | 新增 `VintageDropdown`（`Button + DropdownMenu`），排序 4 chip + 分组 chip → **2 个「当前值 + ▾」下拉**。分组下拉是 UI 层可见域过滤（`selectedGroup` 局部 state + `FavoritesGroupLogic.groupNameOf`），**不进 ViewModel、不落库**；选项基于全量 spots 生成；标签 / 预设 chips 与「清除」入口保留 |
+| `FavoritesScreen.kt:698` | `FavoriteCard` 加 `score: Int?`，改紧凑票据行：圆形选择圈（替代方形 Checkbox，多选态点击语义一致）+ 名称 / 水体小字 + 右侧大号分数（`scoreBySpotId`，缺值 `—`）+ 档位文字（`BandTitles.fromDomainTier`）+ 小鱼；坐标 / 标签 / 摘要 / 信息卡 / 编辑 / 删除入口全部保留 |
+| `FavoritesScreen.kt:297` | Top10 深蓝横幅内嵌 3 条递减鱼形 + 标题 + 副标题 + 「›」；「刷新全部」按钮保留（入口零减少） |
+| `feature/favorites/src/main/res/values{,-en}/strings.xml` | 新增 `ts_fav_group_all` / `ts_fav_group_filter_desc` / `ts_fav_top10_subtitle`（中英成对，占位符一致） |
+| `feature/detail/.../DetailScreen.kt:240` | 五 Tab 栏由「实心分段控件 + 选中白胶囊」改为**整条描边容器 + 选中下划线**（`drawBehind` 纯绘制）；Tab 数量 / contentDescription / onClick / 40dp 高度不变，不推动下方内容 |
+| `DetailScreen.kt:1226,1307` | 主卡补「实测 / 模型」双圆来源徽标（`VintageSourceBadge`）；实心 = 当前数据来源（`Kind.MEASURED/SATELLITE` 判实心），文案复用 `UiR.string.ts_badge_{measured,model}` **零新增 i18n**；与既有 `ConfidenceBadge` 同排，主卡仍冻结 152dp |
+
+**冻结项零改动**：Top10 时段 chip、图表⇄数值表切换、`DaySelector 52dp`、水质 1×3、免责 5 条、
+`ScoreBand` / `ConfidenceBadge` 色值、主卡 152dp、Top10 bounds。
+**设计稿「批量」按钮不做**：客户裁定 D16「长按 = 进入多选」是冻结口径，不能为对齐设计稿新增入口；
+多选态 `BatchActionBar` 保持原样。
+
+### 验收（全绿）
+八模块单测 + `:app:assembleRelease` **BUILD SUCCESSFUL**（428 tasks）；
+`i18n FAIL=0`（新文案全在 XML，代码中文字面量 0）、`contrast FAIL=0 / 29`、
+`selfcheck_full 276 PASS`、`visual_quant --tokens 7 PASS`、`check_entries_v4 36 PASS`、
+`check_parity PASS`（对当前主线 Web + 主线 Android 577/577，见下方 GAP 说明）。
+按 §0.6「有功能修改」升 `versionCode 27→28` / `versionName 1.20.2→1.21.0`；
+APK `E:\Trans\潮点TideSpot-v1.21.0.apk`（52,467,221 B）。**本批未接 USB，真机复拍待下一批**。
+
+### 红线已知例外（脚本不放宽）
+`check_entries_v4.py` 比对的是 **详情页四态静态 dump**（`_v3-*.xml` / `_v4-*.xml`），本批未重拍，
+故仍为 36 PASS。收藏页 chip→下拉会改变 uiautomator dump 的可交互节点数与标签，按客户裁决
+**登记为已知例外**；后续重拍必须按例外口径判读，**不得据此修改或放宽脚本**。
+入口零减少 / Tab 与免责完整 / Top10 bounds 零位移三条口径一条未放松。
+
+### `PARITY_GAP-WEB-S2B-01`（新增）
+- 范围：Web 端收藏页排序 / 分组控件、详情 Tab 与来源徽标形态未同步；Android 新增 3 个 `ts_fav_*` key
+  尚未进入 Web `src/i18n/{zh,en}.json`。
+- 原因：客户裁决「只改 Android + 登记 PARITY_GAP」，且并行 Web 会话在途改动按 §0.7 不得代改。
+- 现状：本批 `check_parity` 在主线 Web + 主线 Android 上 PASS（577/577）；提交合回主线后若在同一树跑，
+  Web 会缺 3 个 key，属**预期差异**。Web 会话后续用 `npm run gen:i18n` 从 Android strings.xml 补齐即可。
+- 既有 `PARITY_GAP-WEB-VER-01`（Web `APP_VERSION=1.18.2` vs Android `1.21.0`）与
+  `PARITY_GAP-WEB-I18N-01` 仍挂，均属 Web 会话范围。
+
+### 回滚
+`jj revert` 本提交。全部改动为 UI Composable + 3 对文案资源 + 版本号；
+无持久化键 / schema / 数据模型变更，不需数据迁移。
+
+### 未完成（客户已知）
+真机复拍 v1.21.0（USB 未连）、四态 dump bounds 重拍与已知例外判读、深色设置页设计稿、
+OV03–OV06 叠层与 4 状态态主动触发、多分辨率 / TalkBack。

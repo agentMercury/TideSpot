@@ -25,7 +25,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -234,10 +237,14 @@ fun DetailScreen(
         }
 
         item {
-            // OPT-V115-02 / S02 C08：设计稿分段控件（容器 358×40 rx12 #EAF1F7，选中白胶囊 rx10）
+            // CHG-95 / S2b：设计稿五 Tab = 「整条描边容器 + 选中下划线」，替换旧实心分段控件 + 白胶囊。
+            // 只换绘制形态：Tab 数量 / contentDescription / onClick / 40dp 高度全部不变，
+            // 不触发入口红线，也不推动下方内容（Top10 bounds 零位移）。
+            val tabUnderline = MaterialTheme.colorScheme.tertiary
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.78f)),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).height(40.dp),
             ) {
                 Row(
@@ -253,9 +260,20 @@ fun DetailScreen(
                             Surface(
                                 onClick = { viewModel.selectTab(tab) },
                                 shape = RoundedCornerShape(10.dp),
-                                color = if (selected) MaterialTheme.colorScheme.surface else Color.Transparent,
-                                border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
+                                color = Color.Transparent,
                                 modifier = Modifier.fillMaxHeight()
+                                    .drawBehind {
+                                        // 选中下划线：纯绘制，不新增节点、不参与测量
+                                        if (selected) {
+                                            val y = size.height - 2.dp.toPx()
+                                            drawLine(
+                                                color = tabUnderline,
+                                                start = Offset(size.width * 0.2f, y),
+                                                end = Offset(size.width * 0.8f, y),
+                                                strokeWidth = 2.5.dp.toPx(),
+                                            )
+                                        }
+                                    }
                                     .semantics { contentDescription = tabDesc },
                             ) {
                                 Column(
@@ -1205,17 +1223,31 @@ private fun ScoreMainCard(
                     }
                 }
                 androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
-                if (kind != null) {
-                    ConfidenceBadge(kind)
-                    if (kind == Kind.LOW_CONFIDENCE) {
-                        // OPT-V115-01 #6（ts_dimension_degraded）：低置信 → 有效权重重算说明
-                        Text(
-                            stringResource(UiR.string.ts_dimension_degraded),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
-                        )
-                    }
-                    androidx.compose.foundation.layout.Spacer(Modifier.height(2.dp))
+                // CHG-95 / S2b：设计稿主卡「实测 / 模型」双圆来源徽标。
+                // 实心 = 当前数据来源，空心 = 对照；文案复用 ts_badge_{measured,model}（零新增 i18n）。
+                // 与既有置信徽标同排，纯装饰不可点击，主卡高度仍冻结 152dp。
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    VintageSourceBadge(
+                        stringResource(UiR.string.ts_badge_measured),
+                        kind == Kind.MEASURED || kind == Kind.SATELLITE,
+                    )
+                    VintageSourceBadge(
+                        stringResource(UiR.string.ts_badge_model),
+                        kind != Kind.MEASURED && kind != Kind.SATELLITE,
+                    )
+                    androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                    if (kind != null) ConfidenceBadge(kind)
+                }
+                if (kind == Kind.LOW_CONFIDENCE) {
+                    // OPT-V115-01 #6（ts_dimension_degraded）：低置信 → 有效权重重算说明
+                    Text(
+                        stringResource(UiR.string.ts_dimension_degraded),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
+                    )
                 }
                 VintageDashedDivider(Modifier.fillMaxWidth().padding(bottom = 2.dp))
                 // 五档色带：档位 = 鱼数（好→差 5→1），恒带档位文字（N-7）；
@@ -1265,6 +1297,31 @@ private fun ScoreMainCard(
         }
     }
 }
+
+/**
+ * CHG-95 / S2b：设计稿主卡「实测 / 模型」圆形来源徽标。
+ * 与 [ConfidenceBadge] 的语义不同：这是固定双圆的来源图例，实心只表示当前数据来源，
+ * 不新增可交互节点、不编造置信等级；颜色一律取 ColorScheme（深浅色自适应）。
+ */
+@Composable
+private fun VintageSourceBadge(label: String, active: Boolean) {
+    val ink = MaterialTheme.colorScheme.onPrimaryContainer
+    Box(
+        Modifier.size(22.dp)
+            .clip(CircleShape)
+            .background(if (active) ink.copy(alpha = 0.88f) else Color.Transparent)
+            .border(1.5.dp, ink.copy(alpha = if (active) 1f else 0.55f), CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+            color = if (active) MaterialTheme.colorScheme.primaryContainer else ink,
+            maxLines = 1,
+        )
+    }
+}
+
 /** OPT-V115-02 / S06 C15：水质指标卡（标签 / 值 / 置信徽标；单卡高 112dp，禁裁切）。 */
 @Composable
 private fun WaterQualityMetricCard(

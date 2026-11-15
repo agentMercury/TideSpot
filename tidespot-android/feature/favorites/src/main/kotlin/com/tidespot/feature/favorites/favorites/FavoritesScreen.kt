@@ -8,23 +8,34 @@ import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.size
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -44,11 +55,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tidespot.core.domain.model.FavoriteSpot
+import com.tidespot.core.ui.band.BandTitles
 import com.tidespot.core.domain.window.Top10TimeFilter
 import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.banner.OfflineBanner
@@ -89,6 +104,9 @@ fun FavoritesScreen(
     var editingSpot by remember { mutableStateOf<FavoriteSpot?>(null) }
     var deleteTarget by remember { mutableStateOf<FavoriteSpot?>(null) }
     var showTop10 by remember { mutableStateOf(false) }
+    // CHG-95 / S2b：设计稿「全部分组 ▾」下拉。只是 UI 层可见域过滤，
+    // 不进 FavoritesUiState / 不落库（排序与筛选的正交关系保持不变）。
+    var selectedGroup by remember { mutableStateOf<String?>(null) }
     // OPT-V11-12：批量操作对话框/确认
     var showBatchDelete by remember { mutableStateOf(false) }
     var showBatchTags by remember { mutableStateOf(false) }
@@ -102,7 +120,12 @@ fun FavoritesScreen(
     }
 
     // OPT-V11-10：「先筛后排」——过滤纯函数与排序纯函数正交；OPT-V11-16：分组在排序结果上切分
-    val filtered = FavoritesFilterLogic.apply(state.spots, state.filter)
+    // CHG-95 / S2b：分组下拉只收窄可见域（内部组键），不改 ViewModel、不新增持久化键。
+    val filtered = FavoritesFilterLogic.apply(state.spots, state.filter).let { base ->
+        selectedGroup?.let { g -> base.filter { FavoritesGroupLogic.groupNameOf(it) == g } } ?: base
+    }
+    // 选项基于全量收藏点生成，避免「筛窄后选项消失」导致无法切回全部分组
+    val groupOptions = FavoritesGroupLogic.groups(state.spots).map { it.name }
     val sorted = FavoritesSortLogic.sort(
         filtered,
         state.sortOrder,
@@ -203,23 +226,53 @@ fun FavoritesScreen(
                     onGroup = { showBatchGroup = true },
                 )
             } else {
-                // F-2.4 排序四选一（OPT-V11-14 增「综合推荐」）
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                // CHG-95 / S2b：设计稿紧凑行表 —— 4 个排序 chip + 分组 chip 收敛成 2 个「当前值 + ▾」下拉。
+                // 交互语义：4 个排序选项与全部分组在下拉内全部可达；长按进入多选（客户裁定 D16）
+                // 保持不变，因此不新增「批量」按钮，避免与冻结裁决冲突。
+                val sortLabels = listOf(
+                    SortOrder.NAME to stringResource(R.string.ts_fav_sort_name),
+                    SortOrder.RECOMMENDED to stringResource(R.string.ts_fav_sort_recommended),
+                    SortOrder.LAST_VIEWED to stringResource(R.string.ts_fav_sort_recent),
+                    SortOrder.SCORE to stringResource(R.string.ts_fav_sort_score),
+                )
+                val currentSort = sortLabels.first { it.first == state.sortOrder }.second
+                val sortDesc = stringResource(R.string.ts_fav_sort_desc, currentSort)
+                val allGroups = stringResource(R.string.ts_fav_group_all)
+                val groupStrings = localTideSpotStrings()
+                val currentGroup = selectedGroup
+                    ?.let { FavoritesGroupLogic.displayName(it, groupStrings) } ?: allGroups
+                val groupDesc = stringResource(R.string.ts_fav_group_filter_desc, currentGroup)
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    item { SortChip(stringResource(R.string.ts_fav_sort_name), state.sortOrder == SortOrder.NAME) { viewModel.setSortOrder(SortOrder.NAME) } }
-                    item { SortChip(stringResource(R.string.ts_fav_sort_recommended), state.sortOrder == SortOrder.RECOMMENDED) { viewModel.setSortOrder(SortOrder.RECOMMENDED) } }
-                    item { SortChip(stringResource(R.string.ts_fav_sort_recent), state.sortOrder == SortOrder.LAST_VIEWED) { viewModel.setSortOrder(SortOrder.LAST_VIEWED) } }
-                    item { SortChip(stringResource(R.string.ts_fav_sort_score), state.sortOrder == SortOrder.SCORE) { viewModel.setSortOrder(SortOrder.SCORE) } }
-                    if (state.filter.isActive) {
-                        item {
-                            val clearDesc = stringResource(R.string.ts_fav_clear_desc)
-                            TextButton(
-                                onClick = { viewModel.setFilter(FavoritesFilterLogic.Filter()) },
-                                modifier = Modifier.semantics { contentDescription = clearDesc },
-                            ) { Text(stringResource(R.string.ts_fav_clear)) }
-                        }
+                    VintageDropdown(
+                        label = currentSort,
+                        desc = sortDesc,
+                        options = sortLabels.map { (order, label) ->
+                            label to { viewModel.setSortOrder(order) }
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    VintageDropdown(
+                        label = currentGroup,
+                        desc = groupDesc,
+                        options = listOf(allGroups to { selectedGroup = null }) +
+                            groupOptions.map { name ->
+                                FavoritesGroupLogic.displayName(name, groupStrings) to { selectedGroup = name }
+                            },
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (state.filter.isActive || selectedGroup != null) {
+                        val clearDesc = stringResource(R.string.ts_fav_clear_desc)
+                        TextButton(
+                            onClick = {
+                                viewModel.setFilter(FavoritesFilterLogic.Filter())
+                                selectedGroup = null
+                            },
+                            modifier = Modifier.semantics { contentDescription = clearDesc },
+                        ) { Text(stringResource(R.string.ts_fav_clear)) }
                     }
                 }
             }
@@ -233,9 +286,43 @@ fun FavoritesScreen(
                 ) {
                     Button(
                         onClick = { showTop10 = true },
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f).semantics { contentDescription = top10Desc },
                     ) {
-                        Text(stringResource(UiR.string.ts_top10_all))
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            // CHG-95 / S2b：设计稿横幅左侧鱼形序列（纯装饰，逐条缩小）
+                            listOf(18.dp, 13.dp, 9.dp).forEach { fishWidth ->
+                                Icon(
+                                    painter = painterResource(UiR.drawable.ic_fish_vintage),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f),
+                                    modifier = Modifier.size(width = fishWidth, height = 9.dp),
+                                )
+                            }
+                            Column(Modifier.weight(1f).padding(start = 2.dp)) {
+                                Text(
+                                    stringResource(UiR.string.ts_top10_all),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    maxLines = 1,
+                                )
+                                Text(
+                                    stringResource(R.string.ts_fav_top10_subtitle),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                                    maxLines = 1,
+                                )
+                            }
+                            Text(
+                                "›",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        }
                     }
                     // OPT-V12-02：显式刷新入口（下拉不可及时仍可用；非 force，受 TTL/令牌桶约束）
                     OutlinedButton(
@@ -356,6 +443,7 @@ fun FavoritesScreen(
                         stale = stale,
                         selecting = state.isSelecting,
                         selected = state.selection.contains(spot.id),
+                        score = state.scoreBySpotId[spot.id],
                         info = info,
                         onOpen = {
                             viewModel.markViewed(spot.id)
@@ -495,15 +583,38 @@ fun FavoritesScreen(
     }
 }
 
+/**
+ * CHG-95 / S2b：设计稿的「当前值 + ▾」下拉，替代 M3 FilterChip。
+ * 排序与分组共用；选项文案全部由调用方传入既有资源，不新增入口文案。
+ * 已知例外：chip → 下拉会改变 dump 的可交互节点数与标签，按客户 2026-11-15
+ * 裁决登记为红线已知例外，红线脚本本身不放宽（见 CONTRACT / PARITY_GAP）。
+ */
 @Composable
-private fun SortChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    val sortDesc = stringResource(R.string.ts_fav_sort_desc, label)
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(label) },
-        modifier = Modifier.semantics { contentDescription = sortDesc },
-    )
+private fun VintageDropdown(
+    label: String,
+    desc: String,
+    options: List<Pair<String, () -> Unit>>,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier) {
+        Button(
+            onClick = { expanded = true },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = desc },
+        ) {
+            Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1)
+            Text("▾", style = MaterialTheme.typography.labelMedium)
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { (text, onSelect) ->
+                DropdownMenuItem(
+                    text = { Text(text) },
+                    onClick = { expanded = false; onSelect() },
+                )
+            }
+        }
+    }
 }
 
 /** OPT-V11-16：分组头（可折叠；显示组内条数，闭合后不再渲染成员）。 */
@@ -590,6 +701,8 @@ private fun FavoriteCard(
     stale: StaleMark,
     selecting: Boolean,
     selected: Boolean,
+    /** CHG-95 / S2b：设计稿右侧大号分数（peakScore，未加载 = null，不编造 0）。 */
+    score: Int?,
     info: FavoritesInfoCardLogic.InfoCard?,
     onOpen: () -> Unit,
     onLongPress: () -> Unit,
@@ -628,47 +741,75 @@ private fun FavoriteCard(
             )
             .semantics { contentDescription = itemDesc },
     ) {
-        Column(Modifier.padding(12.dp)) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+            // CHG-95 / S2b：设计稿紧凑票据行 —— 圆形选择圈 | 名称 + 水体 | 大号分数 + 档位 + 小鱼
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (selecting) {
-                    Checkbox(checked = selected, onCheckedChange = { onLongPress() })
+                val ringColor = if (selected && selecting) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.outline
                 }
-                Icon(
-                    painter = painterResource(UiR.drawable.ic_fish_vintage),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(width = 22.dp, height = 12.dp),
+                // 非多选态纯装饰不可点；多选态点击 = 切换选择，语义与旧 Checkbox 完全一致
+                Box(
+                    Modifier.size(26.dp)
+                        .clip(CircleShape)
+                        .background(if (selected && selecting) ringColor else Color.Transparent)
+                        .border(2.dp, ringColor, CircleShape)
+                        .then(if (selecting) Modifier.clickable { onLongPress() } else Modifier),
                 )
-                Text(spot.name, style = MaterialTheme.typography.titleMedium)
-                // OPT-V115-02 / S08：水体类型行（设计：名称下方）
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(spot.name, style = MaterialTheme.typography.titleMedium, maxLines = 1)
+                    // OPT-V115-02 / S08：水体类型行（设计：名称下方）
+                    Text(
+                        FavoritesInfoCardLogic.waterBodyLabel(spot.waterBody, strings),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            score?.toString() ?: Format.MISSING,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = 28.sp, fontWeight = FontWeight.Bold,
+                            ),
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Icon(
+                            painter = painterResource(UiR.drawable.ic_fish_vintage),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 4.dp).size(width = 18.dp, height = 10.dp),
+                        )
+                    }
+                    score?.let {
+                        Text(
+                            BandTitles.fromDomainTier(it, strings),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+            VintageDashedDivider(Modifier.fillMaxWidth().padding(vertical = 6.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    FavoritesInfoCardLogic.waterBodyLabel(spot.waterBody, strings),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    "${Format.coordinate(spot.lat)}, ${Format.coordinate(spot.lon)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
                 )
                 // OPT-V11-11：陈旧 / 已过期徽标（NONE 不渲染，禁空串）
                 staleBadge?.let { badge ->
                     AssistChip(
                         onClick = {},
                         label = { Text(badge) },
-                        modifier = Modifier.padding(start = 6.dp)
-                            .semantics { contentDescription = dataStatusDesc ?: badge },
+                        modifier = Modifier.semantics { contentDescription = dataStatusDesc ?: badge },
                     )
                 }
-                if (!selecting) {
-                    TextButton(
-                        onClick = onToggleInfo,
-                        modifier = Modifier.semantics { contentDescription = infoDesc },
-                    ) {
-                        Text(stringResource(if (info == null) R.string.ts_fav_info else R.string.ts_fav_collapse))
-                    }
-                }
             }
-            VintageDashedDivider(Modifier.fillMaxWidth().padding(vertical = 2.dp))
-            Text(
-                "${Format.coordinate(spot.lat)}, ${Format.coordinate(spot.lon)}",
-                style = MaterialTheme.typography.bodySmall,
-            )
             // F-2.1 标签（空标签不渲染，isEmpty() 判定）
             if (spot.tags.isNotEmpty()) {
                 Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -702,7 +843,13 @@ private fun FavoriteCard(
                 }
             }
             if (!selecting) {
-                Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.padding(top = 2.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    TextButton(
+                        onClick = onToggleInfo,
+                        modifier = Modifier.semantics { contentDescription = infoDesc },
+                    ) {
+                        Text(stringResource(if (info == null) R.string.ts_fav_info else R.string.ts_fav_collapse))
+                    }
                     TextButton(onClick = onEdit,
                         modifier = Modifier.semantics { contentDescription = editDesc }) {
                         Text(stringResource(R.string.ts_fav_edit))

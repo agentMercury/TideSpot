@@ -25,6 +25,10 @@
     <string name="ts_fav_batch_delete">批量删除</string>
     <string name="ts_fav_batch_delete_desc">确认批量删除</string>
     <string name="ts_fav_sort_desc">排序方式：%1$s</string>
+    <!-- CHG-95 / S2b：分组下拉与 Top10 横幅副标题（设计稿紧凑行表） -->
+    <string name="ts_fav_group_all">全部分组</string>
+    <string name="ts_fav_group_filter_desc">分组筛选：%1$s</string>
+    <string name="ts_fav_top10_subtitle">跨点最佳窗口 · 时段筛选</string>
     <string name="ts_fav_group_desc">分组 %1$s，%2$d 个收藏点，</string>
     <string name="ts_fav_collapsed">已折叠，点击展开</string>
     <string name="ts_fav_expand">点击折叠</string>

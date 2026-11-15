@@ -151,3 +151,8 @@
   Top10 bounds 四态零位移 / Tab 与免责完整」不变（36 项）。
 - 视觉 token 单源见 `spec.json:visual_tokens`，防漂移断言 `design-handdrawn/generator/visual_quant.py --tokens`；
   逐页对拍与验收阈值见 `SKIN-DEV-STANDARD.md` §10 与 `device-compare/UI差异逐页对拍-2026-11-15.md`。
+- **CHG-95 / S2b 落地（客户 2026-11-15 夜裁决）**：S2b **只在收藏页 / 详情页落地，设置页明确不动**
+  （保留 M3 chip / Switch，登记为已知偏离）；**S3 地图底图风格化放弃**，真实矢量瓦片保持、不再排期。
+  设计稿收藏页的「批量」按钮不做——冻结裁决 D16「长按 = 进入多选」优先于设计稿。
+  chip→下拉造成的 dump 节点数 / 标签差异按客户裁决登记为**红线已知例外**，`check_entries_v4.py` 不放宽；
+  双端按 `HANDOVER_V115.md` §0.7 隔离，只改 Android 并登记 `PARITY_GAP-WEB-S2B-01`。
