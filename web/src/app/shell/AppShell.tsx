@@ -1,3 +1,18 @@
+/**
+ * 应用外壳 —— 全局布局、导航栏、设置页、皮肤切换的统一入口（506 行）。
+ *
+ * 与 Android 的关系：对应 \`MainActivity.kt\` + \`AppNav.kt\` 的组装层，但 Web 用
+ * hash 路由（\`#/map\` / \`#/favorites\` / \`#/settings\` / \`#/spot/:id\`）而非状态机。
+ *
+ * 阅读提示（文件较大，按需跳转）：
+ * - 布局骨架：搜索 \`<header>\` / \`<main>\`
+ * - 设置页各版块：搜 \`settings-section\`
+ * - 皮肤选择：搜 \`SkinPicker\`
+ * - 版本号与清缓存：搜 \`APP_VERSION\`
+ *
+ * 主题三轴（皮肤 × 水体 × 明暗）由 \`useSkin\` / \`useThemeMode\` 驱动，
+ * 与 Android 的 \`TideSpotTheme.kt\` 同构；切换后写 localStorage 并即时生效。
+ */
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { useEnvironment } from '../environment/EnvironmentProvider';
 import type { LayoutMode } from '../environment/detect';

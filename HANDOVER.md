@@ -2,7 +2,7 @@
 
 > 交接日期：2026-11-09 ｜ 交接方：M6 开发会话（AI agent，已完成 M6 全量 + APK 产出 + 真机冒烟通过）
 > 接手方：**下一开发会话（AI agent，继续开发）** ｜ 接手起点：**验收反馈迭代 + 已裁定优化池**（§6；无遗留必修阻塞）
-> **接手前必读顺序**：本文档 → `CONTRACT.md`（含 M5/M6 子契约）→ SRS 对应章节（F-2/§6.6/§6.2b/§10/§13）→ `PROGRESS_TRACKER.md` → `M5改进意见01/02.md`（口径背景）→ `ACCEPTANCE_PRECHECK.md`（验收执行单）
+> **接手前必读顺序**：本文档 → `CONTRACT.md`（含 M5/M6 子契约）→ SRS 对应章节（F-2/§6.6/§6.2b/§10/§13）→ `PROGRESS_TRACKER.md` → `docs/archive/M5改进意见01/02.md`（口径背景）→ `ACCEPTANCE_PRECHECK.md`（验收执行单）
 > （历史交接版归档：`archive/HANDOVER_m3_m4_交接版.md`、`archive/HANDOVER_m4_m5_交接版.md`）
 
 ---
@@ -12,7 +12,7 @@
 | 项 | 内容 |
 |---|---|
 | 产品 | 「潮点 TideSpot」Android 纯客户端（无自有服务端）：地图选点 → 5 维逐小时（风浪/天气/钓鱼指数/水质/潮流）×240h + 收藏 + Top10 最佳窗口 |
-| 需求基线 | `TIDESPORT_REQUIREMENTS-修改.md`（SRS v1.3；CHG-06~15 均已回写/登记） |
+| 需求基线 | `TIDESPORT_REQUIREMENTS.md`（SRS；历史修改稿见 `docs/archive/`；CHG-06~15 均已回写/登记） |
 | 交付物 | **可安装 APK（自签名）**，不上架（CHG-02）；目标交付日 **2026-12-08** |
 | 排期基线 | `PROJECT_PLAN.md` v1.0：M0–M6 + 交付验收，当前**领先约 16 天** |
 | 状态台账 | `PROGRESS_TRACKER.md`（每里程碑退出必更）｜ 变更台账：`REQUIREMENTS_REGISTER.md`（至 **CHG-16**）｜ 数据源结论：`DATA_SOURCE_PROBE.md` ｜ **版本管理**：jj+git colocated（工作区根），基线 tag `m6-exit`=`3c018c9`，修复批次每批一次修订提交 |

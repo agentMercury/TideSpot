@@ -21,7 +21,7 @@
 | 水体判定 | `WaterBodyResolver`：marine 实测 + OSTIA 探针 + 缓存（Overpass 已按 M0 结论不接入） | CHG-35 修复链；`DATA_SOURCE_PROBE.md` A9 |
 | 准星/信息条/权限 | 纯 Kotlin 状态机 `CrosshairStateMachine` / `InfoBarState` / `PermissionStateMachine` | `feature/map/crosshair|infobar|location` |
 | 定位 | 系统 `LocationController`（Fused/LocationManager 双通道） | `feature/map/location/LocationController.kt` |
-| 测试 | map 模块 26 个纯 Kotlin 测试（零 Compose/MapLibre 交互测试） | `M3改进意见02.md:87` |
+| 测试 | map 模块 26 个纯 Kotlin 测试（零 Compose/MapLibre 交互测试） | `docs/archive/M3改进意见02.md:87` |
 
 **关键判断**：搜索与逆地理**已有接口抽象**（改造成本低）；**地图渲染/手势/相机没有抽象**，直接绑死 MapLibre 类型（改造成本主要集中于此）。
 
@@ -57,7 +57,7 @@
 | 改造项 | 现状 | 工作内容 | 人日（AI） | 风险 |
 |---|---|---|---|---|
 | `MapSurface` 抽象 | 无 | 抽接口：相机/长按/拖动 idle/图层/标记/attribution；MapLibre 实现回归 | 2–3 | 中：抽象泄漏（MapLibre 类型外溢） |
-| AMap 地图实现 | 无 | `AMapMapSurface`：MapView 生命周期、准星、相机、样式、审图号 | 2–3 | 中：Compose 与 AMap `MapView` 生命周期（黑屏/重复 parent，参见 `M3改进意见02.md:87`） |
+| AMap 地图实现 | 无 | `AMapMapSurface`：MapView 生命周期、准星、相机、样式、审图号 | 2–3 | 中：Compose 与 AMap `MapView` 生命周期（黑屏/重复 parent，参见 `docs/archive/M3改进意见02.md:87`） |
 | 坐标转换层 | 无 | `Gcj02Converter`（双向）+ 精度测试（千岛湖/青岛/深圳三点，判定不翻转） | 1 | 低：算法公开，误差米级 |
 | 搜索适配 | `GeocoderApi` | `AmapGeocoder` 实现（POI 搜索→统一 `SearchResult`） | 1 | 低：接口已抽象 |
 | 逆地理适配 | `PlaceResolver` | `AmapPlaceResolver`（`aoiName` 映射 `waterName`，保留 plusCode 兜底） | 1 | 中：命名口径与 Photon 不一致，收藏名变化需提示 |
@@ -92,7 +92,7 @@
 | AM-03 | 境外点在高德模式不可用 | 境外功能退化 | 高 | 坐标围栏自动回退 + UI 提示（C-3） |
 | AM-04 | AMap SDK 隐私合规不到位 | 应用商店/监管风险 | 中 | 初始化前同意；隐私政策逐源披露；许可清单更新 |
 | AM-05 | 双 SDK 同存导致体积/权限/崩溃面上升 | 包体 +8 MB、N-4 崩溃率 | 中 | 按需初始化（用户启用高德才 init）；双路径冒烟 |
-| AM-06 | MapView 生命周期（Compose 包裹）黑屏/重复 parent | 崩溃/黑屏 | 中 | 参照 `M3改进意见02.md:87` 既有经验；`AndroidView` + `DisposableEffect` 明确顺序；真机冒烟 |
+| AM-06 | MapView 生命周期（Compose 包裹）黑屏/重复 parent | 崩溃/黑屏 | 中 | 参照 `docs/archive/M3改进意见02.md:87` 既有经验；`AndroidView` + `DisposableEffect` 明确顺序；真机冒烟 |
 | AM-07 | 个人 Key 配额不足（搜索/逆地理计费项不同） | 用户侧功能不可用 | 中 | 设置页显示配额提示与失败原因；缓存（逆地理 30 d/点）复用 |
 | AM-08 | `aoiName` 与 Photon 命名口径差异 | 收藏点名称变化、用户困惑 | 低 | 首次切换提示；保留用户手动改名 |
 

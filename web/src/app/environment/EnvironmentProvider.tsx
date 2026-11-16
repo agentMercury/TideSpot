@@ -1,3 +1,13 @@
+/**
+ * 环境自适应（ADP）Provider —— 手机 / 平板 / 桌面三档布局。
+ *
+ * 判定依据：视口宽度 + 用户手动覆盖（后者优先，存 localStorage \`LAYOUT_MODE_KEY\`）。
+ * 判定逻辑本身在 \`detect.ts\`（纯函数，有单测）；本文件只负责监听 resize、
+ * 持久化用户选择、通过 Context 下发 \`env\` 与 \`setLayoutMode\`。
+ *
+ * 这是 **Web 独有**能力：Android 一期只做手机布局（PARITY_GAP-WEB-ADP-01，客户裁定不做）。
+ * 因此不要试图在 Android 侧找对应实现。
+ */
 import {
   createContext,
   useCallback,

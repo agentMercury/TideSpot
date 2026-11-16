@@ -26,7 +26,8 @@ tidespot-android/*/build/
 tidespot-android/*/*/build/
 
 # 本地归档（黄金资产/探针产物，只留本机不入库）
-archive/
+# 注意：必须写成 /archive/ —— 不带前导斜杠会连带匹配 docs/archive/ 等任意层级
+/archive/
 
 # IDE
 .idea/
