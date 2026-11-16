@@ -170,6 +170,39 @@ private fun AppRoot(
             )
         }
     }
+    /**
+     * 「下一个最佳窗口」提示条数据（issue #3 / 对齐 Web v1.22.0）。
+     *
+     * 数据源复用已有跨点 Top10（`favoritesState.top10`，Room 读侧，端侧零额外网络）；
+     * 挑选逻辑交给 `NextWindowFinder`（时间紧迫性优先，与 Top10 的 rank 排序刻意不同）。
+     * 适配成 `feature:map` 的 `NextWindowStripData`，避免 :map 反向依赖 :favorites。
+     */
+    val nextWindowData = remember(favoritesState.top10) {
+        val candidates = favoritesState.top10
+        if (candidates.isEmpty()) {
+            null
+        } else {
+            // 在所有跨点窗口里按时间紧迫性挑一个（不是取 top10 的第一个——那个是 rank 最高的）
+            val allWindows = candidates.map { it.window }
+            val pick = com.tidespot.core.domain.window.NextWindowFinder.findNext(
+                allWindows,
+                System.currentTimeMillis() / 1000L,
+            )
+            pick.window?.let { w ->
+                // 回找该窗口所属的点（多点为同一窗口对象的概率极低，用引用相等 + 兜底首项）
+                val owner = candidates.firstOrNull { it.window === w }
+                    ?: candidates.firstOrNull { it.window.startEpochSec == w.startEpochSec }
+                    ?: candidates.first()
+                com.tidespot.feature.map.NextWindowStripData(
+                    spotId = owner.spot?.id,
+                    spotName = owner.spotName,
+                    window = w,
+                    zone = owner.zone,
+                )
+            }
+        }
+    }
+
     // OPT-V11-05（P1）：进入收藏列表 → 后台预刷新最近查看 5 条（TTL/2 + 令牌桶；失败静默、无 UI 状态）
     LaunchedEffect(navState.page, settingsState.prefetchEnabled) {
         if (navState.page == AppPage.FAVORITES && settingsState.prefetchEnabled) {
@@ -276,6 +309,7 @@ private fun AppRoot(
                         navState = AppNav.reduce(navState, AppNavEvent.TabSelected(AppPage.FAVORITES))
                     },
                     top10Label = stringResource(UiR.string.ts_top10_all),
+                    nextWindowData = nextWindowData,
                     sourceFetchedAtMillis = lastFetchedMillis,
                     // OPT-V12-01：收藏星标 + 气泡卡（点击星标 → 气泡 → 查看详情；不移动准星）
                     favoriteStars = favoriteStars,

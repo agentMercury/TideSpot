@@ -168,6 +168,11 @@ fun MapScreen(
     settingsLabel: String = "",
     onOpenTop10: (() -> Unit)? = null,
     top10Label: String = "",
+    /**
+     * 「下一个最佳窗口」提示条数据（:app 从跨点 Top10 结果适配注入；null = 无可用窗口 → 不渲染）。
+     * 与 Top10 横幅并列：横幅回答「哪个最好」，提示条回答「现在该不该出门」。
+     */
+    nextWindowData: NextWindowStripData? = null,
 /** OPT-V115-02 / S01 C22：最近一次数据拉取时刻（:app 透传；null → 显示「—」，禁编造）。 */
     sourceFetchedAtMillis: Long? = null,
     /** OPT-V12-01（CHG-57）：收藏点星标（Room 读侧由 :app 注入；空 = 不显示星标图层）。 */
@@ -637,6 +642,12 @@ fun MapScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            // 「下一个最佳窗口」提示条（时间紧迫性优先；与 Top10 横幅互补）
+            NextWindowStrip(
+                data = nextWindowData,
+                onOpenDetail = onOpenFavorite,
+            )
 
             // OPT-V115-02 / S01 C19：Top10 入口（信息条上方，设计 366×48）
             if (onOpenTop10 != null && top10Label.isNotEmpty()) {
