@@ -48,7 +48,23 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      # 显式启动 preview 服务：CI 下 Playwright 的 webServer 未能拉起（ERR_CONNECTION_REFUSED），
+      # 改为在 job 里手动起服务并等它就绪，避免依赖 webServer 生命周期。
+      - name: Start preview server
+        run: |
+          npx vite preview --port 4173 --strictPort &
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:4173/ > /dev/null; then
+              echo "preview ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "preview failed to start" >&2
+          exit 1
+
       - name: E2E
+        # PLAYWRIGHT_BASE_URL 已由 config 固定为 127.0.0.1:4173；reuseExistingServer 复用上面起的服务
         run: npm run test:e2e
 
       # 发布前按仓库名重建：https://<user>.github.io/<repo>/
