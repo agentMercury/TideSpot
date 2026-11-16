@@ -52,7 +52,9 @@ jobs:
       # 改为在 job 里手动起服务并等它就绪，避免依赖 webServer 生命周期。
       - name: Start preview server
         run: |
-          npx vite preview --port 4173 --strictPort &
+          # 显式绑定 127.0.0.1：默认 vite preview 只监听 localhost，可能解析到 IPv6 ::1，
+          # 导致 curl 127.0.0.1 与 Playwright 的 127.0.0.1 baseURL 都连不上。
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort &
           for i in $(seq 1 30); do
             if curl -sf http://127.0.0.1:4173/ > /dev/null; then
               echo "preview ready after ${i}s"
@@ -61,6 +63,7 @@ jobs:
             sleep 1
           done
           echo "preview failed to start" >&2
+          curl -v http://127.0.0.1:4173/ 2>&1 | head -20 || true
           exit 1
 
       - name: E2E
