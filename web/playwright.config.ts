@@ -16,8 +16,10 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run preview -- --port 4173',
-    port: 4173,
+    // 显式绑定 127.0.0.1：vite preview 默认只监听 localhost，可能解析到 IPv6 ::1，
+    // 而 baseURL 用的是 127.0.0.1，会导致 ERR_CONNECTION_REFUSED（CI 实测）。
+    command: 'npx vite preview --host 127.0.0.1 --port 4173 --strictPort',
+    url: 'http://127.0.0.1:4173',
     reuseExistingServer: true,
     timeout: 60_000,
   },
