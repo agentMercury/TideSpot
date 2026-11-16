@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ import com.tidespot.core.domain.model.FavoriteSpot
 import com.tidespot.core.domain.model.WaterBodyType
 import com.tidespot.core.ui.strings.localTideSpotStrings
 import com.tidespot.core.ui.strings.TideSpotStrings
+import com.tidespot.core.ui.theme.LocalSkin
 import com.tidespot.core.ui.theme.TideSpotSkins
 import com.tidespot.core.ui.theme.TideSpotTheme
 import com.tidespot.core.ui.theme.VintageOutdoorTheme
@@ -93,6 +95,14 @@ class MainActivity : ComponentActivity() {
             var settings by remember { mutableStateOf(AppSettings.read(graph.settingsStore)) }
             val skin = TideSpotSkins.byId(settings.skinId)
             val darkTheme = SettingsLogic.resolveDarkTheme(settings.themeMode, isSystemInDarkTheme())
+            // 手动切深色时系统栏图标也要跟着翻转，否则深底上会出现深色状态栏图标
+            val view = LocalView.current
+            LaunchedEffect(darkTheme) {
+                androidx.core.view.WindowCompat.getInsetsController(window, view).apply {
+                    isAppearanceLightStatusBars = !darkTheme
+                    isAppearanceLightNavigationBars = !darkTheme
+                }
+            }
             TideSpotTheme(skin = skin, water = WaterBodyType.OCEAN, darkTheme = darkTheme) {
                 AppRoot(
                     graph = graph,
@@ -399,13 +409,16 @@ private fun DetailPage(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
         ) {
-            // 鱼群水印：A 版「把装饰元素替换成鱼形」的母题，纯绘制、不拦截触摸
-            FishWatermark(
-                inland = inland,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 12.dp, bottom = 46.dp),
-            )
+            // 鱼群水印：A 版「把装饰元素替换成鱼形」的母题，纯绘制、不拦截触摸；
+            // F 蓝潮是干净白卡，不要任何手绘水印。
+            if (LocalSkin.current.id != "f-bluetide") {
+                FishWatermark(
+                    inland = inland,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 12.dp, bottom = 46.dp),
+                )
+            }
             Column(modifier = Modifier.fillMaxSize()) {
                 DetailScreen(
                     spot = spot,
@@ -446,28 +459,30 @@ private fun DetailPage(
  */
 @Composable
 private fun FishWatermark(inland: Boolean, modifier: Modifier = Modifier) {
+    val isJournal = LocalSkin.current.id == "e-tidejournal"
+    val tint = if (isJournal) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(
                 if (inland) UiR.drawable.ic_mount_vintage else UiR.drawable.ic_wave_vintage,
             ),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = tint,
             modifier = Modifier
                 .width(56.dp)
                 .height(34.dp)
-                .graphicsLayer(alpha = 0.22f),
+                .graphicsLayer(alpha = if (isJournal) 0.3f else 0.22f),
         )
         Spacer(Modifier.width(4.dp))
         Row(
-            modifier = Modifier.graphicsLayer(alpha = 0.12f),
+            modifier = Modifier.graphicsLayer(alpha = if (isJournal) 0.2f else 0.12f),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             listOf(30.dp, 44.dp, 60.dp).forEach { h ->
                 Icon(
                     painter = painterResource(UiR.drawable.ic_fish_vintage),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = tint,
                     modifier = Modifier.width(h * 1.875f).height(h),
                 )
             }

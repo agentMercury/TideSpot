@@ -51,9 +51,13 @@ class SkinRegistryTest {
 
     @Test
     fun fieldGuide_isRegisteredAndSelectable() {
-        assertEquals(2, TideSpotSkins.all.size)
+        assertEquals(4, TideSpotSkins.all.size)
         assertSame(TideSpotSkins.FieldGuide, TideSpotSkins.byId("d-fieldguide"))
         assertSame(TideSpotSkins.FieldGuide, TideSpotSkins.byName("路亚图鉴"))
+        assertSame(TideSpotSkins.TideJournal, TideSpotSkins.byId("e-tidejournal"))
+        assertSame(TideSpotSkins.TideJournal, TideSpotSkins.byName("潮汐手帐"))
+        assertSame(TideSpotSkins.BlueTide, TideSpotSkins.byId("f-bluetide"))
+        assertSame(TideSpotSkins.BlueTide, TideSpotSkins.byName("蓝潮"))
         // 新增皮肤不得改变缺省皮肤（冷启动缺省仍落 A）
         assertSame(TideSpotSkins.VintageOutdoor, TideSpotSkins.default)
     }
@@ -85,18 +89,16 @@ class SkinRegistryTest {
             surfaceVariant = 0xFFE4E6C6, onSurfaceVariant = 0xFF556045, outline = 0xFF213D2A,
             outlineVariant = 0xFF78815C, error = 0xFFC15A3A, highest = 0xFFF1EED8,
         )
-        // 深色海洋 / 内陆：独立色板（非浅色机械反转）
+        // 深色海洋 / 内陆：深蓝纸 / 深苔纸 + 奶油墨线 + 珊瑚/琥珀强调（对齐 Web A）
         assertScheme(
-            p.seaDark, bg = 0xFF0E1C2B, primary = 0xFF90CAF9, surface = 0xFF17293B,
-            surfaceVariant = 0xFF1E344A, onSurfaceVariant = 0xFF9FB0C0, outline = 0xFF3A4C5E,
-            // CHG-93：深色卡改「深底 + 亮描边」，与 dark-favorites.png 一致
-            outlineVariant = 0xFF3A4C5E, error = 0xFFFF8A65, highest = 0xFF16283A,
+            p.seaDark, bg = 0xFF101A24, primary = 0xFFE9DCBE, surface = 0xFF1A2836,
+            surfaceVariant = 0xFF243547, onSurfaceVariant = 0xFFA89F88, outline = 0xFFE9DCBE,
+            outlineVariant = 0xFF6E6552, error = 0xFFE0805E, highest = 0xFF1A2836,
         )
         assertScheme(
-            p.inlandDark, bg = 0xFF101D18, primary = 0xFFA5D6A7, surface = 0xFF172B21,
-            surfaceVariant = 0xFF1E372A, onSurfaceVariant = 0xFF9DB8A8, outline = 0xFF3A5346,
-            // CHG-93：同上，内陆深色卡不再用亮实心块
-            outlineVariant = 0xFF3A5346, error = 0xFFFFAB91, highest = 0xFF172A20,
+            p.inlandDark, bg = 0xFF121B16, primary = 0xFFE6DFC0, surface = 0xFF1C2A21,
+            surfaceVariant = 0xFF26382C, onSurfaceVariant = 0xFFA9B09B, outline = 0xFFE6DFC0,
+            outlineVariant = 0xFF6B7763, error = 0xFFE08A6A, highest = 0xFF1C2A21,
         )
         // 地图三色（engine.py PALETTE 真值，非编造）
         assertEquals(0xFFD6C6A0.toInt(), p.seaLight.mapLand.toArgb())
@@ -134,6 +136,66 @@ class SkinRegistryTest {
         assertEquals(0xFFE5644C.toInt(), p.seaLight.scheme.tertiary.toArgb())
         assertEquals(0xFFE9A13B.toInt(), p.inlandLight.scheme.tertiary.toArgb())
         assertEquals(0xFFFFC15E.toInt(), p.inlandDark.scheme.tertiary.toArgb())
+    }
+
+    @Test
+    fun tideJournalPalettes_matchWeb() {
+        val p = TideSpotSkins.TideJournal.palettes
+        // 与 D 共用纸/墨源色，海洋强调色换成珊瑚墨
+        assertEquals(0xFFE9F3FA.toInt(), p.seaLight.scheme.background.toArgb())
+        assertEquals(0xFFE5644C.toInt(), p.seaLight.scheme.tertiary.toArgb())
+        assertEquals(0xFF456A84.toInt(), p.seaLight.scheme.secondary.toArgb())
+        assertEquals(0xFFE9F5EE.toInt(), p.inlandLight.scheme.background.toArgb())
+        assertEquals(0xFFE9A13B.toInt(), p.inlandLight.scheme.tertiary.toArgb())
+        assertEquals(0xFF0B1620.toInt(), p.seaDark.scheme.background.toArgb())
+        assertEquals(0xFF0C1A14.toInt(), p.inlandDark.scheme.background.toArgb())
+        // M3 FilterChip 选中态：墨底纸字（深色下反转为纸底墨字）
+        assertEquals(0xFF101820.toInt(), p.seaLight.scheme.secondaryContainer.toArgb())
+        assertEquals(0xFFFFFDF7.toInt(), p.seaLight.scheme.onSecondaryContainer.toArgb())
+        assertEquals(0xFFF2EFE6.toInt(), p.seaDark.scheme.secondaryContainer.toArgb())
+        // 纸手帐：纸纹 + 墨线 + 实墨投影
+        assertEquals(0.8f, TideSpotSkins.TideJournal.texture.grainStrength)
+        assertEquals(0.9f, TideSpotSkins.TideJournal.texture.printShadowAlpha)
+        assertTrue(TideSpotSkins.TideJournal.texture.handDrawnOutline)
+    }
+
+    @Test
+    fun blueTidePalettes_matchWeb() {
+        val p = TideSpotSkins.BlueTide.palettes
+        // 浅色海洋：白卡 + 蓝 / 薄荷
+        assertScheme(
+            p.seaLight, bg = 0xFFEEF3F8, primary = 0xFF1565C0, surface = 0xFFFFFFFF,
+            surfaceVariant = 0xFFEEF3F8, onSurfaceVariant = 0xFF556579, outline = 0xFFDCE5EE,
+            outlineVariant = 0xFFDCE5EE, error = 0xFFC62828, highest = 0xFFFFFFFF,
+        )
+        assertEquals(0xFF00695C.toInt(), p.seaLight.scheme.secondary.toArgb())
+        assertEquals(0xFF26A69A.toInt(), p.seaLight.scheme.tertiary.toArgb())
+        // M3 FilterChip 选中态：主色实心 + onPrimary
+        assertEquals(0xFF1565C0.toInt(), p.seaLight.scheme.secondaryContainer.toArgb())
+        assertEquals(0xFFFFFFFF.toInt(), p.seaLight.scheme.onSecondaryContainer.toArgb())
+        assertEquals(0xFF90CAF9.toInt(), p.seaDark.scheme.secondaryContainer.toArgb())
+        // 浅色内陆：白卡 + 青绿 / 天蓝
+        assertScheme(
+            p.inlandLight, bg = 0xFFEDF6F4, primary = 0xFF00695C, surface = 0xFFFFFFFF,
+            surfaceVariant = 0xFFEDF6F4, onSurfaceVariant = 0xFF4F6B66, outline = 0xFFD6E7E2,
+            outlineVariant = 0xFFD6E7E2, error = 0xFFC62828, highest = 0xFFFFFFFF,
+        )
+        // 深色独立调校
+        assertScheme(
+            p.seaDark, bg = 0xFF0E1721, primary = 0xFF90CAF9, surface = 0xFF16212E,
+            surfaceVariant = 0xFF1E2C3A, onSurfaceVariant = 0xFF9FB0C0, outline = 0xFF2A3A4C,
+            outlineVariant = 0xFF2A3A4C, error = 0xFFEF9A9A, highest = 0xFF16212E,
+        )
+        assertScheme(
+            p.inlandDark, bg = 0xFF0C1B18, primary = 0xFF80CBC4, surface = 0xFF132420,
+            surfaceVariant = 0xFF1B302B, onSurfaceVariant = 0xFF9FB8B2, outline = 0xFF2C433D,
+            outlineVariant = 0xFF2C433D, error = 0xFFEF9A9A, highest = 0xFF132420,
+        )
+        // 干净白卡：无纸纹 / 无墨线 / 无贴纸
+        val texture = TideSpotSkins.BlueTide.texture
+        assertTrue(!texture.paperGrain && !texture.printMisregister && !texture.handDrawnOutline)
+        assertTrue(texture.softShadow && !texture.sectionOrnament && !texture.dashedDivider)
+        assertTrue(texture.softOutline)
     }
 
     @Test
@@ -219,6 +281,6 @@ class SkinRegistryTest {
         assertEquals(texture.mountMotifRes, texture.motifFor(WaterBodyType.INLAND_WATER))
         assertTrue(texture.grainStrength in 0f..1f)
         // CHG-93：纸纹强度与 spec.json visual_tokens 声明一致（防漂移）
-        assertEquals(0.5f, texture.grainStrength)
+        assertEquals(0.65f, texture.grainStrength)
     }
 }

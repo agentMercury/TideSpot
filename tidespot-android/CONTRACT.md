@@ -140,7 +140,7 @@ suspend fun TideSpotRepository.topWindows(spot: FavoriteSpot, horizonDays: Int =
 - UI Agent 编码边界（面向上述冻结签名）：本点 Top10（F-3.5）在 `:feature:detail` 派生层**现算**（cachedDetail slices 同源 → 恒等天然成立）；dh 序列 = `seaLevelHeightMslM` 一阶差分（纯函数放派生层，JVM 可测）。跨点 Top10（F-2.6）与 F-2.5 列表摘要走 `topWindows`（无网可读）。
 - UI 红线沿用：Tab 标题只走 `WaterBodyTabTitles.titlesInTabOrder()`；禁嵌套同向 LazyColumn；预设解析只走 `resolvePreset`；UI 逻辑先抽纯函数再进 Composable。
 - 现场校潮面板（§6.2b 规则 5）：潮 Tab Sheet 记录观测时刻 → `TideCalibrator.fitManual`（≥2 条才启用，±6h 匹配窗）；观测记录 Session 级存 ViewModel，持久化（schema 决策）登记 M6。
-- 验证命令同 §2（JAVA_HOME/`.tools`/subst T:）；沙箱禁新增依赖（maven 不可达）。
+- 验证命令同 §2（JAVA_HOME + `.tools\gradle-8.9`）；沙箱禁新增依赖（maven 不可达）。
 
 ## 并行分工（M6 进行中，2026-11-09 起）
 
@@ -221,7 +221,7 @@ OPT-M5-07 准星一键收藏主路径 + CHG-12④⑤ 接线清单 + 自签名 ke
 ```
 
 - 共同红线沿用 §冻结点 + HANDOVER §7 全部 11 条硬约束；UI 逻辑先抽纯函数再进 Composable；沙箱禁新增依赖（maplibre/compose 等已有 catalog 项可用）。
-- 验证命令：同 HANDOVER §2（subst T: + `.tools\gradle-8.9`）；新增模块 include 行追加后全量跑。
+- 验证命令：同 HANDOVER §2（直接真实路径 + `.tools\gradle-8.9`）；新增模块 include 行追加后全量跑。
 
 ## 并行分工（v1.1 P0-1 进行中，2026-11-10 起）
 
@@ -303,7 +303,7 @@ interface CopernicusCredentialActions {
 ```
 
 - 共同红线沿用 §冻结点 + HANDOVER §7 十一条；**新增**：凭据禁入 BuildConfig/源码/资源/日志（APK 解包零命中为退出标准）；`allowBackup=false`；图标不改主题色值单源。
-- 验证命令同 HANDOVER §2（subst T: + `.tools\gradle-8.9` + verify.ps1）；批次串行。
+- 验证命令同 HANDOVER §2（直接真实路径 + `.tools\gradle-8.9` + verify.ps1）；批次串行。
 
 ## 冻结点
 
@@ -478,11 +478,11 @@ interface CopernicusCredentialActions {
 
 | 编号 | 内容 | 状态 | 补齐版本 |
 |---|---|---|---|
-| `PARITY_GAP-WEB-01` | Web 版整体尚未落地（M0–M7 执行中） | 进行中 | Web v1.0 |
+| `PARITY_GAP-WEB-01` | Web 版整体尚未落地（M0–M7 执行中） | **已关闭**：Web 已交付 v1.18.3（PWA 纯静态，128 项单测 / 8 条 E2E，评分与 Android 逐字段一致） | 2026-11-16 |
 | `PARITY_GAP-WEB-ADP-01` | Web 环境自适应（PC/移动/平板）在 Android 无等价实现（Android 目前仅手机布局） | **客户已裁决 2026-11-13：一期不做**；后续若要求，Android +6~8 人日 | 未排期 |
 | `PARITY_GAP-WEB-02` | Web 无系统级离线/后台刷新（无 WorkManager 等价物） | 已列入白名单 | — |
 | `PARITY_GAP-WEB-I18N-01` | CHG-92 新增 4 个 app 文案 key（`ts_app_reclassify_water_body` / `ts_app_reclassifying` / `ts_app_reclassify_failed` / `ts_app_water_body_unknown_hint`）尚未同步 Web `src/i18n/{zh,en}.json` | **已关闭**：客户 2026-11-14 裁决「本批只改 Android」，Web 会话随后自行执行 `gen:i18n` 补齐，复查 `check_parity` **PASS**（zh/en 各 576 key） | 2026-11-14 |
-| `PARITY_GAP-WEB-VER-01` | Android `versionName` 已升 `1.20.2`（`versionCode=27`），Web `APP_VERSION` 仍为 `1.18.2` | CHG-93 本批只改 Android 代码与 `web/src/i18n` **自动生成物**（N-5 要求）；版本号仍待 Web 会话对齐后关闭 | Web 下批 |
+| `PARITY_GAP-WEB-VER-01` | Android `versionCode=29` / `versionName=1.21.1`；Web `APP_VERSION=1.18.3` | **双端版本号独立管理**（并非缺陷）：两端发布节奏不同，评分内核与文案 key 仍强制一致（`check:parity` 580/580） | 已定案 |
 
 ### 红线
 

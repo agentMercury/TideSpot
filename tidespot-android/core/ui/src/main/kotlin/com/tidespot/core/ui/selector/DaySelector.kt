@@ -1,12 +1,11 @@
 package com.tidespot.core.ui.selector
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +22,10 @@ import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.format.RelativeTimeFormatter
 import com.tidespot.core.ui.strings.TideSpotStrings
 import com.tidespot.core.ui.strings.ZhStrings
+import com.tidespot.core.ui.theme.LocalSkin
+import com.tidespot.core.ui.theme.onSkinAccent
+import com.tidespot.core.ui.theme.skinAccent
+import com.tidespot.core.ui.theme.vintageCard
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -124,6 +127,14 @@ fun DaySelector(
     infoSlot: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
+        val skinId = LocalSkin.current.id
+        val isJournal = skinId == "e-tidejournal"
+        val isBlueTide = skinId == "f-bluetide"
+        val chipShape = when {
+            isJournal -> RoundedCornerShape(8.dp)
+            isBlueTide -> RoundedCornerShape(12.dp)
+            else -> RoundedCornerShape(18.dp)
+        }
         LazyRow(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -131,13 +142,31 @@ fun DaySelector(
             items(chips, key = { it.offsetDays }) { chip ->
                 // OPT-V115-02 / S02 C07：胶囊 chip（rx18）；选中态改读 MaterialTheme primary/onPrimary（皮肤可换）
                 // OPT-V12-04：两行排版（52dp 高、最小 56dp 宽 → 一行 ≥5 个），TalkBack 合并为单句
+                // E：墨底纸字 + 墨线；F：蓝底白字；A/D 保持强调色底。
                 val selected = chip.offsetDays == selectedDay
+                val selectedColor = when {
+                    isJournal -> MaterialTheme.colorScheme.onSurface
+                    isBlueTide -> MaterialTheme.colorScheme.primary
+                    else -> skinAccent()
+                }
+                val selectedInk = when {
+                    isJournal -> MaterialTheme.colorScheme.surface
+                    isBlueTide -> MaterialTheme.colorScheme.onPrimary
+                    else -> onSkinAccent()
+                }
                 Surface(
                     onClick = { onDaySelected(chip.offsetDays) },
-                    shape = RoundedCornerShape(18.dp),
-                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                    border = if (selected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    shape = chipShape,
+                    color = if (selected) selectedColor else MaterialTheme.colorScheme.surface,
                     modifier = Modifier.height(52.dp).widthIn(min = 56.dp)
+                        .vintageCard(
+                            shape = chipShape,
+                            outlineColor = if (selected && isBlueTide) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                androidx.compose.ui.graphics.Color.Unspecified
+                            },
+                        )
                         .semantics(mergeDescendants = true) { contentDescription = chip.contentDescription },
                 ) {
                     Column(
@@ -148,13 +177,13 @@ fun DaySelector(
                         Text(
                             chip.topLabel,
                             style = MaterialTheme.typography.labelLarge,
-                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                            color = if (selected) selectedInk else MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                         )
                         Text(
                             chip.weekdayLabel,
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (selected) selectedInk.copy(alpha = 0.86f) else MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                         )
                     }

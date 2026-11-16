@@ -9,5 +9,5 @@ export const client = new OpenMeteoClient();
 
 export const repository = new TideSpotRepository({ client });
 
-/** 与 Android versionName 对齐（C-7） */
+/** Web 端独立版本号（与 Android 各自主管；评分内核仍强制逐字段一致） */
 export const APP_VERSION = '1.18.3';

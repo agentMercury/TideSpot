@@ -324,7 +324,7 @@ function SettingsPanel() {
     about: (
       <Card key="about" ariaLabel="版本">
         <strong>版本</strong>
-        <p className="ts-hint">TideSpot Web {APP_VERSION}（与 Android versionName 同步）</p>
+        <p className="ts-hint">TideSpot Web {APP_VERSION}（版本号独立于 Android）</p>
         <p className="ts-hint">
           {lang === 'en'
             ? 'If the page still shows an old build, clear caches below (this also unregisters the Service Worker).'

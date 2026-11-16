@@ -68,9 +68,9 @@
   - **A-1 BLK-04 解锁**：`:core:data` androidTest 基建（androidx.test 三件套 + room-testing；依赖经 maven 可达性确认后引入，runner 经本机代理下载）；`RoomDaoTest`/`RoomMigrationTest` @Ignore 空壳 6 用例落地为真机仪器测试（in-memory CRUD/REPLACE/lastSuccess + MigrationTestHelper 三段迁移强校验 + 文件库「重启不丢」）；**真机 6/6 通过**。
   - **P0 缺陷修复（A-1 抓出，当日闭环）**：`MIGRATION_3_4` ALTER 列名 `veto_codes` → `vetoCodes`（v3→v4 升级路径 schema 校验崩溃缺陷）；`RoomMigration34JvmTest` 增「ALTER 列名与实体属性名逐字一致」锁。
   - **A-2**：`LocationController.kt` 弃用 `requestSingleUpdate` → `requestLocationUpdates`（首回调 removeUpdates，单次语义不变；`:feature:map` 禁改约束单点放行）。
-  - **A-3**：`verify.ps1` 一键验证脚本（subst 自愈 + JAVA_HOME + 红线扫描 URL 口径 + 八模块 + assembleRelease + 代理注入），本机实测全绿（OPT-05 CI 门禁本地形态）。
+  - **A-3**：`verify.ps1` 一键验证脚本（JAVA_HOME + 红线扫描 URL 口径 + 八模块 + assembleRelease + 代理注入），本机实测全绿（OPT-05 CI 门禁本地形态）。
   - **A-4**：`tools/` 204MB 重复目录删除（用户确认授权；与 `.tools` 逐目录核实一致）。
-  - **A-5**：本机正式 `gradlew` 首跑验证通过（发行包下载 + domain 测试全绿）；subst T: 维持标准构建路径（R-09 口径不变）。
+  - **A-5**：本机正式 `gradlew` 首跑验证通过（发行包下载 + domain 测试全绿）。~~subst T: 维持标准构建路径~~（**已过时**：2026-11-11 移除，改用真实全英文路径）。
   - **V1.1 优化批次 C（同日续批，客户裁定三项全做，CHG-19）**：
     - **C-1（=A-14 解锁）**：`:core:ui` 引 robolectric 4.14.1 + ui-test（compose-bom）；`ComposeSmokeRobolectricTest` 8 用例（5 Tab 标题矩阵四水体类型/切表 10 轮不崩/DaySelector 回调/FactorBreakdown 三区/同屏唯一附锁）；test worker 代理+信任库系统属性透传（Robolectric 自下载 android-all 独立 JVM）。
     - **C-3**：`MapScreen` LocalLifecycleOwner → `androidx.lifecycle.compose`（FO-25 残留清零；:feature:map 单点放行）。
@@ -78,7 +78,7 @@
     - 口径留证：LazyRow 视口裁剪下 Robolectric 触摸注入不驱动滚动（环境限制），远端 chip 断言收敛为视口内；物理中文路径 D:\ test worker 类加载不可靠再证（R-09）。
 - **进行中**：无。
 - **阻塞项**：无阻塞。挂起项更新：
-  1. **A-05**：本机正式 gradle 双确认——**本机 gradlew 首跑已验证（11-09）**，subst 口径维持；正式收官挂客户确认。
+  1. **A-05**：本机正式 gradle 双确认——**本机 gradlew 首跑已验证（11-09）**；R-09 已于 2026-11-11 闭环（迁移全英文路径，移除 subst）。
   2. **A-07**：OSTIA 恢复后复测（不阻塞，CHG-09 兜底）。
   3. **A-14/C-1**：Robolectric Compose 冒烟四条锁——✅ **已完成（11-09，CHG-19/C-1）**：Robolectric 形态 8 用例落地 :core:ui（真机形态另行覆盖）；C-2（AGP 8.7.3）/C-3（lifecycle-runtime-compose）同批完成。
   4. **交付验收运行时项（12-04~12-08 真机）**：F-2.2、首屏 <300ms、跨时区双点、校潮观测持久化真机、APK 安装冒烟 + §13 清单逐项留证——Room v3→v4 真机迁移已由本批次仪器测试先行覆盖（6/6）。
@@ -184,7 +184,7 @@
 
 | ID | 风险 | 状态 | 近期动作 |
 |---|---|---|---|
-| R-09 | 中文路径导致 Gradle 构建不稳定 | 🟢 缓解 | subst T: + `.tools` Gradle + UTF-8 jvmArgs 已稳定跑通；**A-5 本机正式 gradlew 首跑验证通过（11-09）**——物理中文路径下 favorites 等未配 jvmArgs 的模块仍有类加载失败，**subst T: 维持标准构建路径** |
+| R-09 | 中文路径导致 Gradle 构建不稳定 | ✅ 已关闭 | 工程根已迁移至全英文 `weatherfishcheck`，`subst T:` 于 2026-11-11 移除；**A-5 本机正式 gradlew 首跑验证通过（11-09）**；历史备注：物理中文路径下 favorites 等未配 jvmArgs 的模块曾有类加载失败。 |
 | ~~R-02/R-07~~ | 真机资源不足 → 验收顺延 | 🟢 **关闭（CHG-11）** | 客户提供单台荣耀机（Android 16/无 GMS）作验收设备；GMS 通道书面豁免 |
 | OSTIA 图层故障 | 千岛湖掩膜复测暂缓（服务器端） | 🟡 关注中 | A-07：恢复后一条 curl 复测；CHG-09 UNKNOWN 方案已兜底 |
 ## 7. v1.1 P1 批次（2026-11-10，CHG-28）
@@ -249,7 +249,7 @@
 - **验收现状**：八模块 `gradlew test` **EXIT=0**；`assembleRelease` 产出 `潮点TideSpot-v1.2.0.apk`（51,915,708 B，已分发 `E:\Trans`）；真机切英文逐屏核对**无残留中文**（客户报障的详情页 4 类残留已修，见下「英文残留修复」）。
 - **GAP-05 接线现状**：**10/17**（已接线：`ts_resolving`、`ts_location_denied`、`ts_favorite_dialog_title`、`ts_favorite_name_hint`、`ts_top10_this_spot`、`ts_top10_all`、`ts_top10_empty`、`ts_confirm_favorite`、`ts_placeholder_v11`、`ts_cancel`）；**剩余 7 条转 V1.15 `OPT-V115-01`**（需新增 UI 落点，见 §10 与 `OPT_REQUIREMENTS_V115.md`）。
 - **英文残留修复（CHG-44 关键教训）**：根因＝纯函数默认参数回落 `ZhStrings`/`ZhDomainCopy`，而调用点未注入。已修 `WaterBodyTabTitles.titlesFor`、`DaySelectorLogic.chips`、`Derivations.tabStatus/rowsFor`、`SourceMetaRegistry.granularity`，连带 `chipText`/`extremesLine`/`correctionCompare`/`Top10Formatter`/`SourceFooter`。**红线：新增纯逻辑必须用 `strings/copy` 参数，调用点显式注入**。
-- **环境红线**：Gradle 必须走 `subst T:`（`verify.ps1` 同口径）；直接以中文路径运行会导致 test worker `ClassNotFoundException`。
+- **环境红线**：工程根已迁移至全英文 `D:\workspace\weatherfishcheck`（R-09 已解决），**不再需要 `subst T:`**；直接用 `verify.ps1` 或 `.tools\gradle-8.9` 构建。受限环境下若 `GRADLE_USER_HOME` 不可写，可显式指向工作区内。
 
 - **批次二执行口径（已定，不需再评估）**：`DetailScreen`/`FavoritesScreen`/`MainActivity` 直接 `stringResource(R.string.*)`（资源已建/按同规范补齐）；纯逻辑（`Derivations`/`Top10Formatter`/`FavoritesSummaryFormatter` 等）加 `strings: TideSpotStrings = ZhStrings` / `copy: DomainCopy = ZhDomainCopy` 参数；测试断言保持中文默认实现（零漂移），英文由 `EnStrings` 独立锁定。
 - **风险—影响—概率—应对**：① detail/favorites 大文件逐条替换遗漏 → 影响：切英文残留中文 → 概率中 → 应对：`.tools/i18n_scan.mjs` 门禁 + 真机切换语言逐屏核对；② 纯逻辑注入参数遗漏 → 影响：英文环境下该处仍中文 → 概率中 → 应对：扫描 FAIL 即拦截；③ 资源键漏翻 → 概率低 → 应对：`EnStringsParityTest` 逐键相等锁。

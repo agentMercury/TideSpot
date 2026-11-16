@@ -125,7 +125,6 @@ fun SettingsScreen(
         }
         VintageSectionCard(stringResource(R.string.ts_settings_map_source)) {
         // OPT-A-10：地图来源（提供方可切；未来新增源自动出现在下拉里）
-        Text(stringResource(R.string.ts_settings_map_source), style = MaterialTheme.typography.titleSmall)
         MapProviderDropdown(current = state.mapProvider, onSelect = onMapProviderChange)
         Text(
             stringResource(R.string.ts_settings_map_source_note),
@@ -155,7 +154,6 @@ fun SettingsScreen(
         // CHG-94：当前皮肤卡对齐设计稿的芥末黄高亮外框
         VintageSectionCard(stringResource(R.string.ts_settings_skin), highlight = true) {
         // ── 外观 · 皮肤（SKIN-3 / OPT-A-09）：按皮肤名下拉选择 ──
-        Text(stringResource(R.string.ts_settings_skin), style = MaterialTheme.typography.titleSmall)
         SkinDropdown(currentId = state.skinId, onSelect = onSkinChange)
         Text(
             stringResource(R.string.ts_settings_skin_note),

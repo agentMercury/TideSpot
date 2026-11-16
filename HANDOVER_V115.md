@@ -28,7 +28,7 @@
 | 皮肤 / 主题 token / 换肤入口 | `design-handdrawn/A-vintage-outdoor/SKIN-DEV-STANDARD.md`（版本号 +1 + 顶部变更行） |
 | 有意偏离设计稿（色值 / 布局 / 结构） | 本文件 §5「已知偏离」+ `device-compare/` 对拍报告（附量化对比度） |
 | 一批需求做完 | `design-handdrawn/A-vintage-outdoor/未开始需求清单.md`（状态 + **落地结果指向真实文件与行号**） |
-| 每个提交 | `jj describe` 写清「改了什么 / 为什么 / 门禁结果」；建 change 后 `git update-ref refs/heads/main <commit>` |
+| 每个提交 | `jj describe` 写清「改了什么 / 为什么 / 门禁结果」；建 change 后 `git update-ref refs/heads/main <commit>`，再 `git push origin main` |
 | 多会话 / 多人并行 | 见 §0.7：**各自开 `jj workspace`**，禁止两个会话共用一个工作副本 |
 | 会话结束 | `.workbuddy/memory/YYYY-MM-DD.md` 追加当天决策与踩坑（不记临时路径、工具报错） |
 
@@ -55,7 +55,7 @@
 
 | 位置 | 过时内容 | 现状 |
 |---|---|---|
-| §1 基线表 | 版本行已回填为 1.17.0；**同表其余行**（APK 路径 / SHA / i18n 豁免数 / 对比度对数）仍是 1.15.14 快照 | 版本号以 `tidespot-android/app/build.gradle.kts` 为准 |
+| §1 基线表 | 已于 2026-11-16 回填版本/APK/远端信息；**i18n 豁免数、对比度对数**仍为历史快照 | 版本号以 `tidespot-android/app/build.gradle.kts` 为准 |
 | §2 第 1 条 | 「必须用 `T:` 盘构建（`subst T:`）」 | **已废弃**：2026-11-11 移除 `subst T:` 与 `android.overridePathCheck`，`verify.ps1` 直接用真实路径 |
 | §9 台账表 | 只到 `CHG-57` | `CHG-58` 之后以 `jj log` 与 `PROGRESS_TRACKER.md` 为准 |
 | `PROGRESS_TRACKER.md` §1 | 「v1.1 P0 完成 → P1 待开工」 | 与现状（v1.20.0、手绘 A 全屏换肤 + CHG-93 视觉对齐已落地）不符，属未回填 |
@@ -87,7 +87,7 @@
 1. 改 `versionCode` / `versionName`；
 2. `assembleRelease` 出包 → 真机 `adb install -r` 冒烟（至少地图 / 详情 / 收藏 / 设置四页 + 明暗切换）；
 3. 更新本文件 §1 基线表的版本号（或 §0.5 标注差异）+ `PROGRESS_TRACKER.md` 台账 + 相关需求清单状态；
-4. `jj describe` 写清版本号变化（`chore(release): vX.Y.Z`）+ 门禁结果 → `git update-ref refs/heads/main`。
+4. `jj describe` 写清版本号变化（`chore(release): vX.Y.Z`）+ 门禁结果 → `git update-ref refs/heads/main` → `git push origin main` + 在 GitHub 打 tag 并发 Release。
 
 ### 0.7 并行会话隔离（长期方案，客户 2026-11-13 选定）
 
@@ -108,7 +108,7 @@ cd ../wf-skin && jj status                # 只看得到本副本的改动
 | 独立 `@` | 每个 workspace 有自己的 working-copy commit，提交互不吞并 |
 | 共用历史 | 副本共享同一个 `.jj` 仓库，`jj log` 看到全部提交，无需 fetch |
 | 合回主线 | 在主线 `jj rebase -s <你的 change> -d main`（或先 `jj new main` 再 rebase） |
-| **git 同步** | colocated 的 git 只在 **default 副本**自动跟随；其它副本提交后回 default 执行 `git update-ref refs/heads/main <commit>` |
+| **git 同步** | colocated 的 git 只在 **default 副本**自动跟随；其它副本提交后回 default 执行 `git update-ref refs/heads/main <commit>` 后再 push |
 | 副本位置 | 放到仓库**外**（`../wf-*`）；放仓库内会被快照进主线，等于没隔离 |
 | 用完清理 | `jj workspace forget <name>` + 删目录，否则 `jj log` 会留游离工作副本 |
 
@@ -122,9 +122,9 @@ cd ../wf-skin && jj status                # 只看得到本副本的改动
 
 | 项 | 值 |
 |---|---|
-| 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated（每次提交后手动 `git update-ref refs/heads/main <commit>`） |
-| 版本 | **`versionCode=27` / `versionName=1.20.2`**（2026-11-15 回填；CHG-94 设计侧定稿闭环 + 三项纯绘制装饰，发版规则见 §0.6） |
-| APK | **`E:\Trans\潮点TideSpot-v1.15.14.apk`**（51,933,996 B；SHA-256 `40e59f66a644694d9c09f498ab9d2a5ddd5b43463ffffa95316ba07a1c8c0d3d`；自签名，已装 AAK-AN00） |
+| 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated；**已接入远端** `github.com/agentMercury/TideSpot`（main 为发布线；jj 提交后仍需 `git update-ref refs/heads/main <commit>` 同步本地指针，再 `git push`） |
+| 版本 | **`versionCode=29` / `versionName=1.21.1`**（发版规则见 §0.6；Web 侧独立版本 `1.18.3`） |
+| APK | 最新产物见 `E:\Trans\潮点TideSpot-v1.21.1.apk`（自签名；`adb install -r` 安装，release 与 debug 签名不兼容） |
 | 测试 | 八模块 `gradlew test` **EXIT=0**（每次批次均跑） |
 | i18n | `.tools/i18n_scan.mjs` **FAIL=0**（豁免 12）；`values` / `values-en` 241/241 |
 | GAP-05 | **17/17 每 key ≥1 处引用**（曾出现 15/17 回归，CHG-54 已修复） |
@@ -134,7 +134,7 @@ cd ../wf-skin && jj status                # 只看得到本副本的改动
 
 ## 2. 环境红线（每次都踩，务必先看）
 
-1. **必须用 `T:` 盘构建**：`subst T: D:\workspace\weatherfishcheck`，命令在 `T:\tidespot-android` 下执行（中文路径会让 Gradle test worker 抛 `ClassNotFoundException`）。
+1. **直接用真实路径构建**（R-09 已解决）：工程根为全英文 `D:\workspace\weatherfishcheck`，**不需要** `subst T:` 映射（2026-11-11 已移除 `subst` 与 `android.overridePathCheck`，`verify.ps1` 直接用真实路径）。若 `GRADLE_USER_HOME` 在受限环境不可写，可显式指向工作区内。
 2. `JAVA_HOME` 指向 JDK 17；`adb` = `C:\Users\gamer\AppData\Local\Android\Sdk\platform-tools\adb.exe`。
 3. Release 签名与 debug 不兼容 → **统一测 release 包**（`adb install -r`）。
 4. `assembleRelease` 偶发 `lintVitalAnalyzeRelease … FileSystemException` → 关 Studio / 杀 java 后重跑，或 `-x lintVitalAnalyzeRelease` 再补跑一次。
@@ -196,7 +196,7 @@ P0-1（凭据外部化/引导卡/图标）、P0-2（水质录入/时段筛选/F-
 
 ## 7. 接手第一步
 
-1. `subst T: D:\workspace\weatherfishcheck` → `.\gradlew.bat test` 确认基线绿；`node .tools/i18n_scan.mjs`、`node .tools/contrast_check.mjs` 均应为 0 FAIL。
+1. 在 `tidespot-android\` 下 `.\.tools\gradle-8.9\bin\gradle.bat test`（或 `verify.ps1`）确认基线绿；`node .tools/i18n_scan.mjs`、`node .tools/contrast_check.mjs` 均应为 0 FAIL。
 2. 读 `REQUIREMENTS_REGISTER` CHG-46~56，了解每批改动与遗留裁定。
 3. 后续方向：**V1.2 池**（`OPT_REQUIREMENTS_V11.md` §7：星标 OPT-V12-01、列表刷新 02、详情刷新 03、DaySelector 两行 04、高德 OPT-V12-05）或客户新需求。
 4. 改 UI 前先看 `design-handoff/` 的 **SVG 几何**（不是只看 `screens.json` 的 box），改完 `adb` 截图比对。

@@ -2,12 +2,19 @@ package com.tidespot.feature.detail.detail
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import com.tidespot.core.ui.theme.vintageCard
 import com.tidespot.core.ui.theme.VintageDashedDivider
+import com.tidespot.core.ui.theme.LocalSkin
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +31,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -59,6 +65,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,6 +96,8 @@ import androidx.compose.ui.res.stringResource
 import com.tidespot.core.ui.R as UiR
 import com.tidespot.core.ui.theme.handDrawnOutline
 import com.tidespot.core.ui.theme.printMisregister
+import com.tidespot.core.ui.theme.skinAccent
+import com.tidespot.core.ui.theme.skinAccentInk
 import com.tidespot.core.ui.titles.WaterBodyTabTitles
 import com.tidespot.core.domain.window.BestWindowFinder
 import java.time.LocalDate
@@ -185,6 +194,68 @@ fun DetailScreen(
             }
         }
 
+        // 设计稿：标题下方的水体贴纸 + 右上版画鱼印章（纯装饰，不新增文案 key）
+        item {
+            val strings = localTideSpotStrings()
+            val inlandTag = effectiveWaterBody == com.tidespot.core.domain.model.WaterBodyType.INLAND_WATER
+            val waterLabel = when (effectiveWaterBody) {
+                com.tidespot.core.domain.model.WaterBodyType.INLAND_WATER -> strings.waterBodyInland
+                com.tidespot.core.domain.model.WaterBodyType.NEARSHORE -> strings.waterBodyNearshore
+                com.tidespot.core.domain.model.WaterBodyType.LAND -> strings.waterBodyLand
+                com.tidespot.core.domain.model.WaterBodyType.UNKNOWN -> strings.waterBodyUnknown
+                else -> strings.waterBodyOcean
+            }
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(1.6.dp, MaterialTheme.colorScheme.outline),
+                    modifier = Modifier.height(28.dp),
+                ) {
+                    Row(
+                        Modifier.padding(horizontal = 10.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                if (inlandTag) UiR.drawable.ic_mount_vintage else UiR.drawable.ic_wave_vintage,
+                            ),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.width(24.dp).height(14.dp),
+                        )
+                        Text(waterLabel, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+                androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                val stampFrame = MaterialTheme.colorScheme.secondary.copy(alpha = 0.62f)
+                Box(
+                    Modifier
+                        .size(40.dp)
+                        .drawBehind {
+                            val dash = PathEffect.dashPathEffect(floatArrayOf(9f, 7f))
+                            drawRoundRect(
+                                color = stampFrame,
+                                cornerRadius = CornerRadius(12.dp.toPx()),
+                                style = Stroke(width = 1.6.dp.toPx(), pathEffect = dash),
+                            )
+                        },
+                    contentAlignment = androidx.compose.ui.Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(UiR.drawable.ic_fish_vintage),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.width(30.dp).height(16.dp),
+                    )
+                }
+            }
+        }
+
         // OPT-V12-03（CHG-57）：手动刷新反馈（成功「已更新 HH:mm」；失败/离线给出原因，数据保留不隐藏）
         state.refreshFeedback?.let { fb ->
             item {
@@ -236,65 +307,65 @@ fun DetailScreen(
         }
 
         item {
-            // CHG-95 / S2b：设计稿五 Tab = 「整条描边容器 + 选中下划线」，替换旧实心分段控件 + 白胶囊。
-            // 只换绘制形态：Tab 数量 / contentDescription / onClick / 40dp 高度全部不变，
-            // 不触发入口红线，也不推动下方内容（Top10 bounds 零位移）。
-            val tabUnderline = MaterialTheme.colorScheme.tertiary
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.78f)),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).height(40.dp),
+            // A / D：纯文字五 Tab + 下划线；E：墨线药丸；F：浅底药丸 + 白卡选中。
+            // Tab 数量 / contentDescription / onClick / 40dp 高度保持不变。
+            val skinId = LocalSkin.current.id
+            val isJournal = skinId == "e-tidejournal"
+            val isBlueTide = skinId == "f-bluetide"
+            val isPill = isJournal || isBlueTide
+            val tabUnderline = skinAccentInk()
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 12.dp).height(40.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(
+                        if (isBlueTide) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(if (isJournal) 5.dp else 2.dp),
             ) {
-                Row(
-                    Modifier.fillMaxWidth().height(40.dp)
-                        .horizontalScroll(rememberScrollState())
-                        .padding(3.dp),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
-                        .forEachIndexed { i, tab ->
-                            val tabDesc = stringResource(R.string.ts_detail_tab_desc, tabTitles[i])
-                            val selected = state.selectedTab == tab
-                            Surface(
-                                onClick = { viewModel.selectTab(tab) },
-                                shape = RoundedCornerShape(10.dp),
-                                color = Color.Transparent,
-                                modifier = Modifier.fillMaxHeight()
-                                    .semantics { contentDescription = tabDesc },
+                listOf(DetailTab.SCORE, DetailTab.TIDE, DetailTab.WEATHER, DetailTab.WATER_QUALITY, DetailTab.WAVE)
+                    .forEachIndexed { i, tab ->
+                        val tabDesc = stringResource(R.string.ts_detail_tab_desc, tabTitles[i])
+                        val selected = state.selectedTab == tab
+                        val selectedBg = when {
+                            isJournal -> MaterialTheme.colorScheme.onSurface
+                            isBlueTide -> MaterialTheme.colorScheme.surface
+                            else -> Color.Transparent
+                        }
+                        val selectedInk = when {
+                            isJournal -> MaterialTheme.colorScheme.surface
+                            isBlueTide -> MaterialTheme.colorScheme.primary
+                            else -> tabUnderline
+                        }
+                        Surface(
+                            onClick = { viewModel.selectTab(tab) },
+                            shape = if (isPill) RoundedCornerShape(20.dp) else RoundedCornerShape(4.dp),
+                            color = if (selected) selectedBg else Color.Transparent,
+                            border = if (isJournal) BorderStroke(1.8.dp, MaterialTheme.colorScheme.onSurface) else null,
+                            modifier = Modifier.weight(1f).fillMaxHeight()
+                                .semantics { contentDescription = tabDesc },
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxHeight(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                             ) {
-                                Column(
-                                    modifier = Modifier.fillMaxHeight(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center,
-                                ) {
-                                    // 手绘 A：Tab 图标统一换成版画鱼（纯装饰，不改 Tab 数量与 contentDescription）
-                                    Icon(
-                                        painter = painterResource(UiR.drawable.ic_fish_vintage),
-                                        contentDescription = null,
-                                        tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.width(18.dp).height(10.dp),
-                                    )
-                                    Text(
-                                        tabTitles[i],
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        modifier = Modifier.padding(horizontal = 8.dp),
-                                    )
-                                    // CHG-95 r8 修复：选中下划线改为显式纯绘制 Box（不可点击、无文字）。
-                                    // 旧实现把 drawBehind 挂在 Surface 外层，被 Surface 自身 clip/background
-                                    // 绘制链盖掉，真机浅/深放大图均看不到线；改布局节点后必定上屏。
+                                Text(
+                                    tabTitles[i],
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (selected) selectedInk else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                )
+                                if (!isPill) {
                                     Box(
-                                        Modifier.padding(top = 2.dp)
-                                            .width(32.dp)
+                                        Modifier.padding(top = 3.dp)
+                                            .width(18.dp)
                                             .height(2.5.dp)
                                             .background(if (selected) tabUnderline else Color.Transparent),
                                     )
                                 }
                             }
                         }
-                }
+                    }
             }
         }
 
@@ -304,7 +375,7 @@ fun DetailScreen(
             if (status is DimensionStatus.Degraded) {
                 // F-3.6：「来源不可用/本点无该来源数据 + 重试 + 最近缓存时间」；其余 Tab 照常
                 val retryDesc = stringResource(R.string.ts_detail_retry_desc)
-                Card(Modifier.fillMaxWidth().padding(8.dp)) {
+                Card(Modifier.fillMaxWidth().padding(8.dp).vintageCard(shape = MaterialTheme.shapes.medium)) {
                     Column(Modifier.padding(8.dp)) {
                         Text(status.reason, style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.error)
@@ -405,7 +476,7 @@ fun DetailScreen(
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 4.dp)
-                        .handDrawnOutline(MaterialTheme.colorScheme.outline),
+                        .vintageCard(shape = MaterialTheme.shapes.medium),
                 ) {
                     HourChart(
                         values = values,
@@ -490,7 +561,7 @@ fun DetailScreen(
                     val veto = Derivations.vetoRows(epoch, result.weather.associateBy { it.timeEpochSec },
                         result.marine.associateBy { it.timeEpochSec }, viewModel.holderInternal().doPotentialByEpoch())
                     // OPT-V115-02 / S03：因子分解卡（设计：因子行 / ΠV 明细 / 原始输入三区，卡内）
-                    Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                    Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp).vintageCard(shape = MaterialTheme.shapes.medium)) {
                         FactorBreakdown(
                             rows = score.factors.map {
                                 com.tidespot.core.ui.breakdown.FactorRow(it.id, factorLabel(it.id), it.sub, it.weight, it.detail)
@@ -503,7 +574,7 @@ fun DetailScreen(
             }
             // OPT-V115-02 / S05：天气 Tab 安全摘要卡（免责第 2 条原文完整展示）
             if (state.selectedTab == DetailTab.WEATHER) {
-                Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                Card(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp).vintageCard(shape = MaterialTheme.shapes.medium)) {
                     Column(
                         Modifier.fillMaxWidth().padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -610,7 +681,7 @@ fun DetailScreen(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                         // CHG-94：免责胶囊改走全局票据卡骨架（纯绘制，不改入口语义）
-                        .vintageCard()
+                        .vintageCard(shape = MaterialTheme.shapes.small)
                         .semantics { contentDescription = disclaimerDesc },
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.surfaceVariant,
@@ -818,6 +889,11 @@ private fun CustomTimeRangeDialog(
     var error by remember { mutableStateOf<Top10TimeFilter.CustomError?>(null) }
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = { Text(stringResource(R.string.ts_detail_custom_title)) },
         text = {
             Column {
@@ -1127,6 +1203,42 @@ private fun disclaimerFor(tab: DetailTab, strings: TideSpotStrings): String = wh
  * OPT-V115-02 / S02 C10：今日指数主卡（设计 366×152 · 深蓝 #0D47A1 · rx16）。
  * 内部：大号分数 + 档位文字 + 档位胶囊（冻结 ScoreBand 色）+ 五段色带图例。
  */
+/**
+ * E 手帐的空心巨分数：珊瑚实心字打底做 3dp 偏移，墨线描边字盖在上面，
+ * 对应 Web 的 `text-shadow: 4px 4px 0 accent` + `-webkit-text-stroke: 2.5px ink`。
+ * 纯绘制、不参与业务测量；读屏仍读 contentDescription。
+ */
+@Composable
+private fun JournalScoreText(text: String, ink: Color, accent: Color) {
+    val measurer = rememberTextMeasurer()
+    val layout = measurer.measure(
+        AnnotatedString(text),
+        style = TextStyle(
+            fontFamily = FontFamily.SansSerif,
+            fontSize = 56.sp,
+            lineHeight = 60.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = (-2).sp,
+        ),
+    )
+    Canvas(
+        Modifier.width(124.dp).height(62.dp)
+            .semantics { contentDescription = text },
+    ) {
+        drawText(
+            layout,
+            color = accent,
+            topLeft = Offset(3.dp.toPx(), 3.dp.toPx()),
+        )
+        drawText(
+            layout,
+            color = ink,
+            topLeft = Offset.Zero,
+            drawStyle = Stroke(width = 2.2.dp.toPx()),
+        )
+    }
+}
+
 @Composable
 private fun ScoreMainCard(
     daySlices: List<com.tidespot.core.data.repo.HourSlice>,
@@ -1144,9 +1256,12 @@ private fun ScoreMainCard(
         ?.let { daySlices.getOrNull(it)?.timeEpochSec }
         ?.let { scoresByEpoch[it] }
         ?.let { ScoreBadgeDerivations.badgeKind(it, presetWeightSum) }
+    val skinId = LocalSkin.current.id
+    val isJournal = skinId == "e-tidejournal"
+    val isBlueTide = skinId == "f-bluetide"
 
     Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
+        color = if (isBlueTide) Color.Transparent else MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -1154,98 +1269,146 @@ private fun ScoreMainCard(
             .padding(horizontal = 12.dp, vertical = 4.dp)
             .height(152.dp)
             // CHG-93 / 路径 B：改走全局统一骨架，避免与外壳描边叠成双层
-            .vintageCard(),
+            .vintageCard(shape = RoundedCornerShape(16.dp)),
     ) {
         Box(Modifier.fillMaxSize()) {
-            // 版画鱼角标：纯装饰、不参与测量、不消费触摸
-            // CHG-94：设计稿主卡右上是「虚线圆角框 + 版画鱼」。
-            // 透明度改由 tint 承担（旧 graphicsLayer 会把 drawBehind 一起压淡），
-            // 虚线框用 drawBehind 画在鱼之下，纯绘制不参与测量。
-            val fishFrameColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.42f)
-            Icon(
-                painter = painterResource(UiR.drawable.ic_fish_vintage),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.14f),
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 14.dp, end = 14.dp)
-                    .width(64.dp)
-                    .height(34.dp)
-                    .drawBehind {
-                        drawRoundRect(
-                            color = fishFrameColor,
-                            style = Stroke(
-                                width = 1.6.dp.toPx(),
-                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(9f, 7f)),
-                            ),
-                            cornerRadius = CornerRadius(12.dp.toPx()),
-                        )
-                    },
-            )
+            if (isBlueTide) {
+                // 蓝潮主卡：handoff 的深蓝渐变，白字。
+                Box(
+                    Modifier.fillMaxSize().background(
+                        Brush.linearGradient(listOf(Color(0xFF1565C0), Color(0xFF0D47A1))),
+                    ),
+                )
+            }
+            // 版画鱼角标：纯装饰、不参与测量、不消费触摸。
+            // E 只留水彩鱼、不画虚线框；F 的干净白卡完全不要角标。
+            if (!isBlueTide) {
+                val fishFrameColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.42f)
+                Icon(
+                    painter = painterResource(UiR.drawable.ic_fish_vintage),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.tertiary.copy(alpha = if (isJournal) 0.62f else 0.86f),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 10.dp, end = 10.dp)
+                        .width(52.dp)
+                        .height(28.dp)
+                        .then(
+                            if (isJournal) Modifier else Modifier.drawBehind {
+                                drawRoundRect(
+                                    color = fishFrameColor,
+                                    style = Stroke(
+                                        width = 1.6.dp.toPx(),
+                                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(9f, 7f)),
+                                    ),
+                                    cornerRadius = CornerRadius(10.dp.toPx()),
+                                )
+                            },
+                        ),
+                )
+            }
             Column(Modifier.fillMaxSize().padding(16.dp)) {
-                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Row(
+                    Modifier.padding(end = if (isBlueTide) 0.dp else 64.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
                     Column {
                         Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
-                            Text(
-                                score?.toString() ?: Format.MISSING,
-                                style = MaterialTheme.typography.titleLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            Text(
-                                "/100",
-                                Modifier.padding(bottom = 8.dp, start = 2.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                            )
+                            if (isJournal) {
+                                JournalScoreText(
+                                    score?.toString() ?: Format.MISSING,
+                                    ink = MaterialTheme.colorScheme.onSurface,
+                                    accent = MaterialTheme.colorScheme.tertiary,
+                                )
+                            } else {
+                                Text(
+                                    score?.toString() ?: Format.MISSING,
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontSize = 48.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = if (isBlueTide) FontFamily.SansSerif else FontFamily.Serif,
+                                    ),
+                                    color = if (isBlueTide) Color.White else skinAccent(),
+                                )
+                            }
+                            if (isBlueTide) {
+                                Text(
+                                    "/100",
+                                    Modifier.padding(bottom = 8.dp, start = 2.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White.copy(alpha = 0.75f),
+                                )
+                            } else if (!isJournal) {
+                                Text(
+                                    "/100",
+                                    Modifier.padding(bottom = 8.dp, start = 2.dp),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
                         if (bandLabel == null) {
                             Text(
                                 stringResource(R.string.ts_detail_summary_empty),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
+                                color = if (isBlueTide) Color.White.copy(alpha = 0.8f)
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
                     androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
                     if (band != null && bandLabel != null) {
-                        Surface(color = Color(band.argb), shape = RoundedCornerShape(12.dp)) {
-                            Text(
-                                bandLabel,
-                                Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = Color(band.onArgb),
-                            )
+                        val sticker = when {
+                            isJournal -> Modifier
+                                .border(
+                                    1.4.dp,
+                                    MaterialTheme.colorScheme.onSurface,
+                                    RoundedCornerShape(2.dp),
+                                )
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                            isBlueTide -> Modifier
+                                .background(Color.White.copy(alpha = 0.16f), RoundedCornerShape(4.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                            else -> Modifier
                         }
+                        Text(
+                            bandLabel,
+                            modifier = sticker,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = when {
+                                isJournal -> MaterialTheme.colorScheme.onSurface
+                                isBlueTide -> Color(0xFFB2DFDB)
+                                else -> MaterialTheme.colorScheme.onSurface
+                            },
+                        )
+                    }
+                    if (kind != null) {
+                        androidx.compose.foundation.layout.Spacer(Modifier.width(8.dp))
+                        ConfidenceBadge(kind)
                     }
                 }
                 androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
-                // CHG-95 / S2b：设计稿主卡「实测 / 模型」双圆来源徽标。
-                // 实心 = 当前数据来源，空心 = 对照；文案复用 ts_badge_{measured,model}（零新增 i18n）。
-                // 与既有置信徽标同排，纯装饰不可点击，主卡高度仍冻结 152dp。
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    VintageSourceBadge(
-                        stringResource(UiR.string.ts_badge_measured),
-                        kind == Kind.MEASURED || kind == Kind.SATELLITE,
-                    )
-                    VintageSourceBadge(
-                        stringResource(UiR.string.ts_badge_model),
-                        kind != Kind.MEASURED && kind != Kind.SATELLITE,
-                    )
-                    androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
-                    if (kind != null) ConfidenceBadge(kind)
-                }
                 if (kind == Kind.LOW_CONFIDENCE) {
                     // OPT-V115-01 #6（ts_dimension_degraded）：低置信 → 有效权重重算说明
                     Text(
                         stringResource(UiR.string.ts_dimension_degraded),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
+                        color = if (isBlueTide) Color.White.copy(alpha = 0.8f)
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                VintageDashedDivider(Modifier.fillMaxWidth().padding(bottom = 2.dp))
+                if (isBlueTide) {
+                    Canvas(Modifier.fillMaxWidth().height(3.dp).padding(bottom = 2.dp)) {
+                        drawLine(
+                            color = Color.White.copy(alpha = 0.24f),
+                            start = Offset(0f, size.height / 2f),
+                            end = Offset(size.width, size.height / 2f),
+                            strokeWidth = 1f,
+                        )
+                    }
+                } else {
+                    VintageDashedDivider(Modifier.fillMaxWidth().padding(bottom = 2.dp))
+                }
                 // 五档色带：档位 = 鱼数（好→差 5→1），恒带档位文字（N-7）；
                 // 色值 / onColor 仍取 ScoreBand 冻结单源，选中档由当前分数档位高亮。
                 Row(
@@ -1294,30 +1457,6 @@ private fun ScoreMainCard(
     }
 }
 
-/**
- * CHG-95 / S2b：设计稿主卡「实测 / 模型」圆形来源徽标。
- * 与 [ConfidenceBadge] 的语义不同：这是固定双圆的来源图例，实心只表示当前数据来源，
- * 不新增可交互节点、不编造置信等级；颜色一律取 ColorScheme（深浅色自适应）。
- */
-@Composable
-private fun VintageSourceBadge(label: String, active: Boolean) {
-    val ink = MaterialTheme.colorScheme.onPrimaryContainer
-    Box(
-        Modifier.size(22.dp)
-            .clip(CircleShape)
-            .background(if (active) ink.copy(alpha = 0.88f) else Color.Transparent)
-            .border(1.5.dp, ink.copy(alpha = if (active) 1f else 0.55f), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
-            color = if (active) MaterialTheme.colorScheme.primaryContainer else ink,
-            maxLines = 1,
-        )
-    }
-}
-
 /** OPT-V115-02 / S06 C15：水质指标卡（标签 / 值 / 置信徽标；单卡高 112dp，禁裁切）。 */
 @Composable
 private fun WaterQualityMetricCard(
@@ -1329,7 +1468,7 @@ private fun WaterQualityMetricCard(
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
-        modifier = modifier.height(112.dp),
+        modifier = modifier.height(112.dp).vintageCard(shape = RoundedCornerShape(16.dp)),
     ) {
         Column(
             Modifier.fillMaxSize().padding(12.dp),

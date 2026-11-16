@@ -1,3 +1,7 @@
+# local temp keys (never commit)
+.keys/
+*.pem
+*.key
 # 工作区根 .gitignore（覆盖 tidespot-android 之外的本机文件）
 # 密钥（最高优先级，一旦 git init 必须被忽略）
 tidespot-android/local-secrets.properties
@@ -8,6 +12,7 @@ cm账号.txt
 
 # 本机构建工具与探针产物
 .tools/
+.gradle-home/
 .probe/
 # M6 建库核查（2026-11-09）：杂项目录不入库——tools/ 为 .tools/ 的 204MB 副本（jj 大文件保护拦截），
 # .m4tmp/.opencode 为会话/工具临时数据
@@ -47,3 +52,25 @@ design-handdrawn/A-vintage-outdoor/device-compare/r6/*.png
 design-handdrawn/A-vintage-outdoor/device-compare/r7/*.png
 # r8 真机原始截图（v1.21.0 / v1.21.1，单张 1.5MB；仓库只留 760px JPG 与并排图）
 design-handdrawn/A-vintage-outdoor/device-compare/r8/*.png
+
+# 开发过程临时截图（不入库；已入库的历史截图保留，不追溯删除）
+.shots/android-a-*.png
+.shots/phone-*.png
+.shots/phone-final-*.png
+.shots/emulator-*.png
+.shots/tui*.xml
+.shots/ui*.xml
+.shots/uib*.xml
+.shots/uic*.xml
+.shots/uid*.xml
+.shots/uie*.xml
+.shots/uig*.xml
+.shots/uih*.xml
+.shots/uii*.xml
+.shots/uij*.xml
+.shots/uik*.xml
+.shots/uil*.xml
+.shots/uim*.xml
+
+# 临时构建目录
+.gradle-home/

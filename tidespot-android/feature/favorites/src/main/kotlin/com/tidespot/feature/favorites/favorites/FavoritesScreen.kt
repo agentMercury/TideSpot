@@ -42,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -59,6 +60,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -165,7 +167,18 @@ fun FavoritesScreen(
                 onValueChange = { viewModel.setFilter(state.filter.copy(query = it)) },
                 label = { Text(stringResource(R.string.ts_fav_search_hint)) },
                 singleLine = true,
+                shape = MaterialTheme.shapes.small,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+                    .border(1.6.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
                     .semantics { contentDescription = searchDesc },
             )
             val tags = FavoritesFilterLogic.availableTags(state.spots)
@@ -469,16 +482,35 @@ fun FavoritesScreen(
                         ) { Text(stringResource(R.string.ts_fav_clear_filters)) }
                     }
                 } else {
-                    Text(stringResource(R.string.ts_fav_empty), Modifier.padding(12.dp),
-                        style = MaterialTheme.typography.bodySmall)
-                    // OPT-V12-02：空态/失败态同样提供「刷新全部」（下拉不可及时仍可用）
-                    val refreshAllDesc = stringResource(R.string.ts_fav_refresh_all_desc)
-                    OutlinedButton(
-                        onClick = { viewModel.refreshAll(state.spots) },
-                        enabled = !state.refreshing && state.spots.isNotEmpty(),
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                            .semantics { contentDescription = refreshAllDesc },
-                    ) { Text(stringResource(R.string.ts_fav_refresh_all)) }
+                    Card(
+                        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp).vintageCard(shape = MaterialTheme.shapes.medium),
+                    ) {
+                        Column(
+                            Modifier.fillMaxWidth().padding(vertical = 20.dp, horizontal = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                painter = painterResource(UiR.drawable.ic_fish_vintage),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(width = 76.dp, height = 40.dp),
+                            )
+                            Text(
+                                stringResource(R.string.ts_fav_empty),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            // OPT-V12-02：空态/失败态同样提供「刷新全部」（下拉不可及时仍可用）
+                            val refreshAllDesc = stringResource(R.string.ts_fav_refresh_all_desc)
+                            OutlinedButton(
+                                onClick = { viewModel.refreshAll(state.spots) },
+                                enabled = !state.refreshing && state.spots.isNotEmpty(),
+                                modifier = Modifier
+                                    .semantics { contentDescription = refreshAllDesc },
+                            ) { Text(stringResource(R.string.ts_fav_refresh_all)) }
+                        }
+                    }
                 }
             }
         }
@@ -509,6 +541,11 @@ fun FavoritesScreen(
         val confirmDesc = stringResource(R.string.ts_fav_delete_confirm_desc)
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
+            modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+            shape = MaterialTheme.shapes.large,
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             title = { Text(stringResource(R.string.ts_fav_delete)) },
             text = { Text(stringResource(R.string.ts_fav_delete_confirm, target.name)) },
             confirmButton = {
@@ -530,6 +567,11 @@ fun FavoritesScreen(
         val batchConfirmDesc = stringResource(R.string.ts_fav_batch_delete_desc)
         AlertDialog(
             onDismissRequest = { showBatchDelete = false },
+            modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+            shape = MaterialTheme.shapes.large,
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             title = { Text(stringResource(R.string.ts_fav_batch_delete)) },
             text = { Text(FavoritesBatchLogic.deleteConfirmMessage(state.selection.size, strings)) },
             confirmButton = {
@@ -575,7 +617,18 @@ fun FavoritesScreen(
     // F-2.6 跨点 Top10（Sheet 内独立滚动 = 单层 LazyColumn，无嵌套同向 LazyColumn，D02）
     if (showTop10) {
         ModalBottomSheet(
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),onDismissRequest = { showTop10 = false }) {
+            onDismissRequest = { showTop10 = false },
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 0.dp,
+            dragHandle = {
+                Box(
+                    Modifier.padding(vertical = 8.dp).size(width = 34.dp, height = 4.dp)
+                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.55f), RoundedCornerShape(2.dp)),
+                )
+            },
+        ) {
             Column(Modifier.navigationBarsPadding()) {
                 Top10Content(top10 = state.top10)
             }
@@ -731,7 +784,7 @@ private fun FavoriteCard(
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
             // CHG-93 / 路径 B：统一票据卡骨架（描边 + 套印 + 非对称圆角）
-            .vintageCard()
+            .vintageCard(shape = MaterialTheme.shapes.medium)
             // OPT-V11-11：陈旧/已过期整项降透明度
             .alpha(if (stale.level == StaleLevel.NONE) 1f else FavoritesStaleLogic.ALPHA_STALE)
             // OPT-V11-12：长按 = 进入多选（D16）；单点点击 = 多选态切换选择 / 非多选态进详情
@@ -751,13 +804,13 @@ private fun FavoriteCard(
                 }
                 // 非多选态纯装饰不可点；多选态点击 = 切换选择，语义与旧 Checkbox 完全一致
                 Box(
-                    Modifier.size(26.dp)
+                    Modifier.size(22.dp)
                         .clip(CircleShape)
                         .background(if (selected && selecting) ringColor else Color.Transparent)
-                        .border(2.dp, ringColor, CircleShape)
+                        .border(1.8.dp, ringColor, CircleShape)
                         .then(if (selecting) Modifier.clickable { onLongPress() } else Modifier),
                 )
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(8.dp))
                 Column(Modifier.weight(1f)) {
                     Text(spot.name, style = MaterialTheme.typography.titleMedium, maxLines = 1)
                     // OPT-V115-02 / S08：水体类型行（设计：名称下方）
@@ -769,21 +822,15 @@ private fun FavoriteCard(
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            score?.toString() ?: Format.MISSING,
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontSize = 28.sp, fontWeight = FontWeight.Bold,
-                            ),
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        Icon(
-                            painter = painterResource(UiR.drawable.ic_fish_vintage),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(start = 4.dp).size(width = 18.dp, height = 10.dp),
-                        )
-                    }
+                    Text(
+                        score?.toString() ?: Format.MISSING,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = if (LocalSkin.current.id == "f-bluetide") FontFamily.SansSerif else FontFamily.Serif,
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                     score?.let {
                         Text(
                             BandTitles.fromDomainTier(it, strings),
@@ -792,6 +839,13 @@ private fun FavoriteCard(
                         )
                     }
                 }
+                // 设计稿 / Web A：右侧是箭头，不再放鱼形；鱼只保留在印章/空态
+                Text(
+                    "›",
+                    Modifier.padding(start = 6.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             VintageDashedDivider(Modifier.fillMaxWidth().padding(vertical = 6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -885,6 +939,11 @@ private fun EditSpotDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = {
             Text(stringResource(if (existing == null) R.string.ts_fav_new_title else R.string.ts_fav_edit_title))
         },
@@ -994,6 +1053,11 @@ private fun BatchTagsDialog(
     var replace by remember { mutableStateOf(false) }
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = { Text(stringResource(R.string.ts_fav_batch_tag_title, selectedCount)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1059,6 +1123,11 @@ private fun BatchGroupDialog(
     var group by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = { Text(stringResource(R.string.ts_fav_batch_group_title, selectedCount)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1187,7 +1256,7 @@ private fun Top10Content(top10: List<CrossSpotTop10Entry>) {
                     startText,
                 )
                 Card(
-                    Modifier.fillMaxWidth().padding(vertical = 4.dp).vintageCard()
+                    Modifier.fillMaxWidth().padding(vertical = 4.dp).vintageCard(shape = MaterialTheme.shapes.medium)
                         .semantics { contentDescription = rankDesc },
                 ) {
                     Column(Modifier.padding(12.dp)) {
@@ -1268,6 +1337,11 @@ private fun CustomTop10RangeDialog(
     var error by remember { mutableStateOf<Top10TimeFilter.CustomError?>(null) }
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.vintageCard(shape = MaterialTheme.shapes.large),
+        shape = MaterialTheme.shapes.large,
+        containerColor = MaterialTheme.colorScheme.surface,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = { Text(stringResource(R.string.ts_fav_filter_custom_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

@@ -1,5 +1,6 @@
 package com.tidespot.feature.map
 import com.tidespot.core.ui.theme.vintageCard
+import com.tidespot.core.ui.theme.LocalSkin
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.Icon
 
@@ -49,6 +50,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -545,13 +549,19 @@ fun MapScreen(
                         color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.weight(1f).height(46.dp)
+                            .vintageCard(shape = RoundedCornerShape(12.dp))
                             .semantics { contentDescription = searchHintText },
                     ) {
                         Row(
                             Modifier.fillMaxSize().padding(horizontal = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text("⌕", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                            Icon(
+                                painter = painterResource(UiR.drawable.ic_search_vintage),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp),
+                            )
                             Text(
                                 searchHintText,
                                 Modifier.padding(start = 8.dp),
@@ -563,13 +573,13 @@ fun MapScreen(
                     }
                     if (permissionState is PermissionUiState.Granted && locationController != null) {
                         // 定位：设计稿为实心主色方块（选中/激活态）
-                        TopBarButton("◎", stringResource(R.string.ts_map_my_location), filled = true) { locateMe() }
+                        TopBarButton(UiR.drawable.ic_target_vintage, stringResource(R.string.ts_map_my_location), filled = true) { locateMe() }
                     }
                     if (onOpenFavorites != null && favoritesLabel.isNotEmpty()) {
-                        TopBarButton("★", favoritesLabel, filled = false) { onOpenFavorites.invoke() }
+                        TopBarButton(UiR.drawable.ic_star_vintage, favoritesLabel, filled = false) { onOpenFavorites.invoke() }
                     }
                     if (onOpenSettings != null && settingsLabel.isNotEmpty()) {
-                        TopBarButton("⚙", settingsLabel, filled = false) { onOpenSettings.invoke() }
+                        TopBarButton(UiR.drawable.ic_settings_vintage, settingsLabel, filled = false) { onOpenSettings.invoke() }
                     }
                 }
                 if (searchExpanded) {
@@ -630,13 +640,16 @@ fun MapScreen(
 
             // OPT-V115-02 / S01 C19：Top10 入口（信息条上方，设计 366×48）
             if (onOpenTop10 != null && top10Label.isNotEmpty()) {
+                val isBlueTide = LocalSkin.current.id == "f-bluetide"
+                val bannerShape = if (isBlueTide) RoundedCornerShape(14.dp) else MaterialTheme.shapes.medium
                 Surface(
                     onClick = { onOpenTop10.invoke() },
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    shape = MaterialTheme.shapes.medium,
-                    // CHG-93 / 路径 B：深蓝实心横幅 → 双线白纸信息卡（保留真实瓦片，S3 不碰）
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp).vintageCard(),
+                    color = if (isBlueTide) Color(0xFF0D47A1) else MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = if (isBlueTide) Color.White else MaterialTheme.colorScheme.onSurface,
+                    shape = bannerShape,
+                    // CHG-93 / 路径 B：A/D/E 双线纸卡；F 回到 handoff 的深蓝实心横幅。
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
+                        .vintageCard(shape = bannerShape),
                 ) {
                     Row(
                         Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 12.dp),
@@ -646,19 +659,19 @@ fun MapScreen(
                         Icon(
                             painter = painterResource(UiR.drawable.ic_fish_vintage),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = if (isBlueTide) Color.White.copy(alpha = 0.92f) else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(width = 24.dp, height = 13.dp),
                         )
                         Text(
                             top10Label,
                             Modifier.padding(start = 8.dp).weight(1f),
                             style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = if (isBlueTide) Color.White else MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
                             "›",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = if (isBlueTide) Color.White.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -701,44 +714,51 @@ fun MapScreen(
             )
 
  
-            // OPT-V115-02 / S01 C22：来源行（源更新 / 本机拉取；无数据显「—」）
-            Text(
-                stringResource(
-                    R.string.ts_map_source_line,
-                    Format.MISSING,
-                    sourceFetchedAtMillis?.let { Format.clockMillis(it, java.time.ZoneId.systemDefault()) } ?: Format.MISSING,
-                ),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
-            )
-
-            // OPT-V115-02 / S01 C21：底图署名行（设计 y=818；与 Top10/信息条不重叠）
-            // OPT-A-10：署名随提供方切换（OSM 数据恒署名，瓦片提供方另署）
-            Text(
-                stringResource(R.string.ts_map_attribution, mapProviderName),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
-            )
+            // OPT-V115-02 / S01 C22：来源行 + 署名行
+            // 叠在真实瓦片上必须有纸底衬，否则会与地图 POI 注记互相压字；
+            // 40dp 底垫把整块抬到 MapLibre 自带 logo 上方。
+            Surface(
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp).padding(bottom = 40.dp),
+            ) {
+                Column(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+                    Text(
+                        stringResource(
+                            R.string.ts_map_source_line,
+                            Format.MISSING,
+                            sourceFetchedAtMillis?.let { Format.clockMillis(it, java.time.ZoneId.systemDefault()) } ?: Format.MISSING,
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    // OPT-A-10：署名随提供方切换（OSM 数据恒署名，瓦片提供方另署）
+                    Text(
+                        stringResource(R.string.ts_map_attribution, mapProviderName),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }
 
 /** OPT-V115-02 / S01 C02：顶部工具浮层方块按钮（44×46 rx12；filled 为主色实心，其余白底主色图标）。 */
 @Composable
-private fun TopBarButton(icon: String, description: String, filled: Boolean, onClick: () -> Unit) {
+private fun TopBarButton(iconRes: Int, description: String, filled: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         color = if (filled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        modifier = Modifier.size(44.dp, 46.dp).semantics { contentDescription = description },
+        modifier = Modifier.size(44.dp, 46.dp).vintageCard(shape = RoundedCornerShape(12.dp)).semantics { contentDescription = description },
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Text(
-                icon,
-                style = MaterialTheme.typography.titleLarge,
-                color = if (filled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                tint = if (filled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp),
             )
         }
     }
@@ -747,18 +767,65 @@ private fun TopBarButton(icon: String, description: String, filled: Boolean, onC
 /** 十字准星覆盖层：固定于屏幕中心（地图中心对准式）；Preview 态变琥珀色。 */
 @Composable
 private fun CrosshairOverlay(preview: Boolean, modifier: Modifier = Modifier) {
-    val color = if (preview) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
+    val skinId = LocalSkin.current.id
+    val isJournal = skinId == "e-tidejournal"
+    val isBlueTide = skinId == "f-bluetide"
+    val ring = when {
+        isJournal -> MaterialTheme.colorScheme.onSurface
+        isBlueTide -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.outline
+    }
+    val dot = when {
+        isBlueTide -> MaterialTheme.colorScheme.secondary
+        preview -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.tertiary
+    }
+    val paper = MaterialTheme.colorScheme.surface
     Canvas(modifier = modifier) {
         val cx = size.width / 2f
         val cy = size.height / 2f
-        val gap = 26f
-        val len = 44f
-        val strokeWidth = 4f
-        drawLine(color, Offset(cx - gap - len, cy), Offset(cx - gap, cy), strokeWidth)
-        drawLine(color, Offset(cx + gap, cy), Offset(cx + gap + len, cy), strokeWidth)
-        drawLine(color, Offset(cx, cy - gap - len), Offset(cx, cy - gap), strokeWidth)
-        drawLine(color, Offset(cx, cy + gap), Offset(cx, cy + gap + len), strokeWidth)
-        drawCircle(color, radius = 5f, center = Offset(cx, cy))
+        val radius = 52.dp.toPx()
+        if (!isJournal) {
+            drawCircle(
+                color = paper,
+                radius = 8.dp.toPx(),
+                center = Offset(cx, cy),
+            )
+        }
+        drawCircle(
+            color = ring,
+            radius = radius,
+            center = Offset(cx, cy),
+            style = Stroke(
+                width = if (isBlueTide) 2.dp.toPx() else 1.6.dp.toPx(),
+                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f)),
+            ),
+        )
+        if (isJournal) {
+            // 手帐准星：没有实心点，只有墨线环 + 四向刻度。
+            val tick = 7.dp.toPx()
+            val gap = 6.dp.toPx()
+            listOf(
+                Offset(cx, cy - radius - gap) to Offset(cx, cy - radius - gap - tick),
+                Offset(cx, cy + radius + gap) to Offset(cx, cy + radius + gap + tick),
+                Offset(cx - radius - gap, cy) to Offset(cx - radius - gap - tick, cy),
+                Offset(cx + radius + gap, cy) to Offset(cx + radius + gap + tick, cy),
+            ).forEach { (start, end) ->
+                drawLine(color = ring, start = start, end = end, strokeWidth = 1.6.dp.toPx())
+            }
+        } else {
+            drawCircle(
+                color = ring,
+                radius = 4.dp.toPx(),
+                center = Offset(cx, cy),
+                style = Stroke(width = 1.2.dp.toPx()),
+            )
+            drawCircle(
+                color = dot,
+                radius = if (isBlueTide) 5.dp.toPx() else 3.dp.toPx(),
+                center = Offset(cx, cy),
+            )
+        }
     }
 }
 
@@ -777,7 +844,7 @@ private fun InfoBarPanel(
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.widthIn(max = 236.dp),
+            modifier = Modifier.widthIn(max = 236.dp).vintageCard(shape = RoundedCornerShape(16.dp)),
         ) {
             Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                 Text(

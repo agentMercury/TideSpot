@@ -110,11 +110,21 @@ fun Modifier.handDrawnOutline(
     val sw = strokeWidth.toPx()
     val amp = amplitude.toPx()
     val cornerPx = corner.toPx()
+    // 先画一条稳定实墨底线，保证纸卡有 2.2dp 的清晰轮廓；
+    // 再叠两遍低透明度抖动线，只负责「手工描边」的毛边，不承担可读性。
+    val insetPx = 1f
+    drawRoundRect(
+        color = color.copy(alpha = 0.86f),
+        topLeft = Offset(insetPx, insetPx),
+        size = Size(size.width - insetPx * 2f, size.height - insetPx * 2f),
+        cornerRadius = CornerRadius(cornerPx),
+        style = Stroke(width = sw),
+    )
     repeat(passes) { pass ->
         val points = jitteredOutline(size, cornerPx, amp, Random(seed + pass * 31))
         drawPath(
             path = points,
-            color = color.copy(alpha = if (pass == 0) 0.62f else 0.34f),
+            color = color.copy(alpha = if (pass == 0) 0.30f else 0.16f),
             style = Stroke(width = sw, cap = StrokeCap.Round, join = StrokeJoin.Round),
         )
     }

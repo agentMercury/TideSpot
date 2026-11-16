@@ -85,7 +85,17 @@ data class SkinTexture(
     val paperGrain: Boolean = true,
     val grainStrength: Float = 1f,
     val printMisregister: Boolean = true,
+    /** 浅色下套印投影 alpha；手帐纸的硬墨边要更深，蓝潮则完全不要。 */
+    val printShadowAlpha: Float = 0.18f,
     val handDrawnOutline: Boolean = true,
+    /** 蓝潮的干净白卡只靠 1dp 柔和投影分层，不画墨线。 */
+    val softShadow: Boolean = false,
+    /** 蓝潮的干净白卡另加 1dp 浅色 hairline，替代手绘墨线。 */
+    val softOutline: Boolean = false,
+    /** 版块标题是否带母题图标 / 延展虚线；蓝潮为 false。 */
+    val sectionOrnament: Boolean = true,
+    /** 分隔线是否虚线；蓝潮为 false（实线 hairline）。 */
+    val dashedDivider: Boolean = true,
     val fishMotifRes: Int = R.drawable.ic_fish_vintage,
     val waveMotifRes: Int = R.drawable.ic_wave_vintage,
     val mountMotifRes: Int = R.drawable.ic_mount_vintage,
@@ -120,10 +130,10 @@ private val VintageSeaLight = lightColorScheme(
     onPrimaryContainer = Color(0xFF16324F),
     secondary = Color(0xFF2E6E7E),
     onSecondary = Color(0xFFF7F1DE),
-    // D2（真机对拍 2026-11-13）：M3 FilterChip 选中底走 secondaryContainer；
-    // 原 #E8DDBE 与纸底 #E4D9BC 几乎同色，选中态不可辨。改深一档到 bg2。
-    secondaryContainer = Color(0xFFD8C9A5),
-    onSecondaryContainer = Color(0xFF16324F),
+    // D2 / 2026-11-16：M3 FilterChip 选中底走 secondaryContainer；
+    // 与纸卡反差过小的米色改为藏蓝实底，选中/未选中一眼可分。
+    secondaryContainer = Color(0xFF1B3A5C),
+    onSecondaryContainer = Color(0xFFF7F1DE),
     tertiary = Color(0xFFD9A734),
     onTertiary = Color(0xFF16324F),
     background = Color(0xFFE4D9BC),
@@ -162,9 +172,9 @@ private val VintageInlandLight = lightColorScheme(
     onPrimaryContainer = Color(0xFF213D2A),
     secondary = Color(0xFF3E7A54),
     onSecondary = Color(0xFFF7F4E2),
-    // D2：同上，选中底深一档（原 #E4E6C6 与苔绿纸底太近）
-    secondaryContainer = Color(0xFFCDD6B0),
-    onSecondaryContainer = Color(0xFF213D2A),
+    // D2：同上，墨绿实底，避免苔绿纸底上选中态不可辨
+    secondaryContainer = Color(0xFF2E5A48),
+    onSecondaryContainer = Color(0xFFF7F4E2),
     tertiary = Color(0xFFD9A734),
     onTertiary = Color(0xFF213D2A),
     background = Color(0xFFDCE2C4),
@@ -194,82 +204,82 @@ private val VintageInlandLight = lightColorScheme(
     surfaceContainerHighest = Color(0xFFF1EED8),
 )
 
-// ── 手绘 A：深色 · 海洋 / 近海（独立调色，非浅色机械反转）───────────────────
+// ── 手绘 A：深色 · 海洋 / 近海（深蓝纸 + 奶油墨线 + 珊瑚强调）──────────────
 private val VintageSeaDark = darkColorScheme(
-    primary = Color(0xFF90CAF9),
-    onPrimary = Color(0xFF0E1C2B),
-    primaryContainer = Color(0xFF132538),
-    onPrimaryContainer = Color(0xFFE6EDF5),
-    secondary = Color(0xFF4DB6AC),
-    onSecondary = Color(0xFF0E1C2B),
-    secondaryContainer = Color(0xFF1E344A),
-    onSecondaryContainer = Color(0xFFE6EDF5),
-    tertiary = Color(0xFF80CBC4),
-    onTertiary = Color(0xFF0E1C2B),
-    background = Color(0xFF0E1C2B),
-    onBackground = Color(0xFFE6EDF5),
-    surface = Color(0xFF17293B),
-    onSurface = Color(0xFFE6EDF5),
-    surfaceVariant = Color(0xFF1E344A),
-    onSurfaceVariant = Color(0xFF9FB0C0),
-    outline = Color(0xFF3A4C5E),
-    outlineVariant = Color(0xFF3A4C5E),
-    error = Color(0xFFFF8A65),
-    onError = Color(0xFF0E1C2B),
-    scrim = Color(0xFF0E1C2B),
-    surfaceTint = Color(0xFF90CAF9),
-    inverseSurface = Color(0xFFE6EDF5),
-    inverseOnSurface = Color(0xFF0E1C2B),
+    primary = Color(0xFFE9DCBE),
+    onPrimary = Color(0xFF15243A),
+    primaryContainer = Color(0xFF243547),
+    onPrimaryContainer = Color(0xFFECE3CD),
+    secondary = Color(0xFF7FB3AB),
+    onSecondary = Color(0xFF15243A),
+    secondaryContainer = Color(0xFFE9DCBE),
+    onSecondaryContainer = Color(0xFF15243A),
+    tertiary = Color(0xFFD9A734),
+    onTertiary = Color(0xFF15243A),
+    background = Color(0xFF101A24),
+    onBackground = Color(0xFFECE3CD),
+    surface = Color(0xFF1A2836),
+    onSurface = Color(0xFFECE3CD),
+    surfaceVariant = Color(0xFF243547),
+    onSurfaceVariant = Color(0xFFA89F88),
+    outline = Color(0xFFE9DCBE),
+    outlineVariant = Color(0xFF6E6552),
+    error = Color(0xFFE0805E),
+    onError = Color(0xFF1A120E),
+    scrim = Color(0xFF101A24),
+    surfaceTint = Color(0xFFE9DCBE),
+    inverseSurface = Color(0xFFECE3CD),
+    inverseOnSurface = Color(0xFF15243A),
     inversePrimary = Color(0xFF1B3A5C),
     errorContainer = Color(0xFF3A2A26),
-    onErrorContainer = Color(0xFFFF8A65),
-    tertiaryContainer = Color(0xFF1E344A),
-    onTertiaryContainer = Color(0xFFE6EDF5),
-    surfaceContainerLowest = Color(0xFF0E1C2B),
-    surfaceContainerLow = Color(0xFF132538),
-    surfaceContainer = Color(0xFF17293B),
-    surfaceContainerHigh = Color(0xFF1E344A),
-    // CHG-93：深色卡改深底（对齐 dark-favorites.png #122334 系），层次由 vintageCard 亮描边提供
-    surfaceContainerHighest = Color(0xFF16283A),
+    onErrorContainer = Color(0xFFF0B49C),
+    tertiaryContainer = Color(0xFF3A3222),
+    onTertiaryContainer = Color(0xFFF0D79A),
+    surfaceContainerLowest = Color(0xFF0C141C),
+    surfaceContainerLow = Color(0xFF141F2B),
+    surfaceContainer = Color(0xFF1A2836),
+    surfaceContainerHigh = Color(0xFF243547),
+    // 深色卡 = 纸卡（与 Web A 深色一致），层次靠奶油描边
+    surfaceContainerHighest = Color(0xFF1A2836),
 )
 
-// ── 手绘 A：深色 · 内陆水体 ────────────────────────────────────────────────
+// ── 手绘 A：深色 · 内陆水体（深苔纸 + 奶油墨线 + 琥珀/珊瑚）────────────────
 private val VintageInlandDark = darkColorScheme(
-    primary = Color(0xFFA5D6A7),
-    onPrimary = Color(0xFF101D18),
-    primaryContainer = Color(0xFF162A20),
-    onPrimaryContainer = Color(0xFFE6F0E9),
-    secondary = Color(0xFF66BB6A),
-    onSecondary = Color(0xFF101D18),
-    secondaryContainer = Color(0xFF1E372A),
-    onSecondaryContainer = Color(0xFFE6F0E9),
-    tertiary = Color(0xFF80CBC4),
-    onTertiary = Color(0xFF101D18),
-    background = Color(0xFF101D18),
-    onBackground = Color(0xFFE6F0E9),
-    surface = Color(0xFF172B21),
-    onSurface = Color(0xFFE6F0E9),
-    surfaceVariant = Color(0xFF1E372A),
-    onSurfaceVariant = Color(0xFF9DB8A8),
-    outline = Color(0xFF3A5346),
-    outlineVariant = Color(0xFF3A5346),
-    error = Color(0xFFFFAB91),
-    onError = Color(0xFF101D18),
-    scrim = Color(0xFF101D18),
-    surfaceTint = Color(0xFFA5D6A7),
-    inverseSurface = Color(0xFFE6F0E9),
-    inverseOnSurface = Color(0xFF101D18),
+    primary = Color(0xFFE6DFC0),
+    onPrimary = Color(0xFF15241A),
+    primaryContainer = Color(0xFF26382C),
+    onPrimaryContainer = Color(0xFFECE6D2),
+    secondary = Color(0xFF8FBF82),
+    onSecondary = Color(0xFF15241A),
+    secondaryContainer = Color(0xFFE6DFC0),
+    onSecondaryContainer = Color(0xFF15241A),
+    tertiary = Color(0xFFD9A734),
+    onTertiary = Color(0xFF15241A),
+    background = Color(0xFF121B16),
+    onBackground = Color(0xFFECE6D2),
+    surface = Color(0xFF1C2A21),
+    onSurface = Color(0xFFECE6D2),
+    surfaceVariant = Color(0xFF26382C),
+    onSurfaceVariant = Color(0xFFA9B09B),
+    outline = Color(0xFFE6DFC0),
+    outlineVariant = Color(0xFF6B7763),
+    error = Color(0xFFE08A6A),
+    onError = Color(0xFF1A120E),
+    scrim = Color(0xFF121B16),
+    surfaceTint = Color(0xFFE6DFC0),
+    inverseSurface = Color(0xFFECE6D2),
+    inverseOnSurface = Color(0xFF15241A),
     inversePrimary = Color(0xFF2E5A48),
     errorContainer = Color(0xFF3A2A24),
-    onErrorContainer = Color(0xFFFFAB91),
-    tertiaryContainer = Color(0xFF1E372A),
-    onTertiaryContainer = Color(0xFFE6F0E9),
-    surfaceContainerLowest = Color(0xFF101D18),
-    surfaceContainerLow = Color(0xFF162A20),
-    surfaceContainer = Color(0xFF172B21),
-    surfaceContainerHigh = Color(0xFF1E372A),
-    // CHG-93：深色卡改深底，不再用亮实心块
-    surfaceContainerHighest = Color(0xFF172A20),
+    onErrorContainer = Color(0xFFF0B49C),
+    tertiaryContainer = Color(0xFF3A3222),
+    onTertiaryContainer = Color(0xFFF0D79A),
+    surfaceContainerLowest = Color(0xFF0E1712),
+    surfaceContainerLow = Color(0xFF16241B),
+    surfaceContainer = Color(0xFF1C2A21),
+    surfaceContainerHigh = Color(0xFF26382C),
+    // 深色卡 = 苔纸卡
+    surfaceContainerHighest = Color(0xFF1C2A21),
 )
 
 /**
@@ -475,6 +485,234 @@ private val FieldGuideInlandDark = darkColorScheme(
     surfaceContainerHighest = Color(0xFF12261C),
 )
 
+// ══════════════════════════════════════════════════════════════════════════
+// 潮汐手帐（E · TIDE JOURNAL）—— 纸手帐语言：纸底 + 墨线 + 珊瑚贴纸
+// 色板与 D 共用同一套源色（Web `skins.css` E 段），只把海洋 tertiary 换成珊瑚墨。
+// ══════════════════════════════════════════════════════════════════════════
+private val TideJournalSeaLight = FieldGuideSeaLight.copy(
+    secondary = Color(0xFF456A84),
+    // M3 FilterChip 选中态读 secondaryContainer；E 设计要求「墨底纸字」。
+    secondaryContainer = Color(0xFF101820),
+    onSecondaryContainer = Color(0xFFFFFDF7),
+    tertiary = Color(0xFFE5644C),
+    onTertiary = Color(0xFF101820),
+    tertiaryContainer = Color(0xFFF7D2CB),
+    onTertiaryContainer = Color(0xFF7A2318),
+)
+
+private val TideJournalSeaDark = FieldGuideSeaDark.copy(
+    secondaryContainer = Color(0xFFF2EFE6),
+    onSecondaryContainer = Color(0xFF12222E),
+)
+
+private val TideJournalInlandLight = FieldGuideInlandLight.copy(
+    secondary = Color(0xFF4A6B5E),
+    secondaryContainer = Color(0xFF101820),
+    onSecondaryContainer = Color(0xFFFFFDF7),
+)
+
+private val TideJournalInlandDark = FieldGuideInlandDark.copy(
+    secondaryContainer = Color(0xFFF2EFE6),
+    onSecondaryContainer = Color(0xFF12261C),
+)
+
+// ══════════════════════════════════════════════════════════════════════════
+// 蓝潮（F · BLUE TIDE）—— 干净白卡 + 蓝 / 薄荷双主色 + 大圆角 + 无纸纹
+// 浅色取自 Web `skins.css` F 段；深色按同色系压暗独立调校。
+// ══════════════════════════════════════════════════════════════════════════
+private val BlueTideSeaLight = lightColorScheme(
+    primary = Color(0xFF1565C0),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFD6E8F8),
+    onPrimaryContainer = Color(0xFF10243A),
+    secondary = Color(0xFF00695C),
+    onSecondary = Color(0xFFFFFFFF),
+    // M3 FilterChip 选中态：蓝潮统一用主色实心 + onPrimary。
+    secondaryContainer = Color(0xFF1565C0),
+    onSecondaryContainer = Color(0xFFFFFFFF),
+    tertiary = Color(0xFF26A69A),
+    onTertiary = Color(0xFF10243A),
+    background = Color(0xFFEEF3F8),
+    onBackground = Color(0xFF10243A),
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF10243A),
+    surfaceVariant = Color(0xFFEEF3F8),
+    onSurfaceVariant = Color(0xFF556579),
+    outline = Color(0xFFDCE5EE),
+    outlineVariant = Color(0xFFDCE5EE),
+    error = Color(0xFFC62828),
+    onError = Color(0xFFFFFFFF),
+    scrim = Color(0xFF10243A),
+    surfaceTint = Color(0xFF1565C0),
+    inverseSurface = Color(0xFF10243A),
+    inverseOnSurface = Color(0xFFFFFFFF),
+    inversePrimary = Color(0xFF90CAF9),
+    errorContainer = Color(0xFFFDE7E7),
+    onErrorContainer = Color(0xFF8E1F1F),
+    tertiaryContainer = Color(0xFFE0F2F1),
+    onTertiaryContainer = Color(0xFF004D40),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFF7FAFD),
+    surfaceContainer = Color(0xFFF2F6FA),
+    surfaceContainerHigh = Color(0xFFE6EEF6),
+    surfaceContainerHighest = Color(0xFFFFFFFF),
+)
+
+private val BlueTideSeaDark = darkColorScheme(
+    primary = Color(0xFF90CAF9),
+    onPrimary = Color(0xFF0E1721),
+    primaryContainer = Color(0xFF1E3A5C),
+    onPrimaryContainer = Color(0xFFDCEBFA),
+    secondary = Color(0xFF80CBC4),
+    onSecondary = Color(0xFF0E1721),
+    secondaryContainer = Color(0xFF90CAF9),
+    onSecondaryContainer = Color(0xFF0E1721),
+    tertiary = Color(0xFF80CBC4),
+    onTertiary = Color(0xFF0E1721),
+    background = Color(0xFF0E1721),
+    onBackground = Color(0xFFE6EDF5),
+    surface = Color(0xFF16212E),
+    onSurface = Color(0xFFE6EDF5),
+    surfaceVariant = Color(0xFF1E2C3A),
+    onSurfaceVariant = Color(0xFF9FB0C0),
+    outline = Color(0xFF2A3A4C),
+    outlineVariant = Color(0xFF2A3A4C),
+    error = Color(0xFFEF9A9A),
+    onError = Color(0xFF3A1414),
+    scrim = Color(0xFF0E1721),
+    surfaceTint = Color(0xFF90CAF9),
+    inverseSurface = Color(0xFFE6EDF5),
+    inverseOnSurface = Color(0xFF0E1721),
+    inversePrimary = Color(0xFF1565C0),
+    errorContainer = Color(0xFF3A2020),
+    onErrorContainer = Color(0xFFF7BDBD),
+    tertiaryContainer = Color(0xFF12302C),
+    onTertiaryContainer = Color(0xFFCFE9E5),
+    surfaceContainerLowest = Color(0xFF0E1721),
+    surfaceContainerLow = Color(0xFF121C28),
+    surfaceContainer = Color(0xFF16212E),
+    surfaceContainerHigh = Color(0xFF1E2C3A),
+    surfaceContainerHighest = Color(0xFF16212E),
+)
+
+private val BlueTideInlandLight = lightColorScheme(
+    primary = Color(0xFF00695C),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFD7F0EB),
+    onPrimaryContainer = Color(0xFF10243A),
+    secondary = Color(0xFF1565C0),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFF00695C),
+    onSecondaryContainer = Color(0xFFFFFFFF),
+    tertiary = Color(0xFF26A69A),
+    onTertiary = Color(0xFF10243A),
+    background = Color(0xFFEDF6F4),
+    onBackground = Color(0xFF10243A),
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF10243A),
+    surfaceVariant = Color(0xFFEDF6F4),
+    onSurfaceVariant = Color(0xFF4F6B66),
+    outline = Color(0xFFD6E7E2),
+    outlineVariant = Color(0xFFD6E7E2),
+    error = Color(0xFFC62828),
+    onError = Color(0xFFFFFFFF),
+    scrim = Color(0xFF10243A),
+    surfaceTint = Color(0xFF00695C),
+    inverseSurface = Color(0xFF10243A),
+    inverseOnSurface = Color(0xFFFFFFFF),
+    inversePrimary = Color(0xFF80CBC4),
+    errorContainer = Color(0xFFFDE7E7),
+    onErrorContainer = Color(0xFF8E1F1F),
+    tertiaryContainer = Color(0xFFE0F2F1),
+    onTertiaryContainer = Color(0xFF004D40),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFF7FBFA),
+    surfaceContainer = Color(0xFFF2F9F7),
+    surfaceContainerHigh = Color(0xFFE4F0ED),
+    surfaceContainerHighest = Color(0xFFFFFFFF),
+)
+
+private val BlueTideInlandDark = darkColorScheme(
+    primary = Color(0xFF80CBC4),
+    onPrimary = Color(0xFF0E1721),
+    primaryContainer = Color(0xFF12302C),
+    onPrimaryContainer = Color(0xFFCFE9E5),
+    secondary = Color(0xFF90CAF9),
+    onSecondary = Color(0xFF0E1721),
+    secondaryContainer = Color(0xFF80CBC4),
+    onSecondaryContainer = Color(0xFF0E1721),
+    tertiary = Color(0xFF80CBC4),
+    onTertiary = Color(0xFF0E1721),
+    background = Color(0xFF0C1B18),
+    onBackground = Color(0xFFE6EDF5),
+    surface = Color(0xFF132420),
+    onSurface = Color(0xFFE6EDF5),
+    surfaceVariant = Color(0xFF1B302B),
+    onSurfaceVariant = Color(0xFF9FB8B2),
+    outline = Color(0xFF2C433D),
+    outlineVariant = Color(0xFF2C433D),
+    error = Color(0xFFEF9A9A),
+    onError = Color(0xFF3A1414),
+    scrim = Color(0xFF0C1B18),
+    surfaceTint = Color(0xFF80CBC4),
+    inverseSurface = Color(0xFFE6EDF5),
+    inverseOnSurface = Color(0xFF0C1B18),
+    inversePrimary = Color(0xFF00695C),
+    errorContainer = Color(0xFF3A2020),
+    onErrorContainer = Color(0xFFF7BDBD),
+    tertiaryContainer = Color(0xFF12302C),
+    onTertiaryContainer = Color(0xFFCFE9E5),
+    surfaceContainerLowest = Color(0xFF0C1B18),
+    surfaceContainerLow = Color(0xFF0F1F1B),
+    surfaceContainer = Color(0xFF132420),
+    surfaceContainerHigh = Color(0xFF1B302B),
+    surfaceContainerHighest = Color(0xFF132420),
+)
+
+/** 手帐圆角：卡 12 / 按钮 10 / 标签 20 / 浮层 14。 */
+private val TideJournalShapes = Shapes(
+    extraSmall = RoundedCornerShape(4.dp),
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(14.dp),
+    extraLarge = RoundedCornerShape(20.dp),
+)
+
+/** 蓝潮圆角：卡 16 / 按钮 12 / 浮层 20，仍然不改变任何组件高度。 */
+private val BlueTideShapes = Shapes(
+    extraSmall = RoundedCornerShape(6.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(20.dp),
+    extraLarge = RoundedCornerShape(24.dp),
+)
+
+/** 手帐标题用衬线（KaiTi 的字面替身），正文保持系统无衬线，字号/行高与基线一致。 */
+private val TideJournalTypography = Typography(
+    titleLarge = TextStyle(fontFamily = VintageFontFamily, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold),
+    titleMedium = TextStyle(fontFamily = VintageFontFamily, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold),
+    titleSmall = TextStyle(fontFamily = VintageFontFamily, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+    bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 15.sp, lineHeight = 22.sp, fontWeight = FontWeight.Normal),
+    bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Normal),
+    bodySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
+    labelLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    labelMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    labelSmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Normal),
+)
+
+/** 蓝潮字阶：系统无衬线、标题 700，干净现代。 */
+private val BlueTideTypography = Typography(
+    titleLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold),
+    titleMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold),
+    titleSmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Bold),
+    bodyLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 15.sp, lineHeight = 22.sp, fontWeight = FontWeight.Normal),
+    bodyMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Normal),
+    bodySmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Normal),
+    labelLarge = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    labelMedium = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
+    labelSmall = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 10.sp, lineHeight = 14.sp, fontWeight = FontWeight.Normal),
+)
+
 /**
  * 路亚图鉴的形状：小圆角印章感（3 / 8 / 12 / 14 / 18），
  * 对应设计稿卡片 12px、Top10 条 8px、标签 20px 胶囊。
@@ -551,7 +789,7 @@ object TideSpotSkins {
         shapes = VintageShapes,
         typography = VintageTypography,
         // CHG-93：收敛纸纹强度（设计稿是高频细噪，旧 1f 在真机形成可见网格）
-        texture = SkinTexture(grainStrength = 0.5f),
+        texture = SkinTexture(grainStrength = 0.65f),
     )
 
     /**
@@ -602,8 +840,99 @@ object TideSpotSkins {
         ),
     )
 
-    /** 全部内置皮肤（A 复古户外 + D 路亚图鉴）；未来加皮肤只往这里追加。 */
-    val all: List<TideSpotSkin> = listOf(VintageOutdoor, FieldGuide)
+    /** 潮汐手帐（E）：纸手帐底 + 墨线 + 珊瑚贴纸，标题衬线、正文无衬线。 */
+    val TideJournal = TideSpotSkin(
+        id = "e-tidejournal",
+        name = "潮汐手帐", // i18n-exempt: skin display name is data, not UI copy
+        nameEn = "TIDE JOURNAL",
+        palettes = SkinPalettes(
+            seaLight = SkinPalette(
+                scheme = TideJournalSeaLight,
+                mapLand = Color(0xFFDDE9D5),
+                mapWater = Color(0xFFB7DAEE),
+                mapRoad = Color(0xFFFFFDF7),
+            ),
+            seaDark = SkinPalette(
+                scheme = TideJournalSeaDark,
+                mapLand = Color(0xFF16303F),
+                mapWater = Color(0xFF17394C),
+                mapRoad = Color(0xFF2A4A5C),
+            ),
+            inlandLight = SkinPalette(
+                scheme = TideJournalInlandLight,
+                mapLand = Color(0xFFD9E8D0),
+                mapWater = Color(0xFFB9E0CE),
+                mapRoad = Color(0xFFFFFDF7),
+            ),
+            inlandDark = SkinPalette(
+                scheme = TideJournalInlandDark,
+                mapLand = Color(0xFF18382A),
+                mapWater = Color(0xFF16382A),
+                mapRoad = Color(0xFF26503E),
+            ),
+        ),
+        shapes = TideJournalShapes,
+        typography = TideJournalTypography,
+        texture = SkinTexture(
+            paperGrain = true,
+            grainStrength = 0.8f,
+            printMisregister = true,
+            // 设计稿是 4px 实心墨影：浅色几乎全不透明，深色略收。
+            printShadowAlpha = 0.9f,
+            handDrawnOutline = true,
+            tapeDecoration = true,
+        ),
+    )
+
+    /** 蓝潮（F）：干净白卡 + 蓝 / 薄荷 + 大圆角，无纸纹、无墨线、无贴纸。 */
+    val BlueTide = TideSpotSkin(
+        id = "f-bluetide",
+        name = "蓝潮", // i18n-exempt: skin display name is data, not UI copy
+        nameEn = "BLUE TIDE",
+        palettes = SkinPalettes(
+            seaLight = SkinPalette(
+                scheme = BlueTideSeaLight,
+                mapLand = Color(0xFFE8F0F7),
+                mapWater = Color(0xFFCDE3F4),
+                mapRoad = Color(0xFFFFFFFF),
+            ),
+            seaDark = SkinPalette(
+                scheme = BlueTideSeaDark,
+                mapLand = Color(0xFF142433),
+                mapWater = Color(0xFF17384F),
+                mapRoad = Color(0xFF2A4358),
+            ),
+            inlandLight = SkinPalette(
+                scheme = BlueTideInlandLight,
+                mapLand = Color(0xFFE7F2EF),
+                mapWater = Color(0xFFCBE7E2),
+                mapRoad = Color(0xFFFFFFFF),
+            ),
+            inlandDark = SkinPalette(
+                scheme = BlueTideInlandDark,
+                mapLand = Color(0xFF142A25),
+                mapWater = Color(0xFF163A33),
+                mapRoad = Color(0xFF2A4A42),
+            ),
+        ),
+        shapes = BlueTideShapes,
+        typography = BlueTideTypography,
+        texture = SkinTexture(
+            paperGrain = false,
+            grainStrength = 0f,
+            printMisregister = false,
+            printShadowAlpha = 0f,
+            handDrawnOutline = false,
+            softShadow = true,
+            softOutline = true,
+            sectionOrnament = false,
+            dashedDivider = false,
+            tapeDecoration = false,
+        ),
+    )
+
+    /** 全部内置皮肤（A 复古户外 + D 路亚图鉴 + E 潮汐手帐 + F 蓝潮）。 */
+    val all: List<TideSpotSkin> = listOf(VintageOutdoor, FieldGuide, TideJournal, BlueTide)
 
     /** 缺省皮肤（`skinId` 缺失/非法时落回）。 */
     val default: TideSpotSkin = VintageOutdoor

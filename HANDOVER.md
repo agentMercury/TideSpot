@@ -57,7 +57,7 @@ tidespot-android/
 ## 4. 环境须知
 
 1. **JDK 17 / Android SDK / Gradle 8.9**：JDK `C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot`；SDK `C:\Users\gamer\AppData\Local\Android\Sdk`；Gradle 用 `.tools\gradle-8.9\`（不在 PATH）。
-2. **subst T:**（R-09）：`subst T: "D:\workspace\weatherfishcheck\tidespot-android"` 后在 `T:\` 下构建；**重启后失效，接手先查**（`subst` 无输出即重建）。
+2. **构建路径**（R-09 已解决）：工程根为全英文 `D:\workspace\weatherfishcheck`，**不再需要 `subst T:`**（2026-11-11 移除）。直接在 `tidespot-android\` 下用 `.tools\gradle-8.9\bin\gradle.bat` 或 `verify.ps1`。
 3. **沙箱网络选择性放行**：`repo1.maven.org` / `services.gradle.org` **不可达** → **禁止新增任何依赖/插件**（Robolectric/ui-test 不可用，A-14 Compose 冒烟锁等网络可用）。新模块 build 脚本照抄 `:feature:detail`。
 4. **Copernicus 凭据**：有效，存 `local-secrets.properties`；禁硬编码；`:app` 接线时读取。
 5. **黄金资产**：`archive/m0-m3-assets/`（只归档不删；测试从 classpath `/golden/` 资源加载，与归档无关）；NOAA B7 校潮回归数据在 `core/domain/src/test/resources/`（OPT-08，M5 入库）。
