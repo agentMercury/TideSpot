@@ -1,0 +1,485 @@
+/**
+ * F · 蓝潮（BLUE TIDE）—— design-handoff v3 的干净基线皮肤。
+ *
+ * 语言：白卡 + 1px 浅描边 + 柔和阴影 + 蓝/薄荷点缀；无纸纹、无硬投影、无贴纸装饰。
+ * 只作用于 [data-skin='f-bluetide']；A / D / E 不受影响。
+ */
+
+/* ============================== 1. Tokens ============================== */
+:root[data-skin='f-bluetide'] {
+  --ct-line: var(--color-outline);
+  --ct-soft: var(--color-text-dim);
+  --ct-mint: var(--color-mint-deep);
+  --ct-shadow-card: 0 3px 10px rgba(16, 36, 58, 0.06);
+  --ct-shadow-float: 0 10px 26px rgba(13, 71, 161, 0.2);
+  --ct-radius: 16px;
+
+  --screen-margin: 12px;
+  --card-padding: 14px;
+}
+
+:root[data-skin='f-bluetide'][data-theme='dark'] {
+  --ct-shadow-card: 0 3px 10px rgba(0, 0, 0, 0.32);
+  --ct-shadow-float: 0 10px 26px rgba(0, 0, 0, 0.42);
+}
+
+/* ============================== 2. 基础 ============================== */
+[data-skin='f-bluetide'] body {
+  background: var(--color-bg);
+}
+
+[data-skin='f-bluetide'] .main,
+[data-skin='f-bluetide'] .detail-page {
+  background: var(--color-bg);
+}
+
+[data-skin='f-bluetide'] .main__head h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--color-text);
+}
+
+[data-skin='f-bluetide'] .main--map .main__head {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[data-skin='f-bluetide'] .brand {
+  color: var(--color-primary);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+[data-skin='f-bluetide'] .ts-card {
+  border: 1px solid var(--ct-line);
+  border-radius: var(--ct-radius);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .ts-card--l2 {
+  box-shadow: var(--ct-shadow-float);
+}
+
+[data-skin='f-bluetide'] .ts-card > strong:first-child {
+  font-size: var(--text-title-small-size);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+[data-skin='f-bluetide'] .ts-btn {
+  border-radius: var(--radius-button);
+  font-weight: 600;
+}
+
+[data-skin='f-bluetide'] .ts-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-button);
+}
+
+[data-skin='f-bluetide'] .ts-btn--ghost {
+  border: 1px solid var(--ct-line);
+  background: var(--color-card);
+  color: var(--ct-soft);
+}
+
+[data-skin='f-bluetide'] .ts-btn--ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+[data-skin='f-bluetide'] .ts-chip {
+  border-radius: var(--radius-chip);
+  background: var(--color-surface-variant);
+  color: var(--ct-soft);
+  font-weight: 500;
+}
+
+[data-skin='f-bluetide'] .ts-chip--mint {
+  background: var(--color-mint-bg);
+  color: var(--color-secondary);
+}
+
+[data-skin='f-bluetide'] .ts-chip.is-selected {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+[data-skin='f-bluetide'] .ts-badge {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-badge);
+}
+
+[data-skin='f-bluetide'] .ts-tabs {
+  background: var(--color-surface-variant);
+}
+
+[data-skin='f-bluetide'] .ts-tabs button.is-active {
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .ts-day__chip {
+  border: 1px solid var(--ct-line);
+  border-radius: var(--radius-chip);
+  background: var(--color-card);
+}
+
+[data-skin='f-bluetide'] .ts-day__chip.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* 主卡保持 handoff v3 的深蓝渐变与柔光 */
+[data-skin='f-bluetide'] .ts-score {
+  background: linear-gradient(135deg, #1565c0 0%, #0d47a1 78%);
+  color: #ffffff;
+  box-shadow: var(--ct-shadow-float);
+}
+
+[data-skin='f-bluetide'] .ts-score__denom {
+  display: inline;
+  color: #ffffff;
+  opacity: 0.75;
+}
+
+[data-skin='f-bluetide'] .ts-score__band {
+  background: rgba(255, 255, 255, 0.16);
+  color: #b2dfdb;
+}
+
+/* ============================== 3. 详情 ============================== */
+[data-skin='f-bluetide'] .detail-top__title strong {
+  font-size: var(--text-title-medium-size);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+[data-skin='f-bluetide'] .detail-top__title .hint,
+[data-skin='f-bluetide'] .detail-source {
+  color: var(--ct-soft);
+  font-size: var(--text-label-small-size);
+}
+
+[data-skin='f-bluetide'] .detail-stamp,
+[data-skin='f-bluetide'] .detail-fav-chip {
+  display: none;
+}
+
+/* 水体标签：白底细边 + 薄荷图标 */
+[data-skin='f-bluetide'] .detail-water-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: -2px;
+}
+
+[data-skin='f-bluetide'] .detail-water {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--ct-line);
+  border-radius: 999px;
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: var(--text-label-large-size);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .detail-water svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-mint-deep);
+}
+
+[data-skin='f-bluetide'] .detail-water__ill {
+  display: none;
+}
+
+[data-skin='f-bluetide'] .detail-water__line {
+  display: block;
+}
+
+[data-skin='f-bluetide'] .detail-water i {
+  color: var(--ct-soft);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+[data-skin='f-bluetide'] .detail-sticky {
+  background: var(--color-bg);
+  box-shadow: none;
+  border-bottom: 1px solid var(--ct-line);
+}
+
+[data-skin='f-bluetide'] .detail-page .ts-tabs {
+  background: var(--color-surface-variant);
+}
+
+[data-skin='f-bluetide'] .detail-status__item {
+  border: 1px solid currentColor;
+  border-radius: var(--radius-chip);
+  background: var(--color-card);
+}
+
+[data-skin='f-bluetide'] .disclaimer-entry {
+  border: 1px solid var(--ct-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-variant);
+  color: var(--ct-soft);
+}
+
+/* ============================== 4. 收藏 ============================== */
+[data-skin='f-bluetide'] .fav-toolbar {
+  gap: var(--space-2);
+}
+
+[data-skin='f-bluetide'] .fav-search {
+  border: 1px solid var(--ct-line);
+  border-radius: var(--radius-chip);
+  background: var(--color-card);
+}
+
+[data-skin='f-bluetide'] .fav-group__head {
+  border-bottom: 1px solid var(--ct-line);
+}
+
+[data-skin='f-bluetide'] .fav-card {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--ct-line);
+  border-left: 4px solid var(--fav-band, var(--color-primary));
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .fav-card:hover {
+  box-shadow: var(--ct-shadow-float);
+}
+
+[data-skin='f-bluetide'] .fav-card.is-selected {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+[data-skin='f-bluetide'] .fav-card__check {
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border: 1px solid var(--ct-line);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--color-on-primary);
+}
+
+[data-skin='f-bluetide'] .fav-card__check.is-on {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+[data-skin='f-bluetide'] .fav-card__title strong {
+  font-size: var(--text-title-small-size);
+  font-weight: 700;
+}
+
+[data-skin='f-bluetide'] .fav-card__coord {
+  color: var(--ct-soft);
+  font-size: var(--text-label-small-size);
+}
+
+[data-skin='f-bluetide'] .fav-card__summary {
+  color: var(--color-text);
+  font-size: var(--text-label-large-size);
+}
+
+[data-skin='f-bluetide'] .fav-card__score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  min-width: 44px;
+  padding-left: 6px;
+  border-left: 1px solid var(--ct-line);
+}
+
+[data-skin='f-bluetide'] .fav-card__score b {
+  color: var(--color-primary);
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+[data-skin='f-bluetide'] .fav-card__score span {
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ct-soft);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+[data-skin='f-bluetide'] .fav-card__fish,
+[data-skin='f-bluetide'] .fav-card__fish--notes {
+  display: none;
+}
+
+[data-skin='f-bluetide'] .fav-card__actions {
+  grid-column: 1 / -1;
+  padding-top: 8px;
+  border-top: 1px solid var(--ct-line);
+}
+
+[data-skin='f-bluetide'] .fav-tag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-variant);
+  color: var(--ct-soft);
+}
+
+/* ============================== 5. 地图 ============================== */
+/* 准星：handoff v3 的 116 包围盒 + 细环 r30 + 薄荷点 r7 */
+[data-skin='f-bluetide'] .crosshair__ring {
+  inset: 28px;
+  border: 2px dashed var(--color-mint);
+  opacity: 0.9;
+}
+
+[data-skin='f-bluetide'] .crosshair__dot {
+  background: var(--color-mint-deep);
+  box-shadow:
+    0 0 0 2px var(--color-card),
+    0 0 0 3px var(--color-mint);
+}
+
+[data-skin='f-bluetide'] .map-center-pin {
+  display: none;
+}
+
+[data-skin='f-bluetide'] .map-hud__styles,
+[data-skin='f-bluetide'] .map-search__trigger,
+[data-skin='f-bluetide'] .map-search__panel {
+  border: 1px solid var(--ct-line);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .map-search__results,
+[data-skin='f-bluetide'] .map-star-pop {
+  border: 1px solid var(--ct-line);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-float);
+}
+
+[data-skin='f-bluetide'] .map-info {
+  border: 1px solid var(--ct-line);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-float);
+}
+
+[data-skin='f-bluetide'] .map-info__coord,
+[data-skin='f-bluetide'] .map-info__sub {
+  color: var(--ct-soft);
+}
+
+[data-skin='f-bluetide'] .map-hint {
+  background: rgba(16, 36, 58, 0.92);
+}
+
+[data-skin='f-bluetide'] .map-star {
+  color: #f6a623;
+}
+
+[data-skin='f-bluetide'] .top10-strip {
+  background: #0d47a1;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(13, 71, 161, 0.24);
+}
+
+[data-skin='f-bluetide'] .map-page .maplibregl-ctrl-top-right {
+  margin-top: 42px;
+}
+
+[data-skin='f-bluetide'] .map-page .maplibregl-ctrl-bottom-right {
+  margin-bottom: 92px;
+}
+
+[data-skin='f-bluetide'] .maplibregl-ctrl-group {
+  border: 1px solid var(--ct-line);
+  border-radius: 12px;
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .maplibregl-ctrl-group button {
+  background: var(--color-card);
+}
+
+/* ============================== 6. 设置 / 皮肤卡 ============================== */
+[data-skin='f-bluetide'] .settings-desk__nav {
+  border: 1px solid var(--ct-line);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .settings-desk__nav button.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+[data-skin='f-bluetide'] .skin-card {
+  border: 1px solid var(--ct-line);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--ct-shadow-card);
+}
+
+[data-skin='f-bluetide'] .skin-card__swatch {
+  border: 1px solid var(--ct-line);
+  border-radius: 10px;
+}
+
+[data-skin='f-bluetide'] .skin-card.is-active {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.18);
+}
+
+.skin-card--f-bluetide .skin-card__swatch i:nth-child(1) { background: #eef3f8; }
+.skin-card--f-bluetide .skin-card__swatch i:nth-child(2) { background: #1565c0; }
+.skin-card--f-bluetide .skin-card__swatch i:nth-child(3) { background: #80cbc4; }
+
+/* 默认皮肤品牌副标题：英文小标保持克制 */
+[data-skin='f-bluetide'] .brand__sub {
+  display: block;
+  color: var(--ct-soft);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+
+/* ============================== 7. 交互 ============================== */
+[data-skin='f-bluetide'] :focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-skin='f-bluetide'] .fav-card {
+    transition: none;
+  }
+}

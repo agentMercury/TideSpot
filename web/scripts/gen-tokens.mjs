@@ -1,0 +1,178 @@
+#!/usr/bin/env node
+/**
+ * 只读 design-handoff/tokens/design-tokens.json，生成：
+ *   src/styles/tokens.generated.css   颜色（浅/深）、字号、圆角、间距、阴影、五档色带、置信徽标
+ *   src/ui/tokens/bands.ts            五档色带 / 置信徽标的 TS 常量
+ *
+ * 用法：npm run gen:tokens
+ * 红线：生成物禁止手改；改 token 只能改源 JSON（视觉单一真相源）。
+ */
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import path from 'node:path';
+import { repoRoot, webRoot } from './lib/strings.mjs';
+
+const SRC = path.join(repoRoot, 'design-handoff', 'tokens', 'design-tokens.json');
+const CSS_OUT = path.join(webRoot, 'src', 'styles', 'tokens.generated.css');
+const TS_OUT = path.join(webRoot, 'src', 'ui', 'tokens', 'bands.ts');
+
+const WEIGHTS = { Normal: 400, Medium: 500, Bold: 700, ExtraBold: 800 };
+
+const kebab = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+
+function colorVars(t) {
+  return {
+    '--color-primary': t.primary,
+    '--color-on-primary': '#FFFFFF',
+    '--color-secondary': t.secondary,
+    '--color-tertiary': t.tertiary,
+    '--color-error': t.error,
+    '--color-bg': t.background,
+    '--color-text': t.onBackground,
+    '--color-surface': t.surface,
+    '--color-surface-variant': t.surfaceVariant,
+    '--color-text-dim': t.onSurfaceVariant,
+    '--color-outline': t.outline,
+    '--color-border': t.outlineVariant,
+    '--color-on-surface': t.onSurface,
+    '--color-on-surface-variant': t.onSurfaceVariant,
+  };
+}
+
+function block(selector, vars) {
+  const lines = Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`);
+  return `${selector} {\n${lines.join('\n')}\n}\n`;
+}
+
+async function main() {
+  const json = JSON.parse(await readFile(SRC, 'utf8'));
+
+  const light = {
+    ...colorVars(json.theme.light),
+    '--color-canvas': json.surface.light.L0_canvas,
+    '--color-card': json.surface.light.L1_card,
+    '--color-elevated': json.surface.light.L2_elevated,
+    '--color-text-primary': json.text.light.primary,
+    '--color-text-secondary': json.text.light.secondary,
+    '--color-text-tertiary': json.text.light.tertiary,
+    '--color-on-primary': json.text.light.on_primary,
+    '--color-mint': json.accent_v3.mint,
+    '--color-mint-deep': json.accent_v3.mintDeep,
+    '--color-mint-bg': json.accent_v3.mintBg,
+    '--color-scrim': json.surface.light.scrim,
+  };
+
+  const dark = {
+    ...colorVars(json.theme.dark),
+    '--color-canvas': json.surface.dark.L0_canvas,
+    '--color-card': json.surface.dark.L1_card,
+    '--color-elevated': json.surface.dark.L2_elevated,
+    '--color-text-primary': json.text.dark.primary,
+    '--color-text-secondary': json.text.dark.secondary,
+    '--color-text-tertiary': json.text.dark.tertiary,
+    '--color-on-primary': json.text.dark.on_primary,
+    '--color-bg': json.surface.dark.L0_canvas,
+    '--color-surface': json.surface.dark.L1_card,
+    '--color-text': json.text.dark.primary,
+    '--color-text-dim': json.text.dark.secondary,
+    '--color-border': json.border.dark,
+    '--color-mint': json.accent_v3.mint,
+    '--color-mint-deep': json.accent_v3.mint,
+    '--color-mint-bg': '#12302C',
+    '--color-scrim': json.surface.dark.scrim,
+  };
+
+  const shared = {
+    '--radius-card': `${json.radius.card_dp}px`,
+    '--radius-button': `${json.radius.button_dp}px`,
+    '--radius-chip': `${json.radius.chip_dp}px`,
+    '--radius-badge': `${json.radius.badge_dp}px`,
+    '--radius-sheet': `${json.radius.bottom_sheet_top_dp}px`,
+    '--radius-dialog': `${json.radius.dialog_dp}px`,
+    '--space-1': `${json.spacing.scale_dp[0]}px`,
+    '--space-15': `${json.spacing.scale_dp[1]}px`,
+    '--space-2': `${json.spacing.scale_dp[2]}px`,
+    '--space-3': `${json.spacing.scale_dp[3]}px`,
+    '--space-4': `${json.spacing.scale_dp[4]}px`,
+    '--space-5': `${json.spacing.scale_dp[5]}px`,
+    '--screen-margin': `${json.spacing.screen_horizontal_margin_dp}px`,
+    '--card-padding': `${json.spacing.card_padding_dp}px`,
+    '--section-gap': `${json.spacing.section_gap_dp}px`,
+    '--component-gap': `${json.spacing.component_gap_dp}px`,
+    '--shadow-card': json.elevation_v3.L1_card.ambient,
+    '--shadow-elevated': json.elevation_v3.L2_elevated.key,
+    '--shadow-button': json.elevation_v3.primary_button.shadow,
+  };
+
+  const bands = json.semantic_frozen.score_bands;
+  const badges = json.semantic_frozen.confidence_badges;
+
+  for (const b of bands) {
+    shared[`--band-${b.key}`] = b.color;
+    shared[`--band-${b.key}-on`] = b.on_color;
+  }
+  for (const b of badges) {
+    shared[`--badge-${b.key}`] = b.color;
+    shared[`--badge-${b.key}-on`] = b.on_color;
+  }
+
+  const type = {};
+  for (const s of json.typography.scale) {
+    const k = kebab(s.role);
+    type[`--text-${k}-size`] = `${s.size_sp}px`;
+    type[`--text-${k}-line`] = `${s.line_sp}px`;
+    type[`--text-${k}-weight`] = String(WEIGHTS[s.weight] ?? 400);
+  }
+  type['--text-score-hero-size'] = '56px';
+  type['--text-score-hero-weight'] = '800';
+
+  const css =
+    `/* AUTO-GENERATED by scripts/gen-tokens.mjs from design-handoff/tokens/design-tokens.json\n` +
+    ` * 禁止手改；改视觉请改源 JSON 后重跑 npm run gen:tokens。\n */\n\n` +
+    block(`:root,\n:root[data-theme='light']`, { ...light, ...shared, ...type }) +
+    '\n' +
+    block(`:root[data-theme='dark']`, { ...dark, ...shared, ...type }) +
+    `\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme='light']) {\n` +
+    Object.entries({ ...dark, ...shared, ...type })
+      .map(([k, v]) => `    ${k}: ${v};`)
+      .join('\n') +
+    '\n  }\n}\n';
+
+  await mkdir(path.dirname(CSS_OUT), { recursive: true });
+  await writeFile(CSS_OUT, css, 'utf8');
+
+  const ts =
+    `/** AUTO-GENERATED by scripts/gen-tokens.mjs —— 禁止手改 */\n` +
+    `export interface ScoreBand { key: string; min: number; max: number; label: string; color: string; onColor: string }\n` +
+    `export interface ConfidenceBadgeSpec { key: string; label: string; color: string; onColor: string }\n\n` +
+    `export const SCORE_BANDS: ScoreBand[] = ${JSON.stringify(
+      bands.map((b) => ({ key: b.key, min: b.min, max: b.max, label: b.label, color: b.color, onColor: b.on_color })),
+      null,
+      2,
+    )};\n\n` +
+    `export const CONFIDENCE_BADGES: ConfidenceBadgeSpec[] = ${JSON.stringify(
+      badges.map((b) => ({ key: b.key, label: b.label, color: b.color, onColor: b.on_color })),
+      null,
+      2,
+    )};\n\n` +
+    `/** 按分数取档位（闭区间，与 ScoreBands.kt 一致） */\n` +
+    `export function resolveScoreBand(score: number): ScoreBand {\n` +
+    `  return SCORE_BANDS.find((b) => score >= b.min && score <= b.max) ?? SCORE_BANDS[SCORE_BANDS.length - 1];\n` +
+    `}\n\n` +
+    `export function confidenceBadge(key: string): ConfidenceBadgeSpec | null {\n` +
+    `  const normalized = key === 'UNAVAILABLE' ? 'UNCALIBRATED' : key;\n` +
+    `  return CONFIDENCE_BADGES.find((b) => b.key === normalized) ?? null;\n` +
+    `}\n`;
+
+  await mkdir(path.dirname(TS_OUT), { recursive: true });
+  await writeFile(TS_OUT, ts, 'utf8');
+
+  console.log(
+    `[gen-tokens] light=${Object.keys(light).length} dark=${Object.keys(dark).length} ` +
+      `bands=${bands.length} badges=${badges.length} typography=${json.typography.scale.length}`,
+  );
+}
+
+main().catch((err) => {
+  console.error(`[gen-tokens] FAIL: ${err.message}`);
+  process.exit(1);
+});

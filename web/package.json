@@ -1,0 +1,44 @@
+{
+  "name": "tidespot-web",
+  "private": true,
+  "version": "1.18.3",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "prebuild": "node scripts/gen-tokens.mjs",
+    "gen:tokens": "node scripts/gen-tokens.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check:parity": "node scripts/check_parity.mjs",
+    "gen:i18n": "node scripts/gen-i18n.mjs",
+    "export:fixtures": "node scripts/export-fixtures.mjs",
+    "test:e2e": "playwright test",
+    "check:budget": "node scripts/check-budget.mjs"
+  },
+  "dependencies": {
+    "dexie": "^4.4.7",
+    "maplibre-gl": "^6.18.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "fake-indexeddb": "^6.2.8",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^2.1.8"
+  }
+}

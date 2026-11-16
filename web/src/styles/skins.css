@@ -1,0 +1,432 @@
+/**
+ * 皮肤 token 覆盖层（对齐 Android `TideSpotSkin.kt` / SKIN-1）。
+ * 维度：皮肤(a-vintage / d-fieldguide) × 水体(sea / inland) × 明暗(light / dark)。
+ * 只覆盖「长什么样」：颜色、圆角、字族；Tab 顺序、免责 5 条、五档/六徽标仍走冻结值。
+ */
+
+/* ===================== F · 蓝潮（BLUE TIDE）· 默认 ===================== */
+:root[data-skin='f-bluetide'] {
+  --skin-font: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-chip: 18px;
+  --radius-badge: 4px;
+  --radius-sheet: 20px;
+}
+
+:root[data-skin='f-bluetide'][data-water='sea'][data-theme='light'] {
+  --color-primary: #1565c0;
+  --color-on-primary: #ffffff;
+  --color-secondary: #00695c;
+  --color-tertiary: #26a69a;
+  --color-error: #c62828;
+  --color-bg: #eef3f8;
+  --color-text: #10243a;
+  --color-surface: #ffffff;
+  --color-surface-variant: #eef3f8;
+  --color-text-dim: #556579;
+  --color-outline: #dce5ee;
+  --color-border: #dce5ee;
+  --color-canvas: #eef3f8;
+  --color-card: #ffffff;
+  --color-elevated: #ffffff;
+  --color-on-surface: #10243a;
+  --color-on-surface-variant: #556579;
+  --color-mint: #80cbc4;
+  --color-mint-deep: #26a69a;
+  --color-mint-bg: #e0f2f1;
+}
+
+:root[data-skin='f-bluetide'][data-water='sea'][data-theme='dark'] {
+  --color-primary: #90caf9;
+  --color-on-primary: #0e1721;
+  --color-secondary: #80cbc4;
+  --color-tertiary: #80cbc4;
+  --color-error: #ef9a9a;
+  --color-bg: #0e1721;
+  --color-surface: #16212e;
+  --color-surface-variant: #1e2c3a;
+  --color-text: #e6edf5;
+  --color-text-dim: #9fb0c0;
+  --color-outline: #2a3a4c;
+  --color-border: #2a3a4c;
+  --color-canvas: #0e1721;
+  --color-card: #16212e;
+  --color-elevated: #1e2c3a;
+  --color-on-surface: #e6edf5;
+  --color-on-surface-variant: #9fb0c0;
+  --color-mint: #80cbc4;
+  --color-mint-deep: #80cbc4;
+  --color-mint-bg: #12302c;
+}
+
+:root[data-skin='f-bluetide'][data-water='inland'][data-theme='light'] {
+  --color-primary: #00695c;
+  --color-on-primary: #ffffff;
+  --color-secondary: #1565c0;
+  --color-tertiary: #26a69a;
+  --color-error: #c62828;
+  --color-bg: #edf6f4;
+  --color-text: #10243a;
+  --color-surface: #ffffff;
+  --color-surface-variant: #edf6f4;
+  --color-text-dim: #4f6b66;
+  --color-outline: #d6e7e2;
+  --color-border: #d6e7e2;
+  --color-canvas: #edf6f4;
+  --color-card: #ffffff;
+  --color-elevated: #ffffff;
+  --color-on-surface: #10243a;
+  --color-on-surface-variant: #4f6b66;
+  --color-mint: #80cbc4;
+  --color-mint-deep: #00796b;
+  --color-mint-bg: #e0f2f1;
+}
+
+:root[data-skin='f-bluetide'][data-water='inland'][data-theme='dark'] {
+  --color-primary: #80cbc4;
+  --color-on-primary: #0e1721;
+  --color-secondary: #90caf9;
+  --color-tertiary: #80cbc4;
+  --color-error: #ef9a9a;
+  --color-bg: #0c1b18;
+  --color-surface: #132420;
+  --color-surface-variant: #1b302b;
+  --color-text: #e6edf5;
+  --color-text-dim: #9fb8b2;
+  --color-outline: #2c433d;
+  --color-border: #2c433d;
+  --color-canvas: #0c1b18;
+  --color-card: #132420;
+  --color-elevated: #1b302b;
+  --color-on-surface: #e6edf5;
+  --color-on-surface-variant: #9fb8b2;
+  --color-mint: #80cbc4;
+  --color-mint-deep: #4db6ac;
+  --color-mint-bg: #12302c;
+}
+
+/* ===================== A · 复古户外（VINTAGE OUTDOOR） ===================== */
+:root[data-skin='a-vintage'] {
+  --skin-font: KaiTi, 'STKaiti', 'Kaiti SC', 'Songti SC', 'SimSun', serif;
+  --radius-card: 16px 20px 15px 19px;
+  --radius-button: 10px 14px 10px 15px;
+  --radius-chip: 20px;
+  --radius-sheet: 20px 26px 20px 27px;
+  --radius-badge: 4px;
+}
+
+:root[data-skin='a-vintage'][data-water='sea'][data-theme='light'] {
+  --color-primary: #1b3a5c;
+  --color-on-primary: #f7f1de;
+  --color-secondary: #2e6e7e;
+  --color-tertiary: #d9a734;
+  --color-error: #c15a3a;
+  --color-bg: #e4d9bc;
+  --color-text: #16324f;
+  --color-surface: #f2ead4;
+  --color-surface-variant: #e8ddbe;
+  --color-text-dim: #5c5540;
+  --color-outline: #16324f;
+  --color-border: #8a7c60;
+  --color-canvas: #e4d9bc;
+  --color-card: #f2ead4;
+  --color-elevated: #f7f1de;
+  --color-on-surface: #16324f;
+  --color-on-surface-variant: #5c5540;
+  --color-mint: #2e6e7e;
+  --color-mint-deep: #1b3a5c;
+  --color-mint-bg: #e8ddbe;
+}
+
+:root[data-skin='a-vintage'][data-water='sea'][data-theme='dark'] {
+  --color-primary: #e9dcbe;
+  --color-on-primary: #15243a;
+  --color-secondary: #7fb3ab;
+  --color-tertiary: #d9a734;
+  --color-error: #e0805e;
+  --color-bg: #101a24;
+  --color-text: #ece3cd;
+  --color-surface: #1a2836;
+  --color-surface-variant: #243547;
+  --color-text-dim: #a89f88;
+  --color-outline: #e9dcbe;
+  --color-border: #3a4a58;
+  --color-canvas: #101a24;
+  --color-card: #1a2836;
+  --color-elevated: #243547;
+  --color-on-surface: #ece3cd;
+  --color-on-surface-variant: #a89f88;
+  --color-mint: #7fb3ab;
+  --color-mint-deep: #7fb3ab;
+  --color-mint-bg: #243547;
+}
+
+:root[data-skin='a-vintage'][data-water='inland'][data-theme='light'] {
+  --color-primary: #2e5a48;
+  --color-on-primary: #f7f4e2;
+  --color-secondary: #3e7a54;
+  --color-tertiary: #d9a734;
+  --color-error: #c15a3a;
+  --color-bg: #dce2c4;
+  --color-text: #213d2a;
+  --color-surface: #f1eed8;
+  --color-surface-variant: #e4e6c6;
+  --color-text-dim: #556045;
+  --color-outline: #213d2a;
+  --color-border: #78815c;
+  --color-canvas: #dce2c4;
+  --color-card: #f1eed8;
+  --color-elevated: #f7f4e2;
+  --color-on-surface: #213d2a;
+  --color-on-surface-variant: #556045;
+  --color-mint: #3e7a54;
+  --color-mint-deep: #2e5a48;
+  --color-mint-bg: #e4e6c6;
+}
+
+:root[data-skin='a-vintage'][data-water='inland'][data-theme='dark'] {
+  --color-primary: #e6dfc0;
+  --color-on-primary: #15241a;
+  --color-secondary: #8fbf82;
+  --color-tertiary: #d9a734;
+  --color-error: #e08a6a;
+  --color-bg: #121b16;
+  --color-text: #ece6d2;
+  --color-surface: #1c2a21;
+  --color-surface-variant: #26382c;
+  --color-text-dim: #a9b09b;
+  --color-outline: #e6dfc0;
+  --color-border: #3a4e40;
+  --color-canvas: #121b16;
+  --color-card: #1c2a21;
+  --color-elevated: #26382c;
+  --color-on-surface: #ece6d2;
+  --color-on-surface-variant: #a9b09b;
+  --color-mint: #8fbf82;
+  --color-mint-deep: #8fbf82;
+  --color-mint-bg: #26382c;
+}
+
+/* ===================== D · 路亚图鉴（LURE FIELD GUIDE） ===================== */
+:root[data-skin='d-fieldguide'] {
+  --skin-font: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --radius-card: 14px;
+  --radius-button: 10px;
+  --radius-chip: 999px;
+  --radius-sheet: 18px;
+  --radius-badge: 3px;
+}
+
+:root[data-skin='d-fieldguide'] h1,
+:root[data-skin='d-fieldguide'] strong,
+:root[data-skin='d-fieldguide'] .brand {
+  font-weight: 800;
+}
+
+:root[data-skin='d-fieldguide'][data-water='sea'][data-theme='light'] {
+  --color-primary: #1e6fa8;
+  --color-on-primary: #fffdf7;
+  --color-secondary: #33556b;
+  --color-tertiary: #e5644c;
+  --color-error: #c23b2a;
+  --color-bg: #e9f3fa;
+  --color-text: #101820;
+  --color-surface: #fffdf7;
+  --color-surface-variant: #b7daee;
+  --color-text-dim: #33556b;
+  --color-outline: #101820;
+  --color-border: #33556b;
+  --color-canvas: #e9f3fa;
+  --color-card: #fffdf7;
+  --color-elevated: #f2f8fc;
+  --color-on-surface: #101820;
+  --color-on-surface-variant: #33556b;
+  --color-mint: #e5644c;
+  --color-mint-deep: #1e6fa8;
+  --color-mint-bg: #f7d9d2;
+}
+
+:root[data-skin='d-fieldguide'][data-water='sea'][data-theme='dark'] {
+  --color-primary: #6fb6e8;
+  --color-on-primary: #0b1620;
+  --color-secondary: #9fb6c4;
+  --color-tertiary: #ff8a70;
+  --color-error: #ff8a70;
+  --color-bg: #0b1620;
+  --color-text: #f2efe6;
+  --color-surface: #12222e;
+  --color-surface-variant: #17394c;
+  --color-text-dim: #9fb6c4;
+  --color-outline: #f2efe6;
+  --color-border: #3a4a54;
+  --color-canvas: #0b1620;
+  --color-card: #12222e;
+  --color-elevated: #17394c;
+  --color-on-surface: #f2efe6;
+  --color-on-surface-variant: #9fb6c4;
+  --color-mint: #ff8a70;
+  --color-mint-deep: #6fb6e8;
+  --color-mint-bg: #3a2a12;
+}
+
+:root[data-skin='d-fieldguide'][data-water='inland'][data-theme='light'] {
+  --color-primary: #2f7f6b;
+  --color-on-primary: #fffdf7;
+  --color-secondary: #3a5548;
+  --color-tertiary: #e9a13b;
+  --color-error: #c23b2a;
+  --color-bg: #e9f5ee;
+  --color-text: #101820;
+  --color-surface: #fffdf7;
+  --color-surface-variant: #b9e0ce;
+  --color-text-dim: #3a5548;
+  --color-outline: #101820;
+  --color-border: #3a5548;
+  --color-canvas: #e9f5ee;
+  --color-card: #fffdf7;
+  --color-elevated: #f1fbf5;
+  --color-on-surface: #101820;
+  --color-on-surface-variant: #3a5548;
+  --color-mint: #e9a13b;
+  --color-mint-deep: #2f7f6b;
+  --color-mint-bg: #f7dfb5;
+}
+
+:root[data-skin='d-fieldguide'][data-water='inland'][data-theme='dark'] {
+  --color-primary: #67c2a5;
+  --color-on-primary: #0c1a14;
+  --color-secondary: #9db8a8;
+  --color-tertiary: #ffc15e;
+  --color-error: #ff8a70;
+  --color-bg: #0c1a14;
+  --color-text: #f2efe6;
+  --color-surface: #12261c;
+  --color-surface-variant: #16382a;
+  --color-text-dim: #9db8a8;
+  --color-outline: #f2efe6;
+  --color-border: #34483c;
+  --color-canvas: #0c1a14;
+  --color-card: #12261c;
+  --color-elevated: #16382a;
+  --color-on-surface: #f2efe6;
+  --color-on-surface-variant: #9db8a8;
+  --color-mint: #ffc15e;
+  --color-mint-deep: #67c2a5;
+  --color-mint-bg: #3a2a12;
+}
+
+/* ===================== E · 潮汐手帐（TIDE JOURNAL） ===================== */
+:root[data-skin='e-tidejournal'] {
+  --skin-font: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --radius-card: 12px;
+  --radius-button: 10px;
+  --radius-chip: 20px;
+  --radius-sheet: 14px;
+  --radius-badge: 2px;
+}
+
+:root[data-skin='e-tidejournal'][data-water='sea'][data-theme='light'] {
+  --color-primary: #1e6fa8;
+  --color-on-primary: #fffdf7;
+  --color-secondary: #456a84;
+  --color-tertiary: #e5644c;
+  --color-error: #c23b2a;
+  --color-bg: #e9f3fa;
+  --color-text: #101820;
+  --color-surface: #fffdf7;
+  --color-surface-variant: #b7daee;
+  --color-text-dim: #456a84;
+  --color-outline: #101820;
+  --color-border: #101820;
+  --color-canvas: #e9f3fa;
+  --color-card: #fffdf7;
+  --color-elevated: #f1f8fc;
+  --color-on-surface: #101820;
+  --color-on-surface-variant: #456a84;
+  --color-mint: #e5644c;
+  --color-mint-deep: #1e6fa8;
+  --color-mint-bg: #b7daee;
+}
+
+:root[data-skin='e-tidejournal'][data-water='sea'][data-theme='dark'] {
+  --color-primary: #6fb6e8;
+  --color-on-primary: #0b1620;
+  --color-secondary: #9fb6c4;
+  --color-tertiary: #ff8a70;
+  --color-error: #ff8a70;
+  --color-bg: #0b1620;
+  --color-text: #f2efe6;
+  --color-surface: #12222e;
+  --color-surface-variant: #17394c;
+  --color-text-dim: #9fb6c4;
+  --color-outline: #f2efe6;
+  --color-border: #3a4a54;
+  --color-canvas: #0b1620;
+  --color-card: #12222e;
+  --color-elevated: #17394c;
+  --color-on-surface: #f2efe6;
+  --color-on-surface-variant: #9fb6c4;
+  --color-mint: #ff8a70;
+  --color-mint-deep: #6fb6e8;
+  --color-mint-bg: #3a2a12;
+}
+
+:root[data-skin='e-tidejournal'][data-water='inland'][data-theme='light'] {
+  --color-primary: #2f7f6b;
+  --color-on-primary: #fffdf7;
+  --color-secondary: #4a6b5e;
+  --color-tertiary: #e9a13b;
+  --color-error: #c23b2a;
+  --color-bg: #e9f5ee;
+  --color-text: #101820;
+  --color-surface: #fffdf7;
+  --color-surface-variant: #b9e0ce;
+  --color-text-dim: #4a6b5e;
+  --color-outline: #101820;
+  --color-border: #101820;
+  --color-canvas: #e9f5ee;
+  --color-card: #fffdf7;
+  --color-elevated: #f1fbf5;
+  --color-on-surface: #101820;
+  --color-on-surface-variant: #4a6b5e;
+  --color-mint: #e9a13b;
+  --color-mint-deep: #2f7f6b;
+  --color-mint-bg: #b9e0ce;
+}
+
+:root[data-skin='e-tidejournal'][data-water='inland'][data-theme='dark'] {
+  --color-primary: #67c2a5;
+  --color-on-primary: #0c1a14;
+  --color-secondary: #9db8a8;
+  --color-tertiary: #ffc15e;
+  --color-error: #ff8a70;
+  --color-bg: #0c1a14;
+  --color-surface: #12261c;
+  --color-surface-variant: #16382a;
+  --color-text-dim: #9db8a8;
+  --color-outline: #f2efe6;
+  --color-border: #34483c;
+  --color-canvas: #0c1a14;
+  --color-card: #12261c;
+  --color-elevated: #16382a;
+  --color-on-surface: #f2efe6;
+  --color-on-surface-variant: #9db8a8;
+  --color-mint: #ffc15e;
+  --color-mint-deep: #67c2a5;
+  --color-mint-bg: #3a2a12;
+}
+
+/* 皮肤字族统一注入（正文与标题）；字号/行高仍取 tokens.generated.css */
+:root[data-skin] body,
+:root[data-skin] button,
+:root[data-skin] input {
+  font-family: var(--skin-font);
+}
+
+/* A 的套印错位细节：卡片双线边框（仅浅色，深色下用描边避免噪点） */
+:root[data-skin='a-vintage'][data-theme='light'] .ts-card--l1 {
+  box-shadow: 2px 2px 0 color-mix(in srgb, var(--color-outline) 18%, transparent);
+}
+
+/* D 的贴纸硬投影与评分卡改由 styles/fieldguide.css 统一接管（SKIN-1 shape/texture 轴） */

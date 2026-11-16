@@ -1,0 +1,20 @@
+/**
+ * 布局/交互变量（与断点相关）；颜色、字号、圆角、间距来自 tokens.generated.css。
+ * 这里只保留「随视口/设备变化」的量，避免与生成文件重复定义。
+ */
+:root {
+  --sidebar-w: 320px;
+  --sidebar-w-tablet: 280px;
+  --detail-w: 380px;
+  --tabbar-h: 56px;
+  --header-h: 56px;
+
+  --hit-size: 44px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --hit-size: 40px;
+  }
+}

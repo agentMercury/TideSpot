@@ -1,0 +1,2801 @@
+{
+  "generatedAt": "2026-11-13T09:58:47.100Z",
+  "note": "启发式提取，仅作 M1 对拍候选；经人工确认后才能写入 domain.json 作为断言",
+  "filesScanned": 49,
+  "count": 399,
+  "cases": [
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/DoPhysicsTest.kt",
+      "line": 31,
+      "expected": 7.4,
+      "actualExpression": "DoPhysics.doRef(15.0",
+      "raw": "assertEquals(7.4, DoPhysics.doRef(15.0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/DoPhysicsTest.kt",
+      "line": 32,
+      "expected": 5.2,
+      "actualExpression": "DoPhysics.doRef(40.0",
+      "raw": "assertEquals(5.2, DoPhysics.doRef(40.0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/DoPhysicsTest.kt",
+      "line": 33,
+      "expected": 8.5,
+      "actualExpression": "DoPhysics.doRef(0.0",
+      "raw": "assertEquals(8.5, DoPhysics.doRef(0.0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/DoPhysicsTest.kt",
+      "line": 38,
+      "expected": 0,
+      "actualExpression": "DoPhysics.oxygenScore(3.5",
+      "raw": "assertEquals(0.0, DoPhysics.oxygenScore(3.5"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/DoPhysicsTest.kt",
+      "line": 39,
+      "expected": 1,
+      "actualExpression": "DoPhysics.oxygenScore(9.0",
+      "raw": "assertEquals(1.0, DoPhysics.oxygenScore(9.0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 74,
+      "expected": 76,
+      "actualExpression": "days[\"2026-11-02\"]!!.toDouble(",
+      "raw": "assertEquals(76.0, days[\"2026-11-02\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 75,
+      "expected": 73,
+      "actualExpression": "days[\"2026-11-03\"]!!.toDouble(",
+      "raw": "assertEquals(73.0, days[\"2026-11-03\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 76,
+      "expected": 68,
+      "actualExpression": "days[\"2026-11-04\"]!!.toDouble(",
+      "raw": "assertEquals(68.0, days[\"2026-11-04\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 77,
+      "expected": 77,
+      "actualExpression": "days[\"2026-11-05\"]!!.toDouble(",
+      "raw": "assertEquals(77.0, days[\"2026-11-05\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 85,
+      "expected": 72,
+      "actualExpression": "days[\"2026-11-02\"]!!.toDouble(",
+      "raw": "assertEquals(72.0, days[\"2026-11-02\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 86,
+      "expected": 71,
+      "actualExpression": "days[\"2026-11-03\"]!!.toDouble(",
+      "raw": "assertEquals(71.0, days[\"2026-11-03\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 99,
+      "expected": 16,
+      "actualExpression": "days[\"2026-11-04\"]!!.toDouble(",
+      "raw": "assertEquals(16.0, days[\"2026-11-04\"]!!.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 168,
+      "expected": 23,
+      "actualExpression": "seq.first(",
+      "raw": "assertEquals(23, seq.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 174,
+      "expected": 4,
+      "actualExpression": "seq.size",
+      "raw": "assertEquals(4, seq.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/GoldenParityTest.kt",
+      "line": 183,
+      "expected": 89,
+      "actualExpression": "got.toDouble(",
+      "raw": "assertEquals(89.0, got.toDouble("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/NullHandlingTest.kt",
+      "line": 83,
+      "expected": 3,
+      "actualExpression": "results.size",
+      "raw": "assertEquals(3, results.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/NullHandlingTest.kt",
+      "line": 91,
+      "expected": 19.7,
+      "actualExpression": "com.tidespot.core.domain.water.WaterTempFusion.fuse(listOf(null",
+      "raw": "assertEquals(19.7, com.tidespot.core.domain.water.WaterTempFusion.fuse(listOf(null"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 23,
+      "expected": "7PXWHX22+22",
+      "actualExpression": "OpenLocationCode.encode(29.55",
+      "raw": "assertEquals(\"7PXWHX22+22\", OpenLocationCode.encode(29.55"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 28,
+      "expected": "7PXXJ24Q+26",
+      "actualExpression": "OpenLocationCode.encode(29.605",
+      "raw": "assertEquals(\"7PXXJ24Q+26\", OpenLocationCode.encode(29.605"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 33,
+      "expected": "8Q326822+22",
+      "actualExpression": "OpenLocationCode.encode(31.2",
+      "raw": "assertEquals(\"8Q326822+22\", OpenLocationCode.encode(31.2"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 38,
+      "expected": "8FVC9H88+6J",
+      "actualExpression": "OpenLocationCode.encode(47.365547",
+      "raw": "assertEquals(\"8FVC9H88+6J\", OpenLocationCode.encode(47.365547"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 44,
+      "expected": "7PXXJ22Q+26",
+      "actualExpression": "OpenLocationCode.encode(29.6",
+      "raw": "assertEquals(\"7PXXJ22Q+26\", OpenLocationCode.encode(29.6"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 51,
+      "expected": "7PXWHX22+22",
+      "actualExpression": "OpenLocationCode.encode(29.5500625",
+      "raw": "assertEquals(\"7PXWHX22+22\", OpenLocationCode.encode(29.5500625"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 57,
+      "expected": "7PXXJ24Q+26",
+      "actualExpression": "OpenLocationCode.encode(29.605",
+      "raw": "assertEquals(\"7PXXJ24Q+26\", OpenLocationCode.encode(29.605"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/OpenLocationCodeTest.kt",
+      "line": 74,
+      "expected": 11,
+      "actualExpression": "code.length",
+      "raw": "assertEquals(11, code.length"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/PressureTrendTest.kt",
+      "line": 22,
+      "expected": 1,
+      "actualExpression": "v24 / v0",
+      "raw": "assertEquals(1.0, v24 / v0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 46,
+      "expected": 0,
+      "actualExpression": "empty.alignedSamples",
+      "raw": "assertEquals(0, empty.alignedSamples"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 75,
+      "expected": 0.5,
+      "actualExpression": "windMissing.value / noWindTerm.value",
+      "raw": "assertEquals(0.5, windMissing.value / noWindTerm.value"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 82,
+      "expected": 0.65,
+      "actualExpression": "rainMissing.value / noRainTerm.value",
+      "raw": "assertEquals(0.65, rainMissing.value / noRainTerm.value"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 105,
+      "expected": 3,
+      "actualExpression": "shortResults.size",
+      "raw": "assertEquals(3, shortResults.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 109,
+      "expected": 0.08,
+      "actualExpression": "pressure!!.weight",
+      "raw": "assertEquals(0.08, pressure!!.weight"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 110,
+      "expected": "趋势数据不足",
+      "actualExpression": "pressure.detail",
+      "raw": "assertEquals(\"趋势数据不足\", pressure.detail"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 117,
+      "expected": 0.14,
+      "actualExpression": "p4.weight",
+      "raw": "assertEquals(0.14, p4.weight"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 132,
+      "expected": 0.08,
+      "actualExpression": "pressure.weight",
+      "raw": "assertEquals(0.08, pressure.weight"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 133,
+      "expected": "趋势数据不足",
+      "actualExpression": "pressure.detail",
+      "raw": "assertEquals(\"趋势数据不足\", pressure.detail"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ResilienceTest.kt",
+      "line": 158,
+      "expected": 0.82,
+      "actualExpression": "subB",
+      "raw": "assertEquals(0.82, subB"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ScoreBenchmarkTest.kt",
+      "line": 85,
+      "expected": 240,
+      "actualExpression": "out.size",
+      "raw": "assertEquals(240, out.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ScoreOrchestrationTest.kt",
+      "line": 88,
+      "expected": 0.08,
+      "actualExpression": "pressure.weight",
+      "raw": "assertEquals(0.08, pressure.weight"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ScoreOrchestrationTest.kt",
+      "line": 89,
+      "expected": "趋势数据不足",
+      "actualExpression": "pressure.detail",
+      "raw": "assertEquals(\"趋势数据不足\", pressure.detail"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/ScoreOrchestrationTest.kt",
+      "line": 94,
+      "expected": 0.14,
+      "actualExpression": "p4.weight",
+      "raw": "assertEquals(0.14, p4.weight"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SolunarTest.kt",
+      "line": 51,
+      "expected": 0,
+      "actualExpression": "Solunar.illumination(0.0",
+      "raw": "assertEquals(0.0, Solunar.illumination(0.0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SolunarTest.kt",
+      "line": 52,
+      "expected": 1,
+      "actualExpression": "Solunar.illumination(Solunar.SYNODIC_MONTH_DAYS / 2",
+      "raw": "assertEquals(1.0, Solunar.illumination(Solunar.SYNODIC_MONTH_DAYS / 2"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SolunarTest.kt",
+      "line": 61,
+      "expected": 5.5,
+      "actualExpression": "transit",
+      "raw": "assertEquals(5.5, transit"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 20,
+      "expected": 8,
+      "actualExpression": "all.size",
+      "raw": "assertEquals(8, all.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 52,
+      "expected": "鲫鱼",
+      "actualExpression": "SpeciesPresets.byId(\"crucian_carp\"",
+      "raw": "assertEquals(\"鲫鱼\", SpeciesPresets.byId(\"crucian_carp\""
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 65,
+      "expected": 1,
+      "actualExpression": "partial.size",
+      "raw": "assertEquals(1, partial.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 66,
+      "expected": "a",
+      "actualExpression": "partial.first(",
+      "raw": "assertEquals(\"a\", partial.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 72,
+      "expected": "fresh_lure",
+      "actualExpression": "com.tidespot.core.domain.algorithm.Presets.byId(\"fresh_lure\"",
+      "raw": "assertEquals(\"fresh_lure\", com.tidespot.core.domain.algorithm.Presets.byId(\"fresh_lure\""
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 73,
+      "expected": "sea_shore",
+      "actualExpression": "com.tidespot.core.domain.algorithm.Presets.byId(\"sea_shore\"",
+      "raw": "assertEquals(\"sea_shore\", com.tidespot.core.domain.algorithm.Presets.byId(\"sea_shore\""
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/SpeciesPresetTest.kt",
+      "line": 74,
+      "expected": "fresh_bait",
+      "actualExpression": "com.tidespot.core.domain.algorithm.Presets.byId(\"fresh_bait\"",
+      "raw": "assertEquals(\"fresh_bait\", com.tidespot.core.domain.algorithm.Presets.byId(\"fresh_bait\""
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorB7RegressionTest.kt",
+      "line": 46,
+      "expected": 1,
+      "actualExpression": "c.lagHours",
+      "raw": "assertEquals(1, c.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorB7RegressionTest.kt",
+      "line": 78,
+      "expected": 0,
+      "actualExpression": "c.lagHours",
+      "raw": "assertEquals(0, c.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorB7RegressionTest.kt",
+      "line": 79,
+      "expected": 1,
+      "actualExpression": "c.gain",
+      "raw": "assertEquals(1.0, c.gain"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorManualTypeTest.kt",
+      "line": 38,
+      "expected": 1,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(1, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorManualTypeTest.kt",
+      "line": 50,
+      "expected": -2,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(-2, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorManualTypeTest.kt",
+      "line": 66,
+      "expected": -1,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(-1, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorManualTypeTest.kt",
+      "line": 79,
+      "expected": 2,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(2, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorManualTypeTest.kt",
+      "line": 91,
+      "expected": "再记 1 条即可校潮",
+      "actualExpression": "fit.message",
+      "raw": "assertEquals(\"再记 1 条即可校潮\", fit.message"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 51,
+      "expected": 1,
+      "actualExpression": "c.lagHours",
+      "raw": "assertEquals(1, c.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 52,
+      "expected": 0.97,
+      "actualExpression": "c.gain",
+      "raw": "assertEquals(0.97, c.gain"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 77,
+      "expected": 0,
+      "actualExpression": "c.lagHours",
+      "raw": "assertEquals(0, c.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 78,
+      "expected": 1,
+      "actualExpression": "c.gain",
+      "raw": "assertEquals(1.0, c.gain"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 125,
+      "expected": 2.5,
+      "actualExpression": "applied[1]!!",
+      "raw": "assertEquals(2.5, applied[1]!!"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 126,
+      "expected": 4.5,
+      "actualExpression": "applied[2]!!",
+      "raw": "assertEquals(4.5, applied[2]!!"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 135,
+      "expected": 1,
+      "actualExpression": "fit.gain",
+      "raw": "assertEquals(1.0, fit.gain"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 147,
+      "expected": 1,
+      "actualExpression": "fit.gain",
+      "raw": "assertEquals(1.0, fit.gain"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 148,
+      "expected": 0,
+      "actualExpression": "fit.offsetM",
+      "raw": "assertEquals(0.0, fit.offsetM"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 149,
+      "expected": 1,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(1, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 176,
+      "expected": 1,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(1, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 204,
+      "expected": 2,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(2, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TideCalibratorTest.kt",
+      "line": 216,
+      "expected": 0,
+      "actualExpression": "fit.lagHours",
+      "raw": "assertEquals(0, fit.lagHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 18,
+      "expected": "大潮 · 活汛",
+      "actualExpression": "p.label(",
+      "raw": "assertEquals(\"大潮 · 活汛\", p.label("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 26,
+      "expected": "小潮 · 死汛",
+      "actualExpression": "p.label(",
+      "raw": "assertEquals(\"小潮 · 死汛\", p.label("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 34,
+      "expected": "活汛",
+      "actualExpression": "p.label(",
+      "raw": "assertEquals(\"活汛\", p.label("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 71,
+      "expected": 2,
+      "actualExpression": "spring",
+      "raw": "assertEquals(2, spring"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 72,
+      "expected": 2,
+      "actualExpression": "neap",
+      "raw": "assertEquals(2, neap"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 73,
+      "expected": 2,
+      "actualExpression": "active",
+      "raw": "assertEquals(2, active"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/TidePhaseTest.kt",
+      "line": 74,
+      "expected": 2,
+      "actualExpression": "dead",
+      "raw": "assertEquals(2, dead"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/VetoCodeLockTest.kt",
+      "line": 83,
+      "expected": 48,
+      "actualExpression": "results.size",
+      "raw": "assertEquals(48, results.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/VetoCodeLockTest.kt",
+      "line": 130,
+      "expected": 1,
+      "actualExpression": "outRenamed.windows.size",
+      "raw": "assertEquals(1, outRenamed.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/VetoCodeLockTest.kt",
+      "line": 143,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/VetoCodeLockTest.kt",
+      "line": 153,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/VetoContinuityTest.kt",
+      "line": 105,
+      "expected": 0.05,
+      "actualExpression": "thunder / calm",
+      "raw": "assertEquals(0.05, thunder / calm"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/VetoContinuityTest.kt",
+      "line": 107,
+      "expected": 1,
+      "actualExpression": "outcome.reasons.filter { it.contains(\"雷暴\"",
+      "raw": "assertEquals(1, outcome.reasons.filter { it.contains(\"雷暴\""
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCalibrationWarningTest.kt",
+      "line": 32,
+      "expected": "已按现场校潮校正：时刻延后 1h",
+      "actualExpression": "BestWindowFinder.manualCalibrationWarning(1",
+      "raw": "assertEquals(\"已按现场校潮校正：时刻延后 1h\", BestWindowFinder.manualCalibrationWarning(1"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCalibrationWarningTest.kt",
+      "line": 33,
+      "expected": "已按现场校潮校正：时刻提前 2h",
+      "actualExpression": "BestWindowFinder.manualCalibrationWarning(-2",
+      "raw": "assertEquals(\"已按现场校潮校正：时刻提前 2h\", BestWindowFinder.manualCalibrationWarning(-2"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCalibrationWarningTest.kt",
+      "line": 34,
+      "expected": "已按现场校潮校正：时刻无偏移",
+      "actualExpression": "BestWindowFinder.manualCalibrationWarning(0",
+      "raw": "assertEquals(\"已按现场校潮校正：时刻无偏移\", BestWindowFinder.manualCalibrationWarning(0"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 41,
+      "expected": 0,
+      "actualExpression": "outBelow.windows.size",
+      "raw": "assertEquals(0, outBelow.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 46,
+      "expected": 1,
+      "actualExpression": "outAt.windows.size",
+      "raw": "assertEquals(1, outAt.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 47,
+      "expected": 75,
+      "actualExpression": "outAt.windows[0].peakScore",
+      "raw": "assertEquals(75, outAt.windows[0].peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 61,
+      "expected": 90,
+      "actualExpression": "w.peakScore",
+      "raw": "assertEquals(90, w.peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 67,
+      "expected": 5,
+      "actualExpression": "w.durationHours",
+      "raw": "assertEquals(5, w.durationHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 77,
+      "expected": 3,
+      "actualExpression": "w.durationHours",
+      "raw": "assertEquals(3, w.durationHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 92,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowCoreAndFilterTest.kt",
+      "line": 105,
+      "expected": 0,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(0, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 45,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 47,
+      "expected": 3,
+      "actualExpression": "w1.durationHours",
+      "raw": "assertEquals(3, w1.durationHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 50,
+      "expected": 80,
+      "actualExpression": "w1.peakScore",
+      "raw": "assertEquals(80, w1.peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 60,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 61,
+      "expected": 90,
+      "actualExpression": "out.windows[0].peakScore",
+      "raw": "assertEquals(90, out.windows[0].peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 62,
+      "expected": 76,
+      "actualExpression": "out.windows[1].peakScore",
+      "raw": "assertEquals(76, out.windows[1].peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 71,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 72,
+      "expected": 90,
+      "actualExpression": "out.windows[0].peakScore",
+      "raw": "assertEquals(90, out.windows[0].peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 81,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 88,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 95,
+      "expected": 0,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(0, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 104,
+      "expected": 0,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(0, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 118,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 127,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 128,
+      "expected": "爆护窗口",
+      "actualExpression": "out.windows[0].tier",
+      "raw": "assertEquals(\"爆护窗口\", out.windows[0].tier"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 129,
+      "expected": 2,
+      "actualExpression": "out.windows[0].topFactors.size",
+      "raw": "assertEquals(2, out.windows[0].topFactors.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 131,
+      "expected": "tide",
+      "actualExpression": "out.windows[0].topFactors.first(",
+      "raw": "assertEquals(\"tide\", out.windows[0].topFactors.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 142,
+      "expected": "青岛",
+      "actualExpression": "merged.first(",
+      "raw": "assertEquals(\"青岛\", merged.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 143,
+      "expected": 92,
+      "actualExpression": "merged.first(",
+      "raw": "assertEquals(92, merged.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 153,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 154,
+      "expected": 3,
+      "actualExpression": "out.windows.first(",
+      "raw": "assertEquals(3, out.windows.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 165,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 184,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 187,
+      "expected": 3,
+      "actualExpression": "w1.durationHours",
+      "raw": "assertEquals(3, w1.durationHours"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 188,
+      "expected": 80,
+      "actualExpression": "w1.peakScore",
+      "raw": "assertEquals(80, w1.peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 210,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 211,
+      "expected": 90,
+      "actualExpression": "out.windows[0].peakScore",
+      "raw": "assertEquals(90, out.windows[0].peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 225,
+      "expected": 79,
+      "actualExpression": "winA.first(",
+      "raw": "assertEquals(79.0, winA.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 226,
+      "expected": 77.9,
+      "actualExpression": "winB.first(",
+      "raw": "assertEquals(77.9, winB.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 229,
+      "expected": "A长窗",
+      "actualExpression": "merged.first(",
+      "raw": "assertEquals(\"A长窗\", merged.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 230,
+      "expected": 88,
+      "actualExpression": "merged.first(",
+      "raw": "assertEquals(88, merged.first("
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 231,
+      "expected": "B短窗",
+      "actualExpression": "merged[1].first",
+      "raw": "assertEquals(\"B短窗\", merged[1].first"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 240,
+      "expected": 0,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(0, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 266,
+      "expected": 1,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(1, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 267,
+      "expected": 85,
+      "actualExpression": "out.windows[0].peakScore",
+      "raw": "assertEquals(85, out.windows[0].peakScore"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 279,
+      "expected": 0,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(0, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 293,
+      "expected": 0,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(0, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 302,
+      "expected": 2,
+      "actualExpression": "out.windows.size",
+      "raw": "assertEquals(2, out.windows.size"
+    },
+    {
+      "module": "core/domain/src/test/kotlin/com/tidespot/core/domain/WindowFinderTest.kt",
+      "line": 303,
+      "expected": 92,
+      "actualExpression": "out.windows[0].peakScore",
+      "raw": "assertEquals(92, out.windows[0].peakScore"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 117,
+      "expected": "淳安县",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"淳安县\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 119,
+      "expected": "7PXWHX22+22",
+      "actualExpression": "place.plusCode",
+      "raw": "assertEquals(\"7PXWHX22+22\", place.plusCode"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 120,
+      "expected": "杭州市 · 浙江省",
+      "actualExpression": "place.subLabel",
+      "raw": "assertEquals(\"杭州市 · 浙江省\", place.subLabel"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 121,
+      "expected": "淳安县",
+      "actualExpression": "place.locality",
+      "raw": "assertEquals(\"淳安县\", place.locality"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 122,
+      "expected": "杭州市",
+      "actualExpression": "place.city",
+      "raw": "assertEquals(\"杭州市\", place.city"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 123,
+      "expected": "浙江省",
+      "actualExpression": "place.admin1",
+      "raw": "assertEquals(\"浙江省\", place.admin1"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 128,
+      "expected": "zh",
+      "actualExpression": "aReq.requestUrl!!.queryParameter(\"localityLanguage\"",
+      "raw": "assertEquals(\"zh\", aReq.requestUrl!!.queryParameter(\"localityLanguage\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 129,
+      "expected": "29.55",
+      "actualExpression": "aReq.requestUrl!!.queryParameter(\"latitude\"",
+      "raw": "assertEquals(\"29.55\", aReq.requestUrl!!.queryParameter(\"latitude\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 130,
+      "expected": "118.95",
+      "actualExpression": "aReq.requestUrl!!.queryParameter(\"longitude\"",
+      "raw": "assertEquals(\"118.95\", aReq.requestUrl!!.queryParameter(\"longitude\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 133,
+      "expected": "1",
+      "actualExpression": "bReq.requestUrl!!.queryParameter(\"limit\"",
+      "raw": "assertEquals(\"1\", bReq.requestUrl!!.queryParameter(\"limit\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 134,
+      "expected": "locality",
+      "actualExpression": "bReq.requestUrl!!.queryParameter(\"layer\"",
+      "raw": "assertEquals(\"locality\", bReq.requestUrl!!.queryParameter(\"layer\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 146,
+      "expected": "崂山区",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"崂山区\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 147,
+      "expected": "青岛市 · 山东省",
+      "actualExpression": "place.subLabel",
+      "raw": "assertEquals(\"青岛市 · 山东省\", place.subLabel"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 156,
+      "expected": "骑龙巷街区",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"骑龙巷街区\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 158,
+      "expected": "杭州市 · 浙江省",
+      "actualExpression": "place.subLabel",
+      "raw": "assertEquals(\"杭州市 · 浙江省\", place.subLabel"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 159,
+      "expected": "7PXWHX22+22",
+      "actualExpression": "place.plusCode",
+      "raw": "assertEquals(\"7PXWHX22+22\", place.plusCode"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 168,
+      "expected": 1,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(1, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 169,
+      "expected": 1,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(1, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 170,
+      "expected": "淳安县",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"淳安县\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 179,
+      "expected": "淳安县",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"淳安县\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 181,
+      "expected": 1,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(1, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 183,
+      "expected": 3,
+      "actualExpression": "recorded.size",
+      "raw": "assertEquals(3, recorded.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 184,
+      "expected": 1,
+      "actualExpression": "recorded.count { it.requestUrl!!.encodedPath == \"/bdc-backup\" }",
+      "raw": "assertEquals(1, recorded.count { it.requestUrl!!.encodedPath == \"/bdc-backup\" }"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 194,
+      "expected": 1,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(1, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 195,
+      "expected": 1,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(1, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 199,
+      "expected": 1,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(1, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 200,
+      "expected": 1,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(1, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 206,
+      "expected": 2,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(2, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 207,
+      "expected": 2,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(2, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 222,
+      "expected": 3,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(3, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 223,
+      "expected": 3,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(3, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 273,
+      "expected": "7PXXJ24Q+26",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"7PXXJ24Q+26\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 274,
+      "expected": "7PXXJ24Q+26",
+      "actualExpression": "place.plusCode",
+      "raw": "assertEquals(\"7PXXJ24Q+26\", place.plusCode"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 275,
+      "expected": "29.6050, 119.0380",
+      "actualExpression": "place.subLabel",
+      "raw": "assertEquals(\"29.6050, 119.0380\", place.subLabel"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 277,
+      "expected": 2,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(2, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 278,
+      "expected": 1,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(1, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 279,
+      "expected": 0,
+      "actualExpression": "dao.upserts",
+      "raw": "assertEquals(0, dao.upserts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 284,
+      "expected": 4,
+      "actualExpression": "aCount",
+      "raw": "assertEquals(4, aCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 285,
+      "expected": 2,
+      "actualExpression": "bCount",
+      "raw": "assertEquals(2, bCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 286,
+      "expected": 0,
+      "actualExpression": "dao.upserts",
+      "raw": "assertEquals(0, dao.upserts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/ReverseGeocoderTest.kt",
+      "line": 295,
+      "expected": "7PXWHX22+22",
+      "actualExpression": "place.displayName",
+      "raw": "assertEquals(\"7PXWHX22+22\", place.displayName"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 11,
+      "expected": "山东省",
+      "actualExpression": "T2S.toSimplified(\"山東省\"",
+      "raw": "assertEquals(\"山东省\", T2S.toSimplified(\"山東省\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 12,
+      "expected": "青岛市",
+      "actualExpression": "T2S.toSimplified(\"青島市\"",
+      "raw": "assertEquals(\"青岛市\", T2S.toSimplified(\"青島市\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 13,
+      "expected": "崂山区",
+      "actualExpression": "T2S.toSimplified(\"嶗山區\"",
+      "raw": "assertEquals(\"崂山区\", T2S.toSimplified(\"嶗山區\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 18,
+      "expected": "江苏省苏州市吴中区",
+      "actualExpression": "T2S.toSimplified(\"江蘇省苏州市吴中区\"",
+      "raw": "assertEquals(\"江苏省苏州市吴中区\", T2S.toSimplified(\"江蘇省苏州市吴中区\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 30,
+      "expected": "菲律宾海",
+      "actualExpression": "T2S.toSimplified(\"菲律賓海\"",
+      "raw": "assertEquals(\"菲律宾海\", T2S.toSimplified(\"菲律賓海\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 31,
+      "expected": "琼州海峡",
+      "actualExpression": "T2S.toSimplified(\"瓊州海峽\"",
+      "raw": "assertEquals(\"琼州海峡\", T2S.toSimplified(\"瓊州海峽\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 36,
+      "expected": "",
+      "actualExpression": "T2S.toSimplified(\"\"",
+      "raw": "assertEquals(\"\", T2S.toSimplified(\"\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/geo/T2STest.kt",
+      "line": 37,
+      "expected": "千岛湖 123 ABC",
+      "actualExpression": "T2S.toSimplified(\"千岛湖 123 ABC\"",
+      "raw": "assertEquals(\"千岛湖 123 ABC\", T2S.toSimplified(\"千岛湖 123 ABC\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration34JvmTest.kt",
+      "line": 73,
+      "expected": "vetoCodes",
+      "actualExpression": "field.name",
+      "raw": "assertEquals(\"vetoCodes\", field.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration45JvmTest.kt",
+      "line": 24,
+      "expected": 2,
+      "actualExpression": "TideSpotDatabase.MIGRATION_4_5_STATEMENTS.size",
+      "raw": "assertEquals(2, TideSpotDatabase.MIGRATION_4_5_STATEMENTS.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration45JvmTest.kt",
+      "line": 56,
+      "expected": "java.lang.Double",
+      "actualExpression": "valueField.type.name",
+      "raw": "assertEquals(\"java.lang.Double\", valueField.type.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration45JvmTest.kt",
+      "line": 58,
+      "expected": "TIDE_OBSERVATION",
+      "actualExpression": "ManualObservationEntity.KIND_TIDE_OBSERVATION",
+      "raw": "assertEquals(\"TIDE_OBSERVATION\", ManualObservationEntity.KIND_TIDE_OBSERVATION"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration45JvmTest.kt",
+      "line": 59,
+      "expected": "WATER_TEMP",
+      "actualExpression": "WaterQualityObservationKind.WATER_TEMP.name",
+      "raw": "assertEquals(\"WATER_TEMP\", WaterQualityObservationKind.WATER_TEMP.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration45JvmTest.kt",
+      "line": 60,
+      "expected": "DO",
+      "actualExpression": "WaterQualityObservationKind.DO.name",
+      "raw": "assertEquals(\"DO\", WaterQualityObservationKind.DO.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration45JvmTest.kt",
+      "line": 61,
+      "expected": "TURBIDITY",
+      "actualExpression": "WaterQualityObservationKind.TURBIDITY.name",
+      "raw": "assertEquals(\"TURBIDITY\", WaterQualityObservationKind.TURBIDITY.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration56JvmTest.kt",
+      "line": 21,
+      "expected": 1,
+      "actualExpression": "TideSpotDatabase.MIGRATION_5_6_STATEMENTS.size",
+      "raw": "assertEquals(1, TideSpotDatabase.MIGRATION_5_6_STATEMENTS.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/local/RoomMigration56JvmTest.kt",
+      "line": 41,
+      "expected": "java.lang.String",
+      "actualExpression": "field.type.name",
+      "raw": "assertEquals(\"java.lang.String\", field.type.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/ApiErrorClassifierTest.kt",
+      "line": 20,
+      "expected": 400,
+      "actualExpression": "e.httpStatus",
+      "raw": "assertEquals(400, e.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/ApiErrorClassifierTest.kt",
+      "line": 21,
+      "expected": "Cannot initialize MultiDomains",
+      "actualExpression": "e.reason",
+      "raw": "assertEquals(\"Cannot initialize MultiDomains\", e.reason"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/ApiErrorClassifierTest.kt",
+      "line": 36,
+      "expected": "Wrong Time Zone",
+      "actualExpression": "e.reason",
+      "raw": "assertEquals(\"Wrong Time Zone\", e.reason"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/ApiErrorClassifierTest.kt",
+      "line": 52,
+      "expected": "Latitude must be in range of [-90,90]",
+      "actualExpression": "e.reason",
+      "raw": "assertEquals(\"Latitude must be in range of [-90,90]\", e.reason"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/ApiErrorClassifierTest.kt",
+      "line": 60,
+      "expected": 502,
+      "actualExpression": "e.httpStatus",
+      "raw": "assertEquals(502, e.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 72,
+      "expected": 2,
+      "actualExpression": "list.size",
+      "raw": "assertEquals(2, list.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 74,
+      "expected": "千岛湖",
+      "actualExpression": "first.name",
+      "raw": "assertEquals(\"千岛湖\", first.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 75,
+      "expected": "浙江省",
+      "actualExpression": "first.admin1",
+      "raw": "assertEquals(\"浙江省\", first.admin1"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 76,
+      "expected": "杭州市",
+      "actualExpression": "first.admin2",
+      "raw": "assertEquals(\"杭州市\", first.admin2"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 77,
+      "expected": 29.6,
+      "actualExpression": "first.lat",
+      "raw": "assertEquals(29.6, first.lat"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 78,
+      "expected": 119.03,
+      "actualExpression": "first.lon",
+      "raw": "assertEquals(119.03, first.lon"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 79,
+      "expected": 108,
+      "actualExpression": "first.elevation",
+      "raw": "assertEquals(108.0, first.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 80,
+      "expected": "Asia/Shanghai",
+      "actualExpression": "first.timezone",
+      "raw": "assertEquals(\"Asia/Shanghai\", first.timezone"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 81,
+      "expected": "千岛湖镇",
+      "actualExpression": "list[1].name",
+      "raw": "assertEquals(\"千岛湖镇\", list[1].name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 86,
+      "expected": "千岛湖",
+      "actualExpression": "url.queryParameter(\"name\"",
+      "raw": "assertEquals(\"千岛湖\", url.queryParameter(\"name\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 87,
+      "expected": "5",
+      "actualExpression": "url.queryParameter(\"count\"",
+      "raw": "assertEquals(\"5\", url.queryParameter(\"count\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 88,
+      "expected": "zh",
+      "actualExpression": "url.queryParameter(\"language\"",
+      "raw": "assertEquals(\"zh\", url.queryParameter(\"language\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 89,
+      "expected": "json",
+      "actualExpression": "url.queryParameter(\"format\"",
+      "raw": "assertEquals(\"json\", url.queryParameter(\"format\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 97,
+      "expected": "3",
+      "actualExpression": "recorded.last(",
+      "raw": "assertEquals(\"3\", recorded.last("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/GeocodingClientTest.kt",
+      "line": 109,
+      "expected": 400,
+      "actualExpression": "e.httpStatus",
+      "raw": "assertEquals(400, e.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/RetryExecutorTest.kt",
+      "line": 22,
+      "expected": "ok",
+      "actualExpression": "result",
+      "raw": "assertEquals(\"ok\", result"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/RetryExecutorTest.kt",
+      "line": 24,
+      "expected": 4,
+      "actualExpression": "attempts",
+      "raw": "assertEquals(4, attempts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/RetryExecutorTest.kt",
+      "line": 38,
+      "expected": 503,
+      "actualExpression": "e.httpStatus",
+      "raw": "assertEquals(503, e.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/RetryExecutorTest.kt",
+      "line": 39,
+      "expected": 4,
+      "actualExpression": "attempts",
+      "raw": "assertEquals(4, attempts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/RetryExecutorTest.kt",
+      "line": 59,
+      "expected": "Cannot initialize MultiDomains",
+      "actualExpression": "e.reason",
+      "raw": "assertEquals(\"Cannot initialize MultiDomains\", e.reason"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/RetryExecutorTest.kt",
+      "line": 60,
+      "expected": 1,
+      "actualExpression": "attempts",
+      "raw": "assertEquals(1, attempts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/TokenBucketTest.kt",
+      "line": 106,
+      "expected": 3,
+      "actualExpression": "jobs.count { it.isCompleted }",
+      "raw": "assertEquals(3, jobs.count { it.isCompleted }"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/remote/TokenBucketTest.kt",
+      "line": 108,
+      "expected": 4,
+      "actualExpression": "jobs.count { it.isCompleted }",
+      "raw": "assertEquals(4, jobs.count { it.isCompleted }"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/DetailPrefetcherTest.kt",
+      "line": 49,
+      "expected": 5,
+      "actualExpression": "cand.size",
+      "raw": "assertEquals(5, cand.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/DetailPrefetcherTest.kt",
+      "line": 85,
+      "expected": 2,
+      "actualExpression": "outcome.attemptedSpotIds.size",
+      "raw": "assertEquals(2, outcome.attemptedSpotIds.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/DetailPrefetcherTest.kt",
+      "line": 87,
+      "expected": 3,
+      "actualExpression": "outcome.skippedByToken",
+      "raw": "assertEquals(3, outcome.skippedByToken"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/DetailPrefetcherTest.kt",
+      "line": 88,
+      "expected": 2,
+      "actualExpression": "refreshed",
+      "raw": "assertEquals(2, refreshed"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/DetailPrefetcherTest.kt",
+      "line": 102,
+      "expected": 0,
+      "actualExpression": "refreshed",
+      "raw": "assertEquals(0, refreshed"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/DetailPrefetcherTest.kt",
+      "line": 114,
+      "expected": 2,
+      "actualExpression": "outcome.attemptedSpotIds.size",
+      "raw": "assertEquals(2, outcome.attemptedSpotIds.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/FavoriteBatchRepositoryTest.kt",
+      "line": 176,
+      "expected": 1,
+      "actualExpression": "repository.favorites(",
+      "raw": "assertEquals(1, repository.favorites("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/FavoriteBatchRepositoryTest.kt",
+      "line": 194,
+      "expected": 12.5,
+      "actualExpression": "reloaded.elevation",
+      "raw": "assertEquals(12.5, reloaded.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/FavoriteBatchRepositoryTest.kt",
+      "line": 195,
+      "expected": 28800,
+      "actualExpression": "reloaded.tzOffsetSec",
+      "raw": "assertEquals(28800, reloaded.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/FavoriteBatchRepositoryTest.kt",
+      "line": 210,
+      "expected": 8,
+      "actualExpression": "reloaded.elevation",
+      "raw": "assertEquals(8.0, reloaded.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/FavoriteBatchRepositoryTest.kt",
+      "line": 211,
+      "expected": 32400,
+      "actualExpression": "reloaded.tzOffsetSec",
+      "raw": "assertEquals(32400, reloaded.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 36,
+      "expected": "爆护窗口",
+      "actualExpression": "HourlyScoreStore.band(80",
+      "raw": "assertEquals(\"爆护窗口\", HourlyScoreStore.band(80"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 37,
+      "expected": "爆护窗口",
+      "actualExpression": "HourlyScoreStore.band(100",
+      "raw": "assertEquals(\"爆护窗口\", HourlyScoreStore.band(100"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 38,
+      "expected": "很适合",
+      "actualExpression": "HourlyScoreStore.band(79",
+      "raw": "assertEquals(\"很适合\", HourlyScoreStore.band(79"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 39,
+      "expected": "很适合",
+      "actualExpression": "HourlyScoreStore.band(65",
+      "raw": "assertEquals(\"很适合\", HourlyScoreStore.band(65"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 40,
+      "expected": "可以",
+      "actualExpression": "HourlyScoreStore.band(64",
+      "raw": "assertEquals(\"可以\", HourlyScoreStore.band(64"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 41,
+      "expected": "可以",
+      "actualExpression": "HourlyScoreStore.band(50",
+      "raw": "assertEquals(\"可以\", HourlyScoreStore.band(50"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 42,
+      "expected": "较差",
+      "actualExpression": "HourlyScoreStore.band(49",
+      "raw": "assertEquals(\"较差\", HourlyScoreStore.band(49"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 43,
+      "expected": "较差",
+      "actualExpression": "HourlyScoreStore.band(35",
+      "raw": "assertEquals(\"较差\", HourlyScoreStore.band(35"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 44,
+      "expected": "别去",
+      "actualExpression": "HourlyScoreStore.band(34",
+      "raw": "assertEquals(\"别去\", HourlyScoreStore.band(34"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 45,
+      "expected": "别去",
+      "actualExpression": "HourlyScoreStore.band(0",
+      "raw": "assertEquals(\"别去\", HourlyScoreStore.band(0"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 77,
+      "expected": 28800,
+      "actualExpression": "HourlyScoreStore.resolveTzOffsetSec(w",
+      "raw": "assertEquals(28800, HourlyScoreStore.resolveTzOffsetSec(w"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 105,
+      "expected": 0.3,
+      "actualExpression": "inputs[3].marine?.waveHeightM",
+      "raw": "assertEquals(0.3, inputs[3].marine?.waveHeightM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 107,
+      "expected": 6.5,
+      "actualExpression": "inputs[0].sunriseLocalHour",
+      "raw": "assertEquals(6.5, inputs[0].sunriseLocalHour"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 163,
+      "expected": 1,
+      "actualExpression": "rows.size",
+      "raw": "assertEquals(1, rows.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 168,
+      "expected": 83,
+      "actualExpression": "row.score",
+      "raw": "assertEquals(83.0, row.score"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 169,
+      "expected": "爆护窗口",
+      "actualExpression": "row.band",
+      "raw": "assertEquals(\"爆护窗口\", row.band"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 173,
+      "expected": 1,
+      "actualExpression": "parsed.size",
+      "raw": "assertEquals(1, parsed.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 174,
+      "expected": "solunar",
+      "actualExpression": "parsed[0].jsonObject[\"id\"]!!.jsonPrimitive.content",
+      "raw": "assertEquals(\"solunar\", parsed[0].jsonObject[\"id\"]!!.jsonPrimitive.content"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 187,
+      "expected": 1,
+      "actualExpression": "dao.rows.size",
+      "raw": "assertEquals(1, dao.rows.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 188,
+      "expected": 66,
+      "actualExpression": "dao.rows[0].score",
+      "raw": "assertEquals(66.0, dao.rows[0].score"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 190,
+      "expected": 2,
+      "actualExpression": "dao.rows.size",
+      "raw": "assertEquals(2, dao.rows.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/HourlyScoreStoreTest.kt",
+      "line": 191,
+      "expected": 2,
+      "actualExpression": "dao.forSpot(1",
+      "raw": "assertEquals(2, dao.forSpot(1"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 26,
+      "expected": 10,
+      "actualExpression": "list[0].temperatureC",
+      "raw": "assertEquals(10.0, list[0].temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 27,
+      "expected": 17,
+      "actualExpression": "list[7].temperatureC",
+      "raw": "assertEquals(17.0, list[7].temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 28,
+      "expected": 15,
+      "actualExpression": "list[0].windGustKmh",
+      "raw": "assertEquals(15.0, list[0].windGustKmh"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 29,
+      "expected": 100,
+      "actualExpression": "list[0].cape",
+      "raw": "assertEquals(100.0, list[0].cape"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 30,
+      "expected": 1,
+      "actualExpression": "list[1].weatherCode",
+      "raw": "assertEquals(1, list[1].weatherCode"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 42,
+      "expected": 0.5,
+      "actualExpression": "list[0].precipMm",
+      "raw": "assertEquals(0.5, list[0].precipMm"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 44,
+      "expected": 0,
+      "actualExpression": "list[0].rainMm",
+      "raw": "assertEquals(0.0, list[0].rainMm"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 60,
+      "expected": 0.3,
+      "actualExpression": "list[0].waveHeightM",
+      "raw": "assertEquals(0.3, list[0].waveHeightM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 61,
+      "expected": 19.5,
+      "actualExpression": "list[0].seaSurfaceTempC",
+      "raw": "assertEquals(19.5, list[0].seaSurfaceTempC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 62,
+      "expected": 0.17,
+      "actualExpression": "list[0].seaLevelHeightMslM",
+      "raw": "assertEquals(0.17, list[0].seaLevelHeightMslM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 63,
+      "expected": 1.2,
+      "actualExpression": "list[0].oceanCurrentVelocityKmh",
+      "raw": "assertEquals(1.2, list[0].oceanCurrentVelocityKmh"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 90,
+      "expected": 1,
+      "actualExpression": "list.size",
+      "raw": "assertEquals(1, list.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 91,
+      "expected": 11,
+      "actualExpression": "list[0].temperatureC",
+      "raw": "assertEquals(11.0, list[0].temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 101,
+      "expected": 11,
+      "actualExpression": "temp.value",
+      "raw": "assertEquals(11.0, temp.value"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 118,
+      "expected": 1,
+      "actualExpression": "list.size",
+      "raw": "assertEquals(1, list.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 163,
+      "expected": 1,
+      "actualExpression": "list.size",
+      "raw": "assertEquals(1, list.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 207,
+      "expected": 7,
+      "actualExpression": "back.id",
+      "raw": "assertEquals(7, back.id"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 208,
+      "expected": "千岛湖",
+      "actualExpression": "back.name",
+      "raw": "assertEquals(\"千岛湖\", back.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 209,
+      "expected": "库湾",
+      "actualExpression": "back.memo",
+      "raw": "assertEquals(\"库湾\", back.memo"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 210,
+      "expected": "淡水路亚",
+      "actualExpression": "back.preset",
+      "raw": "assertEquals(\"淡水路亚\", back.preset"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/MapperTest.kt",
+      "line": 213,
+      "expected": 100,
+      "actualExpression": "back.createdAtEpochSec",
+      "raw": "assertEquals(100, back.createdAtEpochSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/SeriesJoinerTest.kt",
+      "line": 30,
+      "expected": 0.42,
+      "actualExpression": "slices[1].marine?.waveHeightM",
+      "raw": "assertEquals(0.42, slices[1].marine?.waveHeightM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/SeriesJoinerTest.kt",
+      "line": 46,
+      "expected": 2,
+      "actualExpression": "slices.size",
+      "raw": "assertEquals(2, slices.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/SeriesJoinerTest.kt",
+      "line": 48,
+      "expected": 0.3,
+      "actualExpression": "slices[1].marine?.waveHeightM",
+      "raw": "assertEquals(0.3, slices[1].marine?.waveHeightM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/SeriesJoinerTest.kt",
+      "line": 49,
+      "expected": 11,
+      "actualExpression": "slices[1].weather?.temperatureC",
+      "raw": "assertEquals(11.0, slices[1].weather?.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/SeriesJoinerTest.kt",
+      "line": 54,
+      "expected": 0,
+      "actualExpression": "SeriesJoiner.join(emptyList(",
+      "raw": "assertEquals(0, SeriesJoiner.join(emptyList("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/SeriesJoinerTest.kt",
+      "line": 55,
+      "expected": 1,
+      "actualExpression": "SeriesJoiner.join(listOf(HourlyWeather(timeEpochSec = 1",
+      "raw": "assertEquals(1, SeriesJoiner.join(listOf(HourlyWeather(timeEpochSec = 1"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 168,
+      "expected": 8,
+      "actualExpression": "result.slices.size",
+      "raw": "assertEquals(8, result.slices.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 171,
+      "expected": 10,
+      "actualExpression": "result.slices[0].weather?.temperatureC",
+      "raw": "assertEquals(10.0, result.slices[0].weather?.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 173,
+      "expected": 13,
+      "actualExpression": "result.slices[3].weather?.temperatureC",
+      "raw": "assertEquals(13.0, result.slices[3].weather?.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 174,
+      "expected": 0.3,
+      "actualExpression": "result.slices[3].marine?.waveHeightM",
+      "raw": "assertEquals(0.3, result.slices[3].marine?.waveHeightM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 175,
+      "expected": 19.5,
+      "actualExpression": "result.slices[3].marine?.seaSurfaceTempC",
+      "raw": "assertEquals(19.5, result.slices[3].marine?.seaSurfaceTempC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 176,
+      "expected": 1.2,
+      "actualExpression": "result.slices[3].marine?.oceanCurrentVelocityKmh",
+      "raw": "assertEquals(1.2, result.slices[3].marine?.oceanCurrentVelocityKmh"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 177,
+      "expected": 0.7,
+      "actualExpression": "result.slices[7].marine?.waveHeightM",
+      "raw": "assertEquals(0.7, result.slices[7].marine?.waveHeightM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 178,
+      "expected": 17,
+      "actualExpression": "result.slices[7].weather?.temperatureC",
+      "raw": "assertEquals(17.0, result.slices[7].weather?.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 187,
+      "expected": 2,
+      "actualExpression": "logDao.rows.count { it.httpStatus == 200 }",
+      "raw": "assertEquals(2, logDao.rows.count { it.httpStatus == 200 }"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 190,
+      "expected": 1,
+      "actualExpression": "result.daily?.time?.size",
+      "raw": "assertEquals(1, result.daily?.time?.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 203,
+      "expected": 2,
+      "actualExpression": "paths.size",
+      "raw": "assertEquals(2, paths.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 213,
+      "expected": "7",
+      "actualExpression": "wq.queryParameter(\"past_days\"",
+      "raw": "assertEquals(\"7\", wq.queryParameter(\"past_days\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 214,
+      "expected": "10",
+      "actualExpression": "wq.queryParameter(\"forecast_days\"",
+      "raw": "assertEquals(\"10\", wq.queryParameter(\"forecast_days\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 215,
+      "expected": "auto",
+      "actualExpression": "wq.queryParameter(\"timezone\"",
+      "raw": "assertEquals(\"auto\", wq.queryParameter(\"timezone\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 220,
+      "expected": "1",
+      "actualExpression": "mq.queryParameter(\"past_days\"",
+      "raw": "assertEquals(\"1\", mq.queryParameter(\"past_days\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 221,
+      "expected": "10",
+      "actualExpression": "mq.queryParameter(\"forecast_days\"",
+      "raw": "assertEquals(\"10\", mq.queryParameter(\"forecast_days\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 247,
+      "expected": 5,
+      "actualExpression": "waveRows.size",
+      "raw": "assertEquals(5, waveRows.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 265,
+      "expected": 1,
+      "actualExpression": "marineRequests",
+      "raw": "assertEquals(1, marineRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 268,
+      "expected": 400,
+      "actualExpression": "err.httpStatus",
+      "raw": "assertEquals(400, err.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 269,
+      "expected": "Cannot initialize MultiDomains",
+      "actualExpression": "err.reason",
+      "raw": "assertEquals(\"Cannot initialize MultiDomains\", err.reason"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 291,
+      "expected": 3,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(3, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 317,
+      "expected": 1,
+      "actualExpression": "marineRequests",
+      "raw": "assertEquals(1, marineRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 322,
+      "expected": 500,
+      "actualExpression": "err.httpStatus",
+      "raw": "assertEquals(500, err.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 363,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 364,
+      "expected": 1,
+      "actualExpression": "marineRequests",
+      "raw": "assertEquals(1, marineRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 369,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 370,
+      "expected": 1,
+      "actualExpression": "marineRequests",
+      "raw": "assertEquals(1, marineRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 375,
+      "expected": 10,
+      "actualExpression": "second.slices[0].weather?.temperatureC",
+      "raw": "assertEquals(10.0, second.slices[0].weather?.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 388,
+      "expected": 2,
+      "actualExpression": "logs.size",
+      "raw": "assertEquals(2, logs.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 393,
+      "expected": 2,
+      "actualExpression": "recent.size",
+      "raw": "assertEquals(2, recent.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 401,
+      "expected": "青岛外海(改)",
+      "actualExpression": "spotDao.rows[s.id]!!.name",
+      "raw": "assertEquals(\"青岛外海(改)\", spotDao.rows[s.id]!!.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 423,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 450,
+      "expected": 7,
+      "actualExpression": "result.slices.size",
+      "raw": "assertEquals(7, result.slices.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 465,
+      "expected": "INLAND_WATER",
+      "actualExpression": "row.waterBodyType",
+      "raw": "assertEquals(\"INLAND_WATER\", row.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 466,
+      "expected": 108,
+      "actualExpression": "row.elevation",
+      "raw": "assertEquals(108.0, row.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 467,
+      "expected": 28800,
+      "actualExpression": "row.tzOffsetSec",
+      "raw": "assertEquals(28800, row.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 469,
+      "expected": "青岛外海",
+      "actualExpression": "row.name",
+      "raw": "assertEquals(\"青岛外海\", row.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 473,
+      "expected": "UNKNOWN",
+      "actualExpression": "unknown.waterBodyType",
+      "raw": "assertEquals(\"UNKNOWN\", unknown.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 474,
+      "expected": 108,
+      "actualExpression": "unknown.elevation",
+      "raw": "assertEquals(108.0, unknown.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 475,
+      "expected": 28800,
+      "actualExpression": "unknown.tzOffsetSec",
+      "raw": "assertEquals(28800, unknown.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 489,
+      "expected": "青岛外海(改)",
+      "actualExpression": "row.name",
+      "raw": "assertEquals(\"青岛外海(改)\", row.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 490,
+      "expected": "新备注",
+      "actualExpression": "row.note",
+      "raw": "assertEquals(\"新备注\", row.note"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 491,
+      "expected": 108,
+      "actualExpression": "row.elevation",
+      "raw": "assertEquals(108.0, row.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 492,
+      "expected": 28800,
+      "actualExpression": "row.tzOffsetSec",
+      "raw": "assertEquals(28800, row.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 493,
+      "expected": "INLAND_WATER",
+      "actualExpression": "row.waterBodyType",
+      "raw": "assertEquals(\"INLAND_WATER\", row.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 496,
+      "expected": "青岛外海(改)",
+      "actualExpression": "domain.name",
+      "raw": "assertEquals(\"青岛外海(改)\", domain.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 507,
+      "expected": "NEARSHORE",
+      "actualExpression": "row.waterBodyType",
+      "raw": "assertEquals(\"NEARSHORE\", row.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 508,
+      "expected": 108,
+      "actualExpression": "row.elevation",
+      "raw": "assertEquals(108.0, row.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 509,
+      "expected": 28800,
+      "actualExpression": "row.tzOffsetSec",
+      "raw": "assertEquals(28800, row.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 554,
+      "expected": 0,
+      "actualExpression": "r.windows.size",
+      "raw": "assertEquals(0, r.windows.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 555,
+      "expected": 0,
+      "actualExpression": "r.validHoursPresent",
+      "raw": "assertEquals(0, r.validHoursPresent"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 571,
+      "expected": 4,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(4, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 596,
+      "expected": 10,
+      "actualExpression": "w0.temperatureC",
+      "raw": "assertEquals(10.0, w0.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 597,
+      "expected": 15,
+      "actualExpression": "w0.windGustKmh",
+      "raw": "assertEquals(15.0, w0.windGustKmh"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 617,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 621,
+      "expected": 10,
+      "actualExpression": "result.slices[0].weather?.temperatureC",
+      "raw": "assertEquals(10.0, result.slices[0].weather?.temperatureC"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 633,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 637,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 641,
+      "expected": 2,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(2, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 642,
+      "expected": 2,
+      "actualExpression": "marineRequests",
+      "raw": "assertEquals(2, marineRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 683,
+      "expected": 1,
+      "actualExpression": "weatherRequests",
+      "raw": "assertEquals(1, weatherRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 684,
+      "expected": 1,
+      "actualExpression": "marineRequests",
+      "raw": "assertEquals(1, marineRequests"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 694,
+      "expected": 4,
+      "actualExpression": "afterFirst",
+      "raw": "assertEquals(4, afterFirst"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 724,
+      "expected": 19800,
+      "actualExpression": "spotDao.rows[s.id]!!.tzOffsetSec",
+      "raw": "assertEquals(19800, spotDao.rows[s.id]!!.tzOffsetSec"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 797,
+      "expected": 0,
+      "actualExpression": "notAdopted.lagHours",
+      "raw": "assertEquals(0, notAdopted.lagHours"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 802,
+      "expected": 1,
+      "actualExpression": "adopted.lagHours",
+      "raw": "assertEquals(1, adopted.lagHours"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 834,
+      "expected": 0.17,
+      "actualExpression": "refreshed.marine.first { it.timeEpochSec == MockFixtures.BASE_EPOCH_SEC + 3 * 3600L }.seaLevelHeightMslM",
+      "raw": "assertEquals(\n            0.17,\n            refreshed.marine.first { it.timeEpochSec == MockFixtures.BASE_EPOCH_SEC + 3 * 3600L }.seaLevelHeightMslM"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 857,
+      "expected": 0.17,
+      "actualExpression": "corrected[1].seaLevelHeightMslM!!",
+      "raw": "assertEquals(0.17, corrected[1].seaLevelHeightMslM!!"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 869,
+      "expected": 0.17,
+      "actualExpression": "refreshed.marine.first(",
+      "raw": "assertEquals(0.17, refreshed.marine.first("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 886,
+      "expected": "NEARSHORE",
+      "actualExpression": "back.waterBodyType",
+      "raw": "assertEquals(\"NEARSHORE\", back.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 887,
+      "expected": 12,
+      "actualExpression": "back.elevation",
+      "raw": "assertEquals(12.0, back.elevation"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryTest.kt",
+      "line": 908,
+      "expected": "tidespot-scoring",
+      "actualExpression": "scoringThread?.name",
+      "raw": "assertEquals(\"tidespot-scoring\", scoringThread?.name"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryWaterBodyFixTest.kt",
+      "line": 115,
+      "expected": "NEARSHORE",
+      "actualExpression": "spotDao.rows[id]!!.waterBodyType",
+      "raw": "assertEquals(\n            \"NEARSHORE\",\n            spotDao.rows[id]!!.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/TideSpotRepositoryWaterBodyFixTest.kt",
+      "line": 134,
+      "expected": "INLAND_WATER",
+      "actualExpression": "spotDao.rows[id]!!.waterBodyType",
+      "raw": "assertEquals(\"INLAND_WATER\", spotDao.rows[id]!!.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/VetoCodesColumnTest.kt",
+      "line": 27,
+      "expected": "[]",
+      "actualExpression": "HourlyScoreStore.vetoCodesToColumn(emptyList(",
+      "raw": "assertEquals(\"[]\", HourlyScoreStore.vetoCodesToColumn(emptyList("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/VetoCodesColumnTest.kt",
+      "line": 73,
+      "expected": 2,
+      "actualExpression": "rows.size",
+      "raw": "assertEquals(2, rows.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/repo/VetoCodesColumnTest.kt",
+      "line": 74,
+      "expected": "[]",
+      "actualExpression": "rows[0].vetoCodes",
+      "raw": "assertEquals(\"[]\", rows[0].vetoCodes"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 68,
+      "expected": "tok-1",
+      "actualExpression": "auth.token(",
+      "raw": "assertEquals(\"tok-1\", auth.token("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 69,
+      "expected": 1,
+      "actualExpression": "tokenCount",
+      "raw": "assertEquals(1, tokenCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 71,
+      "expected": "tok-1",
+      "actualExpression": "auth.token(",
+      "raw": "assertEquals(\"tok-1\", auth.token("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 72,
+      "expected": 1,
+      "actualExpression": "tokenCount",
+      "raw": "assertEquals(1, tokenCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 75,
+      "expected": "tok-1",
+      "actualExpression": "auth.token(",
+      "raw": "assertEquals(\"tok-1\", auth.token("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 76,
+      "expected": 1,
+      "actualExpression": "tokenCount",
+      "raw": "assertEquals(1, tokenCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 79,
+      "expected": "tok-2",
+      "actualExpression": "auth.token(",
+      "raw": "assertEquals(\"tok-2\", auth.token("
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 80,
+      "expected": 2,
+      "actualExpression": "tokenCount",
+      "raw": "assertEquals(2, tokenCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusAuthClientTest.kt",
+      "line": 97,
+      "expected": 401,
+      "actualExpression": "e.httpStatus",
+      "raw": "assertEquals(401, e.httpStatus"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialStoreTest.kt",
+      "line": 35,
+      "expected": "user@example.com",
+      "actualExpression": "loaded?.username",
+      "raw": "assertEquals(\"user@example.com\", loaded?.username"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialStoreTest.kt",
+      "line": 36,
+      "expected": " p@ss w0rd! ",
+      "actualExpression": "loaded?.password",
+      "raw": "assertEquals(\" p@ss w0rd! \", loaded?.password"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialStoreTest.kt",
+      "line": 75,
+      "expected": "new-user",
+      "actualExpression": "loaded.username",
+      "raw": "assertEquals(\"new-user\", loaded.username"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialStoreTest.kt",
+      "line": 76,
+      "expected": "new-pass",
+      "actualExpression": "loaded.password",
+      "raw": "assertEquals(\"new-pass\", loaded.password"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialStoreTest.kt",
+      "line": 77,
+      "expected": 0,
+      "actualExpression": "File(tmp.root",
+      "raw": "assertEquals(0, File(tmp.root"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialValidatorTest.kt",
+      "line": 70,
+      "expected": 1,
+      "actualExpression": "requestCount",
+      "raw": "assertEquals(1, requestCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/CopernicusCredentialValidatorTest.kt",
+      "line": 115,
+      "expected": 0,
+      "actualExpression": "requestCount",
+      "raw": "assertEquals(0, requestCount"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 114,
+      "expected": "WMTS",
+      "actualExpression": "url.queryParameter(\"SERVICE\"",
+      "raw": "assertEquals(\"WMTS\", url.queryParameter(\"SERVICE\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 115,
+      "expected": "GetFeatureInfo",
+      "actualExpression": "url.queryParameter(\"REQUEST\"",
+      "raw": "assertEquals(\"GetFeatureInfo\", url.queryParameter(\"REQUEST\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 116,
+      "expected": "1.0.0",
+      "actualExpression": "url.queryParameter(\"VERSION\"",
+      "raw": "assertEquals(\"1.0.0\", url.queryParameter(\"VERSION\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 118,
+      "expected": "default",
+      "actualExpression": "url.queryParameter(\"STYLE\"",
+      "raw": "assertEquals(\"default\", url.queryParameter(\"STYLE\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 119,
+      "expected": "image/png",
+      "actualExpression": "url.queryParameter(\"FORMAT\"",
+      "raw": "assertEquals(\"image/png\", url.queryParameter(\"FORMAT\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 120,
+      "expected": "EPSG:3857",
+      "actualExpression": "url.queryParameter(\"TILEMATRIXSET\"",
+      "raw": "assertEquals(\"EPSG:3857\", url.queryParameter(\"TILEMATRIXSET\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 121,
+      "expected": "7",
+      "actualExpression": "url.queryParameter(\"TILEMATRIX\"",
+      "raw": "assertEquals(\"7\", url.queryParameter(\"TILEMATRIX\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 122,
+      "expected": "106",
+      "actualExpression": "url.queryParameter(\"TILECOL\"",
+      "raw": "assertEquals(\"106\", url.queryParameter(\"TILECOL\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/OstiaLakeProbeTest.kt",
+      "line": 123,
+      "expected": "application/json",
+      "actualExpression": "url.queryParameter(\"INFOFORMAT\"",
+      "raw": "assertEquals(\"application/json\", url.queryParameter(\"INFOFORMAT\""
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 78,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 79,
+      "expected": 1,
+      "actualExpression": "dao.upserts",
+      "raw": "assertEquals(1, dao.upserts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 83,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 84,
+      "expected": 1,
+      "actualExpression": "dao.upserts",
+      "raw": "assertEquals(1, dao.upserts"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 99,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 100,
+      "expected": "UNKNOWN",
+      "actualExpression": "dao.rows[\"${CacheKeys.spotKey(29.55",
+      "raw": "assertEquals(\n            \"UNKNOWN\",\n            dao.rows[\"${CacheKeys.spotKey(29.55"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 128,
+      "expected": "NEARSHORE",
+      "actualExpression": "dao.rows[\"$key#v${WaterBodyClassifier.JUDGE_VERSION}\"]!!.waterBodyType",
+      "raw": "assertEquals(\n            \"NEARSHORE\",\n            dao.rows[\"$key#v${WaterBodyClassifier.JUDGE_VERSION}\"]!!.waterBodyType"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 146,
+      "expected": 1,
+      "actualExpression": "probeFalse.calls",
+      "raw": "assertEquals(1, probeFalse.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 157,
+      "expected": 1,
+      "actualExpression": "probeTrue.calls",
+      "raw": "assertEquals(1, probeTrue.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 172,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 177,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 181,
+      "expected": 2,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(2, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 187,
+      "expected": 3,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(3, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 190,
+      "expected": 3,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(3, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 204,
+      "expected": 1,
+      "actualExpression": "warnings.size",
+      "raw": "assertEquals(1, warnings.size"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 219,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    },
+    {
+      "module": "core/data/src/test/kotlin/com/tidespot/core/data/water/WaterBodyClassifierTest.kt",
+      "line": 226,
+      "expected": 1,
+      "actualExpression": "probe.calls",
+      "raw": "assertEquals(1, probe.calls"
+    }
+  ]
+}

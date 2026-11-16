@@ -1,0 +1,1569 @@
+/**
+ * D · 路亚图鉴（LURE FIELD GUIDE）—— Web 皮肤视觉层（SKIN-1 的 shape / texture 轴）。
+ *
+ * 只作用于 [data-skin='d-fieldguide']；A · 复古户外保持原样。
+ * 视觉语言：冷白/薄荷平涂纸底 + 2px 近黑粗描边 + 无模糊硬投影 + 小圆角印章 + 贴纸鱼。
+ * 色板（sea / inland × light / dark）仍由 styles/skins.css 提供；本文件不重复定义语义色。
+ */
+
+/* ============================== 1. Skin tokens ============================== */
+:root[data-skin='d-fieldguide'] {
+  /* 描边 */
+  --fg-line: var(--color-outline);
+  --fg-line-w: 2px;
+  --fg-line-w-thin: 1.5px;
+  --fg-dash: 2px;
+
+  /* 硬投影（无 blur）：先给不支持 color-mix 的浏览器兜底 */
+  --fg-edge: rgba(16, 24, 32, 0.24);
+  --fg-edge: color-mix(in srgb, var(--fg-line) 24%, transparent);
+  --fg-shadow-sticker-sm: 2px 2px 0 var(--fg-edge);
+  --fg-shadow-sticker: 3px 3px 0 var(--fg-edge);
+  --fg-shadow-sticker-lg: 4px 4px 0 var(--fg-edge);
+  --fg-scrim: rgba(16, 24, 32, 0.55);
+
+  /* 数据焦点色：珊瑚（海）/ 琥珀（陆） */
+  --fg-accent: var(--color-mint);
+  --fg-on-accent: #101820;
+  --fg-stamp: #3e9e5a;
+
+  /* 形状：小圆角印章（3 / 8 / 10 / 14 / 18） */
+  --fg-radius-seal: 3px;
+  --fg-radius-chip: 8px;
+  --fg-radius-card: 14px;
+  --fg-radius-day: 14px;
+  --fg-radius-sheet: 18px;
+  --fg-radius-pill: 999px;
+
+  /* 字族 / 数字 */
+  --fg-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  --fg-display-weight: 800;
+
+  /* 密度：设计稿页边 16、卡内 14 */
+  --screen-margin: 14px;
+  --card-padding: 14px;
+}
+
+:root[data-skin='d-fieldguide'][data-theme='dark'] {
+  --fg-line: #f2efe6;
+  --fg-edge: rgba(0, 0, 0, 0.9);
+  --fg-scrim: rgba(0, 0, 0, 0.66);
+  --fg-on-accent: #0b1620;
+  --fg-stamp: #67c2a5;
+}
+
+/* 暗色纸纹用滤色，避免噪点把背景压灰 */
+:root[data-skin='d-fieldguide'][data-theme='dark'] body::after {
+  mix-blend-mode: screen;
+  opacity: 0.08;
+}
+
+/* ============================== 2. 纸底与字体 ============================== */
+[data-skin='d-fieldguide'] body {
+  background-color: var(--color-bg);
+  background-image: linear-gradient(160deg, var(--color-bg) 0%, var(--color-surface-variant) 100%);
+  background-attachment: fixed;
+}
+
+/* 纸纹：固定层 + 不接收指针事件，绝不放滚动容器上 */
+[data-skin='d-fieldguide'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+/* 标题与数字：系统黑体 + 特粗（字号/行高仍取 generated tokens） */
+[data-skin='d-fieldguide'] .brand,
+[data-skin='d-fieldguide'] h1,
+[data-skin='d-fieldguide'] h2,
+[data-skin='d-fieldguide'] .ts-score__value,
+[data-skin='d-fieldguide'] .desk-aside__score,
+[data-skin='d-fieldguide'] .fav-card__score b,
+[data-skin='d-fieldguide'] .wq-card__value,
+[data-skin='d-fieldguide'] .map-info__name {
+  font-weight: var(--fg-display-weight);
+  letter-spacing: 0.01em;
+}
+
+[data-skin='d-fieldguide'] .ts-score__value,
+[data-skin='d-fieldguide'] .desk-aside__score,
+[data-skin='d-fieldguide'] .fav-card__score b,
+[data-skin='d-fieldguide'] .wq-card__value,
+[data-skin='d-fieldguide'] .top10-row__peak,
+[data-skin='d-fieldguide'] .map-info__coord,
+[data-skin='d-fieldguide'] .fav-card__coord,
+[data-skin='d-fieldguide'] .detail-source,
+[data-skin='d-fieldguide'] .ts-table td.is-num,
+[data-skin='d-fieldguide'] .skin-card__en {
+  font-family: var(--fg-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-skin='d-fieldguide'] .ts-card > strong:first-child {
+  display: block;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: var(--fg-line-w-thin) dashed var(--fg-line);
+  font-weight: var(--fg-display-weight);
+  letter-spacing: 0.01em;
+}
+
+/* ============================== 3. primitives ============================== */
+/* --- Card：贴纸三件套（白卡 + 粗描边 + 硬投影） --- */
+[data-skin='d-fieldguide'] .ts-card {
+  position: relative;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .ts-card--l0 {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-skin='d-fieldguide'] .ts-card--l2 {
+  box-shadow: var(--fg-shadow-sticker-lg);
+}
+
+/* --- Button：印章按钮，按下时物理下沉 --- */
+[data-skin='d-fieldguide'] .ts-btn {
+  border: var(--fg-line-w) solid transparent;
+  border-radius: 10px;
+  font-weight: 700;
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s ease,
+    background-color 0.12s ease, color 0.12s ease;
+}
+
+[data-skin='d-fieldguide'] .ts-btn--primary {
+  border-color: var(--fg-line);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .ts-btn--ghost {
+  border: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+  color: var(--color-text);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .ts-btn--ghost:hover {
+  background: var(--color-card);
+  color: var(--color-primary);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .ts-btn--quiet {
+  color: var(--color-text-dim);
+  border-color: transparent;
+  border-radius: 6px;
+}
+
+[data-skin='d-fieldguide'] .ts-btn--quiet:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
+[data-skin='d-fieldguide'] .ts-btn:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+[data-skin='d-fieldguide'] .ts-btn:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  transform: none;
+}
+
+/* --- Chip：小印章药丸 --- */
+[data-skin='d-fieldguide'] .ts-chip {
+  min-height: 26px;
+  padding: 0 10px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+[data-skin='d-fieldguide'] .ts-chip--mint {
+  background: var(--fg-accent);
+  color: var(--fg-on-accent);
+}
+
+[data-skin='d-fieldguide'] .ts-chip.is-selected {
+  background: var(--color-primary);
+  border-color: var(--fg-line);
+  color: var(--color-on-primary);
+}
+
+/* --- ConfidenceBadge：3px 印章角 + 粗描边 --- */
+[data-skin='d-fieldguide'] .ts-badge {
+  padding: 2px 7px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-seal);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* --- SegmentedTabs：纸面 + 粗下边线 + 珊瑚短下划线 --- */
+[data-skin='d-fieldguide'] .ts-tabs {
+  gap: 2px;
+  padding: 0;
+  border-bottom: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-skin='d-fieldguide'] .ts-tabs button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-dim);
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .ts-tabs button:hover {
+  color: var(--color-primary);
+}
+
+[data-skin='d-fieldguide'] .ts-tabs button.is-active {
+  position: relative;
+  background: transparent;
+  color: var(--color-primary);
+  box-shadow: none;
+}
+
+[data-skin='d-fieldguide'] .ts-tabs button.is-active::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--fg-accent);
+}
+
+/* --- DaySelector：52px 印章日期卡 --- */
+[data-skin='d-fieldguide'] .ts-day {
+  grid-auto-columns: minmax(58px, 1fr);
+  gap: 8px;
+  /* overflow-x:auto 会裁掉硬投影，用等量负外边距抵消内边距 */
+  padding: 2px 2px 6px;
+  margin: -2px -2px -6px;
+}
+
+[data-skin='d-fieldguide'] .ts-day__chip {
+  min-height: 52px;
+  padding: 4px 8px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-day);
+  background: var(--color-card);
+  color: var(--color-text);
+  box-shadow: none;
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s ease,
+    background-color 0.12s ease;
+}
+
+[data-skin='d-fieldguide'] .ts-day__chip:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .ts-day__chip.is-active {
+  border-color: var(--fg-line);
+  background: var(--fg-accent);
+  color: var(--fg-on-accent);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .ts-day__chip.is-active .ts-day__week {
+  color: var(--fg-on-accent);
+  opacity: 0.85;
+}
+
+[data-skin='d-fieldguide'] .ts-day__top {
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .ts-day__score {
+  top: 3px;
+  right: 5px;
+  font-family: var(--fg-mono);
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* --- ScoreCard：图鉴贴纸卡（不再是深蓝渐变） --- */
+[data-skin='d-fieldguide'] .ts-score {
+  overflow: hidden;
+  padding: 16px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  color: var(--color-text);
+  box-shadow: var(--fg-shadow-sticker-lg);
+}
+
+[data-skin='d-fieldguide'] .ts-score__glow {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .ts-score__head {
+  position: relative;
+  z-index: 1;
+}
+
+[data-skin='d-fieldguide'] .ts-score__band {
+  min-height: 24px;
+  padding: 0 10px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--fg-accent);
+  color: var(--fg-on-accent);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='d-fieldguide'] .ts-score__value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 10px 0 2px;
+  padding-right: 56px;
+}
+
+[data-skin='d-fieldguide'] .ts-score__value {
+  margin: 0;
+  font-size: var(--text-score-hero-size);
+  line-height: 1;
+  color: var(--fg-accent);
+  letter-spacing: -0.02em;
+}
+
+[data-skin='d-fieldguide'] .ts-score__denom {
+  display: inline;
+  font-family: var(--fg-mono);
+  font-size: var(--text-label-large-size);
+  font-weight: 700;
+  color: var(--color-text-dim);
+}
+
+[data-skin='d-fieldguide'] .ts-score__window {
+  color: var(--color-text);
+  font-size: var(--text-body-small-size);
+  font-weight: 600;
+  opacity: 1;
+}
+
+[data-skin='d-fieldguide'] .ts-score__stamp {
+  position: absolute;
+  top: 54px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: var(--fg-line-w) dashed var(--fg-stamp);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--fg-stamp);
+  transform: rotate(-7deg);
+  opacity: 0.92;
+}
+
+[data-skin='d-fieldguide'] .ts-score__segments {
+  gap: 4px;
+  margin-top: 14px;
+}
+
+[data-skin='d-fieldguide'] .ts-seg {
+  min-height: 36px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-chip);
+  opacity: 0.9;
+}
+
+[data-skin='d-fieldguide'] .ts-seg.is-active {
+  border-width: 2.5px;
+  box-shadow: var(--fg-shadow-sticker-sm);
+  opacity: 1;
+}
+
+[data-skin='d-fieldguide'] .ts-seg__label {
+  font-weight: 700;
+}
+
+/* --- Table：粗表头线 + 淡墨分隔 + 数字等宽 --- */
+[data-skin='d-fieldguide'] .ts-table th {
+  padding: 6px 8px;
+  border-bottom: var(--fg-line-w) solid var(--fg-line);
+  color: var(--color-text);
+  font-weight: 800;
+  font-size: var(--text-label-large-size);
+  letter-spacing: 0.02em;
+}
+
+[data-skin='d-fieldguide'] .ts-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--fg-line) 22%, transparent);
+}
+
+[data-skin='d-fieldguide'] .ts-table td.is-num {
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .ts-table tr.is-clickable:hover {
+  background: var(--color-surface-variant);
+}
+
+/* --- Sheet：贴纸抽屉 --- */
+[data-skin='d-fieldguide'] .ts-sheet__scrim {
+  background: var(--fg-scrim);
+}
+
+[data-skin='d-fieldguide'] .ts-sheet__panel {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-bottom: 0;
+  border-radius: var(--fg-radius-sheet) var(--fg-radius-sheet) 0 0;
+  background: var(--color-card);
+  box-shadow: 0 -4px 0 var(--fg-edge);
+}
+
+[data-skin='d-fieldguide'] .ts-sheet__handle {
+  width: 44px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fg-line);
+}
+
+[data-skin='d-fieldguide'] .ts-sheet__head strong {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+/* --- Form：粗描边输入 --- */
+[data-skin='d-fieldguide'] .ts-field input,
+[data-skin='d-fieldguide'] .fav-search,
+[data-skin='d-fieldguide'] .fav-editor-input,
+[data-skin='d-fieldguide'] .top10-range__input {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 10px;
+  background: var(--color-card);
+  color: var(--color-text);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .ts-field input:focus-visible,
+[data-skin='d-fieldguide'] .fav-search:focus-visible,
+[data-skin='d-fieldguide'] .fav-editor-input:focus-visible,
+[data-skin='d-fieldguide'] .top10-range__input:focus-visible {
+  outline: 3px solid var(--fg-accent);
+  outline-offset: 2px;
+}
+
+[data-skin='d-fieldguide'] .ts-field label {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* --- Tooltip / Switch --- */
+[data-skin='d-fieldguide'] .ts-tip__bubble {
+  padding: 5px 9px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-chip);
+  background: var(--color-text);
+  color: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .ts-switch__track {
+  width: 46px;
+  height: 26px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .ts-switch__track.is-on {
+  background: var(--color-primary);
+}
+
+[data-skin='d-fieldguide'] .ts-switch__thumb {
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .ts-switch__track.is-on .ts-switch__thumb {
+  transform: translateX(20px);
+}
+
+/* --- 空态（贴纸鱼 + 标题） --- */
+[data-skin='d-fieldguide'] .fg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 12px;
+  text-align: center;
+}
+
+[data-skin='d-fieldguide'] .fg-empty__art {
+  display: block;
+  width: 74px;
+  height: auto;
+  color: var(--color-primary);
+  transform: rotate(-4deg);
+  margin-bottom: 2px;
+}
+
+[data-skin='d-fieldguide'] .fg-empty__art--notes {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .fg-empty__title {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+[data-skin='d-fieldguide'] .fg-empty__hint {
+  margin: 0;
+  color: var(--color-text-dim);
+  font-size: var(--text-body-small-size);
+  line-height: 1.6;
+}
+
+/* 默认（A 皮肤）不显示图鉴专属插画，保持原空态 */
+.fg-empty {
+  display: block;
+}
+
+.fg-empty__art {
+  display: none;
+}
+
+/* ============================== 4. Shell ============================== */
+[data-skin='d-fieldguide'] .topbar,
+[data-skin='d-fieldguide'] .mobile-header {
+  border-bottom: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+}
+
+.brand__mark,
+.brand__sub {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .brand__mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+  transform: rotate(-4deg);
+}
+
+[data-skin='d-fieldguide'] .brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+[data-skin='d-fieldguide'] .brand__sub {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--fg-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--color-text-dim);
+  white-space: nowrap;
+}
+
+[data-skin='d-fieldguide'] .topbar__nav button,
+[data-skin='d-fieldguide'] .sidebar button {
+  border: var(--fg-line-w) solid transparent;
+  border-radius: var(--fg-radius-pill);
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .topbar__nav button.is-active,
+[data-skin='d-fieldguide'] .sidebar button.is-active {
+  border-color: var(--fg-line);
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .mode-switch {
+  padding: 3px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .mode-switch button {
+  border-radius: var(--fg-radius-pill);
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .mode-switch button.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: none;
+}
+
+[data-skin='d-fieldguide'] .sidebar {
+  border-right: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .sidebar__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-4);
+  color: var(--color-text);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+[data-skin='d-fieldguide'] .sidebar__title::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-seal);
+  background: var(--fg-accent);
+}
+
+[data-skin='d-fieldguide'] .main {
+  background: var(--color-bg);
+}
+
+[data-skin='d-fieldguide'] .main__head h1 {
+  position: relative;
+  padding-bottom: 7px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+[data-skin='d-fieldguide'] .main__head h1::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 34px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fg-accent);
+}
+
+/* 地图页全幅：标题视觉隐藏（保留可访问性），让地图贴满 */
+[data-skin='d-fieldguide'] .main--map .main__head {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+[data-skin='d-fieldguide'] .tabbar {
+  border-top: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .tabbar button {
+  position: relative;
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .tabbar button.is-active {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .tabbar button.is-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 26px;
+  height: 3px;
+  margin-left: -13px;
+  border-radius: 0 0 2px 2px;
+  background: var(--fg-accent);
+}
+
+/* 通用旧类：chip / ghost-button / primary-button / card / hint */
+[data-skin='d-fieldguide'] .chip {
+  padding: 2px 10px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .chip--ghost {
+  background: transparent;
+  color: var(--color-text-dim);
+}
+
+[data-skin='d-fieldguide'] .ghost-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-weight: 700;
+  box-shadow: var(--fg-shadow-sticker-sm);
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s ease,
+    background-color 0.12s ease, color 0.12s ease;
+}
+
+[data-skin='d-fieldguide'] .ghost-button:hover {
+  border-color: var(--fg-line);
+  background: var(--color-card);
+  color: var(--color-primary);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .ghost-button.is-active {
+  border-color: var(--fg-line);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .ghost-button:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+[data-skin='d-fieldguide'] .primary-button {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .card {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .hint,
+[data-skin='d-fieldguide'] .ts-hint {
+  color: var(--color-text-dim);
+  line-height: 1.65;
+}
+
+/* ============================== 5. 详情页 ============================== */
+[data-skin='d-fieldguide'] .detail-page {
+  background: var(--color-bg);
+}
+
+[data-skin='d-fieldguide'] .detail-top__title strong {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+[data-skin='d-fieldguide'] .detail-source {
+  color: var(--color-text-dim);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='d-fieldguide'] .detail-sticky {
+  border-bottom: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-bg);
+  box-shadow: none;
+}
+
+[data-skin='d-fieldguide'] .detail-page .ts-tabs {
+  min-height: 36px;
+  background: transparent;
+}
+
+/* 水体胶囊（D 专属；A 在 vintage.css 单独开启） */
+.detail-water,
+.detail-water-row,
+.detail-stamp {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .detail-stamp {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+  transform: rotate(-4deg);
+}
+
+[data-skin='d-fieldguide'] .detail-water-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+[data-skin='d-fieldguide'] .detail-water {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 3px 10px 3px 6px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .detail-water svg {
+  width: 34px;
+  height: auto;
+  color: var(--color-primary);
+}
+
+[data-skin='d-fieldguide'] .detail-water i {
+  font-family: var(--fg-mono);
+  font-style: normal;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--color-text-dim);
+}
+
+[data-skin='d-fieldguide'] .detail-fav-chip {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .detail-status__item {
+  min-height: 26px;
+  padding: 0 10px;
+  border: var(--fg-line-w-thin) dashed var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .detail-status__item--warn {
+  border-color: #8a4b00;
+  background: #fff4e5;
+  color: #8a4b00;
+}
+
+[data-skin='d-fieldguide'][data-theme='dark'] .detail-status__item--warn {
+  border-color: #ffcc80;
+  background: #3a2a12;
+  color: #ffcc80;
+}
+
+[data-skin='d-fieldguide'] .disclaimer-entry {
+  border: var(--fg-line-w) dashed var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-weight: 700;
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .disclaimer-entry:hover {
+  color: var(--color-primary);
+}
+
+[data-skin='d-fieldguide'] .disclaimer-list {
+  padding-left: 1.1em;
+}
+
+[data-skin='d-fieldguide'] .detail-error {
+  border: var(--fg-line-w) solid var(--color-error);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: 4px 4px 0 color-mix(in srgb, var(--color-error) 32%, transparent);
+}
+
+[data-skin='d-fieldguide'] .wq-cards {
+  gap: 10px;
+}
+
+[data-skin='d-fieldguide'] .wq-card__value {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* ============================== 6. 收藏页 ============================== */
+[data-skin='d-fieldguide'] .fav-toolbar {
+  gap: 8px;
+}
+
+[data-skin='d-fieldguide'] .fav-search {
+  padding: 0 14px;
+  border-radius: var(--fg-radius-pill);
+}
+
+[data-skin='d-fieldguide'] .fav-batch {
+  border: var(--fg-line-w) dashed var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .fav-batch strong {
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .fav-message {
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-chip);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .fav-group__head {
+  min-height: 40px;
+  padding: 0 6px;
+  border-bottom: var(--fg-line-w-thin) dashed var(--fg-line);
+  color: var(--color-text);
+}
+
+[data-skin='d-fieldguide'] .fav-group__head strong {
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .fav-group__caret {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .fav-card {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto 30px;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .fav-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .fav-card.is-selected {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 3px 3px 0 var(--color-primary);
+}
+
+[data-skin='d-fieldguide'] .fav-card__check {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--color-on-primary);
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .fav-card__check.is-on {
+  background: var(--color-primary);
+}
+
+[data-skin='d-fieldguide'] .fav-card__title strong {
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .fav-card__coord {
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='d-fieldguide'] .fav-card__summary {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .fav-card__score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  min-width: 46px;
+  padding-left: 6px;
+  border-left: var(--fg-line-w-thin) dashed var(--fg-line);
+}
+
+[data-skin='d-fieldguide'] .fav-card__score b {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+[data-skin='d-fieldguide'] .fav-card__score span {
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-dim);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+[data-skin='d-fieldguide'] .fav-card__fish {
+  display: block;
+  grid-column: 4;
+  width: 30px;
+  height: auto;
+  margin-top: 2px;
+  color: var(--color-primary);
+  transform: rotate(-4deg);
+  opacity: 0.9;
+}
+
+[data-skin='d-fieldguide'] .fav-card__actions {
+  grid-column: 1 / -1;
+  padding-top: 6px;
+  border-top: var(--fg-line-w-thin) dashed var(--fg-line);
+}
+
+[data-skin='d-fieldguide'] .fav-tag {
+  padding: 1px 7px;
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-seal);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .fav-detail-col {
+  border: var(--fg-line-w) solid var(--fg-line);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+/* 默认（A）：收藏卡为原 flex 布局，不显示新增分数列与贴纸鱼 */
+.fav-card__score,
+.fav-card__fish {
+  display: none;
+}
+
+/* ============================== 7. 地图页 ============================== */
+[data-skin='d-fieldguide'] .map-canvas::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* MapLibre 控件：下移避开「我的位置」，并统一成贴纸小卡 */
+[data-skin='d-fieldguide'] .map-page .maplibregl-ctrl-top-right {
+  margin-top: 42px;
+}
+
+[data-skin='d-fieldguide'] .map-page .maplibregl-ctrl-bottom-right {
+  margin-bottom: 92px;
+}
+
+[data-skin='d-fieldguide'] .maplibregl-ctrl-group {
+  overflow: hidden;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .maplibregl-ctrl-group button {
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .maplibregl-ctrl-group button + button {
+  border-top: var(--fg-line-w-thin) solid var(--fg-line);
+}
+
+[data-skin='d-fieldguide'] .crosshair__ring {
+  border: var(--fg-line-w) dashed var(--fg-line);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-card) 62%, transparent);
+}
+
+[data-skin='d-fieldguide'] .crosshair__dot {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .crosshair__ticks {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--color-card);
+  filter: drop-shadow(0 0 1px var(--fg-line)) drop-shadow(0 1px 0 var(--fg-line));
+  opacity: 0.95;
+}
+
+[data-skin='d-fieldguide'] .crosshair__pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+.crosshair__ticks,
+.crosshair__pin {
+  display: none;
+}
+
+[data-skin='d-fieldguide'] .map-hud__styles {
+  padding: 4px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .map-style-btn {
+  border-radius: var(--fg-radius-pill);
+  color: var(--color-text-dim);
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .map-style-btn.is-active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+[data-skin='d-fieldguide'] .map-search__trigger,
+[data-skin='d-fieldguide'] .map-search__panel {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+  color: var(--color-text);
+}
+
+[data-skin='d-fieldguide'] .map-search__results {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .map-search__item {
+  border-radius: var(--fg-radius-chip);
+}
+
+[data-skin='d-fieldguide'] .map-search__item.is-active {
+  background: var(--color-surface-variant);
+}
+
+[data-skin='d-fieldguide'] .map-info {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-lg);
+}
+
+[data-skin='d-fieldguide'] .map-info__name {
+  gap: 6px;
+}
+
+[data-skin='d-fieldguide'] .map-info__coord {
+  color: var(--color-text-dim);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='d-fieldguide'] .map-hint {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  color: var(--color-text);
+  box-shadow: var(--fg-shadow-sticker);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .map-hint__close {
+  color: var(--color-text);
+}
+
+[data-skin='d-fieldguide'] .map-star {
+  width: 30px;
+  height: 30px;
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--fg-accent);
+  font-size: 15px;
+  text-shadow: none;
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .map-star:hover {
+  transform: translate(-1px, -2px) scale(1.06);
+}
+
+[data-skin='d-fieldguide'] .map-star-pop {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-lg);
+}
+
+[data-skin='d-fieldguide'] .map-star-pop__name {
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .map-star-pop__tag {
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-seal);
+  background: transparent;
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .map-star-pop__close {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .top10-strip {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .top10-strip__label {
+  border: var(--fg-line-w-thin) solid var(--fg-line);
+  border-radius: var(--fg-radius-pill);
+  background: var(--fg-accent);
+  color: var(--fg-on-accent);
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .top10-strip__more {
+  color: var(--color-on-primary);
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .top10-row {
+  border: var(--fg-line-w-thin) solid transparent;
+  border-radius: var(--fg-radius-chip);
+}
+
+[data-skin='d-fieldguide'] .top10-row:hover {
+  border-color: var(--fg-line);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+[data-skin='d-fieldguide'] .top10-row__name {
+  font-weight: 700;
+}
+
+[data-skin='d-fieldguide'] .top10-row__peak {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+[data-skin='d-fieldguide'] .top10-range__label {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .map-aside {
+  border-left: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+/* ============================== 8. 桌面详情 / 设置 ============================== */
+[data-skin='d-fieldguide'] .desk-spot__list {
+  border-right: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .desk-spot__side {
+  border-left: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .desk-spot__rail {
+  border-left: var(--fg-line-w) solid var(--fg-line);
+  background: var(--color-card);
+}
+
+[data-skin='d-fieldguide'] .desk-spot__item {
+  border: var(--fg-line-w-thin) solid transparent;
+  border-radius: var(--fg-radius-chip);
+}
+
+[data-skin='d-fieldguide'] .desk-spot__item:hover {
+  background: var(--color-card);
+  border-color: var(--fg-line);
+}
+
+[data-skin='d-fieldguide'] .desk-spot__item.is-active {
+  border-width: var(--fg-line-w);
+  border-color: var(--fg-line);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .desk-spot__item.is-active .hint {
+  color: var(--color-on-primary);
+  opacity: 0.82;
+}
+
+[data-skin='d-fieldguide'] .desk-aside__score {
+  color: var(--fg-accent) !important;
+  font-size: 52px;
+  letter-spacing: -0.02em;
+}
+
+[data-skin='d-fieldguide'] .settings-desk__nav {
+  border: var(--fg-line-w) solid var(--fg-line);
+  border-radius: var(--fg-radius-card);
+  background: var(--color-card);
+  box-shadow: var(--fg-shadow-sticker);
+}
+
+[data-skin='d-fieldguide'] .settings-desk__nav button {
+  border: var(--fg-line-w-thin) solid transparent;
+  border-radius: var(--fg-radius-chip);
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+[data-skin='d-fieldguide'] .settings-desk__nav button:hover {
+  background: var(--color-surface-variant);
+}
+
+[data-skin='d-fieldguide'] .settings-desk__nav button.is-active {
+  border-color: var(--fg-line);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 800;
+  box-shadow: var(--fg-shadow-sticker-sm);
+}
+
+/* ============================== 9. 皮肤选择卡（SkinPicker） ============================== */
+.skin-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.skin-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 2px solid var(--color-outline);
+  border-radius: 12px;
+  background: var(--color-card);
+  color: var(--color-text);
+  text-align: left;
+  box-shadow: 2px 2px 0 color-mix(in srgb, var(--color-outline) 20%, transparent);
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s ease;
+}
+
+.skin-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--color-outline) 26%, transparent);
+}
+
+.skin-card.is-active {
+  border-color: var(--color-primary);
+  box-shadow: 3px 3px 0 var(--color-primary);
+}
+
+.skin-card__swatch {
+  display: flex;
+  flex-direction: column;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  overflow: hidden;
+  border: 2px solid var(--color-outline);
+  border-radius: 8px;
+}
+
+.skin-card__swatch i {
+  flex: 1;
+}
+
+.skin-card--a-vintage .skin-card__swatch i:nth-child(1) { background: #e4d9bc; }
+.skin-card--a-vintage .skin-card__swatch i:nth-child(2) { background: #1b3a5c; }
+.skin-card--a-vintage .skin-card__swatch i:nth-child(3) { background: #d9a734; }
+.skin-card--d-fieldguide .skin-card__swatch i:nth-child(1) { background: #e9f3fa; }
+.skin-card--d-fieldguide .skin-card__swatch i:nth-child(2) { background: #1e6fa8; }
+.skin-card--d-fieldguide .skin-card__swatch i:nth-child(3) { background: #e5644c; }
+
+.skin-card__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.skin-card__name {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.skin-card__en {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--color-text-dim);
+}
+
+.skin-card__tag {
+  margin-top: 2px;
+  color: var(--color-text-dim);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skin-card__seal {
+  margin-left: auto;
+  flex: none;
+  padding: 2px 6px;
+  border: 1.5px solid var(--color-outline);
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  transform: rotate(-4deg);
+}
+
+.skin-card.is-active .skin-card__seal {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.skin-card__fish {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  width: 22px;
+  height: auto;
+  color: var(--color-primary);
+  opacity: 0.85;
+  transform: rotate(-5deg);
+}
+
+/* ============================== 10. 细节与降级 ============================== */
+[data-skin='d-fieldguide'] :focus-visible {
+  outline: 3px solid var(--fg-accent);
+  outline-offset: 2px;
+}
+
+[data-skin='d-fieldguide'] .crosshair,
+[data-skin='d-fieldguide'] .ts-score__stamp,
+[data-skin='d-fieldguide'] .brand__mark,
+[data-skin='d-fieldguide'] .fav-card__fish,
+[data-skin='d-fieldguide'] .fg-empty__art {
+  will-change: auto;
+}
+
+@media (max-width: 600px) {
+  .skin-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .skin-card__tag {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 430px) {
+  [data-skin='d-fieldguide'] .ts-score__stamp {
+    width: 42px;
+    height: 42px;
+    top: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-skin='d-fieldguide'] .ts-btn,
+  [data-skin='d-fieldguide'] .ts-day__chip,
+  [data-skin='d-fieldguide'] .ghost-button,
+  [data-skin='d-fieldguide'] .fav-card,
+  [data-skin='d-fieldguide'] .skin-card {
+    transition: none;
+  }
+}
