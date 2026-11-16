@@ -77,10 +77,6 @@ jobs:
           PAGES_BASE: /${{ github.event.repository.name }}/
 
       - uses: actions/configure-pages@v5
-        with:
-          # 首次运行时 Pages 站点尚不存在，让 action 尝试自动启用
-          # （若仓库策略禁止，需在 Settings -> Pages 手动把 Source 设为 GitHub Actions）
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
