@@ -1,0 +1,62 @@
+name: 🐛 Bug 报告
+description: 报告一个可复现的问题
+title: '[Bug] '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 感谢反馈！请尽量填写完整，便于定位。
+  - type: textarea
+    id: desc
+    attributes:
+      label: 问题描述
+      description: 清楚简洁地描述这个 bug
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开…
+        2. 点击…
+        3. 看到…
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为
+      description: 实际发生了什么，可附截图
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 端
+      options:
+        - Android
+        - Web
+        - 两者都有
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 设置页可查，如 v1.21.1
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 附加信息
+      description: 日志、截图、相关链接
+    validations:
+      required: false
