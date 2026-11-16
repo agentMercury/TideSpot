@@ -63,16 +63,8 @@
 }
 
 /* 手帐标题：楷体 */
-[data-skin='e-tidejournal'] .brand,
-[data-skin='e-tidejournal'] h1,
-[data-skin='e-tidejournal'] .ts-card > strong:first-child,
-[data-skin='e-tidejournal'] .detail-top__title strong,
-[data-skin='e-tidejournal'] .map-info__name,
-[data-skin='e-tidejournal'] .fav-card__title strong,
-[data-skin='e-tidejournal'] .top10-strip,
-[data-skin='e-tidejournal'] .disclaimer-entry,
-[data-skin='e-tidejournal'] .settings-desk__nav button.is-active,
-[data-skin='e-tidejournal'] .fg-empty__title {
+[data-skin='e-tidejournal'] .brand, [data-skin='e-tidejournal'] h1, [data-skin='e-tidejournal'] .ts-card > strong:first-child, [data-skin='e-tidejournal'] .detail-top__title strong, [data-skin='e-tidejournal'] .map-info__name, [data-skin='e-tidejournal'] .fav-card__title strong, [data-skin='e-tidejournal'] .top10-strip, [data-skin='e-tidejournal'] .disclaimer-entry, [data-skin='e-tidejournal'] .settings-desk__nav button.is-active, [data-skin='e-tidejournal'] .fg-empty__title,
+.skin-card--e-tidejournal .skin-card__name, .skin-card--e-tidejournal .skin-card__tag {
   font-family: var(--fn-serif);
   letter-spacing: 0.04em;
 }
@@ -94,8 +86,21 @@
 }
 
 /* 水印 / 海底波带：只在新皮肤显示 */
-.fn-watermark,
-.fn-seabed {
+.fn-watermark, .fn-seabed,
+[data-skin='e-tidejournal'] .ts-tabs button.is-active::after,
+[data-skin='e-tidejournal'] .ts-score__glow, [data-skin='e-tidejournal'] .ts-score__stamp,
+[data-skin='e-tidejournal'] .ts-score__denom,
+[data-skin='e-tidejournal'] .ts-seg__figures,
+.fg-empty__art--notes,
+.fav-card__fish--notes,
+[data-skin='e-tidejournal'] .fg-empty__art--guide,
+.brand__fish--notes,
+[data-skin='e-tidejournal'] .brand__fish--guide,
+[data-skin='e-tidejournal'] .detail-stamp, [data-skin='e-tidejournal'] .detail-fav-chip,
+[data-skin='e-tidejournal'] .detail-water__ill,
+.detail-water__line,
+[data-skin='e-tidejournal'] .fav-card__fish,
+[data-skin='e-tidejournal'] .crosshair__dot {
   display: none;
 }
 
@@ -110,8 +115,8 @@
   pointer-events: none;
 }
 
-[data-skin='e-tidejournal'] .app,
-[data-skin='e-tidejournal'] .desk-spot {
+[data-skin='e-tidejournal'] .app, [data-skin='e-tidejournal'] .desk-spot,
+[data-skin='e-tidejournal'] .detail-page--embedded {
   position: relative;
   z-index: 1;
 }
@@ -120,14 +125,10 @@
   z-index: 1;
 }
 
-[data-skin='e-tidejournal'] .detail-page--embedded {
-  position: relative;
-  z-index: 1;
-}
-
+[data-skin='e-tidejournal'] .main, [data-skin='e-tidejournal'] .detail-page, [data-skin='e-tidejournal'] .desk-spot,
 [data-skin='e-tidejournal'] .main,
 [data-skin='e-tidejournal'] .detail-page,
-[data-skin='e-tidejournal'] .desk-spot {
+[data-skin='e-tidejournal'] .detail-page .ts-tabs {
   background: transparent;
 }
 
@@ -193,7 +194,8 @@
   box-shadow: var(--fn-shadow-sm);
 }
 
-[data-skin='e-tidejournal'] .ts-btn--ghost:hover {
+[data-skin='e-tidejournal'] .ts-btn--ghost:hover,
+[data-skin='e-tidejournal'] .ghost-button:hover {
   color: var(--fn-accent2);
   transform: translate(-1px, -1px);
   box-shadow: var(--fn-shadow);
@@ -210,7 +212,8 @@
   text-underline-offset: 3px;
 }
 
-[data-skin='e-tidejournal'] .ts-btn:active:not(:disabled) {
+[data-skin='e-tidejournal'] .ts-btn:active:not(:disabled),
+[data-skin='e-tidejournal'] .ghost-button:active {
   transform: translate(1px, 1px);
   box-shadow: none;
 }
@@ -237,7 +240,8 @@
   color: var(--fn-ink);
 }
 
-[data-skin='e-tidejournal'] .ts-chip.is-selected {
+[data-skin='e-tidejournal'] .ts-chip.is-selected,
+[data-skin='e-tidejournal'] .map-style-btn.is-active {
   background: var(--fn-ink);
   color: var(--fn-paper);
 }
@@ -279,10 +283,6 @@
   font-weight: 700;
 }
 
-[data-skin='e-tidejournal'] .ts-tabs button.is-active::after {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .ts-tabs--scroll {
   overflow-x: auto;
   padding: 3px 3px 6px;
@@ -307,7 +307,8 @@
   box-shadow: none;
 }
 
-[data-skin='e-tidejournal'] .ts-day__chip.is-active {
+[data-skin='e-tidejournal'] .ts-day__chip.is-active,
+[data-skin='e-tidejournal'] .topbar__nav button.is-active, [data-skin='e-tidejournal'] .sidebar button.is-active {
   border-color: var(--fn-ink);
   background: var(--fn-ink);
   color: var(--fn-paper);
@@ -353,11 +354,6 @@
   box-shadow: var(--fn-shadow-card);
 }
 
-[data-skin='e-tidejournal'] .ts-score__glow,
-[data-skin='e-tidejournal'] .ts-score__stamp {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .ts-score__head {
   order: 1;
   justify-content: flex-start;
@@ -401,10 +397,6 @@
   text-shadow: 4px 4px 0 var(--fn-accent);
 }
 
-[data-skin='e-tidejournal'] .ts-score__denom {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .ts-score__window {
   order: 3;
   margin-top: 9px;
@@ -442,10 +434,6 @@
   border-color: var(--fn-ink);
   box-shadow: 0 0 0 2px var(--fn-ink);
   transform: none;
-}
-
-[data-skin='e-tidejournal'] .ts-seg__figures {
-  display: none;
 }
 
 [data-skin='e-tidejournal'] .ts-seg__label {
@@ -536,24 +524,12 @@
   text-align: center;
 }
 
-.fg-empty__art--notes {
-  display: none;
-}
-
-.fav-card__fish--notes {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .fg-empty__art--notes {
   display: block;
   width: 86px;
   height: auto;
   color: var(--fn-water2);
   transform: rotate(-4deg);
-}
-
-[data-skin='e-tidejournal'] .fg-empty__art--guide {
-  display: none;
 }
 
 [data-skin='e-tidejournal'] .fg-empty__title {
@@ -584,10 +560,6 @@
   letter-spacing: 0.06em;
 }
 
-.brand__fish--notes {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .brand__mark {
   display: grid;
   place-items: center;
@@ -602,11 +574,8 @@
   transform: rotate(-3deg);
 }
 
-[data-skin='e-tidejournal'] .brand__fish--guide {
-  display: none;
-}
-
-[data-skin='e-tidejournal'] .brand__fish--notes {
+[data-skin='e-tidejournal'] .brand__fish--notes,
+[data-skin='e-tidejournal'] .detail-water__line {
   display: block;
 }
 
@@ -627,14 +596,6 @@
   color: var(--fn-ink);
   font-size: 12px;
   font-weight: 700;
-}
-
-[data-skin='e-tidejournal'] .topbar__nav button.is-active,
-[data-skin='e-tidejournal'] .sidebar button.is-active {
-  border-color: var(--fn-ink);
-  background: var(--fn-ink);
-  color: var(--fn-paper);
-  box-shadow: 2px 2px 0 var(--fn-accent);
 }
 
 [data-skin='e-tidejournal'] .mode-switch {
@@ -668,10 +629,6 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.6px;
-}
-
-[data-skin='e-tidejournal'] .main {
-  background: transparent;
 }
 
 [data-skin='e-tidejournal'] .main__head h1 {
@@ -745,22 +702,11 @@
   box-shadow: var(--fn-shadow-sm);
 }
 
-[data-skin='e-tidejournal'] .ghost-button:hover {
-  color: var(--fn-accent2);
-  transform: translate(-1px, -1px);
-  box-shadow: var(--fn-shadow);
-}
-
 [data-skin='e-tidejournal'] .ghost-button.is-active {
   background: var(--fn-ink);
   color: var(--fn-paper);
   border-color: var(--fn-ink);
   box-shadow: 2px 2px 0 var(--fn-accent);
-}
-
-[data-skin='e-tidejournal'] .ghost-button:active {
-  transform: translate(1px, 1px);
-  box-shadow: none;
 }
 
 [data-skin='e-tidejournal'] .primary-button {
@@ -770,7 +716,10 @@
   box-shadow: var(--fn-shadow);
 }
 
-[data-skin='e-tidejournal'] .card {
+[data-skin='e-tidejournal'] .card,
+[data-skin='e-tidejournal'] .map-info,
+[data-skin='e-tidejournal'] .map-star-pop,
+[data-skin='e-tidejournal'] .settings-desk__nav {
   border: var(--fn-line) solid var(--fn-ink);
   border-radius: var(--fn-radius);
   background: var(--fn-paper);
@@ -784,9 +733,6 @@
 }
 
 /* ============================== 5. 详情页 ============================== */
-[data-skin='e-tidejournal'] .detail-page {
-  background: transparent;
-}
 
 [data-skin='e-tidejournal'] .detail-top {
   gap: 10px;
@@ -821,11 +767,6 @@
   letter-spacing: 0.04em;
 }
 
-[data-skin='e-tidejournal'] .detail-stamp,
-[data-skin='e-tidejournal'] .detail-fav-chip {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .detail-water-row {
   display: flex;
   justify-content: flex-start;
@@ -855,18 +796,6 @@
   color: var(--fn-paper);
 }
 
-[data-skin='e-tidejournal'] .detail-water__ill {
-  display: none;
-}
-
-[data-skin='e-tidejournal'] .detail-water__line {
-  display: block;
-}
-
-.detail-water__line {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .detail-water i {
   color: var(--fn-paper);
   font-family: Georgia, serif;
@@ -886,10 +815,6 @@
   font-family: var(--fn-serif);
   font-size: 9px;
   letter-spacing: 1px;
-}
-
-[data-skin='e-tidejournal'] .detail-page .ts-tabs {
-  background: transparent;
 }
 
 [data-skin='e-tidejournal'] .detail-status__item {
@@ -1083,7 +1008,8 @@
   letter-spacing: 0.04em;
 }
 
-[data-skin='e-tidejournal'] .fav-card__coord {
+[data-skin='e-tidejournal'] .fav-card__coord,
+[data-skin='e-tidejournal'] .map-info__coord {
   color: var(--fn-soft);
   font-size: 9px;
 }
@@ -1120,10 +1046,6 @@
   font-size: 8px;
   font-weight: 600;
   white-space: nowrap;
-}
-
-[data-skin='e-tidejournal'] .fav-card__fish {
-  display: none;
 }
 
 [data-skin='e-tidejournal'] .fav-card__fish--notes {
@@ -1196,10 +1118,6 @@
   box-shadow: 0 0 0 5px color-mix(in srgb, var(--fn-paper) 62%, transparent);
 }
 
-[data-skin='e-tidejournal'] .crosshair__dot {
-  display: none;
-}
-
 [data-skin='e-tidejournal'] .crosshair__ticks {
   position: absolute;
   inset: 0;
@@ -1241,11 +1159,6 @@
   font-weight: 700;
 }
 
-[data-skin='e-tidejournal'] .map-style-btn.is-active {
-  background: var(--fn-ink);
-  color: var(--fn-paper);
-}
-
 [data-skin='e-tidejournal'] .map-search__trigger,
 [data-skin='e-tidejournal'] .map-search__panel {
   border: var(--fn-line) solid var(--fn-ink);
@@ -1262,26 +1175,15 @@
   box-shadow: var(--fn-shadow);
 }
 
-[data-skin='e-tidejournal'] .map-search__item.is-active {
+[data-skin='e-tidejournal'] .map-search__item.is-active,
+[data-skin='e-tidejournal'] .settings-desk__nav button:hover {
   background: var(--color-surface-variant);
-}
-
-[data-skin='e-tidejournal'] .map-info {
-  border: var(--fn-line) solid var(--fn-ink);
-  border-radius: var(--fn-radius);
-  background: var(--fn-paper);
-  box-shadow: var(--fn-shadow-card);
 }
 
 [data-skin='e-tidejournal'] .map-info__name {
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.05em;
-}
-
-[data-skin='e-tidejournal'] .map-info__coord {
-  color: var(--fn-soft);
-  font-size: 9px;
 }
 
 [data-skin='e-tidejournal'] .map-hint {
@@ -1294,7 +1196,8 @@
   font-weight: 600;
 }
 
-[data-skin='e-tidejournal'] .map-hint__close {
+[data-skin='e-tidejournal'] .map-hint__close,
+[data-skin='e-tidejournal'] .map-star-pop__close {
   color: var(--fn-ink);
 }
 
@@ -1314,13 +1217,6 @@
   transform: translate(-1px, -2px) scale(1.06);
 }
 
-[data-skin='e-tidejournal'] .map-star-pop {
-  border: var(--fn-line) solid var(--fn-ink);
-  border-radius: var(--fn-radius);
-  background: var(--fn-paper);
-  box-shadow: var(--fn-shadow-card);
-}
-
 [data-skin='e-tidejournal'] .map-star-pop__name {
   font-family: var(--fn-serif);
   font-size: 15px;
@@ -1331,10 +1227,6 @@
   border: var(--fn-line-thin) solid var(--fn-ink);
   border-radius: 2px;
   background: transparent;
-}
-
-[data-skin='e-tidejournal'] .map-star-pop__close {
-  color: var(--fn-ink);
 }
 
 /* Top10：纸面药丸，不再是深蓝块 */
@@ -1406,11 +1298,7 @@
   background: transparent;
 }
 
-[data-skin='e-tidejournal'] .desk-spot__side {
-  border-left: var(--fn-line) solid var(--fn-ink);
-  background: transparent;
-}
-
+[data-skin='e-tidejournal'] .desk-spot__side,
 [data-skin='e-tidejournal'] .desk-spot__rail {
   border-left: var(--fn-line) solid var(--fn-ink);
   background: transparent;
@@ -1448,23 +1336,12 @@
   text-shadow: 2px 2px 0 var(--fn-ink);
 }
 
-[data-skin='e-tidejournal'] .settings-desk__nav {
-  border: var(--fn-line) solid var(--fn-ink);
-  border-radius: var(--fn-radius);
-  background: var(--fn-paper);
-  box-shadow: var(--fn-shadow-card);
-}
-
 [data-skin='e-tidejournal'] .settings-desk__nav button {
   border: var(--fn-line-thin) solid transparent;
   border-radius: 8px;
   color: var(--fn-ink);
   font-size: 11px;
   font-weight: 700;
-}
-
-[data-skin='e-tidejournal'] .settings-desk__nav button:hover {
-  background: var(--color-surface-variant);
 }
 
 [data-skin='e-tidejournal'] .settings-desk__nav button.is-active {
@@ -1494,12 +1371,6 @@
 .skin-card--e-tidejournal .skin-card__swatch i:nth-child(1) { background: #e9f3fa; }
 .skin-card--e-tidejournal .skin-card__swatch i:nth-child(2) { background: #1e6fa8; }
 .skin-card--e-tidejournal .skin-card__swatch i:nth-child(3) { background: #e5644c; }
-
-.skin-card--e-tidejournal .skin-card__name,
-.skin-card--e-tidejournal .skin-card__tag {
-  font-family: var(--fn-serif);
-  letter-spacing: 0.04em;
-}
 
 .skin-card--e-tidejournal .skin-card__seal {
   font-family: var(--fn-serif);

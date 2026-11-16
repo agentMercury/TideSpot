@@ -24,12 +24,8 @@
 }
 
 /* ============================== 2. 基础 ============================== */
-[data-skin='f-bluetide'] body {
-  background: var(--color-bg);
-}
-
-[data-skin='f-bluetide'] .main,
-[data-skin='f-bluetide'] .detail-page {
+[data-skin='f-bluetide'] body,
+[data-skin='f-bluetide'] .main, [data-skin='f-bluetide'] .detail-page {
   background: var(--color-bg);
 }
 
@@ -63,7 +59,8 @@
   box-shadow: var(--ct-shadow-card);
 }
 
-[data-skin='f-bluetide'] .ts-card--l2 {
+[data-skin='f-bluetide'] .ts-card--l2,
+[data-skin='f-bluetide'] .fav-card:hover {
   box-shadow: var(--ct-shadow-float);
 }
 
@@ -107,7 +104,8 @@
   color: var(--color-secondary);
 }
 
-[data-skin='f-bluetide'] .ts-chip.is-selected {
+[data-skin='f-bluetide'] .ts-chip.is-selected,
+[data-skin='f-bluetide'] .settings-desk__nav button.is-active {
   background: var(--color-primary);
   color: var(--color-on-primary);
 }
@@ -117,7 +115,8 @@
   border-radius: var(--radius-badge);
 }
 
-[data-skin='f-bluetide'] .ts-tabs {
+[data-skin='f-bluetide'] .ts-tabs,
+[data-skin='f-bluetide'] .detail-page .ts-tabs {
   background: var(--color-surface-variant);
 }
 
@@ -127,7 +126,8 @@
   box-shadow: var(--ct-shadow-card);
 }
 
-[data-skin='f-bluetide'] .ts-day__chip {
+[data-skin='f-bluetide'] .ts-day__chip,
+[data-skin='f-bluetide'] .fav-search {
   border: 1px solid var(--ct-line);
   border-radius: var(--radius-chip);
   background: var(--color-card);
@@ -164,14 +164,16 @@
   letter-spacing: 0;
 }
 
-[data-skin='f-bluetide'] .detail-top__title .hint,
-[data-skin='f-bluetide'] .detail-source {
+[data-skin='f-bluetide'] .detail-top__title .hint, [data-skin='f-bluetide'] .detail-source,
+[data-skin='f-bluetide'] .fav-card__coord {
   color: var(--ct-soft);
   font-size: var(--text-label-small-size);
 }
 
-[data-skin='f-bluetide'] .detail-stamp,
-[data-skin='f-bluetide'] .detail-fav-chip {
+[data-skin='f-bluetide'] .detail-stamp, [data-skin='f-bluetide'] .detail-fav-chip,
+[data-skin='f-bluetide'] .detail-water__ill,
+[data-skin='f-bluetide'] .fav-card__fish, [data-skin='f-bluetide'] .fav-card__fish--notes,
+[data-skin='f-bluetide'] .map-center-pin {
   display: none;
 }
 
@@ -203,10 +205,6 @@
   color: var(--color-mint-deep);
 }
 
-[data-skin='f-bluetide'] .detail-water__ill {
-  display: none;
-}
-
 [data-skin='f-bluetide'] .detail-water__line {
   display: block;
 }
@@ -222,10 +220,6 @@
   background: var(--color-bg);
   box-shadow: none;
   border-bottom: 1px solid var(--ct-line);
-}
-
-[data-skin='f-bluetide'] .detail-page .ts-tabs {
-  background: var(--color-surface-variant);
 }
 
 [data-skin='f-bluetide'] .detail-status__item {
@@ -246,12 +240,6 @@
   gap: var(--space-2);
 }
 
-[data-skin='f-bluetide'] .fav-search {
-  border: 1px solid var(--ct-line);
-  border-radius: var(--radius-chip);
-  background: var(--color-card);
-}
-
 [data-skin='f-bluetide'] .fav-group__head {
   border-bottom: 1px solid var(--ct-line);
 }
@@ -267,10 +255,6 @@
   border-radius: var(--radius-card);
   background: var(--color-card);
   box-shadow: var(--ct-shadow-card);
-}
-
-[data-skin='f-bluetide'] .fav-card:hover {
-  box-shadow: var(--ct-shadow-float);
 }
 
 [data-skin='f-bluetide'] .fav-card.is-selected {
@@ -296,11 +280,6 @@
 [data-skin='f-bluetide'] .fav-card__title strong {
   font-size: var(--text-title-small-size);
   font-weight: 700;
-}
-
-[data-skin='f-bluetide'] .fav-card__coord {
-  color: var(--ct-soft);
-  font-size: var(--text-label-small-size);
 }
 
 [data-skin='f-bluetide'] .fav-card__summary {
@@ -334,11 +313,6 @@
   white-space: nowrap;
 }
 
-[data-skin='f-bluetide'] .fav-card__fish,
-[data-skin='f-bluetide'] .fav-card__fish--notes {
-  display: none;
-}
-
 [data-skin='f-bluetide'] .fav-card__actions {
   grid-column: 1 / -1;
   padding-top: 8px;
@@ -367,25 +341,14 @@
     0 0 0 3px var(--color-mint);
 }
 
-[data-skin='f-bluetide'] .map-center-pin {
-  display: none;
-}
-
-[data-skin='f-bluetide'] .map-hud__styles,
-[data-skin='f-bluetide'] .map-search__trigger,
-[data-skin='f-bluetide'] .map-search__panel {
+[data-skin='f-bluetide'] .map-hud__styles, [data-skin='f-bluetide'] .map-search__trigger, [data-skin='f-bluetide'] .map-search__panel,
+[data-skin='f-bluetide'] .settings-desk__nav {
   border: 1px solid var(--ct-line);
   background: var(--color-card);
   box-shadow: var(--ct-shadow-card);
 }
 
-[data-skin='f-bluetide'] .map-search__results,
-[data-skin='f-bluetide'] .map-star-pop {
-  border: 1px solid var(--ct-line);
-  background: var(--color-card);
-  box-shadow: var(--ct-shadow-float);
-}
-
+[data-skin='f-bluetide'] .map-search__results, [data-skin='f-bluetide'] .map-star-pop,
 [data-skin='f-bluetide'] .map-info {
   border: 1px solid var(--ct-line);
   background: var(--color-card);
@@ -431,16 +394,6 @@
 }
 
 /* ============================== 6. 设置 / 皮肤卡 ============================== */
-[data-skin='f-bluetide'] .settings-desk__nav {
-  border: 1px solid var(--ct-line);
-  background: var(--color-card);
-  box-shadow: var(--ct-shadow-card);
-}
-
-[data-skin='f-bluetide'] .settings-desk__nav button.is-active {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
 
 [data-skin='f-bluetide'] .skin-card {
   border: 1px solid var(--ct-line);

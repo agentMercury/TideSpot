@@ -247,7 +247,8 @@
   --color-mint-bg: #f7d9d2;
 }
 
-:root[data-skin='d-fieldguide'][data-water='sea'][data-theme='dark'] {
+:root[data-skin='d-fieldguide'][data-water='sea'][data-theme='dark'],
+:root[data-skin='e-tidejournal'][data-water='sea'][data-theme='dark'] {
   --color-primary: #6fb6e8;
   --color-on-primary: #0b1620;
   --color-secondary: #9fb6c4;
@@ -347,29 +348,6 @@
   --color-mint: #e5644c;
   --color-mint-deep: #1e6fa8;
   --color-mint-bg: #b7daee;
-}
-
-:root[data-skin='e-tidejournal'][data-water='sea'][data-theme='dark'] {
-  --color-primary: #6fb6e8;
-  --color-on-primary: #0b1620;
-  --color-secondary: #9fb6c4;
-  --color-tertiary: #ff8a70;
-  --color-error: #ff8a70;
-  --color-bg: #0b1620;
-  --color-text: #f2efe6;
-  --color-surface: #12222e;
-  --color-surface-variant: #17394c;
-  --color-text-dim: #9fb6c4;
-  --color-outline: #f2efe6;
-  --color-border: #3a4a54;
-  --color-canvas: #0b1620;
-  --color-card: #12222e;
-  --color-elevated: #17394c;
-  --color-on-surface: #f2efe6;
-  --color-on-surface-variant: #9fb6c4;
-  --color-mint: #ff8a70;
-  --color-mint-deep: #6fb6e8;
-  --color-mint-bg: #3a2a12;
 }
 
 :root[data-skin='e-tidejournal'][data-water='inland'][data-theme='light'] {
