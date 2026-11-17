@@ -204,7 +204,7 @@ adb install -r "潮点TideSpot-v1.21.1.apk"
 
 | 端 | 版本 |
 |---|---|
-| Android | `1.21.1`（versionCode 29） |
+| Android | `1.22.0`（versionCode 30） |
 | Web | `1.18.3` |
 
 两端版本号独立管理，评分内核与文案 key 强制一致。
