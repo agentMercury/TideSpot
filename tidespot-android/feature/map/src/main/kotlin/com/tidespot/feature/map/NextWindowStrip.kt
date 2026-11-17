@@ -1,9 +1,8 @@
 package com.tidespot.feature.map
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -62,12 +61,12 @@ data class NextWindowStripData(
  * 数据由 `:app` 组装层从跨点 Top10 结果适配传入（见 [NextWindowStripData]）。
  *
  * @param data 提示条数据（null = 无可用窗口 → 不渲染）
- * @param onOpenDetail 点击 → 进该点详情（null 或 spotId 为 null 时不可点击）
+ * @param onOpenDetail 点击 → 进该点详情，同时带上**被点击的窗口**（供详情页自动定位）
  */
 @Composable
 fun NextWindowStrip(
     data: NextWindowStripData?,
-    onOpenDetail: ((Long) -> Unit)?,
+    onOpenDetail: ((NextWindowStripData) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     if (data == null) return
@@ -92,11 +91,10 @@ fun NextWindowStrip(
 
     val isInWindow = result.state == NextWindowFinder.State.IN_WINDOW
     val label = if (isInWindow) "正在窗口内" else "下一个窗口"
-    val detail = if (isInWindow) {
-        "${data.spotName} · $range · 还剩 $duration"
-    } else {
-        "${data.spotName} · $range · 还有 $duration"
-    }
+    // 两行布局：第一行 = 状态 + 点名称（主信息）；第二行 = 时段 + 剩余 + 分数（细节）
+    // 单行会把最关键的「还剩多久」截断掉（真机 AAK-AN00 实测）
+    val title = "$label · ${data.spotName}"
+    val subtitle = if (isInWindow) "$range · 还剩 $duration" else "$range · 还有 $duration"
 
     val isBlueTide = LocalSkin.current.id == "f-bluetide"
     val shape = if (isBlueTide) RoundedCornerShape(14.dp) else MaterialTheme.shapes.medium
@@ -113,10 +111,9 @@ fun NextWindowStrip(
         else -> MaterialTheme.colorScheme.onSurface
     }
 
-    val clickableSpotId = data.spotId
     Surface(
-        onClick = { if (clickableSpotId != null) onOpenDetail?.invoke(clickableSpotId) },
-        enabled = onOpenDetail != null && clickableSpotId != null,
+        onClick = { if (data.spotId != null) onOpenDetail?.invoke(data) },
+        enabled = onOpenDetail != null && data.spotId != null,
         color = container,
         contentColor = content,
         shape = shape,
@@ -126,29 +123,30 @@ fun NextWindowStrip(
             .vintageCard(shape = shape),
     ) {
         Row(
-            Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 12.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                label,
-                style = MaterialTheme.typography.labelMedium,
-                color = content.copy(alpha = 0.86f),
-                modifier = Modifier.padding(end = 8.dp),
-            )
-            Text(
-                detail,
-                Modifier.weight(1f),
-                style = MaterialTheme.typography.titleSmall,
-                color = content,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = content,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = content.copy(alpha = 0.82f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Text(
                 window.peakScore.toString(),
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = content,
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = Modifier.padding(start = 10.dp),
             )
         }
     }

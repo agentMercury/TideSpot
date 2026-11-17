@@ -214,15 +214,28 @@ private fun AppRoot(
             }
         }
     }
+    // issue #3 体验跟进：从首页提示条进入时，记录「要定位到的窗口」，让详情页自动跳到该窗口
+    // 的峰值小时，并在评分卡标注当日最高分（避免 88 分 vs 91 分的困惑）
+    var focusWindowOnEnter by remember { mutableStateOf<com.tidespot.core.domain.model.BestWindow?>(null) }
+
     // OPT-V12-02（CHG-57）：离开收藏页即取消进行中的刷新（切页取消，无残留进度/ANR）
     LaunchedEffect(navState.page) {
         if (navState.page != AppPage.FAVORITES) favoritesVm.cancelRefresh()
+        // issue #3：离开详情页后清空「待定位窗口」，避免下次从别处进入时误定位
+        if (navState.page != AppPage.DETAIL) focusWindowOnEnter = null
     }
     // CHG-12④b：ZoneId 由 DetailViewModel 构造器默认值按 spot.tzOffsetSec 单源解析；
     // 设置 detailDays 变化或换点 → 重建（缓存先行语义不变）
     val detailSpot = navState.detailSpot
     val detailVm = remember(detailSpot?.id, settingsState.detailDays) {
-        detailSpot?.let { DetailViewModel(graph.repository, it, daysRange = settingsState.detailDays, networkAvailable = { graph.isNetworkAvailable() }) }
+        detailSpot?.let {
+            DetailViewModel(
+                graph.repository, it,
+                daysRange = settingsState.detailDays,
+                networkAvailable = { graph.isNetworkAvailable() },
+                focusWindow = focusWindowOnEnter,
+            )
+        }
     }
 
     // ── v1.1 UX 批次（18/20/21）：浮动按钮 + 返回手势 + 返回地图定位 ──
@@ -318,6 +331,19 @@ private fun AppRoot(
                             lastViewedSpot = spot
                             favoritesVm.markViewed(spot.id)
                             // 返回地图时相机回到点星标前的位置
+                            pendingMapTarget = lastMapTarget
+                            navState = AppNav.reduce(
+                                navState,
+                                AppNavEvent.OpenDetail(spot, source = AppPage.MAP),
+                            )
+                        }
+                    },
+                    // issue #3：从提示条进入 → 记下该窗口，详情页会自动定位到它
+                    onOpenNextWindowDetail = { data ->
+                        focusWindowOnEnter = data.window
+                        favoritesVm.state.value.spots.firstOrNull { it.id == data.spotId }?.let { spot ->
+                            lastViewedSpot = spot
+                            favoritesVm.markViewed(spot.id)
                             pendingMapTarget = lastMapTarget
                             navState = AppNav.reduce(
                                 navState,

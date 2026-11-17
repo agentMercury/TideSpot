@@ -6,6 +6,7 @@ import com.tidespot.core.data.repo.Ttl
 import com.tidespot.core.domain.algorithm.ScenePreset
 import com.tidespot.core.domain.model.FishScoreResult
 import com.tidespot.core.domain.window.BestWindowFinder
+import com.tidespot.core.domain.window.DetailFocus
 import com.tidespot.core.ui.breakdown.RawInputRow
 import com.tidespot.core.ui.format.Format
 import com.tidespot.core.ui.strings.TideSpotStrings
@@ -26,12 +27,23 @@ class DetailStateHolder(
     daysRange: Int,
     val lonDeg: Double,
     val preset: ScenePreset,
+    /** issue #3 体验跟进：首次数据到达时要定位到的窗口（null = 保持默认「今天」）。 */
+    private var focusWindow: com.tidespot.core.domain.model.BestWindow? = null,
 ) {
+
+    /** 时区偏移秒（用于 DetailFocus 的本地日判定）。 */
+    private val zoneOffsetSec: Int = zone.rules.getOffset(java.time.Instant.now()).totalSeconds
+
 
     private val _state = MutableStateFlow(
         DetailUiState(daysRange = DaySelectorLogic.coerceDaysRange(daysRange)),
     )
     val state: StateFlow<DetailUiState> = _state
+
+    /** issue #3：注入「进入详情时应定位到的窗口」（须在首次 onResult 前调用）。 */
+    fun setFocusWindow(window: com.tidespot.core.domain.model.BestWindow?) {
+        focusWindow = window
+    }
 
     /** OPT-V11-03（CHG-27）：最近一次 onResult 的「下一整点」（时段筛选重算的时间域下限）。 */
     private var lastNextHourEpochSec = 0L
@@ -105,9 +117,25 @@ class DetailStateHolder(
             preset.salinityPpt,
             waterTempObservations = waterTempObservations,
         )
-        _state.update {
-            it.copy(result = result, scores = scores, tideRates = rates, quality = quality, top10 = top10, loading = false, refreshing = false)
+        // issue #3 体验跟进：首次数据到达时，若调用方指定了「要定位到的窗口」，
+        // 自动切到该窗口峰值所在的日与小时（避免用户看到提示条 88 分、详情页 91 分而困惑）
+        val focus = focusWindow?.let { w ->
+            DetailFocus.locateWindow(w, nowSec, zoneOffsetSec, _state.value.daysRange)
         }
+        _state.update { st ->
+            val next = st.copy(
+                result = result, scores = scores, tideRates = rates, quality = quality,
+                top10 = top10, loading = false, refreshing = false,
+            )
+            if (focus != null && st.result == null) {
+                // 只在首次数据到达时定位一次，避免后续刷新把用户手动切走的 Tab/Day 拉回来
+                next.copy(selectedDay = focus.dayIndex, selectedHour = focus.hourIndex)
+            } else {
+                next
+            }
+        }
+        // 定位只生效一次
+        focusWindow = null
     }
 
     fun setLoading(loading: Boolean) = _state.update { it.copy(loading = loading) }
@@ -142,6 +170,7 @@ class DetailStateHolder(
             _state.update { it.copy(selectedDay = dayIndex, selectedHour = null) }
         }
     }
+
 
     fun selectHour(hourIndex: Int?) = _state.update { it.copy(selectedHour = hourIndex) }
 

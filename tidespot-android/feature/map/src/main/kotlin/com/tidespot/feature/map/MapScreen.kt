@@ -173,6 +173,8 @@ fun MapScreen(
      * 与 Top10 横幅并列：横幅回答「哪个最好」，提示条回答「现在该不该出门」。
      */
     nextWindowData: NextWindowStripData? = null,
+    /** issue #3：从提示条进入详情（携带窗口，供详情页自动定位；null = 不可点击）。 */
+    onOpenNextWindowDetail: ((NextWindowStripData) -> Unit)? = null,
 /** OPT-V115-02 / S01 C22：最近一次数据拉取时刻（:app 透传；null → 显示「—」，禁编造）。 */
     sourceFetchedAtMillis: Long? = null,
     /** OPT-V12-01（CHG-57）：收藏点星标（Room 读侧由 :app 注入；空 = 不显示星标图层）。 */
@@ -646,7 +648,9 @@ fun MapScreen(
             // 「下一个最佳窗口」提示条（时间紧迫性优先；与 Top10 横幅互补）
             NextWindowStrip(
                 data = nextWindowData,
-                onOpenDetail = onOpenFavorite,
+                onOpenDetail = onOpenNextWindowDetail ?: onOpenFavorite?.let { openById ->
+                    { d: NextWindowStripData -> d.spotId?.let(openById) }
+                },
             )
 
             // OPT-V115-02 / S01 C19：Top10 入口（信息条上方，设计 366×48）

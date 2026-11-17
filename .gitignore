@@ -75,3 +75,9 @@ design-handdrawn/A-vintage-outdoor/device-compare/r8/*.png
 
 # 临时构建目录
 .gradle-home/
+
+# Android 模拟器工作副本（本机沙箱用，非项目文件）
+.android/
+
+# 真机验收截图（本机留证，不入库）
+.shots/verify/

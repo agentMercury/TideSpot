@@ -69,5 +69,4 @@ data class DetailUiState(
     /** OPT-V12-03：最近一次手动刷新结果（null = 尚无手动刷新 → 不渲染提示）。 */
     val refreshFeedback: RefreshFeedback? = null,
     /** OPT-V12-03：最近一次手动刷新成功时刻（epoch 毫秒；null = 无，禁编造时间）。 */
-    val lastRefreshAtMillis: Long? = null,
-)
+    val lastRefreshAtMillis: Long? = null,)

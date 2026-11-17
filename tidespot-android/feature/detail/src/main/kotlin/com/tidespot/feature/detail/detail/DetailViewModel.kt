@@ -39,6 +39,14 @@ class DetailViewModel(
     private val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO,
     /** OPT-V12-03（CHG-57）：联网判定（:app 注入；默认 true = 既有行为零漂移）。 */
     private val networkAvailable: () -> Boolean = { true },
+    /**
+     * issue #3 体验跟进：进入详情时要定位到的窗口（:app 从首页提示条传入；null = 默认「今天」）。
+     *
+     * 动机：首页提示条按时间紧迫性指向「下一个窗口」（如 17:00–21:00 / 88 分），
+     * 而详情页默认显示「当日最高分」（如 06:00 / 91 分），两个数字对不上会让用户怀疑数据不一致。
+     * 传入该窗口后，详情页会定位到它的峰值小时，并在评分卡标注当日最高分。
+     */
+    focusWindow: com.tidespot.core.domain.model.BestWindow? = null,
 ) : ViewModel() {
 
     private val holder = DetailStateHolder(
@@ -47,6 +55,7 @@ class DetailViewModel(
         lonDeg = spot.lon,
         // CHG-13/D03：与 :core:data 落库共用唯一解析（id→中文标签→水体兜底），禁 UI 侧另行解析
         preset = preset ?: HourlyScoreStore.resolvePreset(spot),
+        focusWindow = focusWindow,
     )
 
     val state: kotlinx.coroutines.flow.StateFlow<DetailUiState> = holder.state

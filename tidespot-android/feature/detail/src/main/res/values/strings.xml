@@ -80,6 +80,8 @@
     <string name="ts_detail_weather_source">天气来源 · %1$s · 本机拉取 %2$s</string>
     <string name="ts_detail_stale_cache">当前显示为最近缓存（重试失败保留旧数据）</string>
     <string name="ts_detail_unit_score">分</string>
+    <!-- issue #3：当日最高分标注（与首页提示条的「下一个窗口」并存时解释差异） -->
+    <string name="ts_detail_day_best_hint">当日最高 %1$d 分，在 %2$s</string>
 
     <!-- 水质实测 Sheet -->
     <string name="ts_detail_wq_sheet_title">录入水质实测</string>

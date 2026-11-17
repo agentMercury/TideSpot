@@ -505,6 +505,11 @@ fun DetailScreen(
 
             // ③ 当日摘要（极值 + 时刻）
             DailySummaryLine(state.selectedTab, values, daySlices, zone, state)
+
+            // issue #3 体验跟进：当日最高分**已由上面的 DailySummaryLine 呈现**
+            // （「当日摘要：最高 91.0 分（06:00）/ 最低 …」）。
+            // 这里刻意**不再重复加一行**——早期实现加过「当日最高 91 分，在 06:00」，
+            // 真机验证发现与摘要行完全重复，徒增噪声，已移除。
             // D12（CHG-16⑭）：潮 Tab 高低潮标记 + dt（dh/dt）副轴 + 校正对照
             if (state.selectedTab == DetailTab.TIDE) {
                 // UX-23（OPT-V11-23）：海水点潮 Tab 顶部潮汛 chip（大潮/小潮 × 活汛/死汛；内陆不显示）

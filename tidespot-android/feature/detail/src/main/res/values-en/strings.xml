@@ -74,6 +74,7 @@
     <string name="ts_detail_weather_source">Weather source · %1$s · fetched %2$s</string>
     <string name="ts_detail_stale_cache">Showing the latest cache (old data kept after a failed retry)</string>
     <string name="ts_detail_unit_score">pts</string>
+    <string name="ts_detail_day_best_hint">Day high %1$d pts at %2$s</string>
 
     <string name="ts_detail_wq_sheet_title">Add water quality measurement</string>
     <string name="ts_detail_wq_save_desc">Save water quality measurement</string>
