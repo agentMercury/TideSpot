@@ -105,12 +105,12 @@
     <string name="ts_disclaimer_tide_correction">「现场校潮」为用户自记高潮观测对模型滞后的经验修正（lag 平移），仅用于相对时刻参考；校正不改变数据来源与精度，仍非官方潮汐表。</string>
 
     <!-- ── OPT-V11-13：置信徽标（§8.2-4；六档六色且带文字） ── -->
-    <string name="ts_badge_measured">实测</string>
-    <string name="ts_badge_satellite">卫星</string>
-    <string name="ts_badge_model">模型</string>
-    <string name="ts_badge_estimated">估算</string>
+    <string name="ts_badge_measured">实测数据</string>
+    <string name="ts_badge_satellite">卫星数据</string>
+    <string name="ts_badge_model">数据完整</string>
+    <string name="ts_badge_estimated">部分估算</string>
     <string name="ts_badge_uncalibrated">未校正</string>
-    <string name="ts_badge_low_confidence">低置信</string>
+    <string name="ts_badge_low_confidence">数据不足</string>
     <string name="ts_confidence_description">数据置信：%1$s</string>
 
     <!-- ── F-3.7 数据来源署名 ── -->

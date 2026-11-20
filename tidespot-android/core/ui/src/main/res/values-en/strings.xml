@@ -103,10 +103,10 @@
     <!-- OPT-V11-13: confidence badges (SRS §8.2-4) -->
     <string name="ts_badge_measured">Measured</string>
     <string name="ts_badge_satellite">Satellite</string>
-    <string name="ts_badge_model">Model</string>
-    <string name="ts_badge_estimated">Estimated</string>
+    <string name="ts_badge_model">Complete</string>
+    <string name="ts_badge_estimated">Partial est.</string>
     <string name="ts_badge_uncalibrated">Uncalibrated</string>
-    <string name="ts_badge_low_confidence">Low conf.</string>
+    <string name="ts_badge_low_confidence">Sparse data</string>
     <string name="ts_confidence_description">Data confidence: %1$s</string>
 
     <!-- F-3.7 data attribution -->

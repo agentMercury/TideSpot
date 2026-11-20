@@ -218,4 +218,40 @@ class NextWindowFinderTest {
         assertTrue(range.contains("–"), "应为 HH:00–HH:00 形式，实际 $range")
         assertEquals(11, range.length, "格式固定 11 字符（含 en dash）")
     }
+    // ---------- 日期感知格式化（bug：后天窗口显示成「今天还没到」） ----------
+
+    @Test
+    fun `今天窗口不显示日期`() {
+        val tz = 8 * 3600
+        // 本地今天 08:00 起、核心 4h → 08:00–12:00
+        val nowLocal8 = 1794844800L + 8 * 3600L   // 本地 11-17 08:00
+        val w = win(0, coreLenH = 4)               // t0 起，t0 = 1794560000（可能不是今天）
+        // 用相对 now 构造：让 startEpoch 落在「今天」
+        val todayStart = nowLocal8 - 8 * 3600L     // 本地今天 00:00
+        val wToday = w.copy(
+            startEpochSec = todayStart + 8 * 3600L,
+            peakEpochSec = todayStart + 8 * 3600L,
+            coreStartEpochSec = todayStart + 8 * 3600L,
+            coreEndEpochSec = todayStart + 11 * 3600L,
+        )
+        val s = NextWindowFinder.formatWindowRangeWithDate(wToday, nowLocal8, tz)
+        assertEquals("08:00–12:00", s, "今天的窗口不应带日期")
+    }
+
+    @Test
+    fun `后天窗口前缀日期`() {
+        val tz = 8 * 3600
+        val nowLocal8 = 1794844800L + 8 * 3600L   // 本地 11-17 08:00
+        val todayStart = nowLocal8 - 8 * 3600L
+        // 本地 11-19 08:00（后天）
+        val target = todayStart + 2 * 86400L + 8 * 3600L
+        val w = win(0, coreLenH = 4).copy(
+            startEpochSec = target,
+            peakEpochSec = target,
+            coreStartEpochSec = target,
+            coreEndEpochSec = target + 3 * 3600L,
+        )
+        val s = NextWindowFinder.formatWindowRangeWithDate(w, nowLocal8, tz)
+        assertEquals("11/19 08:00–12:00", s, "后天窗口应显示 MM/DD 前缀")
+    }
 }

@@ -85,8 +85,10 @@ fun NextWindowStrip(
     if (result.state == NextWindowFinder.State.NONE) return
 
     val zone = data.zone ?: ZoneId.systemDefault()
-    val range = localHour(window.startEpochSec, zone) + "–" +
-        localHour(NextWindowFinder.windowEndExclusive(window), zone)
+    // 日期感知：今天的窗口只显示时分；后天及以后前缀 MM/DD
+    // （不加日期会误读成「今天 08:00 还没到」，真机实测踩到）
+    val tzSec = zone.rules.getOffset(java.time.Instant.ofEpochSecond(nowSec)).totalSeconds
+    val range = NextWindowFinder.formatWindowRangeWithDate(window, nowSec, tzSec)
     val duration = NextWindowFinder.formatDuration(result.remainingSec)
 
     val isInWindow = result.state == NextWindowFinder.State.IN_WINDOW

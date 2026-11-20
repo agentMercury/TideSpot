@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -61,6 +62,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
@@ -414,6 +416,7 @@ fun DetailScreen(
                         scoresByEpoch = scoresByEpoch,
                         presetWeightSum = viewModel.holderInternal().preset.weightSum,
                         zone = zone,
+                        dayScore = state.dayScore,
                     )
                 }
             }
@@ -1251,10 +1254,21 @@ private fun ScoreMainCard(
     scoresByEpoch: Map<Long, com.tidespot.core.domain.model.FishScoreResult>,
     presetWeightSum: Double,
     zone: ZoneId,
+    /**
+     * 日综合分（替换原先的「当日峰值」）。
+     *
+     * 峰值只回答「今天最好能到多少」，但用户读作「现在怎么样」——
+     * 上午 10 点大卡显示 91（06:00 峰值），实际此刻可能只有 68 分。
+     * 日综合分回答「今天整体值不值得去」，口径见 [DayScoreCalculator]。
+     */
+    dayScore: Double? = null,
 ) {
     val validIdx = values.indices.filter { values[it] != null }
+    // 峰值索引仍需要：置信徽标取峰值小时的（主要数据依据在那里）
     val peakIdx = validIdx.maxByOrNull { values[it]!! }
-    val score = peakIdx?.let { values[it] }?.toInt()?.coerceIn(0, 100)
+    // 大卡主数字：优先用日综合分；无则回退峰值（兼容无数据场景）
+    val score = (dayScore?.let { Math.round(it).toInt() } ?: peakIdx?.let { values[it] }?.toInt())
+        ?.coerceIn(0, 100)
     val band = score?.let { ScoreBand.of(it) }
     val bandLabel = score?.let { BandTitles.fromDomainTier(it, localTideSpotStrings()) }
     val kind = peakIdx
@@ -1285,14 +1299,25 @@ private fun ScoreMainCard(
                     ),
                 )
             }
-            // 版画鱼角标：纯装饰、不参与测量、不消费触摸。
+            // 版画鱼角标：**颜色 = 档位**（issue #3 体验跟进）。
+            //
+            // 原本这里是纯装饰（固定 tertiary 色），档位信息由左侧的 bandLabel 承担；
+            // 但下方五档色带已经高亮了同一档位，bandLabel 冗余。删除后把档位语义
+            // 交给这条鱼的颜色承载——既保留信息，又不增加文字噪声。
+            //
+            // 无分数时回退原来的装饰色（不编造档位）。
             // E 只留水彩鱼、不画虚线框；F 的干净白卡完全不要角标。
             if (!isBlueTide) {
                 val fishFrameColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.42f)
+                val fishTint = if (band != null) {
+                    Color(band.argb).copy(alpha = if (isJournal) 0.94f else 0.96f)
+                } else {
+                    MaterialTheme.colorScheme.tertiary.copy(alpha = if (isJournal) 0.62f else 0.86f)
+                }
                 Icon(
                     painter = painterResource(UiR.drawable.ic_fish_vintage),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary.copy(alpha = if (isJournal) 0.62f else 0.86f),
+                    contentDescription = if (band != null) bandLabel else null,
+                    tint = fishTint,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 10.dp, end = 10.dp)
@@ -1314,10 +1339,14 @@ private fun ScoreMainCard(
             }
             Column(Modifier.fillMaxSize().padding(16.dp)) {
                 Row(
-                    Modifier.padding(end = if (isBlueTide) 0.dp else 64.dp),
+                    // 对齐小鱼右缘：小鱼在 Box 层 padding(end=10dp)，本 Row 在 Column(16dp) 内。
+                    // 不用负 padding（Compose 直接抛 IllegalArgumentException: Padding must be non-negative，
+                    // v1.22.0 曾因此进详情页必崩），改用给徽标加 offset 的正向方案。
+                    Modifier.fillMaxWidth(),
                     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                 ) {
-                    Column {
+                    // 左侧文字列缩进（给右上角小鱼让位；蓝潮无鱼不缩进）
+                    Column(Modifier.padding(end = if (isBlueTide) 0.dp else 64.dp)) {
                         Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
                             if (isJournal) {
                                 JournalScoreText(
@@ -1352,6 +1381,15 @@ private fun ScoreMainCard(
                                 )
                             }
                         }
+                        // 说明这个数字是「今日综合」而非峰值（避免用户误读为当前时刻）
+                        if (score != null && dayScore != null) {
+                            Text(
+                                "今日综合",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isBlueTide) Color.White.copy(alpha = 0.7f)
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         if (bandLabel == null) {
                             Text(
                                 stringResource(R.string.ts_detail_summary_empty),
@@ -1362,34 +1400,24 @@ private fun ScoreMainCard(
                         }
                     }
                     androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
-                    if (band != null && bandLabel != null) {
-                        val sticker = when {
-                            isJournal -> Modifier
-                                .border(
-                                    1.4.dp,
-                                    MaterialTheme.colorScheme.onSurface,
-                                    RoundedCornerShape(2.dp),
-                                )
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                            isBlueTide -> Modifier
-                                .background(Color.White.copy(alpha = 0.16f), RoundedCornerShape(4.dp))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                            else -> Modifier
-                        }
-                        Text(
-                            bandLabel,
-                            modifier = sticker,
-                            style = MaterialTheme.typography.titleSmall,
-                            color = when {
-                                isJournal -> MaterialTheme.colorScheme.onSurface
-                                isBlueTide -> Color(0xFFB2DFDB)
-                                else -> MaterialTheme.colorScheme.onSurface
-                            },
-                        )
-                    }
+                    // issue #3 体验跟进：**档位文字已移除**。
+                    // 理由：下方五档色带已经高亮当前档位，再显示一次「爆护窗口 / 很适合」是同义重复。
+                    // 档位信息改由右上角小鱼的颜色承载（见上方的 fishTint）。
                     if (kind != null) {
                         androidx.compose.foundation.layout.Spacer(Modifier.width(8.dp))
-                        ConfidenceBadge(kind)
+                        // 对齐小鱼右缘（10dp）。offset 在 Row 内被约束裁剪而无效（实测差 21px 不变），
+                        // 改用「往外撑 6dp」的合法手段：layout 修饰符不改变 padding 非负约束，
+                        // 直接把徽标绘制位置右移 6dp 且不参与父级约束。
+                        ConfidenceBadge(
+                            kind,
+                            modifier = if (isBlueTide) Modifier
+                            else Modifier.layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(x = (6.dp.toPx()).toInt(), y = 0)
+                                }
+                            },
+                        )
                     }
                 }
                 androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))

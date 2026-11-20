@@ -122,10 +122,13 @@ class DetailStateHolder(
         val focus = focusWindow?.let { w ->
             DetailFocus.locateWindow(w, nowSec, zoneOffsetSec, _state.value.daysRange)
         }
+        // 日综合分（替换大卡的当日峰值，见 DayScoreCalculator）
+        val initialDayScore = dayScoreOf(scores, 0)
         _state.update { st ->
             val next = st.copy(
                 result = result, scores = scores, tideRates = rates, quality = quality,
                 top10 = top10, loading = false, refreshing = false,
+                dayScore = initialDayScore,
             )
             if (focus != null && st.result == null) {
                 // 只在首次数据到达时定位一次，避免后续刷新把用户手动切走的 Tab/Day 拉回来
@@ -164,11 +167,44 @@ class DetailStateHolder(
     /** Tab 切换：仅改选中位（N-2 不重算）。 */
     fun selectTab(tab: DetailTab) = _state.update { it.copy(selectedTab = tab, selectedHour = null) }
 
-    /** 日切换：仅改选中位并清空小时选中。 */
+    /** 日切换：改选中位、清空小时选中，并重算日综合分。 */
     fun selectDay(dayIndex: Int) {
         if (dayIndex in 0 until _state.value.daysRange) {
-            _state.update { it.copy(selectedDay = dayIndex, selectedHour = null) }
+            val scores = _state.value.scores
+            _state.update {
+                it.copy(
+                    selectedDay = dayIndex,
+                    selectedHour = null,
+                    dayScore = dayScoreOf(scores, dayIndex),
+                )
+            }
         }
+    }
+
+    /**
+     * 计算指定日的日综合分。
+     *
+     * 先按「本地日」筛出该日的逐小时评分，再交给 [com.tidespot.core.domain.window.DayScoreCalculator]。
+     * 时区偏移与详情页图表同源（[zone]），保证大卡与柱状图口径一致。
+     */
+    private fun dayScoreOf(
+        scores: List<com.tidespot.core.domain.model.FishScoreResult>,
+        dayIndex: Int,
+    ): Double? {
+        if (scores.isEmpty()) return null
+        val nowSec = System.currentTimeMillis() / 1000
+        val todayLocalDay = floorDiv(nowSec + zoneOffsetSec, 86400L)
+        val targetLocalDay = todayLocalDay + dayIndex
+        val dayScores = scores.filter {
+            floorDiv(it.timeEpochSec + zoneOffsetSec, 86400L) == targetLocalDay
+        }
+        return com.tidespot.core.domain.window.DayScoreCalculator.compute(dayScores, zoneOffsetSec)
+    }
+
+    /** 向下取整除法（Kotlin `/` 对负数向零取整）。 */
+    private fun floorDiv(a: Long, b: Long): Long {
+        val q = a / b
+        return if (a % b != 0L && (a xor b) < 0) q - 1 else q
     }
 
 

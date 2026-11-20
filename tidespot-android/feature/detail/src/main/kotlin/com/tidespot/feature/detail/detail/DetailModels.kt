@@ -69,4 +69,14 @@ data class DetailUiState(
     /** OPT-V12-03：最近一次手动刷新结果（null = 尚无手动刷新 → 不渲染提示）。 */
     val refreshFeedback: RefreshFeedback? = null,
     /** OPT-V12-03：最近一次手动刷新成功时刻（epoch 毫秒；null = 无，禁编造时间）。 */
-    val lastRefreshAtMillis: Long? = null,)
+    val lastRefreshAtMillis: Long? = null,
+    /**
+     * issue #3 体验跟进：**日综合分**（替换大卡原先的「当日峰值」）。
+     *
+     * 峰值只回答「今天最好能到多少」，但用户读作「现在怎么样」——上午 10 点显示 91（06:00 峰值），
+     * 实际此刻可能只有 68 分。日综合分回答「今天整体值不值得去」，口径见 DayScoreCalculator。
+     *
+     * null = 无评分数据（渲染「—」，禁编造 0）。按 selectedDay 变化重算。
+     */
+    val dayScore: Double? = null,
+)

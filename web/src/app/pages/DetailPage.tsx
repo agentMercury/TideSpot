@@ -18,6 +18,7 @@ import {
 } from '../../ui/primitives/primitives';
 import { HourChart, type HourPoint } from '../../ui/charts/HourChart';
 import { hourTableRows } from '../../ui/charts/hourRows';
+import { computeDayScore } from '../../domain/dayScore';
 import { resolveScoreBand } from '../../ui/tokens/bands';
 import { t, useLang } from '../../ui/i18n';
 import type { SpotRow } from '../../data/db';
@@ -87,6 +88,8 @@ interface DayGroup {
   points: HourPoint[];
   peakEpoch: number;
   peakIndex: number;
+  /** 该日的原始逐时分数（含 epoch，供日综合分计算用；points 只保留 hour+total）。 */
+  scores: Array<{ timeEpochSec: number; total: number }>;
 }
 
 export function DetailPage({ spotId, embedded = false }: { spotId: number; embedded?: boolean }) {
@@ -195,11 +198,13 @@ export function DetailPage({ spotId, embedded = false }: { spotId: number; embed
           points: [],
           peakEpoch: s.timeEpochSec,
           peakIndex: 0,
+          scores: [],
         };
         map.set(key, group);
       }
       const hour = d.getUTCHours();
       group.points.push({ hour, total: s.total });
+      group.scores.push({ timeEpochSec: s.timeEpochSec, total: s.total });
       if (s.total > group.peak) {
         group.peak = s.total;
         group.peakEpoch = s.timeEpochSec;
@@ -255,6 +260,18 @@ export function DetailPage({ spotId, embedded = false }: { spotId: number; embed
     if (!detail || !activeDay || activeDay.points.length === 0) return null;
     return activeDay.points[activeDay.peakIndex];
   }, [detail, activeDay]);
+
+  /**
+   * 日综合分（对齐 Android DayScoreCalculator，v7 口径）。
+   *
+   * 大卡原先显示 activeDay.points[peakIndex].total（当日峰值）——问题：
+   * 峰值只回答「今天最好能到多少」，用户读作「现在怎么样」。
+   * 日综合分回答「今天整体值不值得去」。
+   */
+  const dayScore = useMemo(() => {
+    if (!activeDay || activeDay.scores.length === 0) return null;
+    return computeDayScore(activeDay.scores, tzSec);
+  }, [activeDay, tzSec]);
 
   const peakResult = useMemo(() => {
     if (!detail || !activeDay) return null;
@@ -423,13 +440,13 @@ export function DetailPage({ spotId, embedded = false }: { spotId: number; embed
         )}
         {tab === 'score' && (
           <>
-            {peakScore && (
+            {dayScore != null && (
               <ScoreCard
-                total={peakScore.total}
-                band={band}
+                total={Math.round(dayScore)}
+                band={resolveScoreBand(Math.round(dayScore))}
                 confidence={peakResult?.confidence ?? 'MODEL'}
                 windowLabel={bestWindow ? `最佳窗 ${bestWindow}` : undefined}
-                activeSegment={Math.min(4, Math.floor((peakScore.total / 100) * 5))}
+                activeSegment={Math.min(4, Math.floor((dayScore / 100) * 5))}
               />
             )}
 

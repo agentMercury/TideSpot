@@ -147,4 +147,58 @@ object NextWindowFinder {
      */
     fun formatWindowRange(window: BestWindow, tzSec: Int): String =
         formatLocalHour(window.startEpochSec, tzSec) + "–" + formatLocalHour(windowEndExclusive(window), tzSec)
+
+    /**
+     * 带**日期感知**的窗口区间文案（issue #3 体验跟进）。
+     *
+     * ## 为什么需要
+     * 提示条原本只显示 `08:00–12:00`。当窗口在后天时，文案变成
+     * 「08:00–12:00 · 还有 40 小时 54 分」——用户会误读成「今天 08:00，还没到」
+     * （真机实测踩到）。
+     *
+     * ## 规则
+     * - 窗口在**今天** → 不显示日期（`08:00–12:00`，保持简洁）
+     * - 窗口在**明天及以后** → 前缀日期（`11/22 08:00–12:00`）
+     *
+     * @param nowEpochSec 当前时刻（用于算「今天」）
+     * @param tzSec 时区偏移秒
+     */
+    fun formatWindowRangeWithDate(window: BestWindow, nowEpochSec: Long, tzSec: Int): String {
+        val range = formatWindowRange(window, tzSec)
+        val todayLocalDay = floorDiv(nowEpochSec + tzSec, 86400L)
+        val startLocalDay = floorDiv(window.startEpochSec + tzSec, 86400L)
+        if (startLocalDay == todayLocalDay) return range
+        // 明天及以后：前缀 MM/DD
+        // 反算月/日（避免引入 java.time，保持 :core:domain 纯 Kotlin）
+        val days = floorDiv(window.startEpochSec + tzSec, 86400L).toInt()
+        val localDate = civilFromDays(days)
+        val mm = localDate.first
+        val dd = localDate.second
+        return (if (mm < 10) "0$mm" else "$mm") + "/" + (if (dd < 10) "0$dd" else "$dd") + " " + range
+    }
+
+    /** 向下取整除法（Kotlin `/` 对负数向零取整）。 */
+    private fun floorDiv(a: Long, b: Long): Long {
+        val q = a / b
+        return if (a % b != 0L && (a xor b) < 0) q - 1 else q
+    }
+
+    /**
+     * 从「unix 天数」反算 (月, 日)。
+     *
+     * 标准 civil_from_days 算法（Howard Hinnant），只用整数运算，避免在 `:core:domain`
+     * 引入 `java.time`（该模块保持纯 Kotlin，见 CONTRACT 冻结点）。
+     */
+    private fun civilFromDays(days: Int): Pair<Int, Int> {
+        val z = days + 719468L
+        val era = (if (z >= 0) z else z - 146096) / 146097
+        val doe = (z - era * 146097).toInt()                       // [0, 146096]
+        val yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365  // [0, 399]
+        val y = yoe + era * 400
+        val doy = doe - (365 * yoe + yoe / 4 - yoe / 100)          // [0, 365]
+        val mp = (5 * doy + 2) / 153                               // [0, 11]
+        val d = doy - (153 * mp + 2) / 5 + 1                       // [1, 31]
+        val m = if (mp < 10) mp + 3 else mp - 9                    // [1, 12]
+        return m to d
+    }
 }
