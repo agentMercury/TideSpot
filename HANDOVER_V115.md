@@ -123,7 +123,7 @@ cd ../wf-skin && jj status                # 只看得到本副本的改动
 | 项 | 值 |
 |---|---|
 | 代码 | `D:\workspace\weatherfishcheck`，jj/git colocated；**已接入远端** `github.com/agentMercury/TideSpot`（main 为发布线；jj 提交后仍需 `git update-ref refs/heads/main <commit>` 同步本地指针，再 `git push`） |
-| 版本 | **`versionCode=30` / `versionName=1.22.0`**（发版规则见 §0.6；Web 侧独立版本 `1.18.3`） |
+| 版本 | **`versionCode=31` / `versionName=1.23.0`**（发版规则见 §0.6；Web 侧独立版本 `1.18.3`） |
 | APK | 最新产物见 `E:\Trans\潮点TideSpot-v1.21.1.apk`（自签名；`adb install -r` 安装，release 与 debug 签名不兼容） |
 | 测试 | 八模块 `gradlew test` **EXIT=0**（每次批次均跑） |
 | i18n | `.tools/i18n_scan.mjs` **FAIL=0**（豁免 12）；`values` / `values-en` 241/241 |
